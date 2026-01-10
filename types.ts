@@ -56,7 +56,7 @@ export interface Post {
   commentsCount: number;
   comments: Comment[];
   views: number;
-  flags: string[]; // User IDs who flagged this
+  flags: string[]; 
   isOpportunity: boolean;
   applicants?: string[]; 
   college: College;

@@ -3,11 +3,11 @@ import { Post, User, College, UserStatus, LiveEvent, Notification, Violation, Co
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v7',
-  USERS: 'maksocial_users_v7',
+  POSTS: 'maksocial_posts_v8',
+  USERS: 'maksocial_users_v8',
   LOGGED_IN_ID: 'maksocial_current_user_id',
   EVENTS: 'maksocial_events_v3',
-  VIOLATIONS: 'maksocial_violations_v1'
+  VIOLATIONS: 'maksocial_violations_v2'
 };
 
 const INITIAL_USERS: User[] = [
@@ -44,14 +44,13 @@ const INITIAL_USERS: User[] = [
 export const db = {
   getPosts: (): Post[] => {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
-    const posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS.map(p => ({ 
+    return saved ? JSON.parse(saved) : MOCK_POSTS.map(p => ({ 
       ...p, 
       views: p.views || 0, 
       flags: p.flags || [],
       comments: p.comments || [],
-      commentsCount: p.commentsCount || p.comments?.length || 0
+      commentsCount: p.commentsCount || 0
     }));
-    return posts;
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   
@@ -97,7 +96,7 @@ export const db = {
         db.sendNotification(userId, {
           id: Date.now().toString(),
           userId,
-          message: `⚠️ Official Warning: ${reason}. You now have ${warnings} warnings. Repeated violations will lead to permanent suspension.`,
+          message: `⚠️ System Warning (${warnings}/3): ${reason}. Continued violations will result in account termination.`,
           timestamp: 'Just now',
           isRead: false,
           type: 'moderation'
@@ -113,14 +112,6 @@ export const db = {
     const users = db.getUsers();
     const updated = users.map(u => u.id === userId ? { ...u, isSuspended: true } : u);
     db.saveUsers(updated);
-    db.sendNotification(userId, {
-      id: Date.now().toString(),
-      userId,
-      message: `🚫 Your account has been suspended indefinitely for severe policy violations.`,
-      timestamp: 'Just now',
-      isRead: false,
-      type: 'moderation'
-    });
   },
 
   addComment: (postId: string, comment: Comment) => {
@@ -136,30 +127,8 @@ export const db = {
     return updated;
   },
 
-  analyzeContent: (content: string) => {
-    const lower = content.toLowerCase();
-    let category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent' = 'Social';
-    if (lower.includes('deadline') || lower.includes('urgent')) category = 'Urgent';
-    else if (lower.includes('job') || lower.includes('career')) category = 'Career';
-    else if (lower.includes('course') || lower.includes('exam')) category = 'Academic';
-    else if (lower.includes('fee') || lower.includes('money')) category = 'Finance';
-    return { sentiment: 'Neutral' as const, category };
-  },
-
   deletePost: (postId: string, deletedByUserId: string) => {
     const posts = db.getPosts();
-    const postToDelete = posts.find(p => p.id === postId);
-    if (!postToDelete) return;
-    if (deletedByUserId !== postToDelete.authorId) {
-      db.sendNotification(postToDelete.authorId, {
-        id: Date.now().toString(),
-        userId: postToDelete.authorId,
-        message: `Your post was removed by an administrator for policy violations.`,
-        timestamp: 'Just now',
-        isRead: false,
-        type: 'moderation'
-      });
-    }
     const updated = posts.filter(p => p.id !== postId);
     db.savePosts(updated);
     return updated;
@@ -188,19 +157,6 @@ export const db = {
     db.saveUsers(updated);
   },
 
-  applyForOpportunity: (postId: string, userId: string) => {
-    const posts = db.getPosts();
-    const users = db.getUsers();
-    const post = posts.find(p => p.id === postId);
-    const user = users.find(u => u.id === userId);
-    if (post && user) {
-      if (!post.applicants?.includes(userId)) post.applicants = [...(post.applicants || []), userId];
-      if (!user.appliedTo?.includes(postId)) user.appliedTo = [...(user.appliedTo || []), postId];
-      db.savePosts(posts);
-      db.saveUsers(users);
-    }
-  },
-
   likePost: (postId: string) => {
     const posts = db.getPosts();
     const updated = posts.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p);
@@ -211,6 +167,5 @@ export const db = {
   getEvents: (): LiveEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.EVENTS);
     return saved ? JSON.parse(saved) : [{ id: 'e1', title: 'Makerere 100 Years Celebration', youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', isLive: true, organizer: 'Admin' }];
-  },
-  saveEvents: (events: LiveEvent[]) => localStorage.setItem(DB_KEYS.EVENTS, JSON.stringify(events)),
+  }
 };

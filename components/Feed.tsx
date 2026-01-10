@@ -4,11 +4,41 @@ import { Post, User, Comment } from '../types';
 import { db } from '../db';
 import { GoogleGenAI, Type } from "@google/genai";
 import { 
-  Image as ImageIcon, Video, Heart, MessageCircle, Share2, 
-  Sparkles, TrendingUp, AlertCircle, Briefcase, GraduationCap, X, 
-  Link as LinkIcon, CheckCircle, ExternalLink, Banknote, Users, Loader2, 
-  Eye, Trash2, Flag, MoreHorizontal, ShieldAlert, Send 
+  Image as ImageIcon, Heart, MessageCircle, Share2, 
+  Sparkles, TrendingUp, AlertCircle, X, 
+  Link as LinkIcon, Users, Loader2, 
+  Eye, Trash2, Flag, MoreHorizontal, ShieldAlert, Send,
+  GraduationCap, Briefcase, Zap
 } from 'lucide-react';
+
+const CategoryBadge: React.FC<{ category?: string }> = ({ category }) => {
+  switch (category) {
+    case 'Urgent':
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-red-500/20 animate-pulse">
+          <AlertCircle size={12} /> Urgent
+        </span>
+      );
+    case 'Academic':
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-500/20">
+          <GraduationCap size={12} /> Academic
+        </span>
+      );
+    case 'Career':
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20">
+          <Briefcase size={12} /> Career
+        </span>
+      );
+    default:
+      return (
+        <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-500/10 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-500/10">
+          <Users size={12} /> Social
+        </span>
+      );
+  }
+};
 
 const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -29,13 +59,11 @@ const Feed: React.FC = () => {
     setPosts(db.getPosts());
     setUser(db.getUser());
     
-    const timer = setTimeout(() => {
-      const currentPosts = db.getPosts();
-      currentPosts.forEach(p => db.incrementView(p.id));
+    const timer = setInterval(() => {
       setPosts(db.getPosts());
-    }, 2000);
+    }, 3000);
     
-    return () => clearTimeout(timer);
+    return () => clearInterval(timer);
   }, []);
 
   const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +98,7 @@ const Feed: React.FC = () => {
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const parts: any[] = [{ text: `Post content: "${newPostContent}". Review for Academic/Social/Finance/Career/Urgent categories and check SAFETY for pornographic or highly suggestive material. Return JSON only {category, sentiment, isSafe, safetyReason}.` }];
+      const parts: any[] = [{ text: `Post analysis: "${newPostContent}". Categories: Academic/Social/Finance/Career/Urgent. Check SAFETY (pornography/suggestive). Return JSON {category, isSafe, safetyReason}.` }];
       
       if (imageBase64) parts.push({ inlineData: { data: imageBase64, mimeType } });
 
@@ -83,11 +111,10 @@ const Feed: React.FC = () => {
             type: Type.OBJECT,
             properties: {
               category: { type: Type.STRING },
-              sentiment: { type: Type.STRING },
               isSafe: { type: Type.BOOLEAN },
               safetyReason: { type: Type.STRING }
             },
-            required: ["category", "sentiment", "isSafe"]
+            required: ["category", "isSafe"]
           }
         }
       });
@@ -96,8 +123,7 @@ const Feed: React.FC = () => {
       setIsAnalyzing(false);
 
       if (!aiResult.isSafe) {
-        const reason = aiResult.safetyReason || 'Content violates safety guidelines regarding indecent imagery or text.';
-        setRejectionMessage(reason);
+        setRejectionMessage(aiResult.safetyReason || 'Content violates university decency guidelines.');
         db.saveViolation({
           id: Date.now().toString(),
           userId: user.id,
@@ -105,7 +131,7 @@ const Feed: React.FC = () => {
           content: newPostContent,
           media: imageBase64,
           mimeType: mimeType,
-          reason: reason,
+          reason: aiResult.safetyReason || 'AI Rejection',
           timestamp: new Date().toLocaleString(),
           status: 'blocked'
         });
@@ -121,8 +147,6 @@ const Feed: React.FC = () => {
         timestamp: 'Just now',
         content: newPostContent,
         images: selectedMedia?.type === 'image' ? [selectedMedia.url] : undefined,
-        video: selectedMedia?.type === 'video' ? selectedMedia.url : undefined,
-        externalLink: externalUrl || undefined,
         hashtags: [`#${user.college}`, '#MAK'],
         likes: 0,
         commentsCount: 0,
@@ -131,7 +155,7 @@ const Feed: React.FC = () => {
         flags: [],
         isOpportunity: aiResult.category === 'Career',
         college: user.college,
-        aiMetadata: { category: aiResult.category as any, sentiment: aiResult.sentiment as any, isSafe: true }
+        aiMetadata: { category: aiResult.category as any, sentiment: 'Neutral', isSafe: true }
       };
 
       const updated = [newPost, ...posts];
@@ -139,12 +163,9 @@ const Feed: React.FC = () => {
       db.savePosts(updated);
       setNewPostContent('');
       setSelectedMedia(null);
-      setExternalUrl('');
-      setShowUrlInput(false);
     } catch (e) {
-      console.error(e);
       setIsAnalyzing(false);
-      setRejectionMessage("A system error occurred during safety review. Please try again.");
+      setRejectionMessage("Security analysis failure. Retry later.");
     }
   };
 
@@ -163,134 +184,118 @@ const Feed: React.FC = () => {
     setNewCommentText('');
   };
 
-  const isAdmin = user.email?.endsWith('@admin.mak.ac.ug');
-
   return (
     <div className="max-w-6xl mx-auto px-6 py-6 flex gap-8">
       <div className="flex-1 space-y-6 max-w-2xl">
         <div className="glass-card p-6 rounded-[2rem] border-blue-500/20 shadow-lg relative overflow-hidden">
           {rejectionMessage && (
-            <div className="absolute inset-0 bg-red-900/95 z-50 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
-              <ShieldAlert size={48} className="text-white mb-4" />
-              <h3 className="text-xl font-black text-white italic uppercase tracking-widest">Post Blocked</h3>
-              <p className="text-red-200 mt-2 font-medium">{rejectionMessage}</p>
-              <button onClick={() => setRejectionMessage(null)} className="mt-6 px-8 py-3 bg-white text-red-900 font-black rounded-full text-sm uppercase">Got it</button>
+            <div className="absolute inset-0 bg-red-950/95 z-50 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
+              <ShieldAlert size={40} className="text-red-500 mb-6" />
+              <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase">Blocked</h3>
+              <p className="text-red-200 mt-2 font-medium max-w-md">{rejectionMessage}</p>
+              <button onClick={() => setRejectionMessage(null)} className="mt-8 px-10 py-4 bg-white text-red-900 font-black rounded-full text-sm uppercase tracking-widest shadow-xl">Close</button>
             </div>
           )}
 
           <div className="flex items-center space-x-3 mb-4">
              <div className="p-2 bg-blue-500/10 rounded-xl"><Sparkles className="text-blue-600" size={18} /></div>
-             <h3 className="text-sm font-bold text-blue-600 uppercase tracking-widest">Connect with Makerere</h3>
+             <h3 className="text-sm font-bold text-blue-600 uppercase tracking-widest">Share with {user.college}</h3>
           </div>
           <textarea 
-            className="w-full bg-transparent border-none focus:outline-none text-[var(--text-primary)] resize-none min-h-[80px] text-lg placeholder:text-slate-400" 
-            placeholder={`What's happening, ${user.name.split(' ')[0]}?`}
+            className="w-full bg-transparent border-none focus:outline-none text-[var(--text-primary)] resize-none min-h-[80px] text-lg placeholder:text-slate-500" 
+            placeholder={`Say something, ${user.name.split(' ')[0]}...`}
             value={newPostContent}
             onChange={e => setNewPostContent(e.target.value)}
           />
 
-          {showUrlInput && (
-            <div className="mb-4 flex gap-2">
-              <input className="flex-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-2 text-sm outline-none" placeholder="YouTube or X link..." value={externalUrl} onChange={e => setExternalUrl(e.target.value)} />
-              <button onClick={() => { setExternalUrl(''); setShowUrlInput(false); }} className="text-slate-500"><X size={18}/></button>
-            </div>
-          )}
-
           {selectedMedia && (
-            <div className="relative mb-4">
-               <img src={selectedMedia.url} className="h-40 w-auto rounded-2xl object-cover shadow-lg" />
-               <button onClick={() => setSelectedMedia(null)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5"><X size={14}/></button>
+            <div className="relative mb-4 inline-block">
+               <img src={selectedMedia.url} className="h-40 rounded-2xl object-cover border border-white/5 shadow-2xl" />
+               <button onClick={() => setSelectedMedia(null)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2"><X size={14}/></button>
             </div>
           )}
 
           <div className="flex justify-between items-center mt-4 border-t border-black/5 dark:border-white/5 pt-4">
-             <div className="flex gap-2">
-               <button onClick={() => mediaInputRef.current?.click()} className="text-slate-500 hover:text-blue-600 bg-black/5 dark:bg-white/5 p-3 rounded-xl"><ImageIcon size={20}/></button>
-               <button onClick={() => setShowUrlInput(!showUrlInput)} className="text-slate-500 hover:text-blue-600 bg-black/5 dark:bg-white/5 p-3 rounded-xl"><LinkIcon size={20}/></button>
-               <input type="file" ref={mediaInputRef} className="hidden" accept="image/*" onChange={handleMediaUpload} />
-             </div>
+             <button onClick={() => mediaInputRef.current?.click()} className="text-slate-400 hover:text-blue-500 p-3 rounded-xl hover:bg-white/5 transition-colors"><ImageIcon size={22}/></button>
+             <input type="file" ref={mediaInputRef} className="hidden" accept="image/*" onChange={handleMediaUpload} />
              <button 
                 onClick={handleCreatePost} 
                 disabled={isAnalyzing || (!newPostContent.trim() && !selectedMedia)}
-                className="bg-blue-600 px-8 py-3 rounded-full font-black text-sm text-white shadow-lg flex items-center gap-2"
+                className="bg-blue-600 px-10 py-3 rounded-full font-black text-sm text-white shadow-xl shadow-blue-600/20 flex items-center gap-2 transition-all hover:bg-blue-700 disabled:opacity-50"
              >
-                {isAnalyzing ? <><Loader2 className="animate-spin" size={16}/> Safety Reviewing...</> : 'Publish'}
+                {isAnalyzing ? <Loader2 className="animate-spin" size={18}/> : 'Publish'}
              </button>
           </div>
         </div>
 
         {posts.map(post => (
-          <div key={post.id} className="glass-card p-6 rounded-[2rem] space-y-4 border shadow-md">
+          <div key={post.id} className="glass-card p-6 rounded-[2.5rem] space-y-4 border shadow-sm group">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <img src={post.authorAvatar} className="w-11 h-11 rounded-full object-cover" />
+                <img src={post.authorAvatar} className="w-12 h-12 rounded-full object-cover border border-white/5" />
                 <div>
                   <h4 className="font-bold text-sm text-[var(--text-primary)]">{post.author}</h4>
                   <p className="text-[10px] text-slate-500 font-bold uppercase">{post.timestamp} • {post.college}</p>
                 </div>
               </div>
-              <div className="relative">
-                <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-2 text-slate-400"><MoreHorizontal size={20} /></button>
-                {activeMenuId === post.id && (
-                  <div className="absolute right-0 top-10 w-48 glass-card border rounded-2xl p-2 z-30 shadow-2xl">
-                    {(post.authorId === user.id || isAdmin) && <button onClick={() => { if(window.confirm("Delete?")) setPosts(db.deletePost(post.id, user.id)!); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 font-bold hover:bg-red-500/10 rounded-xl"><Trash2 size={16} /> Delete Post</button>}
-                    {post.authorId !== user.id && <button onClick={() => { db.flagPost(post.id, user.id); setPosts(db.getPosts()); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm font-bold"><Flag size={16} /> Report</button>}
-                  </div>
-                )}
+              <div className="flex items-center gap-4">
+                 <CategoryBadge category={post.aiMetadata?.category} />
+                 <button onClick={() => setActiveMenuId(activeMenuId === post.id ? null : post.id)} className="p-2 text-slate-500"><MoreHorizontal size={20}/></button>
               </div>
             </div>
-            
-            <p className="text-[var(--text-primary)] leading-relaxed">{post.content}</p>
-            {post.images && post.images.map((img, i) => <img key={i} src={img} className="rounded-2xl w-full h-auto shadow-xl" />)}
-            
-            <div className="flex items-center space-x-6 pt-4 border-t border-black/5 dark:border-white/5">
-              <button onClick={() => setPosts(db.likePost(post.id))} className="flex items-center space-x-2 text-slate-500 hover:text-red-500"><Heart size={18} /><span className="text-xs font-bold">{post.likes}</span></button>
-              <button onClick={() => setSelectedPostForComments(post)} className="flex items-center space-x-2 text-slate-500 hover:text-blue-500"><MessageCircle size={18} /><span className="text-xs font-bold">{post.commentsCount || 0}</span></button>
-              <div className="flex items-center space-x-2 text-slate-400"><Eye size={18} /><span className="text-xs font-bold">{post.views || 0}</span></div>
+            <p className="text-base leading-relaxed text-[var(--text-primary)]">{post.content}</p>
+            {post.images?.map((img, i) => <img key={i} src={img} className="rounded-3xl w-full h-auto shadow-2xl border border-white/5" />)}
+            <div className="flex items-center space-x-6 pt-4 border-t border-black/5 dark:border-white/10">
+              <button onClick={() => db.likePost(post.id)} className="flex items-center space-x-2 text-slate-400 hover:text-red-500 transition-colors"><Heart size={18}/><span className="text-xs font-bold">{post.likes}</span></button>
+              <button onClick={() => setSelectedPostForComments(post)} className="flex items-center space-x-2 text-slate-400 hover:text-blue-500 transition-colors"><MessageCircle size={18}/><span className="text-xs font-bold">{post.commentsCount || 0}</span></button>
+              <div className="flex items-center space-x-2 text-slate-400"><Eye size={18}/><span className="text-xs font-bold">{post.views || 0}</span></div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Comment Drawer / Modal */}
       {selectedPostForComments && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
-           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedPostForComments(null)}></div>
-           <div className="glass-card w-full max-w-2xl h-[80vh] rounded-[3rem] relative flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="glass-card w-full max-w-2xl h-[85vh] rounded-[3rem] relative flex flex-col overflow-hidden animate-in zoom-in-95">
               <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                 <h3 className="text-2xl font-black italic tracking-tighter">Post Discussion</h3>
-                 <button onClick={() => setSelectedPostForComments(null)} className="p-2 hover:bg-white/10 rounded-full"><X/></button>
+                 <div>
+                    <h3 className="text-2xl font-black italic tracking-tighter text-[var(--text-primary)]">Post Discussion</h3>
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Global Community Input</p>
+                 </div>
+                 <button onClick={() => setSelectedPostForComments(null)} className="p-3 hover:bg-white/10 rounded-full transition-colors"><X/></button>
               </div>
               <div className="flex-1 overflow-y-auto p-8 space-y-6">
-                 <div className="pb-6 border-b border-white/5">
-                    <p className="text-lg text-[var(--text-primary)] font-medium italic">"{selectedPostForComments.content}"</p>
+                 <div className="p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 mb-10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <img src={selectedPostForComments.authorAvatar} className="w-6 h-6 rounded-full" />
+                      <span className="text-[10px] font-black uppercase text-blue-500">{selectedPostForComments.author}</span>
+                    </div>
+                    <p className="text-lg font-medium italic text-[var(--text-primary)]">"{selectedPostForComments.content}"</p>
                  </div>
                  {selectedPostForComments.comments?.map(c => (
-                   <div key={c.id} className="flex gap-4 group">
-                      <img src={c.authorAvatar} className="w-10 h-10 rounded-full object-cover" />
+                   <div key={c.id} className="flex gap-4">
+                      <img src={c.authorAvatar} className="w-10 h-10 rounded-2xl object-cover" />
                       <div className="flex-1">
                          <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-sm font-black text-blue-400">{c.author}</h4>
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">{c.timestamp}</span>
+                            <h4 className="text-sm font-black text-blue-500">{c.author}</h4>
+                            <span className="text-[10px] text-slate-500">{c.timestamp}</span>
                          </div>
                          <p className="text-sm text-[var(--text-primary)] leading-relaxed">{c.text}</p>
                       </div>
                    </div>
                  ))}
-                 {(!selectedPostForComments.comments || selectedPostForComments.comments.length === 0) && (
-                   <p className="text-center text-slate-500 italic py-10">No comments yet. Be the first to start the conversation!</p>
-                 )}
+                 {(!selectedPostForComments.comments?.length) && <p className="text-center py-20 text-slate-500 font-medium italic">Join the conversation...</p>}
               </div>
-              <div className="p-8 border-t border-white/5 bg-black/20">
-                 <div className="flex gap-4 items-center bg-black/30 p-2 rounded-2xl border border-white/5 focus-within:border-blue-500/50 transition-all">
+              <div className="p-8 bg-black/30 border-t border-white/5">
+                 <div className="flex gap-4 items-center bg-white/5 p-2 rounded-2xl border border-white/10 focus-within:border-blue-500 transition-all">
                     <input 
-                      className="flex-1 bg-transparent border-none outline-none px-4 py-2 text-sm" 
-                      placeholder="Write your response..." 
-                      value={newCommentText}
-                      onChange={e => setNewCommentText(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleAddComment()}
+                      className="flex-1 bg-transparent border-none outline-none px-4 py-2 text-sm text-white" 
+                      placeholder="Type your response..." 
+                      value={newCommentText} 
+                      onChange={e => setNewCommentText(e.target.value)} 
+                      onKeyDown={e => e.key === 'Enter' && handleAddComment()} 
                     />
-                    <button onClick={handleAddComment} className="bg-blue-600 p-3 rounded-xl text-white hover:scale-105 transition-all"><Send size={18}/></button>
+                    <button onClick={handleAddComment} className="bg-blue-600 p-3 rounded-xl text-white hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"><Send size={18}/></button>
                  </div>
               </div>
            </div>

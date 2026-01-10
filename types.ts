@@ -20,6 +20,26 @@ export interface Notification {
   type: 'moderation' | 'engagement' | 'system';
 }
 
+export interface Comment {
+  id: string;
+  author: string;
+  authorAvatar: string;
+  text: string;
+  timestamp: string;
+}
+
+export interface Violation {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string;
+  media?: string; // base64 encoded image
+  mimeType?: string;
+  reason: string;
+  timestamp: string;
+  status: 'blocked' | 'reviewed_ok' | 'reviewed_confirmed';
+}
+
 export interface Post {
   id: string;
   author: string;
@@ -33,7 +53,8 @@ export interface Post {
   externalLink?: string; 
   hashtags: string[];
   likes: number;
-  comments: number;
+  commentsCount: number;
+  comments: Comment[];
   views: number;
   flags: string[]; // User IDs who flagged this
   isOpportunity: boolean;
@@ -58,6 +79,7 @@ export interface User {
   college: College;
   status: UserStatus;
   isSuspended?: boolean;
+  warningsCount?: number;
   badges: Badge[];
   appliedTo?: string[];
   notifications?: Notification[];
@@ -78,6 +100,7 @@ export interface AnalyticsData {
   messages: number;
   revenue: number;
   engagement: number;
+  violations?: number;
 }
 
 export interface ChatMessage {

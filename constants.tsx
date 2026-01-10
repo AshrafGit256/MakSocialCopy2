@@ -27,7 +27,9 @@ export const MOCK_POSTS: Post[] = [
     hashtags: ['#COCIS', '#AI', '#Makerere'],
     images: ['https://picsum.photos/seed/lab/800/450'],
     likes: 42,
-    comments: 12,
+    // Fix: Updated comments to be an array and added commentsCount
+    comments: [],
+    commentsCount: 12,
     // Fix: Added missing required views property
     views: 120,
     // Fix: Added missing required flags property
@@ -47,7 +49,9 @@ export const MOCK_POSTS: Post[] = [
     content: 'All Finalists from CEDAT are reminded to clear with the library by Friday.',
     hashtags: ['#CEDAT', '#Graduation'],
     likes: 155,
-    comments: 48,
+    // Fix: Updated comments to be an array and added commentsCount
+    comments: [],
+    commentsCount: 48,
     // Fix: Added missing required views property
     views: 850,
     // Fix: Added missing required flags property

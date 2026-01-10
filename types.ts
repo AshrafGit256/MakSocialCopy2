@@ -1,18 +1,50 @@
 
-export type AppView = 'landing' | 'login' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore';
+
+export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
+export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
+
+export interface Badge {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+  type: 'moderation' | 'engagement' | 'system';
+}
 
 export interface Post {
   id: string;
   author: string;
+  authorId: string;
   authorRole: string;
   authorAvatar: string;
   timestamp: string;
   content: string;
-  image?: string;
+  images?: string[];
+  video?: string;
+  externalLink?: string; 
   hashtags: string[];
   likes: number;
   comments: number;
+  views: number;
+  flags: string[]; // User IDs who flagged this
   isOpportunity: boolean;
+  applicants?: string[]; 
+  college: College;
+  aiMetadata?: {
+    sentiment: 'Positive' | 'Neutral' | 'Critical';
+    category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
+    isSafe?: boolean;
+    safetyReason?: string;
+  };
 }
 
 export interface User {
@@ -22,22 +54,21 @@ export interface User {
   avatar: string;
   bio?: string;
   connections: number;
+  email?: string;
+  college: College;
+  status: UserStatus;
+  isSuspended?: boolean;
+  badges: Badge[];
+  appliedTo?: string[];
+  notifications?: Notification[];
 }
 
-export interface Message {
+export interface LiveEvent {
   id: string;
-  senderId: string;
-  text: string;
-  timestamp: string;
-  isMe: boolean;
-}
-
-export interface ChatSession {
-  id: string;
-  user: User;
-  lastMessage: string;
-  unreadCount: number;
-  messages: Message[];
+  title: string;
+  youtubeUrl: string;
+  isLive: boolean;
+  organizer: string;
 }
 
 export interface AnalyticsData {
@@ -45,4 +76,24 @@ export interface AnalyticsData {
   posts: number;
   activeUsers: number;
   messages: number;
+  revenue: number;
+  engagement: number;
+}
+
+export interface ChatMessage {
+  id: string;
+  text: string;
+  timestamp: string;
+  isMe: boolean;
+}
+
+export interface ChatConversation {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  lastMessage: string;
+  unreadCount: number;
+  messages: ChatMessage[];
 }

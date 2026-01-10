@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 
 interface LoginProps {
   onLogin: (email: string) => void;
+  onSwitchToRegister: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -18,7 +19,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div className="flex h-screen bg-[#05080c]">
-      {/* Left side Image */}
       <div className="hidden lg:block w-1/2 relative">
         <img 
           src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Makerere_University_Main_Building.jpg" 
@@ -35,7 +35,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         </div>
       </div>
 
-      {/* Right side Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-12">
           <div className="flex items-center space-x-3">
@@ -75,11 +74,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               />
             </div>
 
-            <div className="flex items-center gap-3">
-              <input type="checkbox" className="w-5 h-5 rounded-lg border-white/5 bg-[#1a1f2e] text-blue-600 focus:ring-blue-600" />
-              <span className="text-sm text-slate-400 font-medium">Keep me logged in</span>
-            </div>
-
             <button 
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[2rem] text-lg transition-all shadow-2xl shadow-blue-600/30 active:scale-95"
@@ -88,22 +82,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </button>
           </form>
 
-          <div className="relative">
-             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-             <div className="relative flex justify-center text-xs uppercase font-black tracking-widest text-slate-600"><span className="px-4 bg-[#05080c]">Or Continue With</span></div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-             <button className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/5 py-4 rounded-2xl transition-all font-bold text-sm">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" /> Google
-             </button>
-             <button className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/5 py-4 rounded-2xl transition-all font-bold text-sm">
-                <img src="https://www.svgrepo.com/show/475638/apple-color.svg" className="w-5 h-5" alt="Apple" /> Apple
-             </button>
-          </div>
-
           <p className="text-center text-slate-500 font-medium">
-             New to Mak Social? <a href="#" className="text-white font-bold hover:underline">Create an account</a>
+             New to Mak Social? <button onClick={onSwitchToRegister} className="text-white font-bold hover:underline">Create an account</button>
           </p>
         </div>
       </div>

@@ -1,196 +1,210 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ANALYTICS } from '../constants';
+import { db } from '../db';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, AreaChart, Area, PieChart, Pie, Cell 
+  AreaChart, Area, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
-import { Users, FileText, MessageCircle, AlertTriangle, ShieldCheck, Search, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+import { Users, FileText, Download, ShieldCheck, AlertTriangle, UserMinus, UserCheck, Star, Activity, PieChart as PieIcon, TrendingUp, Briefcase, Eye, Printer, X, Flag, Trash2, CheckCircle } from 'lucide-react';
 
 const Admin: React.FC = () => {
+  const [users, setUsers] = useState(db.getUsers());
+  const [posts, setPosts] = useState(db.getPosts());
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'reports' | 'intelligence'>('overview');
+  const [selectedOppId, setSelectedOppId] = useState<string | null>(null);
+
+  const opportunities = posts.filter(p => p.isOpportunity);
+  const flaggedPosts = posts.filter(p => (p.flags || []).length > 0).sort((a, b) => (b.flags?.length || 0) - (a.flags?.length || 0));
+
+  const handleDownloadReport = () => {
+    const data = JSON.stringify({ users, analytics: ANALYTICS, opportunities, posts }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'MakSocial_Intelligence_Full_Report.json';
+    a.click();
+  };
+
+  const toggleSuspend = (id: string) => {
+    const updated = users.map(u => u.id === id ? { ...u, isSuspended: !u.isSuspended } : u);
+    setUsers(updated);
+    db.saveUsers(updated);
+  };
+
+  const handleModeratePost = (postId: string, action: 'delete' | 'ignore') => {
+    if (action === 'delete') {
+      if (window.confirm("Confirm deletion of this reported content? The user will be notified.")) {
+        const adminUser = db.getUser();
+        const updated = db.deletePost(postId, adminUser.id);
+        if (updated) setPosts(updated);
+      }
+    } else {
+      // Clear flags
+      const updated = posts.map(p => p.id === postId ? { ...p, flags: [] } : p);
+      setPosts(updated);
+      db.savePosts(updated);
+    }
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 pb-12">
-      {/* Admin Header */}
+    <div className="p-8 max-w-7xl mx-auto space-y-8 pb-32 transition-theme">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-white flex items-center gap-3">
-             <ShieldCheck className="text-red-500" size={32} />
-             System Administrator Panel
-          </h1>
-          <p className="text-slate-500 mt-1">Real-time platform analytics and moderation control center.</p>
+        <div className="space-y-1">
+          <h1 className="text-5xl font-black text-slate-900 dark:text-white italic tracking-tighter">System Intelligence</h1>
+          <p className="text-slate-500 font-medium">Safety moderation and strategic analytics.</p>
         </div>
-        <div className="flex gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-            <input 
-              className="bg-[#1a1f2e] border border-white/10 rounded-2xl py-2.5 pl-10 pr-4 text-sm focus:outline-none w-64"
-              placeholder="Search users or logs..."
-            />
-          </div>
-          <button className="bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-2xl font-bold transition-all border border-white/10">
-            Export Report
-          </button>
-        </div>
+        <button onClick={handleDownloadReport} className="flex items-center justify-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-3xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-600/30 hover:scale-105 transition-all">
+          <Download size={20}/> Database Dump
+        </button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { label: 'Total Students', value: '12,452', trend: '+12%', icon: <Users />, color: 'text-blue-500', up: true },
-          { label: 'Opportunities Posted', value: '842', trend: '+5.4%', icon: <FileText />, color: 'text-green-500', up: true },
-          { label: 'Messages Sent', value: '154k', trend: '-2.1%', icon: <MessageCircle />, color: 'text-yellow-500', up: false },
-          { label: 'Pending Reports', value: '14', trend: '-15%', icon: <AlertTriangle />, color: 'text-red-500', up: false },
-        ].map((stat, i) => (
-          <div key={i} className="glass-card p-6 rounded-3xl relative overflow-hidden group">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 bg-current ${stat.color} group-hover:scale-150 transition-transform duration-700`}></div>
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-2xl bg-white/5 ${stat.color}`}>
-                {stat.icon}
-              </div>
-              <div className={`flex items-center gap-1 text-xs font-black px-2 py-1 rounded-full ${stat.up ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                {stat.up ? <ArrowUpRight size={12}/> : <ArrowDownRight size={12}/>}
-                {stat.trend}
-              </div>
-            </div>
-            <p className="text-slate-500 text-sm font-medium">{stat.label}</p>
-            <h3 className="text-3xl font-black text-white mt-1">{stat.value}</h3>
-          </div>
+      <div className="flex flex-wrap gap-4 bg-black/5 dark:bg-white/5 p-2 rounded-[2.5rem] w-fit border border-black/5 dark:border-white/5">
+        {['overview', 'users', 'reports', 'intelligence'].map((tab: any) => (
+          <button 
+            key={tab} 
+            onClick={() => setActiveTab(tab)} 
+            className={`px-8 py-3 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all relative ${
+              activeTab === tab ? 'bg-white text-slate-900 shadow-xl' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+            }`}
+          >
+            {tab === 'reports' && flaggedPosts.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-[8px] animate-pulse">
+                {flaggedPosts.length}
+              </span>
+            )}
+            {tab}
+          </button>
         ))}
       </div>
 
-      {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="glass-card p-8 rounded-[2rem]">
-          <h3 className="text-xl font-bold text-white mb-8">Daily Activity Trends</h3>
-          <div className="h-[350px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={ANALYTICS}>
-                <defs>
-                  <linearGradient id="colorPosts" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="day" stroke="#64748b" axisLine={false} tickLine={false} />
-                <YAxis stroke="#64748b" axisLine={false} tickLine={false} />
-                <Tooltip 
-                  contentStyle={{ background: '#1a1f2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px' }}
-                  itemStyle={{ color: '#fff' }}
-                />
-                <Area type="monotone" dataKey="posts" stroke="#3b82f6" fillOpacity={1} fill="url(#colorPosts)" strokeWidth={3} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+           {[
+             { label: 'Total Members', value: users.length, icon: <Users />, color: 'text-blue-500' },
+             { label: 'Active Reports', value: flaggedPosts.length, icon: <Flag />, color: 'text-red-500' },
+             { label: 'Platform Views', value: posts.reduce((acc, p) => acc + (p.views || 0), 0), icon: <Activity />, color: 'text-indigo-500' },
+             { label: 'Safety Score', value: '98.2%', icon: <ShieldCheck />, color: 'text-purple-500' },
+           ].map((stat, i) => (
+             <div key={i} className="glass-card p-8 rounded-[2.5rem]">
+               <div className={`p-4 rounded-2xl bg-black/5 dark:bg-white/5 ${stat.color} mb-6 w-fit`}>{stat.icon}</div>
+               <p className="text-slate-500 text-xs font-black uppercase tracking-widest">{stat.label}</p>
+               <h3 className="text-4xl font-black text-slate-900 dark:text-white mt-1 italic">{stat.value}</h3>
+             </div>
+           ))}
         </div>
+      )}
 
-        <div className="glass-card p-8 rounded-[2rem]">
-          <h3 className="text-xl font-bold text-white mb-8">Messaging Volume</h3>
-          <div className="h-[350px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ANALYTICS}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="day" stroke="#64748b" axisLine={false} tickLine={false} />
-                <YAxis stroke="#64748b" axisLine={false} tickLine={false} />
-                <Tooltip 
-                  contentStyle={{ background: '#1a1f2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px' }}
-                  itemStyle={{ color: '#fff' }}
-                />
-                <Bar dataKey="messages" fill="#10b981" radius={[8, 8, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+      {activeTab === 'reports' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between px-4">
+             <h3 className="text-2xl font-black text-slate-900 dark:text-white italic">Content Reports Queue</h3>
+             <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">{flaggedPosts.length} items pending review</p>
           </div>
+          
+          {flaggedPosts.length === 0 ? (
+            <div className="glass-card p-20 rounded-[3rem] text-center border-dashed border-2 border-black/10 dark:border-white/10">
+               <ShieldCheck size={48} className="mx-auto text-emerald-500 mb-6" />
+               <h4 className="text-xl font-black text-slate-900 dark:text-white">Clean Platform</h4>
+               <p className="text-slate-500 mt-2">No content reports currently requiring attention.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+               {flaggedPosts.map(post => (
+                 <div key={post.id} className="glass-card p-8 rounded-[2.5rem] border-red-500/10 flex flex-col md:flex-row items-center justify-between gap-8 hover:border-red-500/30 transition-all">
+                    <div className="flex items-center gap-6 flex-1">
+                       <img src={post.authorAvatar} className="w-16 h-16 rounded-2xl object-cover shadow-lg" />
+                       <div className="space-y-1">
+                          <div className="flex items-center gap-3">
+                             <p className="font-black text-slate-900 dark:text-white italic">{post.author}</p>
+                             <span className="px-2 py-0.5 bg-red-500/10 text-red-600 text-[10px] font-black rounded uppercase tracking-tighter">
+                                {post.flags?.length} Reports
+                             </span>
+                          </div>
+                          <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 italic">"{post.content}"</p>
+                          <p className="text-[10px] text-slate-500 font-bold uppercase">{post.college} • {post.timestamp}</p>
+                       </div>
+                    </div>
+                    <div className="flex gap-3">
+                       <button 
+                         onClick={() => handleModeratePost(post.id, 'ignore')}
+                         className="px-6 py-3 bg-black/5 dark:bg-white/5 rounded-2xl text-[10px] font-black uppercase text-slate-500 hover:text-emerald-500 hover:bg-emerald-500/10 transition-all flex items-center gap-2"
+                       >
+                         <CheckCircle size={14}/> Keep Post
+                       </button>
+                       <button 
+                         onClick={() => handleModeratePost(post.id, 'delete')}
+                         className="px-6 py-3 bg-red-500/10 text-red-600 rounded-2xl text-[10px] font-black uppercase hover:bg-red-600 hover:text-white transition-all shadow-xl shadow-red-500/10 flex items-center gap-2"
+                       >
+                         <Trash2 size={14}/> Delete & Notify
+                       </button>
+                    </div>
+                 </div>
+               ))}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* Tables Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* User Monitoring */}
-        <div className="lg:col-span-2 glass-card rounded-[2rem] overflow-hidden">
-          <div className="p-8 border-b border-white/5 flex items-center justify-between">
-            <h3 className="text-xl font-bold text-white">Recent Message Logs</h3>
-            <button className="text-blue-400 text-sm font-bold">Monitor All</button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-white/5 text-slate-500 text-xs font-black uppercase tracking-widest">
-                  <th className="px-8 py-4">User</th>
-                  <th className="px-8 py-4">Action</th>
-                  <th className="px-8 py-4">Status</th>
-                  <th className="px-8 py-4 text-right">Time</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {[
-                  { user: 'Sarah A.', action: 'Posted Opportunity', status: 'Safe', time: '2 mins ago' },
-                  { user: 'Kato John', action: 'Direct Message', status: 'Safe', time: '5 mins ago' },
-                  { user: 'Namely B.', action: 'Flagged Content', status: 'Risk', time: '12 mins ago' },
-                  { user: 'Walusimbi A.', action: 'Created Group', status: 'Safe', time: '1 hour ago' },
-                ].map((row, i) => (
-                  <tr key={i} className="hover:bg-white/5 transition-colors group cursor-default">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-800 flex-shrink-0">
-                           <img src={`https://i.pravatar.cc/150?u=${row.user}`} className="w-full h-full rounded-xl object-cover" />
-                        </div>
-                        <span className="font-bold text-white group-hover:text-blue-400 transition-colors">{row.user}</span>
+      {activeTab === 'users' && (
+        <div className="glass-card rounded-[3rem] overflow-hidden border border-black/5 dark:border-white/5">
+          <table className="w-full text-left">
+            <thead className="bg-black/5 dark:bg-white/5 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">
+              <tr>
+                <th className="p-8">Member Identity</th>
+                <th className="p-8">College</th>
+                <th className="p-8">Activity</th>
+                <th className="p-8 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/5 dark:divide-white/5">
+              {users.map(u => (
+                <tr key={u.id} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group">
+                  <td className="p-8">
+                    <div className="flex items-center gap-4">
+                      <img src={u.avatar} className="w-12 h-12 rounded-2xl object-cover" />
+                      <div>
+                        <p className="font-black text-slate-900 dark:text-white text-base italic">{u.name}</p>
+                        <p className="text-xs text-slate-500 font-bold">{u.email}</p>
                       </div>
-                    </td>
-                    <td className="px-8 py-5 text-sm text-slate-400 font-medium">{row.action}</td>
-                    <td className="px-8 py-5">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        row.status === 'Safe' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
-                      }`}>
-                        {row.status}
-                      </span>
-                    </td>
-                    <td className="px-8 py-5 text-sm text-slate-500 text-right">{row.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                  <td className="p-8">
+                    <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black rounded-full uppercase">{u.college}</span>
+                  </td>
+                  <td className="p-8">
+                    <span className="text-xs font-bold text-slate-500">{u.appliedTo?.length || 0} Apps</span>
+                  </td>
+                  <td className="p-8 text-right">
+                    <button onClick={() => toggleSuspend(u.id)} className={`p-3 rounded-xl transition-all ${u.isSuspended ? 'bg-emerald-500/20 text-emerald-600' : 'bg-yellow-500/20 text-yellow-600'}`}>
+                      {u.isSuspended ? <UserCheck size={18}/> : <AlertTriangle size={18}/>}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+      )}
 
-        {/* Content Breakdown Pie */}
-        <div className="glass-card p-8 rounded-[2rem] flex flex-col items-center">
-          <h3 className="text-xl font-bold text-white mb-8 self-start">Content Type Distribution</h3>
-          <div className="h-[250px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={[
-                    { name: 'Discussion', value: 45 },
-                    { name: 'Opportunity', value: 25 },
-                    { name: 'Market', value: 20 },
-                    { name: 'Other', value: 10 },
-                  ]}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {COLORS.map((color, index) => <Cell key={index} fill={color} />)}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-8 grid grid-cols-2 gap-4 w-full">
-            {['Discussion', 'Opportunity', 'Market', 'Other'].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i] }}></div>
-                <span className="text-xs text-slate-400 font-bold">{item}</span>
-              </div>
-            ))}
-          </div>
+      {activeTab === 'intelligence' && (
+        <div className="glass-card p-12 rounded-[3.5rem] h-[500px]">
+           <h3 className="text-2xl font-black text-slate-900 dark:text-white italic mb-10">Network Velocity</h3>
+           <ResponsiveContainer width="100%" height="80%">
+             <AreaChart data={ANALYTICS}>
+               <defs>
+                 <linearGradient id="engagementGrad" x1="0" y1="0" x2="0" y2="1">
+                   <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                   <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                 </linearGradient>
+               </defs>
+               <Tooltip contentStyle={{borderRadius: '20px', border: 'none', background: '#1a1f2e'}} />
+               <Area type="monotone" dataKey="engagement" stroke="#3b82f6" strokeWidth={5} fill="url(#engagementGrad)" />
+             </AreaChart>
+           </ResponsiveContainer>
         </div>
-      </div>
+      )}
     </div>
   );
 };

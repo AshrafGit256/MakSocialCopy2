@@ -1,13 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppView, User } from './types';
+import { AppView, User, College, UserStatus } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
+import Register from './components/Register';
 import Sidebar from './components/Sidebar';
 import Feed from './components/Feed';
 import Chat from './components/Chat';
 import Profile from './components/Profile';
 import Admin from './components/Admin';
+import Events from './components/Events';
+import Explore from './components/Explore';
 import { db } from './db';
 
 const App: React.FC = () => {
@@ -27,6 +30,32 @@ const App: React.FC = () => {
     setIsLoggedIn(true);
     setUserRole(isAdmin ? 'admin' : 'student');
     setView(isAdmin ? 'admin' : 'home');
+    
+    const user = db.getUser();
+    db.saveUser({ ...user, email });
+  };
+
+  const handleRegister = (email: string, college: College, status: UserStatus) => {
+    setIsLoggedIn(true);
+    setUserRole('student');
+    setView('home');
+    
+    const newUser: User = {
+      id: Date.now().toString(),
+      name: email.split('@')[0],
+      role: 'University Student',
+      avatar: `https://i.pravatar.cc/150?u=${email}`,
+      connections: 0,
+      email: email,
+      college: college,
+      status: status,
+      badges: [],
+      appliedTo: []
+    };
+    
+    const users = db.getUsers();
+    db.saveUsers([...users, newUser]);
+    localStorage.setItem('maksocial_current_user_id', newUser.id);
   };
 
   const handleLogout = () => {
@@ -37,31 +66,33 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (view) {
       case 'landing': return <Landing onStart={() => setView('login')} />;
-      case 'login': return <Login onLogin={handleLogin} />;
+      case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
+      case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
       case 'home': return <Feed />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile />;
+      case 'events': return <Events />;
+      case 'explore': return <Explore />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }
   };
 
-  if (!isLoggedIn && (view === 'landing' || view === 'login')) {
+  const isAuthView = view === 'landing' || view === 'login' || view === 'register';
+
+  if (!isLoggedIn && isAuthView) {
     return renderContent();
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#05080c] text-slate-200">
-      {/* Sidebar Navigation */}
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme">
       <Sidebar 
         activeView={view} 
         setView={setView} 
         isAdmin={userRole === 'admin'} 
         onLogout={handleLogout}
       />
-
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative bg-[#05080c]">
+      <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)]">
         {renderContent()}
       </main>
     </div>

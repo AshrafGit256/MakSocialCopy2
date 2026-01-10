@@ -1,0 +1,114 @@
+
+import React, { useState } from 'react';
+
+interface LoginProps {
+  onLogin: (email: string) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      onLogin(email);
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-[#05080c]">
+      {/* Left side Image */}
+      <div className="hidden lg:block w-1/2 relative">
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Makerere_University_Main_Building.jpg" 
+          className="w-full h-full object-cover"
+          alt="Campus"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#05080c]/80 to-transparent flex flex-col justify-end p-20">
+           <h1 className="text-7xl font-black text-white tracking-tighter italic leading-none">Your University,<br/>Your Network</h1>
+           <p className="text-slate-300 text-xl mt-6 max-w-md font-medium">Join thousands of students and share what matters to your community.</p>
+           <div className="mt-8 flex gap-4">
+              <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white/50">Admin: name@admin.mak.ac.ug</span>
+              <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white/50">User: name@mak.ac.ug</span>
+           </div>
+        </div>
+      </div>
+
+      {/* Right side Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-12">
+          <div className="flex items-center space-x-3">
+             <div className="w-12 h-12 bg-white rounded-2xl"></div>
+             <span className="text-4xl font-black italic tracking-tighter uppercase text-white">Mak Social</span>
+          </div>
+
+          <div className="space-y-2">
+             <h2 className="text-3xl font-black text-white">Welcome Back</h2>
+             <p className="text-slate-500 font-medium">Please enter your university credentials to continue.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-400">University Email</label>
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="student@mak.ac.ug"
+                className="w-full bg-[#1a1f2e] border border-white/5 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 transition-all placeholder:text-slate-700"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400">Password</label>
+                <a href="#" className="text-xs font-bold text-blue-500 hover:underline">Forgot Password?</a>
+              </div>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-[#1a1f2e] border border-white/5 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 transition-all placeholder:text-slate-700"
+                required
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input type="checkbox" className="w-5 h-5 rounded-lg border-white/5 bg-[#1a1f2e] text-blue-600 focus:ring-blue-600" />
+              <span className="text-sm text-slate-400 font-medium">Keep me logged in</span>
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[2rem] text-lg transition-all shadow-2xl shadow-blue-600/30 active:scale-95"
+            >
+              Login to Account
+            </button>
+          </form>
+
+          <div className="relative">
+             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+             <div className="relative flex justify-center text-xs uppercase font-black tracking-widest text-slate-600"><span className="px-4 bg-[#05080c]">Or Continue With</span></div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+             <button className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/5 py-4 rounded-2xl transition-all font-bold text-sm">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" /> Google
+             </button>
+             <button className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/5 py-4 rounded-2xl transition-all font-bold text-sm">
+                <img src="https://www.svgrepo.com/show/475638/apple-color.svg" className="w-5 h-5" alt="Apple" /> Apple
+             </button>
+          </div>
+
+          <p className="text-center text-slate-500 font-medium">
+             New to Mak Social? <a href="#" className="text-white font-bold hover:underline">Create an account</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

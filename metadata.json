@@ -1,0 +1,8 @@
+{
+  "name": "Copy of MakSocial",
+  "description": "The official social network for university students to share opportunities, collaborate, and communicate.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

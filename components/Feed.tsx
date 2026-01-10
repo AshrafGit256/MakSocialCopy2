@@ -15,7 +15,7 @@ const Feed: React.FC = () => {
   const [user, setUser] = useState<User>(db.getUser());
   const [newPostContent, setNewPostContent] = useState('');
   const [externalUrl, setExternalUrl] = useState('');
-  const [selectedMedia, setSelectedMedia] = useState<{url: string, type: 'image' | 'video'} | null>(null);
+  const [selectedMedia, setSelectedMedia] = useState<{url: string, type: 'image' | 'video', file?: File} | null>(null);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -40,21 +40,55 @@ const Feed: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setSelectedMedia({ url, type: file.type.startsWith('video') ? 'video' : 'image' });
+      setSelectedMedia({ 
+        url, 
+        type: file.type.startsWith('video') ? 'video' : 'image',
+        file: file
+      });
     }
   };
 
-  const categorizeAndSafetyCheck = async (content: string) => {
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1]);
+      };
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  const categorizeAndSafetyCheck = async (content: string, imageBase64?: string, mimeType?: string) => {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      
+      const parts: any[] = [
+        { text: `Analyze this university student post for safety and categorization. 
+          Rules:
+          1. CATEGORY: Must be one of Academic, Social, Finance, Career, or Urgent.
+          2. SENTIMENT: Must be Positive, Neutral, or Critical.
+          3. SAFETY: Is this content pornographic, indecent, sexually explicit, highly suggestive (e.g. transparent clothing, exposed intimate parts), or violent? (isSafe: true/false).
+          4. REASON: If isSafe is false, provide a polite but firm explanation of why it was rejected (e.g., "Image contains indecent attire").
+          
+          Text content: "${content}"
+          
+          Return as valid JSON only.` }
+      ];
+
+      if (imageBase64 && mimeType) {
+        parts.push({
+          inlineData: {
+            data: imageBase64,
+            mimeType: mimeType
+          }
+        });
+      }
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Analyze this university student post: "${content}". 
-        Rules: 
-        1. Categories: Academic, Social, Finance, Career, Urgent. 
-        2. Sentiment: Positive, Neutral, or Critical.
-        3. SAFETY: Is this post pornographic, sexually explicit, hateful, or promoting illegal activities? (isSafe: true/false). If false, provide a brief reason.
-        Return as valid JSON only.`,
+        contents: { parts },
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -74,6 +108,8 @@ const Feed: React.FC = () => {
       return result;
     } catch (error) {
       console.error("AI Analysis failed:", error);
+      // If AI fails completely (including safety block at API level), assume unsafe for platform protection if images are involved
+      if (imageBase64) return { sentiment: 'Neutral', category: 'Social', isSafe: false, safetyReason: "Our automated systems detected a potential safety violation in the media provided." };
       return { ...db.analyzeContent(content), isSafe: true };
     }
   };
@@ -82,11 +118,19 @@ const Feed: React.FC = () => {
     if (!newPostContent.trim() && !selectedMedia && !externalUrl) return;
     
     setIsAnalyzing(true);
-    const aiResult = await categorizeAndSafetyCheck(newPostContent);
+    let imageBase64;
+    let mimeType;
+
+    if (selectedMedia?.type === 'image' && selectedMedia.file) {
+      imageBase64 = await fileToBase64(selectedMedia.file);
+      mimeType = selectedMedia.file.type;
+    }
+
+    const aiResult = await categorizeAndSafetyCheck(newPostContent, imageBase64, mimeType);
     setIsAnalyzing(false);
 
     if (aiResult.isSafe === false) {
-      alert(`⚠️ Content Rejected: ${aiResult.safetyReason || 'This post violates our community safety guidelines.'}`);
+      alert(`⚠️ Content Rejected: ${aiResult.safetyReason || 'This content violates our community safety guidelines regarding indecent or harmful material.'}`);
       return;
     }
 
@@ -259,7 +303,7 @@ const Feed: React.FC = () => {
                 className="bg-blue-600 px-8 py-3 rounded-full font-black text-sm text-white shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
              >
                 {isAnalyzing ? (
-                  <><Loader2 className="animate-spin" size={16}/> Safety Checking...</>
+                  <><Loader2 className="animate-spin" size={16}/> Safety Reviewing...</>
                 ) : 'Publish Post'}
              </button>
           </div>
@@ -365,7 +409,7 @@ const Feed: React.FC = () => {
                 <MessageCircle size={18} />
                 <span className="text-xs font-bold">{post.comments}</span>
               </button>
-              <div className="flex items-center space-x-2 text-slate-400">
+              <div className="flex items-center space-x-2 text-slate-400" title="Total Views">
                 <Eye size={18} />
                 <span className="text-xs font-bold">{post.views || 0}</span>
               </div>

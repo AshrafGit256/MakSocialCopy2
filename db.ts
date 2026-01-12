@@ -15,13 +15,13 @@ const DB_KEYS = {
 const INITIAL_USERS: User[] = [
   {
     id: 'u1',
-    name: 'Sarah A.',
+    name: 'Guru A.',
     role: 'CS Student',
-    avatar: 'https://i.pravatar.cc/150?u=sarah',
+    avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
     connections: 245,
     college: 'COCIS',
     status: 'Year 2',
-    email: 'sarah@mak.ac.ug',
+    email: 'guru@mak.ac.ug',
     badges: [{ id: 'b1', name: 'Top Contributor', icon: '🔥', color: 'text-orange-500' }],
     appliedTo: [],
     notifications: [],

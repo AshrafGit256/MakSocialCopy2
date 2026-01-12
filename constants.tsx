@@ -61,7 +61,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Sarah A.',
     authorId: 'u1',
     authorRole: 'CS Student',
-    authorAvatar: 'https://i.pravatar.cc/150?u=sarah',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
     timestamp: '2 hours ago',
     content: 'Excited about the new AI lab in COCIS block B!',
     hashtags: ['#COCIS', '#AI', '#Makerere'],

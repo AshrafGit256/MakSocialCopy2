@@ -11,9 +11,12 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
     <div className="min-h-screen bg-[#05080c] text-white flex flex-col overflow-x-hidden">
       {/* Top Navbar */}
       <nav className="px-8 py-6 flex items-center justify-between sticky top-0 z-50 glass-card border-b border-white/5">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center font-black text-xl">M</div>
-          <span className="text-2xl font-black italic tracking-tighter uppercase">Mak Social</span>
+        <div className="flex items-center space-x-1">
+          <img
+            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
+            alt="Campus"
+            className="w-20 y-20"
+          />
         </div>
         <div className="hidden md:flex items-center space-x-10 text-sm font-bold tracking-wide uppercase">
           <a href="#" className="text-slate-400 hover:text-white transition-colors">Home</a>

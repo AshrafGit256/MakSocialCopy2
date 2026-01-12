@@ -25,10 +25,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
           alt="Campus"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#05080c]/80 to-transparent flex flex-col justify-end p-20">
-           <h1 className="text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.05]">
-  Your University,<br />
-  Your Network
-</h1>
+           <h1
+            className="text-6xl md:text-7xl font-bold text-white tracking-tight leading-snug"
+            style={{ fontFamily: "'Exo 2', sans-serif" }}
+          >
+            Your University,<br />
+            Your Network
+          </h1>
 
            <p className="text-slate-300 text-xl mt-6 max-w-md font-medium">Join thousands of students and share what matters to your community.</p>
            <div className="mt-8 flex gap-4">

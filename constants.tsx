@@ -58,7 +58,7 @@ export const MOCK_POSTS: Post[] = [
   },
   {
     id: '1',
-    author: 'Sarah A.',
+    author: 'Guru A.',
     authorId: 'u1',
     authorRole: 'CS Student',
     authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
@@ -112,7 +112,7 @@ export const ANALYTICS: AnalyticsData[] = [
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
-    user: { name: 'Sarah A.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
+    user: { name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg'},
     lastMessage: 'The notes are on the portal.',
     unreadCount: 2,
     messages: [

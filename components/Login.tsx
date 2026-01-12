@@ -20,13 +20,16 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
   return (
     <div className="flex h-screen bg-[#05080c]">
       <div className="hidden lg:block w-1/2 relative">
-        <img 
-          src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Makerere_University_Main_Building.jpg" 
-          className="w-full h-full object-cover"
+        <img
+          src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/makerere_at_night.webp"
           alt="Campus"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#05080c]/80 to-transparent flex flex-col justify-end p-20">
-           <h1 className="text-7xl font-black text-white tracking-tighter italic leading-none">Your University,<br/>Your Network</h1>
+           <h1 className="text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.05]">
+  Your University,<br />
+  Your Network
+</h1>
+
            <p className="text-slate-300 text-xl mt-6 max-w-md font-medium">Join thousands of students and share what matters to your community.</p>
            <div className="mt-8 flex gap-4">
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white/50">Admin: name@admin.mak.ac.ug</span>
@@ -37,10 +40,10 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-12">
-          <div className="flex items-center space-x-3">
-             <div className="w-12 h-12 bg-white rounded-2xl"></div>
-             <span className="text-4xl font-black italic tracking-tighter uppercase text-white">Mak Social</span>
-          </div>
+          <img
+            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
+            alt="MakSocial Logo"
+          />
 
           <div className="space-y-2">
              <h2 className="text-3xl font-black text-white">Welcome Back</h2>

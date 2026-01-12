@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MakSocial - Connect with your Community</title>
+    <title>MakSocial - Let's Connect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -13,68 +13,68 @@
           extend: {
             colors: {
               brand: {
-                dark: '#05080c',
+                dark: '#020617',
                 light: '#ffffff',
-                accent: '#3b82f6'
+                accent: '#6366f1'
               }
+            },
+            borderRadius: {
+              'xl': '0.75rem',
+              '2xl': '1rem',
+              '3xl': '1.5rem'
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
           --bg-primary: #ffffff;
-          --bg-secondary: #f3f4f6;
-          --text-primary: #111827;
+          --bg-secondary: #f8fafc;
+          --text-primary: #0f172a;
           --text-secondary: #64748b;
-          --border-color: rgba(0, 0, 0, 0.08);
-          --card-bg: rgba(255, 255, 255, 0.95);
-          --sidebar-bg: #ffffff;
+          --border-color: rgba(0, 0, 0, 0.05);
+          --card-bg: rgba(255, 255, 255, 0.8);
         }
 
         .dark:root {
-          --bg-primary: #05080c;
-          --bg-secondary: #0a0f18;
+          --bg-primary: #020617;
+          --bg-secondary: #0f172a;
           --text-primary: #f8fafc;
           --text-secondary: #94a3b8;
-          --border-color: rgba(255, 255, 255, 0.06);
-          --card-bg: rgba(26, 31, 46, 0.75);
-          --sidebar-bg: #0a0f18;
+          --border-color: rgba(255, 255, 255, 0.08);
+          --card-bg: rgba(15, 23, 42, 0.6);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Geist', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 5px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 20px;
-        }
-        
-        .dark ::-webkit-scrollbar-thumb {
             background: #334155;
+            border-radius: 10px;
         }
         
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
-            transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0.75rem; /* Reduced corner radius */
         }
 
-        .transition-theme {
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
     </style>
 <script type="importmap">
@@ -90,7 +90,7 @@
 }
 </script>
 </head>
-<body class="bg-brand-light dark:bg-brand-dark overflow-x-hidden">
+<body class="bg-brand-light dark:bg-brand-dark overflow-x-hidden antialiased">
     <div id="root"></div>
 </body>
 </html>

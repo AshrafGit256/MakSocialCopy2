@@ -23,7 +23,7 @@ const App: React.FC = () => {
     if (isLoggedIn) {
       setCurrentUser(db.getUser());
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, view]);
 
   const handleLogin = (email: string) => {
     const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
@@ -44,7 +44,7 @@ const App: React.FC = () => {
       id: Date.now().toString(),
       name: email.split('@')[0],
       role: 'University Student',
-      avatar: `https://i.pravatar.cc/150?u=${email}`,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
       connections: 0,
       email: email,
       college: college,
@@ -53,9 +53,9 @@ const App: React.FC = () => {
       appliedTo: []
     };
     
-    const users = db.getUsers();
-    db.saveUsers([...users, newUser]);
+    db.saveUsers([...db.getUsers(), newUser]);
     localStorage.setItem('maksocial_current_user_id', newUser.id);
+    setCurrentUser(newUser);
   };
 
   const handleLogout = () => {
@@ -69,6 +69,7 @@ const App: React.FC = () => {
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
       case 'home': return <Feed />;
+      case 'groups': return <Feed collegeFilter={currentUser?.college} />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile />;
       case 'events': return <Events />;
@@ -92,7 +93,7 @@ const App: React.FC = () => {
         isAdmin={userRole === 'admin'} 
         onLogout={handleLogout}
       />
-      <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)]">
+      <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar">
         {renderContent()}
       </main>
     </div>

@@ -1,5 +1,6 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore';
+/* Fix: Added 'groups' and 'search' to AppView union type to match navigation items and App routing logic */
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -66,6 +67,15 @@ export interface Post {
     isSafe?: boolean;
     safetyReason?: string;
   };
+  // AD PROPERTIES
+  isAd?: boolean;
+  adPartnerName?: string;
+  adCtaText?: string;
+  adLink?: string;
+  // MakTV PROPERTIES
+  isMakTV?: boolean;
+  makTVType?: 'Interview' | 'News' | 'Brief';
+  makTVGuest?: string;
 }
 
 export interface User {

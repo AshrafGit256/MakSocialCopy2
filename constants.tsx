@@ -16,9 +16,49 @@ export const NAV_ITEMS = [
 
 export const MOCK_POSTS: Post[] = [
   {
+    id: 'maktv-1',
+    author: 'MakTV Media',
+    authorId: 'admin',
+    authorRole: 'Official Media',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    timestamp: '10 mins ago',
+    content: 'MAK NEWS HOUR: Journalism students review the new campus security measures and the upcoming guild elections.',
+    hashtags: ['#MakNews', '#Journalism', '#Makerere'],
+    video: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    likes: 850,
+    comments: [],
+    commentsCount: 45,
+    views: 5200,
+    flags: [],
+    isOpportunity: false,
+    college: 'Global' as any,
+    isMakTV: true,
+    makTVType: 'News'
+  },
+  {
+    id: 'maktv-2',
+    author: 'MakTV Spotlight',
+    authorId: 'admin',
+    authorRole: 'Official Media',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    timestamp: '2 hours ago',
+    content: 'ALUMNI INTERVIEW: Hon. Gerald Karuhanga shares his journey from Makerere Law School to National Leadership.',
+    hashtags: ['#AlumniSpotlight', '#MakLaw', '#Inspiration'],
+    video: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    likes: 1200,
+    comments: [],
+    commentsCount: 130,
+    views: 8900,
+    flags: [],
+    isOpportunity: false,
+    college: 'LAW',
+    isMakTV: true,
+    makTVType: 'Interview',
+    makTVGuest: 'Hon. Gerald Karuhanga'
+  },
+  {
     id: '1',
     author: 'Sarah A.',
-    // Fixed: Added missing authorId
     authorId: 'u1',
     authorRole: 'CS Student',
     authorAvatar: 'https://i.pravatar.cc/150?u=sarah',
@@ -27,42 +67,38 @@ export const MOCK_POSTS: Post[] = [
     hashtags: ['#COCIS', '#AI', '#Makerere'],
     images: ['https://picsum.photos/seed/lab/800/450'],
     likes: 42,
-    // Fix: Updated comments to be an array and added commentsCount
     comments: [],
     commentsCount: 12,
-    // Fix: Added missing required views property
     views: 120,
-    // Fix: Added missing required flags property
     flags: [],
     isOpportunity: false,
     college: 'COCIS',
     aiMetadata: { sentiment: 'Positive', category: 'Academic' }
   },
   {
-    id: '2',
-    author: 'Admin',
-    // Fixed: Added missing authorId
-    authorId: 'admin',
-    authorRole: 'University Admin',
-    authorAvatar: 'https://i.pravatar.cc/150?u=admin',
-    timestamp: '1 day ago',
-    content: 'All Finalists from CEDAT are reminded to clear with the library by Friday.',
-    hashtags: ['#CEDAT', '#Graduation'],
-    likes: 155,
-    // Fix: Updated comments to be an array and added commentsCount
+    id: 'ad-img-1',
+    author: 'MTN Uganda',
+    authorId: 'ad1',
+    authorRole: 'Brand Partner',
+    authorAvatar: 'https://logo.clearbit.com/mtn.co.ug',
+    timestamp: 'Sponsored',
+    content: 'Upgrade your campus experience with Unbeatable Student Data Bundles. Dial *150*6# to join Pulse today!',
+    hashtags: ['#MTNPulse', '#MakerereData'],
+    images: ['https://picsum.photos/seed/mtn/800/600'],
+    likes: 1205,
     comments: [],
-    commentsCount: 48,
-    // Fix: Added missing required views property
-    views: 850,
-    // Fix: Added missing required flags property
+    commentsCount: 88,
+    views: 12400,
     flags: [],
-    isOpportunity: true,
-    college: 'CEDAT',
-    aiMetadata: { sentiment: 'Neutral', category: 'Career' }
+    isOpportunity: false,
+    college: 'Global' as any,
+    isAd: true,
+    adPartnerName: 'MTN Pulse',
+    adCtaText: 'Get Bundles',
+    adLink: 'https://www.mtn.co.ug/pulse/'
   }
 ];
 
-// Fix: Adding missing required 'engagement' property to match AnalyticsData type
 export const ANALYTICS: AnalyticsData[] = [
   { day: 'Mon', posts: 120, activeUsers: 450, messages: 1200, revenue: 400, engagement: 1275 },
   { day: 'Tue', posts: 150, activeUsers: 520, messages: 1400, revenue: 600, engagement: 1530 },
@@ -73,7 +109,6 @@ export const ANALYTICS: AnalyticsData[] = [
   { day: 'Sun', posts: 80, activeUsers: 250, messages: 600, revenue: 300, engagement: 775 },
 ];
 
-// Added to fix the import error in components/Chat.tsx
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
@@ -84,17 +119,6 @@ export const MOCK_CHATS: ChatConversation[] = [
       { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false },
       { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true },
       { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false },
-    ]
-  },
-  {
-    id: 'c2',
-    user: { name: 'Kato John', avatar: 'https://i.pravatar.cc/150?u=kato' },
-    lastMessage: 'See you at the library.',
-    unreadCount: 0,
-    messages: [
-      { id: 'm4', text: 'Are we meeting today?', timestamp: 'Yesterday', isMe: false },
-      { id: 'm5', text: 'Yeah, 2 PM?', timestamp: 'Yesterday', isMe: true },
-      { id: 'm6', text: 'See you at the library.', timestamp: 'Yesterday', isMe: false },
     ]
   }
 ];

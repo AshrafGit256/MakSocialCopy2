@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, LiveEvent, Notification, Violation, Comment } from './types';
+import { Post, User, College, UserStatus, LiveEvent, Notification, Violation, Comment, Poll } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -7,7 +7,8 @@ const DB_KEYS = {
   USERS: 'maksocial_users_v8',
   LOGGED_IN_ID: 'maksocial_current_user_id',
   EVENTS: 'maksocial_events_v3',
-  VIOLATIONS: 'maksocial_violations_v2'
+  VIOLATIONS: 'maksocial_violations_v2',
+  POLLS: 'maksocial_polls_v1'
 };
 
 const INITIAL_USERS: User[] = [
@@ -86,6 +87,40 @@ export const db = {
     const violations = db.getViolations();
     const updated = violations.map(v => v.id === id ? { ...v, status } : v);
     localStorage.setItem(DB_KEYS.VIOLATIONS, JSON.stringify(updated));
+  },
+
+  getPolls: (): Poll[] => {
+    const saved = localStorage.getItem(DB_KEYS.POLLS);
+    if (!saved) return [];
+    const polls: Poll[] = JSON.parse(saved);
+    const now = new Date().getTime();
+    return polls.map(p => ({
+      ...p,
+      isActive: p.isActive && new Date(p.expiresAt).getTime() > now
+    }));
+  },
+  savePoll: (poll: Poll) => {
+    const polls = db.getPolls();
+    localStorage.setItem(DB_KEYS.POLLS, JSON.stringify([poll, ...polls]));
+  },
+  deletePoll: (id: string) => {
+    const polls = db.getPolls();
+    localStorage.setItem(DB_KEYS.POLLS, JSON.stringify(polls.filter(p => p.id !== id)));
+  },
+  voteInPoll: (pollId: string, optionId: string, userId: string) => {
+    const polls = db.getPolls();
+    const updated = polls.map(p => {
+      if (p.id === pollId && !p.votedUserIds.includes(userId)) {
+        return {
+          ...p,
+          votedUserIds: [...p.votedUserIds, userId],
+          options: p.options.map(o => o.id === optionId ? { ...o, votes: o.votes + 1 } : o)
+        };
+      }
+      return p;
+    });
+    localStorage.setItem(DB_KEYS.POLLS, JSON.stringify(updated));
+    return updated;
   },
 
   sendWarning: (userId: string, reason: string) => {

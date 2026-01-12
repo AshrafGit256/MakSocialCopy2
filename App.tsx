@@ -40,6 +40,7 @@ const App: React.FC = () => {
     setUserRole('student');
     setView('home');
     
+    // Fix: Added missing social metrics properties required by the User interface
     const newUser: User = {
       id: Date.now().toString(),
       name: email.split('@')[0],
@@ -50,7 +51,11 @@ const App: React.FC = () => {
       college: college,
       status: status,
       badges: [],
-      appliedTo: []
+      appliedTo: [],
+      postsCount: 0,
+      followersCount: 0,
+      followingCount: 0,
+      totalLikesCount: 0
     };
     
     db.saveUsers([...db.getUsers(), newUser]);

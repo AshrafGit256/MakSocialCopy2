@@ -25,7 +25,11 @@ const INITIAL_USERS: User[] = [
     badges: [{ id: 'b1', name: 'Top Contributor', icon: '🔥', color: 'text-orange-500' }],
     appliedTo: [],
     notifications: [],
-    warningsCount: 0
+    warningsCount: 0,
+    postsCount: 12,
+    followersCount: 1420,
+    followingCount: 382,
+    totalLikesCount: 4500
   },
   {
     id: 'u2',
@@ -39,7 +43,11 @@ const INITIAL_USERS: User[] = [
     badges: [],
     appliedTo: [],
     notifications: [],
-    warningsCount: 0
+    warningsCount: 0,
+    postsCount: 8,
+    followersCount: 890,
+    followingCount: 215,
+    totalLikesCount: 1200
   }
 ];
 
@@ -121,7 +129,12 @@ export const db = {
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID) || 'u1';
-    return users.find(u => u.id === currentId) || users[0];
+    let user = users.find(u => u.id === currentId) || users[0];
+    // Ensure social metrics exist
+    if (user.postsCount === undefined) {
+      user = { ...user, postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0 };
+    }
+    return user;
   },
 
   getViolations: (): Violation[] => {

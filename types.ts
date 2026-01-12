@@ -125,6 +125,11 @@ export interface User {
   badges: Badge[];
   appliedTo?: string[];
   notifications?: Notification[];
+  // Social Metrics
+  postsCount: number;
+  followersCount: number;
+  followingCount: number;
+  totalLikesCount: number;
 }
 
 export interface LiveEvent {

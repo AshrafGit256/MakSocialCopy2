@@ -69,26 +69,33 @@ const Profile: React.FC = () => {
           <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8">
             <div className="flex flex-col lg:flex-row items-center lg:items-end gap-8">
               {/* Avatar */}
-              <div className="relative group/avatar">
-                <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-600 via-purple-500 to-rose-500 rounded-[2.5rem] blur opacity-75 group-hover/avatar:opacity-100 transition duration-1000 group-hover/avatar:duration-200 animate-gradient-xy"></div>
-                <div className="relative">
-                  <img 
-                    src={isEditing ? editForm.avatar : user.avatar} 
-                    className="w-48 h-48 rounded-[2.2rem] object-cover border-8 border-brand-dark shadow-2xl transition-all"
-                    alt="Profile"
-                  />
-                  {isEditing && (
-                    <button 
-                      onClick={handleAvatarChange}
-                      className="absolute inset-0 bg-black/60 rounded-[2.2rem] flex flex-col items-center justify-center text-white font-black text-xs opacity-0 group-hover/avatar:opacity-100 transition-opacity uppercase tracking-widest"
-                    >
-                      <Camera className="mb-2" size={24} />
-                      Replace
-                    </button>
-                  )}
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-brand-dark rounded-full shadow-lg"></div>
-                </div>
-              </div>
+<div className="relative group/avatar flex justify-center">
+  {/* Soft glow ring */}
+  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 opacity-40 blur-xl group-hover/avatar:opacity-70 transition duration-700"></div>
+
+  <div className="relative">
+    <img
+      src={isEditing ? editForm.avatar : user.avatar}
+      alt="Profile"
+      className="w-44 h-44 rounded-full object-cover border-4 border-white/10 shadow-xl transition-transform duration-500 group-hover/avatar:scale-[1.03]"
+    />
+
+    {/* Replace overlay */}
+    {isEditing && (
+      <button
+        onClick={handleAvatarChange}
+        className="absolute inset-0 rounded-full bg-black/50 flex flex-col items-center justify-center text-white text-xs font-semibold opacity-0 group-hover/avatar:opacity-100 transition-opacity tracking-wide"
+      >
+        <Camera size={22} className="mb-1" />
+        Change
+      </button>
+    )}
+
+    {/* Online indicator */}
+    <span className="absolute bottom-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-[#05080c] rounded-full shadow-md"></span>
+  </div>
+</div>
+
 
               {/* Bio Details */}
               <div className="text-center lg:text-left space-y-3 pb-2">

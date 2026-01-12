@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, LiveEvent, Notification, Violation, Comment, Poll } from './types';
+import { Post, User, College, UserStatus, LiveEvent, Notification, Violation, Comment, Poll, TimelineEvent } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -8,7 +8,8 @@ const DB_KEYS = {
   LOGGED_IN_ID: 'maksocial_current_user_id',
   EVENTS: 'maksocial_events_v3',
   VIOLATIONS: 'maksocial_violations_v2',
-  POLLS: 'maksocial_polls_v1'
+  POLLS: 'maksocial_polls_v1',
+  TIMELINE: 'maksocial_timeline_v1'
 };
 
 const INITIAL_USERS: User[] = [
@@ -43,17 +44,40 @@ const INITIAL_USERS: User[] = [
 ];
 
 export const db = {
+  getTimeline: (): TimelineEvent[] => {
+    const saved = localStorage.getItem(DB_KEYS.TIMELINE);
+    return saved ? JSON.parse(saved) : [];
+  },
+  logTimelineEvent: (event: Omit<TimelineEvent, 'id' | 'timestamp'>) => {
+    const timeline = db.getTimeline();
+    const newEvent: TimelineEvent = {
+      ...event,
+      id: Date.now().toString(),
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(DB_KEYS.TIMELINE, JSON.stringify([newEvent, ...timeline].slice(0, 200))); // Keep last 200
+  },
+
   getPosts: (): Post[] => {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
-    return saved ? JSON.parse(saved) : MOCK_POSTS.map(p => ({ 
+    const posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS.map(p => ({ 
       ...p, 
       views: p.views || 0, 
       flags: p.flags || [],
       comments: p.comments || [],
       commentsCount: p.commentsCount || 0
     }));
+
+    // Logic: Filter out expired ads for the feed
+    const now = new Date().getTime();
+    return posts.filter(p => {
+      if (!p.isAd || !p.adExpiryDate) return true;
+      return new Date(p.adExpiryDate).getTime() > now;
+    });
   },
-  savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
+  savePosts: (posts: Post[]) => {
+    localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts));
+  },
   
   getUsers: (): User[] => {
     const saved = localStorage.getItem(DB_KEYS.USERS);
@@ -63,6 +87,31 @@ export const db = {
   
   saveUser: (user: User) => {
     const users = db.getUsers();
+    const oldUser = users.find(u => u.id === user.id);
+    
+    // Log profile updates if it's an existing user
+    if (oldUser) {
+      if (oldUser.name !== user.name) {
+        db.logTimelineEvent({
+          type: 'profile_update',
+          userId: user.id,
+          userName: user.name,
+          userAvatar: user.avatar,
+          description: `Changed their name from "${oldUser.name}" to "${user.name}"`
+        });
+      }
+      if (oldUser.bio !== user.bio) {
+        db.logTimelineEvent({
+          type: 'profile_update',
+          userId: user.id,
+          userName: user.name,
+          userAvatar: user.avatar,
+          description: `Updated their bio`,
+          details: user.bio
+        });
+      }
+    }
+
     const updated = users.some(u => u.id === user.id) 
       ? users.map(u => u.id === user.id ? user : u)
       : [...users, user];
@@ -101,6 +150,15 @@ export const db = {
   },
   savePoll: (poll: Poll) => {
     const polls = db.getPolls();
+    const user = db.getUser();
+    db.logTimelineEvent({
+      type: 'poll_created',
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar,
+      description: `Launched a campus poll: "${poll.question}"`,
+      targetId: poll.id
+    });
     localStorage.setItem(DB_KEYS.POLLS, JSON.stringify([poll, ...polls]));
   },
   deletePoll: (id: string) => {
@@ -151,6 +209,19 @@ export const db = {
 
   addComment: (postId: string, comment: Comment) => {
     const posts = db.getPosts();
+    const user = db.getUser();
+    const targetPost = posts.find(p => p.id === postId);
+
+    db.logTimelineEvent({
+      type: 'comment',
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar,
+      targetId: postId,
+      description: `Commented on ${targetPost?.author}'s broadcast`,
+      details: comment.text
+    });
+
     const updated = posts.map(p => {
       if (p.id === postId) {
         const comments = [...(p.comments || []), comment];
@@ -163,9 +234,10 @@ export const db = {
   },
 
   deletePost: (postId: string, deletedByUserId: string) => {
-    const posts = db.getPosts();
+    const saved = localStorage.getItem(DB_KEYS.POSTS);
+    const posts: Post[] = saved ? JSON.parse(saved) : [];
     const updated = posts.filter(p => p.id !== postId);
-    db.savePosts(updated);
+    localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(updated));
     return updated;
   },
 
@@ -194,6 +266,18 @@ export const db = {
 
   likePost: (postId: string) => {
     const posts = db.getPosts();
+    const user = db.getUser();
+    const targetPost = posts.find(p => p.id === postId);
+
+    db.logTimelineEvent({
+      type: 'like',
+      userId: user.id,
+      userName: user.name,
+      userAvatar: user.avatar,
+      targetId: postId,
+      description: `Liked ${targetPost?.author}'s post`
+    });
+
     const updated = posts.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p);
     db.savePosts(updated);
     return updated;

@@ -5,6 +5,18 @@ export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | '
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 
+export interface TimelineEvent {
+  id: string;
+  type: 'like' | 'comment' | 'profile_update' | 'new_post' | 'ad_created' | 'poll_created';
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  targetId?: string;
+  description: string;
+  timestamp: string; // ISO string
+  details?: string;
+}
+
 export interface Badge {
   id: string;
   name: string;
@@ -89,6 +101,9 @@ export interface Post {
   adPartnerName?: string;
   adCtaText?: string;
   adLink?: string;
+  adAmountPaid?: number;
+  adExpiryDate?: string;
+  adNotes?: string;
   // MakTV PROPERTIES
   isMakTV?: boolean;
   makTVType?: 'Interview' | 'News' | 'Brief';

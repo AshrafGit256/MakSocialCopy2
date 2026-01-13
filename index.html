@@ -22,12 +22,15 @@
               'xl': '0.75rem',
               '2xl': '1rem',
               '3xl': '1.5rem'
+            },
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
           --bg-primary: #f8fafc;
@@ -50,7 +53,7 @@
         }
 
         body {
-            font-family: 'Inter', 'Geist', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -85,6 +88,11 @@
 
         .transition-theme {
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Modern Typography Tweaks */
+        h1, h2, h3, h4 {
+            letter-spacing: -0.02em;
         }
     </style>
 <script type="importmap">

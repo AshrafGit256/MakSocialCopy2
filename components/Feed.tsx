@@ -48,7 +48,7 @@ const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
         { v: timeLeft.s, l: 's' }
       ].map((item, i) => (
         <div key={i} className="bg-black/5 dark:bg-black/40 backdrop-blur-sm border border-black/5 dark:border-white/10 rounded-lg px-2 py-1.5 flex flex-col items-center min-w-[32px]">
-           <span className="text-[12px] font-black text-indigo-600 dark:text-white italic leading-tight">{item.v}</span>
+           <span className="text-[12px] font-black text-indigo-600 dark:text-white leading-tight">{item.v}</span>
            <span className="text-[6px] uppercase font-bold text-slate-500 dark:text-slate-400">{item.l}</span>
         </div>
       ))}
@@ -225,7 +225,7 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
         {/* Main Feed Column */}
         <div className="lg:col-span-8 space-y-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-4">
-            <h2 className="text-3xl font-black italic tracking-tighter text-[var(--text-primary)] uppercase">
+            <h2 className="text-3xl font-extrabold tracking-tighter text-[var(--text-primary)] uppercase">
               {collegeFilter ? `${collegeFilter} WING` : 'CAMPUS PULSE'}
             </h2>
             {!collegeFilter && (
@@ -252,14 +252,14 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
             {rejectionMessage && (
               <div className="absolute inset-0 bg-rose-950/95 z-50 flex flex-col items-center justify-center p-8 text-center animate-in zoom-in-95">
                 <ShieldAlert size={32} className="text-rose-500 mb-2" />
-                <h3 className="text-[12px] font-black text-white uppercase italic tracking-widest">Protocol Breach</h3>
+                <h3 className="text-[12px] font-black text-white uppercase tracking-widest">Protocol Breach</h3>
                 <p className="text-rose-200 text-[10px] mt-1 leading-relaxed max-w-xs">{rejectionMessage}</p>
                 <button onClick={() => setRejectionMessage(null)} className="mt-5 px-6 py-2.5 bg-white text-rose-950 font-black rounded-lg text-[9px] uppercase tracking-widest hover:scale-105 transition-transform">Dismiss</button>
               </div>
             )}
             <div className="flex items-start gap-4 mb-4">
                <img src={user.avatar} className="w-11 h-11 rounded-xl object-cover border border-[var(--border-color)] shadow-sm" />
-               <textarea className="flex-1 bg-transparent border-none focus:outline-none text-[15px] resize-none min-h-[80px] placeholder:text-slate-400 text-[var(--text-primary)]" placeholder={`Broadcast what's happening at ${collegeFilter || 'the Hill'}...`} value={newPostContent} onChange={e => setNewPostContent(e.target.value)} />
+               <textarea className="flex-1 bg-transparent border-none focus:outline-none text-[15px] font-medium resize-none min-h-[80px] placeholder:text-slate-400 text-[var(--text-primary)]" placeholder={`Broadcast what's happening at ${collegeFilter || 'the Hill'}...`} value={newPostContent} onChange={e => setNewPostContent(e.target.value)} />
             </div>
             {selectedMedia && (
               <div className="relative mt-2 inline-block shadow-lg">
@@ -291,7 +291,7 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
                 <div className="flex items-center gap-4">
                   <img src={post.authorAvatar} className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)] shadow-sm" />
                   <div>
-                    <h4 className={`text-[13px] font-black italic tracking-tight ${post.isAd ? 'text-amber-600' : post.isEventBroadcast ? 'text-emerald-600' : 'text-[var(--text-primary)]'}`}>{post.author}</h4>
+                    <h4 className={`text-[13px] font-extrabold tracking-tight ${post.isAd ? 'text-amber-600' : post.isEventBroadcast ? 'text-emerald-600' : 'text-[var(--text-primary)]'}`}>{post.author}</h4>
                     <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{post.timestamp} • {post.college}</p>
                   </div>
                 </div>
@@ -304,7 +304,7 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
                 <div className="rounded-[2.5rem] overflow-hidden border border-emerald-500/20 bg-emerald-50 dark:bg-emerald-950/20 p-8 space-y-6 relative group/event">
                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                       <div className="space-y-1">
-                         <h3 className="text-2xl font-black text-emerald-900 dark:text-white italic uppercase tracking-tighter leading-tight">{post.eventTitle}</h3>
+                         <h3 className="text-2xl font-black text-emerald-900 dark:text-white uppercase tracking-tighter leading-tight">{post.eventTitle}</h3>
                          <div className="flex flex-wrap gap-5 mt-2">
                             <div className="flex items-center gap-2 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest"><MapPin size={14}/> {post.eventLocation}</div>
                             <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest"><Clock size={14}/> {post.eventTime} • {post.eventDate}</div>
@@ -372,7 +372,7 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
                    <div className="p-2 bg-indigo-600 rounded-lg text-white"><CheckCircle2 size={16}/></div>
                    <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-widest">Campus Pulse Poll</h3>
                 </div>
-                <p className="text-sm font-black text-[var(--text-primary)] italic mb-6 leading-snug">"{activePoll.question}"</p>
+                <p className="text-sm font-black text-[var(--text-primary)] mb-6 leading-snug">"{activePoll.question}"</p>
                 <div className="space-y-3">
                    {activePoll.options.map(opt => {
                      const isVoted = activePoll.votedUserIds.includes(user.id);
@@ -435,7 +435,7 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
                    <div key={event.id} className="flex gap-4 group cursor-pointer">
                       <div className="w-12 h-12 shrink-0 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex flex-col items-center justify-center group-hover:bg-indigo-600 group-hover:border-indigo-600 transition-all">
                          <span className="text-[8px] font-black text-slate-400 group-hover:text-white/80 uppercase tracking-widest">{new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}</span>
-                         <span className="text-sm font-black text-[var(--text-primary)] group-hover:text-white italic">{new Date(event.date).getDate()}</span>
+                         <span className="text-sm font-black text-[var(--text-primary)] group-hover:text-white">{new Date(event.date).getDate()}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                          <h4 className="text-[11px] font-black text-[var(--text-primary)] truncate uppercase tracking-tight">{event.title}</h4>
@@ -473,9 +473,9 @@ const Feed: React.FC<FeedProps> = ({ collegeFilter }) => {
            <div className="px-6 text-center space-y-4 pb-10">
               <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Mak Social Ecosystem v8.2</p>
               <div className="flex justify-center gap-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                 <a href="#" className="hover:text-indigo-600">Privacy</a>
-                 <a href="#" className="hover:text-indigo-600">Terms</a>
-                 <a href="#" className="hover:text-indigo-600">Support</a>
+                 <a href="#" className="hover:text-indigo-600 transition-colors">Privacy</a>
+                 <a href="#" className="hover:text-indigo-600 transition-colors">Terms</a>
+                 <a href="#" className="hover:text-indigo-600 transition-colors">Support</a>
               </div>
            </div>
         </aside>

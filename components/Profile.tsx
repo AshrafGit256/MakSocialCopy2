@@ -83,10 +83,10 @@ const Profile: React.FC = () => {
                 ) : (
                   <>
                     <div className="flex items-center gap-3 justify-center lg:justify-start">
-                       <h1 className="text-5xl font-black text-[var(--text-primary)] dark:text-white tracking-tighter italic uppercase">{user.name}</h1>
+                       <h1 className="text-5xl font-extrabold text-[var(--text-primary)] dark:text-white tracking-tighter uppercase">{user.name}</h1>
                        <Award className="text-indigo-600 dark:text-indigo-500" size={24} />
                     </div>
-                    <p className="text-xl text-indigo-600 dark:text-indigo-400 font-bold italic tracking-wide">{user.role}</p>
+                    <p className="text-xl text-indigo-600 dark:text-indigo-400 font-bold tracking-wide uppercase">{user.role}</p>
                     <div className="flex flex-wrap items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-500 justify-center lg:justify-start">
                        <span className="flex items-center gap-2"><MapPin size={14}/> {user.college}</span>
                        <span className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></span>
@@ -118,7 +118,7 @@ const Profile: React.FC = () => {
              ].map((stat, i) => (
                <div key={i} className="flex flex-col items-center justify-center p-6 bg-[var(--sidebar-bg)] rounded-2xl border border-[var(--border-color)] hover:shadow-md transition-all group">
                   <div className="text-slate-400 mb-2 group-hover:text-indigo-600 transition-colors">{stat.icon}</div>
-                  <span className="text-2xl font-black text-[var(--text-primary)] italic">{stat.val.toLocaleString()}</span>
+                  <span className="text-2xl font-black text-[var(--text-primary)]">{stat.val.toLocaleString()}</span>
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">{stat.label}</span>
                </div>
              ))}
@@ -126,7 +126,7 @@ const Profile: React.FC = () => {
 
           {!isEditing && (
             <div className="mt-10 px-4">
-               <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed italic max-w-4xl border-l-4 border-indigo-600 pl-8 py-2">
+               <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium italic max-w-4xl border-l-4 border-indigo-600 pl-8 py-2">
                  {user.bio || 'Node active. Awaiting biography sequence initialization from the hub master.'}
                </p>
             </div>

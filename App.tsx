@@ -12,6 +12,7 @@ import Admin from './components/Admin';
 import Events from './components/Events';
 import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
+import Search from './components/Search';
 import { db } from './db';
 
 const App: React.FC = () => {
@@ -80,6 +81,7 @@ const App: React.FC = () => {
       case 'events': return <Events />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
+      case 'search': return <Search />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }
@@ -92,7 +94,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans">
       <Sidebar 
         activeView={view} 
         setView={setView} 

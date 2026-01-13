@@ -6,39 +6,63 @@ import {
   Mail, MapPin, Calendar, Link as LinkIcon, Edit3, Share2, Grid, 
   Users, Layout, Award, Save, X, Camera, Bell, ShieldAlert, 
   Info, Heart, Plus, MoreVertical, Layers, Bookmark, Settings,
-  Image as ImageIcon, MessageCircle
+  Image as ImageIcon, MessageCircle, ArrowLeft, Send
 } from 'lucide-react';
 
-const Profile: React.FC = () => {
-  const [user, setUser] = useState<User>(db.getUser());
+interface ProfileProps {
+  userId?: string;
+  onNavigateBack?: () => void;
+}
+
+const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<User>(db.getUser());
+  const [editForm, setEditForm] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<'posts' | 'media' | 'notifs'>('posts');
+  const currentUser = db.getUser();
+  const isOwnProfile = !userId || userId === currentUser.id;
 
   useEffect(() => {
     const sync = () => {
-        const current = db.getUser();
-        setUser(current);
-        setEditForm(current);
+        const targetId = userId || currentUser.id;
+        const users = db.getUsers();
+        const profileUser = users.find(u => u.id === targetId) || currentUser;
+        
+        setUser(profileUser);
+        setEditForm(profileUser);
+        
         const allPosts = db.getPosts();
-        setPosts(allPosts.filter(p => p.authorId === current.id));
+        setPosts(allPosts.filter(p => p.authorId === targetId));
     };
     sync();
     const interval = setInterval(sync, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [userId]);
+
+  if (!user) return <div className="p-20 text-center font-black uppercase italic tracking-widest text-slate-400">Loading Node...</div>;
 
   const handleSave = () => {
-    db.saveUser(editForm);
-    setUser(editForm);
-    setIsEditing(false);
+    if (editForm) {
+      db.saveUser(editForm);
+      setUser(editForm);
+      setIsEditing(false);
+    }
   };
 
   const unreadCount = (user.notifications || []).filter(n => !n.isRead).length;
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-6 space-y-10 pb-32">
+      {onNavigateBack && !isOwnProfile && (
+        <button 
+          onClick={onNavigateBack}
+          className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 transition-all mb-4"
+        >
+          <ArrowLeft size={16}/> Return to Scan
+        </button>
+      )}
+
       <div className="relative group rounded-[3rem] overflow-hidden bg-[var(--sidebar-bg)] shadow-xl border border-[var(--border-color)] transition-theme">
         <div className="h-72 w-full relative overflow-hidden">
           <img 
@@ -56,7 +80,7 @@ const Profile: React.FC = () => {
                 <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-600 via-purple-500 to-rose-500 rounded-[2.5rem] blur opacity-40 group-hover/avatar:opacity-100 transition duration-1000 group-hover/avatar:duration-200"></div>
                 <div className="relative">
                   <img 
-                    src={isEditing ? editForm.avatar : user.avatar} 
+                    src={isEditing && editForm ? editForm.avatar : user.avatar} 
                     className="w-48 h-48 rounded-[2.2rem] object-cover border-8 border-[var(--sidebar-bg)] shadow-2xl transition-all"
                     alt="Profile"
                   />
@@ -65,7 +89,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div className="text-center lg:text-left space-y-3 pb-2">
-                {isEditing ? (
+                {isEditing && editForm ? (
                   <div className="space-y-3 min-w-[300px]">
                     <input 
                       className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl px-5 py-3 text-2xl font-black text-[var(--text-primary)] focus:ring-2 focus:ring-indigo-600 outline-none"
@@ -98,13 +122,24 @@ const Profile: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {isEditing ? (
-                <>
-                  <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/30 flex items-center gap-2 active:scale-95"><Save size={18} /> Sync Identity</button>
-                  <button onClick={() => setIsEditing(false)} className="bg-[var(--bg-secondary)] text-slate-500 px-6 py-4 rounded-2xl border border-[var(--border-color)] transition-all font-black text-[10px] uppercase tracking-widest">Abort</button>
-                </>
+              {isOwnProfile ? (
+                isEditing ? (
+                  <>
+                    <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/30 flex items-center gap-2 active:scale-95"><Save size={18} /> Sync Identity</button>
+                    <button onClick={() => setIsEditing(false)} className="bg-[var(--bg-secondary)] text-slate-500 px-6 py-4 rounded-2xl border border-[var(--border-color)] transition-all font-black text-[10px] uppercase tracking-widest">Abort</button>
+                  </>
+                ) : (
+                  <button onClick={() => { setEditForm(user); setIsEditing(true); }} className="bg-white dark:bg-white/10 text-slate-900 dark:text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg border border-[var(--border-color)] hover:bg-slate-100 dark:hover:bg-white/20 flex items-center gap-2 active:scale-95"><Edit3 size={18} /> Edit node</button>
+                )
               ) : (
-                <button onClick={() => { setEditForm(user); setIsEditing(true); }} className="bg-white dark:bg-white/10 text-slate-900 dark:text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg border border-[var(--border-color)] hover:bg-slate-100 dark:hover:bg-white/20 flex items-center gap-2 active:scale-95"><Edit3 size={18} /> Edit node</button>
+                <>
+                  <button className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/30 flex items-center gap-3 hover:bg-indigo-700 active:scale-95">
+                    <Plus size={18}/> Follow Node
+                  </button>
+                  <button className="bg-white dark:bg-white/5 text-[var(--text-primary)] px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg border border-[var(--border-color)] hover:bg-slate-50 flex items-center gap-3 active:scale-95">
+                    <Send size={18}/> Send Signal
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -124,22 +159,21 @@ const Profile: React.FC = () => {
              ))}
           </div>
 
-          {!isEditing && (
-            <div className="mt-10 px-4">
-               <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium italic max-w-4xl border-l-4 border-indigo-600 pl-8 py-2">
-                 {user.bio || 'Node active. Awaiting biography sequence initialization from the hub master.'}
-               </p>
-            </div>
-          )}
+          <div className="mt-10 px-4">
+             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium italic max-w-4xl border-l-4 border-indigo-600 pl-8 py-2">
+               {user.bio || 'Node active. Awaiting biography sequence initialization from the hub master.'}
+             </p>
+          </div>
         </div>
       </div>
 
+      {/* Tabs and Content (Same as before but filtered by props) */}
       <div className="space-y-8">
         <div className="flex items-center gap-10 border-b border-[var(--border-color)] px-4 overflow-x-auto no-scrollbar">
            {[
              { id: 'posts', label: 'Identity Feed', icon: <Grid size={18}/> },
              { id: 'media', label: 'Media Vault', icon: <ImageIcon size={18}/> },
-             { id: 'notifs', label: 'Signal Stream', icon: <Bell size={18}/>, count: unreadCount },
+             ...(isOwnProfile ? [{ id: 'notifs', label: 'Signal Stream', icon: <Bell size={18}/>, count: unreadCount }] : []),
            ].map(tab => (
              <button 
                key={tab.id}
@@ -149,9 +183,6 @@ const Profile: React.FC = () => {
                }`}
              >
                {tab.icon} {tab.label}
-               {tab.count !== undefined && tab.count > 0 && (
-                 <span className="bg-rose-600 text-white text-[8px] px-1.5 py-0.5 rounded-full shadow-sm">{tab.count}</span>
-               )}
              </button>
            ))}
         </div>
@@ -173,17 +204,10 @@ const Profile: React.FC = () => {
                            </div>
                         )}
                      </div>
-                     <div className="p-6 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50 dark:bg-black/20">
-                        <div className="flex gap-4">
-                           <span className="flex items-center gap-1.5 text-rose-500 text-[10px] font-black italic"><Heart size={14} fill="currentColor"/> {post.likes}</span>
-                           <span className="flex items-center gap-1.5 text-slate-500 text-[10px] font-black italic"><MessageCircle size={14}/> {post.commentsCount}</span>
-                        </div>
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{post.timestamp}</span>
-                     </div>
                   </div>
                 ))}
                 {posts.length === 0 && (
-                    <div className="col-span-full py-20 text-center text-slate-400 italic font-black text-xs uppercase tracking-widest">No active signals found.</div>
+                    <div className="col-span-full py-20 text-center text-slate-400 italic font-black text-xs uppercase tracking-widest">No active signals found for this node.</div>
                 )}
              </div>
            )}

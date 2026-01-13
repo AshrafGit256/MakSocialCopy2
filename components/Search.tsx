@@ -2,9 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Post } from '../types';
-import { Search as SearchIcon, Users, Hash, Clock, Plus, MessageCircle, Heart, Eye } from 'lucide-react';
+import { 
+  Search as SearchIcon, Users, Hash, Plus, 
+  MessageCircle, Heart, Eye, ArrowRight, Sparkles, 
+  Zap, Command, FileText, ImageIcon 
+} from 'lucide-react';
 
-const Search: React.FC = () => {
+interface SearchProps {
+  onNavigateToProfile: (userId: string) => void;
+  onNavigateToPost: (postId: string) => void;
+}
+
+const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }) => {
   const [query, setQuery] = useState('');
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
@@ -43,37 +52,52 @@ const Search: React.FC = () => {
     );
   }, [query, allUsers, allPosts]);
 
+  const isArticle = (p: Post) => p.content.length > 150 && !p.images?.length;
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 space-y-10 pb-32">
-      <div className="space-y-6">
-        <h1 className="text-5xl font-extrabold tracking-tighter text-[var(--text-primary)] uppercase">The Hub Search</h1>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Find nodes, signals, and assets across campus.</p>
-        
-        <div className="relative max-w-3xl">
-          <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={24} />
-          <input 
-            className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2rem] py-6 pl-16 pr-8 text-lg font-medium text-[var(--text-primary)] focus:ring-4 focus:ring-indigo-600/10 outline-none transition-all placeholder:text-slate-400"
-            placeholder="Search for students, posts, or tags..."
+    <div className="max-w-6xl mx-auto px-6 py-10 space-y-12 pb-32">
+      <div className="relative group max-w-4xl mx-auto">
+        {/* Animated aura */}
+        <div className="absolute -inset-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-[3rem] blur-2xl opacity-20 group-focus-within:opacity-40 transition duration-700"></div>
+
+        <div className="relative flex items-center bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-[3rem] px-6 py-6 shadow-2xl backdrop-blur-xl transition-all group-focus-within:border-indigo-500">
+          
+          {/* Icon bubble */}
+          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/10 text-indigo-600 group-focus-within:bg-indigo-600 group-focus-within:text-white transition-all">
+            <SearchIcon size={26} />
+          </div>
+
+          {/* Input */}
+          <input
+            className="flex-1 bg-transparent px-6 text-xl font-semibold text-[var(--text-primary)] outline-none placeholder:text-slate-400"
+            placeholder="Search students, posts, hashtags, or ideas..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
           />
+
+          {/* Live indicator */}
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            Live
+          </div>
         </div>
       </div>
 
-      {query.trim() && (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5">
-          <div className="flex items-center gap-4 bg-[var(--bg-secondary)] p-1 rounded-2xl border border-[var(--border-color)] w-fit">
+
+      {query.trim() ? (
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-500">
+          <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-[1.5rem] border border-[var(--border-color)] w-fit">
             {[
-              { id: 'all', label: 'All Results' },
+              { id: 'all', label: 'Universal' },
               { id: 'people', label: 'People' },
-              { id: 'posts', label: 'Posts' }
+              { id: 'posts', label: 'Broadcasts' }
             ].map(tab => (
               <button 
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                  activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'
+                className={`px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  activeTab === tab.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'text-slate-500 hover:text-[var(--text-primary)]'
                 }`}
               >
                 {tab.label}
@@ -81,73 +105,104 @@ const Search: React.FC = () => {
             ))}
           </div>
 
-          {(activeTab === 'all' || activeTab === 'people') && filteredUsers.length > 0 && (
-            <section className="space-y-6">
-              <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                <Users className="text-indigo-600" /> People Nodes
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredUsers.map(u => (
-                  <div key={u.id} className="glass-card p-6 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 transition-all flex items-center justify-between group">
-                    <div className="flex items-center gap-4">
-                      <img src={u.avatar} className="w-14 h-14 rounded-2xl object-cover border border-[var(--border-color)] group-hover:border-indigo-500 transition-colors" />
-                      <div>
-                        <h4 className="font-extrabold text-[var(--text-primary)] uppercase tracking-tight leading-none">{u.name}</h4>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{u.role} • {u.college}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            {/* Left Result Panel */}
+            <div className="lg:col-span-12 space-y-12">
+              {(activeTab === 'all' || activeTab === 'people') && filteredUsers.length > 0 && (
+                <section className="space-y-6">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
+                    <Users size={16} className="text-indigo-600" /> Population Cluster ({filteredUsers.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredUsers.map(u => (
+                      <div 
+                        key={u.id} 
+                        onClick={() => onNavigateToProfile(u.id)}
+                        className="glass-card p-6 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-600/5 transition-all flex items-center justify-between group cursor-pointer"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            <img src={u.avatar} className="w-16 h-16 rounded-[1.25rem] object-cover border-2 border-[var(--border-color)] group-hover:border-indigo-500 transition-colors" />
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-[var(--text-primary)] text-lg leading-none">{u.name}</h4>
+                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{u.college} • {u.role}</p>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-indigo-600/5 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                           <ArrowRight size={20}/>
+                        </div>
                       </div>
-                    </div>
-                    <button className="p-3 bg-indigo-600/10 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm">
-                       <Plus size={20}/>
-                    </button>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
+                </section>
+              )}
 
-          {(activeTab === 'all' || activeTab === 'posts') && filteredPosts.length > 0 && (
-            <section className="space-y-6">
-              <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                <Hash className="text-indigo-600" /> Signal Broadcasts
-              </h3>
-              <div className="space-y-6">
-                {filteredPosts.map(p => (
-                  <div key={p.id} className="glass-card p-8 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 transition-all shadow-sm">
-                    <div className="flex items-center gap-4 mb-4">
-                      <img src={p.authorAvatar} className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)]" />
-                      <div>
-                        <h4 className="font-extrabold text-[var(--text-primary)] uppercase tracking-tight leading-none">{p.author}</h4>
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{p.timestamp} • {p.college}</p>
+              {(activeTab === 'all' || activeTab === 'posts') && filteredPosts.length > 0 && (
+                <section className="space-y-6">
+                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
+                    <Hash size={16} className="text-indigo-600" /> Active Signal Stream ({filteredPosts.length})
+                  </h3>
+                  <div className="grid grid-cols-1 gap-6">
+                    {filteredPosts.map(p => (
+                      <div 
+                        key={p.id} 
+                        onClick={() => onNavigateToPost(p.id)}
+                        className="glass-card p-8 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-600/5 transition-all cursor-pointer group flex flex-col md:flex-row gap-8"
+                      >
+                        <div className="flex-1 space-y-4">
+                          <div className="flex items-center gap-4">
+                            <img src={p.authorAvatar} className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)]" />
+                            <div>
+                              <h4 className="font-extrabold text-[var(--text-primary)] uppercase tracking-tight leading-none text-sm">{p.author}</h4>
+                              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{p.timestamp} • {p.college}</p>
+                            </div>
+                            <div className="ml-auto">
+                              {isArticle(p) ? (
+                                <div className="flex items-center gap-2 text-[8px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded uppercase tracking-widest">
+                                  <FileText size={10}/> Long Form
+                                </div>
+                              ) : p.images?.length ? (
+                                <div className="flex items-center gap-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded uppercase tracking-widest">
+                                  <ImageIcon size={10}/> Visual Asset
+                                </div>
+                              ) : null}
+                            </div>
+                          </div>
+                          <p className={`text-[var(--text-primary)] ${isArticle(p) ? 'text-lg font-serif italic' : 'text-base font-medium'} leading-relaxed line-clamp-3`}>
+                            "{p.content}"
+                          </p>
+                          <div className="flex items-center gap-8 pt-4 border-t border-[var(--border-color)]">
+                            <span className="flex items-center gap-2 text-rose-500 text-[10px] font-black"><Heart size={16}/> {p.likes.toLocaleString()}</span>
+                            <span className="flex items-center gap-2 text-indigo-600 text-[10px] font-black"><MessageCircle size={16}/> {p.commentsCount}</span>
+                            <span className="flex items-center gap-2 text-slate-400 text-[10px] font-black"><Eye size={16}/> {p.views.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        
+                        {p.images?.[0] && (
+                          <div className="w-full md:w-64 aspect-video md:aspect-square rounded-2xl overflow-hidden border border-[var(--border-color)] shrink-0">
+                            <img src={p.images[0]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <p className="text-base text-[var(--text-primary)] font-medium italic leading-relaxed">"{p.content}"</p>
-                    <div className="flex items-center gap-8 mt-6 pt-4 border-t border-[var(--border-color)]">
-                      <span className="flex items-center gap-2 text-rose-500 text-xs font-black"><Heart size={16}/> {p.likes}</span>
-                      <span className="flex items-center gap-2 text-indigo-600 text-xs font-black"><MessageCircle size={16}/> {p.commentsCount}</span>
-                      <span className="flex items-center gap-2 text-slate-400 text-xs font-black"><Eye size={16}/> {p.views}</span>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {filteredUsers.length === 0 && filteredPosts.length === 0 && (
-            <div className="py-20 text-center space-y-4 glass-card bg-transparent border-dashed border-[var(--border-color)]">
-               <div className="w-20 h-20 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <SearchIcon size={32} className="text-slate-300" />
-               </div>
-               <h3 className="text-xl font-black text-slate-400 uppercase tracking-tighter italic">No signals found for "{query}"</h3>
-               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Adjust your scan parameters and try again.</p>
+                </section>
+              )}
             </div>
-          )}
+          </div>
         </div>
-      )}
-
-      {!query.trim() && (
-        <div className="py-32 text-center opacity-40 select-none">
-           <SearchIcon size={80} className="mx-auto text-slate-300 dark:text-slate-800" />
-           <p className="text-lg font-black text-slate-400 uppercase tracking-[0.4em] mt-8 italic">Scan initialized. Awaiting input...</p>
+      ) : (
+        <div className="py-40 text-center space-y-8 animate-in fade-in zoom-in duration-700">
+           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner relative group">
+              <div className="absolute inset-0 bg-indigo-600 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-10"></div>
+              <SearchIcon size={56} className="text-slate-300 group-hover:text-indigo-600 transition-colors duration-500" />
+           </div>
+           <div className="space-y-2">
+             <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Deep Scan Initialization Required</h3>
+             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">Awaiting alphanumeric signal input...</p>
+           </div>
         </div>
       )}
     </div>

@@ -20,6 +20,10 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'student' | 'admin'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  
+  // Navigation states for deep linking
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [targetPostId, setTargetPostId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -69,19 +73,29 @@ const App: React.FC = () => {
     setView('landing');
   };
 
+  const navigateToProfile = (userId: string) => {
+    setSelectedUserId(userId);
+    setView('profile');
+  };
+
+  const navigateToPost = (postId: string) => {
+    setTargetPostId(postId);
+    setView('home');
+  };
+
   const renderContent = () => {
     switch (view) {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed />;
+      case 'home': return <Feed targetPostId={targetPostId} onClearTarget={() => setTargetPostId(null)} />;
       case 'groups': return <Feed collegeFilter={currentUser?.college} />;
       case 'messages': return <Chat />;
-      case 'profile': return <Profile />;
+      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => setSelectedUserId(null)} />;
       case 'events': return <Events />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search />;
+      case 'search': return <Search onNavigateToProfile={navigateToProfile} onNavigateToPost={navigateToPost} />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }

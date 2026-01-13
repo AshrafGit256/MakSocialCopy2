@@ -1,13 +1,13 @@
 
-/* Fix: Added 'groups' and 'search' to AppView union type to match navigation items and App routing logic */
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search';
+/* Fix: Added 'groups', 'search', and 'calendar' to AppView union type */
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 
 export interface TimelineEvent {
   id: string;
-  type: 'like' | 'comment' | 'profile_update' | 'new_post' | 'ad_created' | 'poll_created';
+  type: 'like' | 'comment' | 'profile_update' | 'new_post' | 'ad_created' | 'poll_created' | 'event_scheduled' | 'event_reminder';
   userId: string;
   userName: string;
   userAvatar: string;
@@ -15,6 +15,19 @@ export interface TimelineEvent {
   description: string;
   timestamp: string; // ISO string
   details?: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description: string;
+  date: string; // YYYY-MM-DD
+  time: string;
+  location: string;
+  image?: string;
+  category: 'Academic' | 'Social' | 'Sports' | 'Exams' | 'Other';
+  createdBy: string;
+  registrationLink?: string;
 }
 
 export interface Badge {
@@ -108,6 +121,13 @@ export interface Post {
   isMakTV?: boolean;
   makTVType?: 'Interview' | 'News' | 'Brief';
   makTVGuest?: string;
+  // EVENT BROADCAST PROPERTIES
+  isEventBroadcast?: boolean;
+  eventDate?: string;
+  eventTime?: string;
+  eventLocation?: string;
+  eventTitle?: string;
+  eventRegistrationLink?: string;
 }
 
 export interface User {

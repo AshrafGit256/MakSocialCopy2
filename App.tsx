@@ -11,6 +11,7 @@ import Profile from './components/Profile';
 import Admin from './components/Admin';
 import Events from './components/Events';
 import Explore from './components/Explore';
+import CalendarView from './components/Calendar';
 import { db } from './db';
 
 const App: React.FC = () => {
@@ -40,7 +41,6 @@ const App: React.FC = () => {
     setUserRole('student');
     setView('home');
     
-    // Fix: Added missing social metrics properties required by the User interface
     const newUser: User = {
       id: Date.now().toString(),
       name: email.split('@')[0],
@@ -79,6 +79,7 @@ const App: React.FC = () => {
       case 'profile': return <Profile />;
       case 'events': return <Events />;
       case 'explore': return <Explore />;
+      case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }

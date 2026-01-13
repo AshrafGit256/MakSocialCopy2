@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { 
-  Home, Search, Compass, MessageCircle, LayoutGrid, User
+  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation } from './types';
 
 export const NAV_ITEMS = [
   { id: 'home', label: 'Home', icon: <Home size={22} /> },
   { id: 'search', label: 'Search', icon: <Search size={22} /> },
+  { id: 'calendar', label: 'Calendar', icon: <Calendar size={22} /> },
   { id: 'explore', label: 'Explore', icon: <Compass size={22} /> },
   { id: 'messages', label: 'Messages', icon: <MessageCircle size={22} /> },
   { id: 'groups', label: 'Colleges', icon: <LayoutGrid size={22} /> },

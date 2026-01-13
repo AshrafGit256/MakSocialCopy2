@@ -46,6 +46,7 @@ const App: React.FC = () => {
     setUserRole('student');
     setView('home');
     
+    // Fix: Added missing joinedColleges property to User object creation
     const newUser: User = {
       id: Date.now().toString(),
       name: email.split('@')[0],
@@ -60,7 +61,8 @@ const App: React.FC = () => {
       postsCount: 0,
       followersCount: 0,
       followingCount: 0,
-      totalLikesCount: 0
+      totalLikesCount: 0,
+      joinedColleges: [college]
     };
     
     db.saveUsers([...db.getUsers(), newUser]);

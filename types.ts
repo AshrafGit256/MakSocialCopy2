@@ -5,6 +5,14 @@ export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | '
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 
+export interface CollegeStats {
+  id: College;
+  followers: number;
+  postCount: number;
+  dean: string;
+  description: string;
+}
+
 export interface TimelineEvent {
   id: string;
   type: 'like' | 'comment' | 'profile_update' | 'new_post' | 'ad_created' | 'poll_created' | 'event_scheduled' | 'event_reminder';
@@ -102,7 +110,7 @@ export interface Post {
   flags: string[]; 
   isOpportunity: boolean;
   applicants?: string[]; 
-  college: College;
+  college: College | 'Global';
   aiMetadata?: {
     sentiment: 'Positive' | 'Neutral' | 'Critical';
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
@@ -145,6 +153,7 @@ export interface User {
   badges: Badge[];
   appliedTo?: string[];
   notifications?: Notification[];
+  joinedColleges: College[];
   // Social Metrics
   postsCount: number;
   followersCount: number;

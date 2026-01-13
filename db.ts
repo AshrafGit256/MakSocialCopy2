@@ -63,7 +63,7 @@ export const db = {
         date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
         time: '14:00',
         location: 'Freedom Square',
-        image: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Makerere_University_Main_Building.jpg',
+        image: 'https://img.freepik.com/free-vector/professional-debate-poster_742173-785.jpg',
         category: 'Academic',
         createdBy: 'admin'
       }

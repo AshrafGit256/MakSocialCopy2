@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { Violation, User, Post, Poll, TimelineEvent } from '../types';
-// Added Bell to the imports from lucide-react
 import { 
   TrendingUp, Monitor, Users, Activity, ShieldAlert, Tv, 
   Trash2, Play, MessageCircle, Eye, Plus, CheckCircle2, Clock,
@@ -92,13 +91,13 @@ const Admin: React.FC = () => {
   const getEventIcon = (type: string) => {
     switch (type) {
       case 'like': return <Heart size={14} className="text-rose-500" fill="currentColor" />;
-      case 'comment': return <MessageCircle size={14} className="text-indigo-400" fill="currentColor" />;
+      case 'comment': return <MessageCircle size={14} className="text-indigo-600 dark:text-indigo-400" fill="currentColor" />;
       case 'profile_update': return <UserIcon size={14} className="text-amber-500" />;
-      case 'new_post': return <Zap size={14} className="text-indigo-500" />;
+      case 'new_post': return <Zap size={14} className="text-indigo-600 dark:text-indigo-500" />;
       case 'ad_created': return <DollarSign size={14} className="text-emerald-500" />;
       case 'poll_created': return <CheckCircle2 size={14} className="text-sky-500" />;
       case 'event_scheduled': return <Calendar size={14} className="text-purple-500" />;
-      case 'event_reminder': return <Bell size={14} className="text-amber-400" />;
+      case 'event_reminder': return <Bell size={14} className="text-amber-500 dark:text-amber-400" />;
       default: return <Activity size={14} className="text-slate-500" />;
     }
   };
@@ -109,7 +108,7 @@ const Admin: React.FC = () => {
       case 'comment': return 'bg-indigo-500/10 border-indigo-500/20';
       case 'profile_update': return 'bg-amber-500/10 border-amber-500/20';
       case 'new_post': return 'bg-indigo-500/10 border-indigo-500/20';
-      default: return 'bg-white/5 border-white/10';
+      default: return 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10';
     }
   };
 
@@ -118,13 +117,13 @@ const Admin: React.FC = () => {
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-             <div className="p-2.5 bg-indigo-600 rounded-xl shadow-xl shadow-indigo-600/30"><Monitor className="text-white" size={26}/></div>
-             <h1 className="text-5xl font-black italic tracking-tighter text-white uppercase">Command</h1>
+             <div className="p-2.5 bg-indigo-600 rounded-xl shadow-xl shadow-indigo-600/30 transition-theme"><Monitor className="text-white" size={26}/></div>
+             <h1 className="text-5xl font-black italic tracking-tighter text-[var(--text-primary)] uppercase">Command</h1>
           </div>
           <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] pl-1">Forensic Intelligence & Governance</p>
         </div>
         
-        <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/10 shadow-inner overflow-x-auto no-scrollbar">
+        <div className="flex bg-[var(--bg-secondary)] p-1.5 rounded-2xl border border-[var(--border-color)] shadow-inner overflow-x-auto no-scrollbar transition-theme">
           {[
             { id: 'intelligence', label: 'Stats', icon: <TrendingUp size={16}/> },
             { id: 'registry', label: 'Feed', icon: <Activity size={16}/> },
@@ -136,7 +135,7 @@ const Admin: React.FC = () => {
               key={tab.id} 
               onClick={() => setActiveTab(tab.id as any)} 
               className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === tab.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'text-slate-500 hover:text-white'
+                activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'
               }`}
             >
               {tab.icon} {tab.label}
@@ -148,15 +147,15 @@ const Admin: React.FC = () => {
       {activeTab === 'intelligence' && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-in fade-in duration-500">
            {[
-             { label: 'Total Engagement', val: posts.reduce((a,c) => a+c.views, 0).toLocaleString(), icon: <Activity/>, color: 'text-indigo-500' },
-             { label: 'Ad Revenue', val: `UGX ${totalAdRevenue.toLocaleString()}`, icon: <DollarSign/>, color: 'text-emerald-500' },
-             { label: 'Active Ads', val: posts.filter(p => p.isAd).length, icon: <Briefcase/>, color: 'text-amber-500' },
-             { label: 'MakTV Assets', val: posts.filter(p => p.isMakTV).length, icon: <Tv/>, color: 'text-indigo-400' },
+             { label: 'Total Engagement', val: posts.reduce((a,c) => a+c.views, 0).toLocaleString(), icon: <Activity/>, color: 'text-indigo-600 dark:text-indigo-500' },
+             { label: 'Ad Revenue', val: `UGX ${totalAdRevenue.toLocaleString()}`, icon: <DollarSign/>, color: 'text-emerald-600 dark:text-emerald-500' },
+             { label: 'Active Ads', val: posts.filter(p => p.isAd).length, icon: <Briefcase/>, color: 'text-amber-600 dark:text-amber-500' },
+             { label: 'MakTV Assets', val: posts.filter(p => p.isMakTV).length, icon: <Tv/>, color: 'text-indigo-600 dark:text-indigo-400' },
            ].map((s,i) => (
-             <div key={i} className="glass-card p-8 shadow-2xl bg-gradient-to-br from-indigo-500/[0.02] to-transparent border-white/5">
-                <div className={`p-3 rounded-xl bg-white/5 w-fit mb-6 ${s.color}`}>{s.icon}</div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{s.label}</p>
-                <h3 className="text-4xl font-black italic mt-1 text-white">{s.val}</h3>
+             <div key={i} className="glass-card p-8 shadow-sm bg-[var(--sidebar-bg)] border-[var(--border-color)] group hover:border-indigo-500 transition-all">
+                <div className={`p-3 rounded-xl bg-[var(--bg-secondary)] w-fit mb-6 ${s.color}`}>{s.icon}</div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{s.label}</p>
+                <h3 className="text-4xl font-black italic mt-1 text-[var(--text-primary)]">{s.val}</h3>
              </div>
            ))}
         </div>
@@ -165,22 +164,22 @@ const Admin: React.FC = () => {
       {activeTab === 'timeline' && (
         <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700">
            <div className="flex items-center justify-between">
-              <h3 className="text-3xl font-black text-white italic tracking-tighter uppercase">Activity Stream</h3>
+              <h3 className="text-3xl font-black text-[var(--text-primary)] italic tracking-tighter uppercase">Activity Stream</h3>
               <button 
                 onClick={() => { localStorage.removeItem('maksocial_timeline_v1'); setTimeline([]); }}
-                className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-400"
+                className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-700"
               >
                 Flush Logs
               </button>
            </div>
 
            <div className="relative pl-8 md:pl-0">
-              <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-white/5 -translate-x-1/2"></div>
+              <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-[var(--border-color)] -translate-x-1/2 transition-theme"></div>
 
               {Object.entries(groupedTimeline).length > 0 ? Object.entries(groupedTimeline).map(([date, events]) => (
                 <div key={date} className="relative mb-16 last:mb-0">
                    <div className="flex justify-start md:justify-center mb-10 relative z-10">
-                      <span className="px-6 py-2 bg-[#020617] border border-white/10 rounded-full text-[10px] font-black text-indigo-400 uppercase tracking-widest shadow-2xl">
+                      <span className="px-6 py-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest shadow-sm transition-theme">
                          {date}
                       </span>
                    </div>
@@ -191,24 +190,24 @@ const Admin: React.FC = () => {
                         return (
                           <div key={event.id} className={`flex items-start md:items-center gap-8 md:gap-0 relative ${isEven ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
                              <div className={`w-full md:w-[45%] group`}>
-                                <div className={`glass-card p-5 border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-all relative ${isEven ? 'md:ml-auto' : 'md:mr-auto'}`}>
+                                <div className={`glass-card p-6 border-[var(--border-color)] bg-[var(--sidebar-bg)] hover:bg-[var(--bg-secondary)] transition-theme relative shadow-sm ${isEven ? 'md:ml-auto' : 'md:mr-auto'}`}>
                                    <div className="flex items-center gap-3 mb-3">
-                                      <img src={event.userAvatar} className="w-8 h-8 rounded-lg object-cover border border-white/10" />
+                                      <img src={event.userAvatar} className="w-8 h-8 rounded-lg object-cover border border-[var(--border-color)]" />
                                       <div>
-                                         <h4 className="text-[11px] font-black text-white uppercase tracking-tight leading-none">{event.userName}</h4>
-                                         <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                         <h4 className="text-[11px] font-black text-[var(--text-primary)] uppercase tracking-tight leading-none">{event.userName}</h4>
+                                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                       </div>
                                    </div>
-                                   <p className="text-[12px] text-slate-300 font-medium italic">"{event.description}"</p>
+                                   <p className="text-[13px] text-slate-600 dark:text-slate-300 font-medium italic">"{event.description}"</p>
                                    {event.details && (
-                                     <div className="mt-3 p-3 bg-black/40 rounded-xl border border-white/5 text-[10px] text-slate-500 leading-relaxed font-mono">
+                                     <div className="mt-3 p-3 bg-slate-50 dark:bg-black/40 rounded-xl border border-[var(--border-color)] text-[10px] text-slate-500 leading-relaxed font-mono">
                                         {event.details}
                                      </div>
                                    )}
                                 </div>
                              </div>
                              <div className="absolute left-0 md:left-1/2 -translate-x-1/2 z-20">
-                                <div className={`w-10 h-10 rounded-full border-2 border-[#020617] flex items-center justify-center shadow-xl ${getEventColorClass(event.type)}`}>
+                                <div className={`w-10 h-10 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center shadow-lg transition-theme ${getEventColorClass(event.type)}`}>
                                    {getEventIcon(event.type)}
                                 </div>
                              </div>
@@ -219,7 +218,7 @@ const Admin: React.FC = () => {
                    </div>
                 </div>
               )) : (
-                <div className="p-32 text-center glass-card border-dashed text-slate-600 font-black uppercase italic text-xs">
+                <div className="p-32 text-center glass-card border-dashed border-[var(--border-color)] text-slate-400 font-black uppercase italic text-xs tracking-widest">
                    Awaiting platform signals...
                 </div>
               )}
@@ -230,39 +229,39 @@ const Admin: React.FC = () => {
       {activeTab === 'maktv' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-right-5">
            <div className="lg:col-span-5 space-y-6">
-              <div className="glass-card p-8 border-indigo-500/20 bg-indigo-950/5 relative overflow-hidden">
-                 <h3 className="text-2xl font-black italic text-white mb-6 uppercase tracking-tight flex items-center gap-2">
-                   <Radio size={24} className="text-indigo-500" /> Broadcast Studio
+              <div className="glass-card p-8 border-indigo-500/20 bg-indigo-50/30 dark:bg-indigo-950/5 relative overflow-hidden shadow-sm">
+                 <h3 className="text-2xl font-black italic text-[var(--text-primary)] mb-6 uppercase tracking-tight flex items-center gap-2">
+                   <Radio size={24} className="text-indigo-600 dark:text-indigo-500" /> Broadcast Studio
                  </h3>
                  <div className="space-y-4">
-                    <div className="flex p-1 bg-white/5 rounded-xl border border-white/5">
+                    <div className="flex p-1 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-color)] transition-theme">
                        <button onClick={() => setMakType('News')} className={`flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest ${makType === 'News' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500'}`}>News Hour</button>
                        <button onClick={() => setMakType('Interview')} className={`flex-1 py-3 rounded-lg text-[9px] font-black uppercase tracking-widest ${makType === 'Interview' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500'}`}>Alumni Spotlight</button>
                     </div>
                     {makType === 'Interview' && (
-                      <input className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm outline-none" placeholder="Guest Identity" value={makGuest} onChange={e => setMakGuest(e.target.value)} />
+                      <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] text-sm outline-none focus:border-indigo-500 transition-theme" placeholder="Guest Identity" value={makGuest} onChange={e => setMakGuest(e.target.value)} />
                     )}
-                    <textarea className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm outline-none h-24 resize-none" placeholder="Broadcast Headlines" value={makContent} onChange={e => setMakContent(e.target.value)} />
-                    <input className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm outline-none" placeholder="Video URL" value={makVideoUrl} onChange={e => setMakVideoUrl(e.target.value)} />
-                    <button onClick={handleCreateMakTV} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/30">GO LIVE</button>
+                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] text-sm outline-none h-24 resize-none focus:border-indigo-500 transition-theme" placeholder="Broadcast Headlines" value={makContent} onChange={e => setMakContent(e.target.value)} />
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-[var(--text-primary)] text-sm outline-none focus:border-indigo-500 transition-theme" placeholder="Video URL" value={makVideoUrl} onChange={e => setMakVideoUrl(e.target.value)} />
+                    <button onClick={handleCreateMakTV} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/30 active:scale-95 transition-all">GO LIVE</button>
                  </div>
               </div>
            </div>
            <div className="lg:col-span-7 space-y-6">
-              <h3 className="text-xl font-black italic text-white uppercase tracking-widest flex items-center gap-2"><Tv size={20} className="text-slate-500" /> Master Inventory</h3>
-              <div className="grid grid-cols-1 gap-4 max-h-[500px] overflow-y-auto no-scrollbar">
+              <h3 className="text-xl font-black italic text-[var(--text-primary)] uppercase tracking-widest flex items-center gap-2"><Tv size={20} className="text-slate-400" /> Master Inventory</h3>
+              <div className="grid grid-cols-1 gap-4 max-h-[500px] overflow-y-auto no-scrollbar pr-2">
                  {posts.filter(p => p.isMakTV).map(p => (
-                   <div key={p.id} className="glass-card p-5 border-white/5 bg-white/[0.01] flex gap-5 items-center">
-                      <div className="w-32 aspect-video rounded-xl bg-black border border-white/10 overflow-hidden shrink-0">
+                   <div key={p.id} className="glass-card p-5 border-[var(--border-color)] bg-[var(--sidebar-bg)] hover:bg-[var(--bg-secondary)] transition-theme flex gap-5 items-center shadow-sm">
+                      <div className="w-32 aspect-video rounded-xl bg-black border border-[var(--border-color)] overflow-hidden shrink-0 shadow-sm">
                          <video src={p.video} className="w-full h-full object-cover" muted />
                       </div>
-                      <div className="flex-1">
-                         <div className="flex justify-between">
-                            <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400">{p.makTVType}</span>
-                            <button onClick={() => { db.deletePost(p.id, 'admin'); setPosts(db.getPosts()); }} className="text-rose-500"><Trash2 size={16}/></button>
+                      <div className="flex-1 min-w-0">
+                         <div className="flex justify-between items-start">
+                            <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">{p.makTVType}</span>
+                            <button onClick={() => { db.deletePost(p.id, 'admin'); setPosts(db.getPosts()); }} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
                          </div>
-                         <h4 className="text-white text-xs font-black mt-2">{p.makTVGuest || 'CAMPUS NEWS'}</h4>
-                         <p className="text-[10px] text-slate-500 line-clamp-1">"{p.content}"</p>
+                         <h4 className="text-[var(--text-primary)] text-xs font-black mt-2 truncate uppercase tracking-tight">{p.makTVGuest || 'CAMPUS NEWS'}</h4>
+                         <p className="text-[10px] text-slate-400 line-clamp-1 italic mt-1">"{p.content}"</p>
                       </div>
                    </div>
                  ))}

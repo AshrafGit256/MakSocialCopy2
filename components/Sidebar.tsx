@@ -28,14 +28,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   };
 
   return (
-    <aside className="w-64 border-r border-white/5 flex flex-col h-full bg-[#020617] z-50 transition-all shadow-2xl">
+    <aside className="w-64 border-r border-[var(--border-color)] flex flex-col h-full bg-[var(--sidebar-bg)] z-50 transition-theme shadow-lg">
       <div className="p-6">
         <div className="mb-10 cursor-pointer group" onClick={() => setView('home')}>
           <img
-  src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
-  alt="MakSocial Logo"
-/>
-
+            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
+            alt="MakSocial Logo"
+            className="w-full grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all"
+          />
         </div>
 
         <nav className="space-y-1">
@@ -43,16 +43,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             <button
               key={item.id}
               onClick={() => setView(item.id as AppView)}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all group ${
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all group ${
                 activeView === item.id 
-                ? 'bg-indigo-600/10 text-indigo-400 font-bold' 
-                : 'text-slate-500 hover:bg-white/5 hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-md' 
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
-              <span className={`transition-transform duration-300 group-hover:scale-110 ${activeView === item.id ? 'text-indigo-400' : ''}`}>
+              <span className={`transition-transform duration-300 group-hover:scale-110`}>
                 {item.icon}
               </span>
-              <span className="text-xs tracking-wide font-bold uppercase">
+              <span className="text-[10px] tracking-widest font-black uppercase">
                 {item.id === 'groups' ? `${currentUser.college} Wing` : item.label}
               </span>
             </button>
@@ -60,14 +60,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           
           <button
             onClick={() => setView('events')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all group ${
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all group ${
               activeView === 'events' 
-              ? 'bg-rose-600/10 text-rose-400 font-bold' 
-              : 'text-slate-500 hover:bg-white/5 hover:text-white'
+              ? 'bg-rose-600 text-white shadow-md' 
+              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
             }`}
           >
-            <Radio size={20} className={activeView === 'events' ? 'text-rose-400' : ''} />
-            <span className="text-xs tracking-wide font-bold uppercase">Live Hub</span>
+            <Radio size={20} />
+            <span className="text-[10px] tracking-widest font-black uppercase">Live Hub</span>
           </button>
         </nav>
       </div>
@@ -76,22 +76,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
         {isAdmin && (
           <button
             onClick={() => setView('admin')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all border border-dashed ${
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all border border-dashed ${
               activeView === 'admin' 
               ? 'bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-600/20' 
-              : 'border-white/10 text-slate-500 hover:border-white/30 hover:text-white'
+              : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500 hover:text-indigo-500'
             }`}
           >
             <Cpu size={18} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Admin Control</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">Admin Control</span>
           </button>
         )}
         
         <div className="flex gap-2">
-           <button onClick={toggleTheme} className="flex-1 p-3 bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all flex items-center justify-center">
+           <button onClick={toggleTheme} className="flex-1 p-3 bg-[var(--bg-secondary)] rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all flex items-center justify-center">
              {isDark ? <Sun size={18} /> : <Moon size={18} />}
            </button>
-           <button onClick={onLogout} className="flex-1 p-3 bg-rose-500/10 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center">
+           <button onClick={onLogout} className="flex-1 p-3 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center">
              <LogOut size={18} />
            </button>
         </div>

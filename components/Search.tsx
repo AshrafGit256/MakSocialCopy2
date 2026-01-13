@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Post } from '../types';
@@ -57,35 +56,23 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 space-y-12 pb-32">
       <div className="relative group max-w-4xl mx-auto">
-        {/* Animated aura */}
-        <div className="absolute -inset-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-[3rem] blur-2xl opacity-20 group-focus-within:opacity-40 transition duration-700"></div>
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-4 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-full px-6 py-4 focus-within:border-indigo-500 transition-colors">
+            
+            <SearchIcon size={20} className="text-slate-400" />
 
-        <div className="relative flex items-center bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-[3rem] px-6 py-6 shadow-2xl backdrop-blur-xl transition-all group-focus-within:border-indigo-500">
-          
-          {/* Icon bubble */}
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/10 text-indigo-600 group-focus-within:bg-indigo-600 group-focus-within:text-white transition-all">
-            <SearchIcon size={26} />
-          </div>
-
-          {/* Input */}
-          <input
-            className="flex-1 bg-transparent px-6 text-xl font-semibold text-[var(--text-primary)] outline-none placeholder:text-slate-400"
-            placeholder="Search students, posts, hashtags, or ideas..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoFocus
-          />
-
-          {/* Live indicator */}
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-            Live
+            <input
+              className="flex-1 bg-transparent text-base font-medium text-[var(--text-primary)] outline-none placeholder:text-slate-500"
+              placeholder="Search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              autoFocus
+            />
           </div>
         </div>
       </div>
 
-
-      {query.trim() ? (
+      query.trim() ? 
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-500">
           <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-[1.5rem] border border-[var(--border-color)] w-fit">
             {[
@@ -193,18 +180,7 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
             </div>
           </div>
         </div>
-      ) : (
-        <div className="py-40 text-center space-y-8 animate-in fade-in zoom-in duration-700">
-           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner relative group">
-              <div className="absolute inset-0 bg-indigo-600 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-10"></div>
-              <SearchIcon size={56} className="text-slate-300 group-hover:text-indigo-600 transition-colors duration-500" />
-           </div>
-           <div className="space-y-2">
-             <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Deep Scan Initialization Required</h3>
-             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">Awaiting alphanumeric signal input...</p>
-           </div>
-        </div>
-      )}
+      
     </div>
   );
 };

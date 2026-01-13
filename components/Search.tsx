@@ -72,7 +72,7 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
         </div>
       </div>
 
-      query.trim() ? 
+      {query.trim() ? (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-500">
           <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-[1.5rem] border border-[var(--border-color)] w-fit">
             {[
@@ -180,7 +180,18 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
             </div>
           </div>
         </div>
-      
+      ) : (
+        <div className="py-40 text-center space-y-8 animate-in fade-in zoom-in duration-700">
+           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner relative group">
+              <div className="absolute inset-0 bg-indigo-600 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-10"></div>
+              <SearchIcon size={56} className="text-slate-300 group-hover:text-indigo-600 transition-colors duration-500" />
+           </div>
+           <div className="space-y-2">
+             <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Deep Scan Initialization Required</h3>
+             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">Awaiting alphanumeric signal input...</p>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

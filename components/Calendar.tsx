@@ -174,7 +174,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <h1 className="text-6xl font-black italic tracking-tighter text-[var(--text-primary)] uppercase flex items-center gap-4">
-             <CalendarDays className="text-indigo-500" size={48} /> Calendar
+             <CalendarDays className="text-3xl font-extrabold tracking-tighter text-[var(--text-primary)] uppercase"/> Calendar
            </h1>
            <p className="text-slate-500 font-bold uppercase tracking-[0.4em] text-[10px] mt-2 ml-1">Universal Campus Registry Protocol</p>
         </div>

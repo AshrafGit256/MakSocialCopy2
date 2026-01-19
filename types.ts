@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'nexus';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -20,6 +20,21 @@ export interface Resource {
   fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
   fileData?: string; // Base64 data for local storage
   timestamp: string;
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  college: College;
+  ownerId: string;
+  ownerName: string;
+  status: 'Recruiting' | 'Building' | 'Alpha' | 'Completed';
+  tags: string[];
+  rolesNeeded: string[];
+  team: { id: string, name: string, avatar: string }[];
+  timestamp: string;
+  progress: number;
 }
 
 export interface AnalyticsData {

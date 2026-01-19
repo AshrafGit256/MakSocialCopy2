@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Post, User, College, CollegeStats, LeadershipMember, AuthorityRole } from '../types';
 import { db } from '../db';
 import { GoogleGenAI } from "@google/genai";
@@ -38,9 +39,11 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const [collegeStats, setCollegeStats] = useState<CollegeStats[]>(db.getCollegeStats());
   const [activeTab, setActiveTab] = useState<College | 'Global'>(collegeFilter || 'Global');
   const [newPostContent, setNewPostContent] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [rejectionMessage, setRejectionMessage] = useState<string | null>(null);
   const [showManageModal, setShowManageModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Identity logic
   const isSuperAdmin = user.email?.toLowerCase().endsWith('@admin.mak.ac.ug');
@@ -78,17 +81,34 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     setCollegeStats(db.getCollegeStats());
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleCreatePost = async () => {
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() && !selectedImage) return;
     setIsAnalyzing(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Analyze: "${newPostContent}". JSON {category: Academic/Social/Urgent, isSafe: boolean, reason: string}`,
-        config: { responseMimeType: "application/json" }
-      });
-      const result = JSON.parse(response.text);
+      let result = { category: 'Social', isSafe: true, reason: '' };
+      
+      // If there's text, analyze it with Gemini
+      if (newPostContent.trim()) {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: `Analyze: "${newPostContent}". JSON {category: Academic/Social/Urgent, isSafe: boolean, reason: string}`,
+          config: { responseMimeType: "application/json" }
+        });
+        result = JSON.parse(response.text);
+      }
+
       if (!result.isSafe) {
         setRejectionMessage(result.reason);
         setIsAnalyzing(false);
@@ -96,19 +116,43 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
       }
       
       const newPost: Post = {
-        id: Date.now().toString(), author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar,
+        id: Date.now().toString(), 
+        author: user.name, 
+        authorId: user.id, 
+        authorRole: user.role, 
+        authorAvatar: user.avatar,
         authorAuthority: isSuperAdmin ? 'Super Admin' : (isAdminOfActiveCollege ? 'Administrator' : undefined),
-        timestamp: 'Just now', content: newPostContent, hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1,
-        flags: [], isOpportunity: result.category === 'Career', college: activeCollege || 'Global',
-        aiMetadata: { category: result.category, isSafe: true }
+        timestamp: 'Just now', 
+        content: newPostContent, 
+        images: selectedImage ? [selectedImage] : undefined,
+        hashtags: [], 
+        likes: 0, 
+        commentsCount: 0, 
+        comments: [], 
+        views: 1,
+        flags: [], 
+        isOpportunity: result.category === 'Career', 
+        college: activeCollege || 'Global',
+        aiMetadata: { category: result.category as any, isSafe: true }
       };
       db.addPost(newPost);
       setNewPostContent('');
+      setSelectedImage(null);
       setPosts(db.getPosts(activeCollege || undefined));
       setIsAnalyzing(false);
     } catch (e) { 
       setIsAnalyzing(false); 
       console.error(e);
+      // Fallback post if Gemini fails
+      const fallbackPost: Post = {
+        id: Date.now().toString(), author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar,
+        timestamp: 'Just now', content: newPostContent, images: selectedImage ? [selectedImage] : undefined,
+        hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], 
+        isOpportunity: false, college: activeCollege || 'Global'
+      };
+      db.addPost(fallbackPost);
+      setNewPostContent('');
+      setSelectedImage(null);
     }
   };
 
@@ -218,9 +262,41 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                       <img src={user.avatar} className="w-12 h-12 rounded-xl object-cover border border-[var(--border-color)]" />
                       <textarea value={newPostContent} onChange={e => setNewPostContent(e.target.value)} className="flex-1 bg-transparent border-none focus:outline-none text-[15px] font-medium resize-none h-24 placeholder:text-slate-400 text-[var(--text-primary)]" placeholder={`Broadcast to ${activeCollege || 'the Hill'}...`} />
                    </div>
+                   
+                   {/* Image Preview */}
+                   {selectedImage && (
+                     <div className="mt-4 relative inline-block">
+                        <img src={selectedImage} className="max-h-48 rounded-xl border border-[var(--border-color)] shadow-lg" />
+                        <button 
+                          onClick={() => setSelectedImage(null)}
+                          className="absolute -top-2 -right-2 p-1.5 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-colors shadow-lg"
+                        >
+                          <X size={14}/>
+                        </button>
+                     </div>
+                   )}
+
                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-[var(--border-color)]">
-                      <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest"><ImageIcon size={18}/> Asset</button>
-                      <button onClick={handleCreatePost} disabled={isAnalyzing || !newPostContent.trim()} className="bg-indigo-600 text-white px-10 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 shadow-lg shadow-indigo-600/20">
+                      <div className="flex gap-4">
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          onChange={handleImageSelect} 
+                          accept="image/*" 
+                          className="hidden" 
+                        />
+                        <button 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest transition-colors"
+                        >
+                          <ImageIcon size={18}/> Asset
+                        </button>
+                      </div>
+                      <button 
+                        onClick={handleCreatePost} 
+                        disabled={isAnalyzing || (!newPostContent.trim() && !selectedImage)} 
+                        className="bg-indigo-600 text-white px-10 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+                      >
                          {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16}/>} Broadcast
                       </button>
                    </div>
@@ -250,7 +326,15 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              )}
                           </div>
                        </div>
+                       
                        <p className="text-[var(--text-primary)] text-base font-medium leading-relaxed italic border-l-2 border-indigo-600/30 pl-6 py-1">"{post.content}"</p>
+                       
+                       {post.images && post.images.length > 0 && (
+                         <div className="mt-6 rounded-2xl overflow-hidden border border-[var(--border-color)]">
+                            <img src={post.images[0]} className="w-full object-cover max-h-[600px] hover:scale-[1.02] transition-transform duration-700" alt="Signal Asset" />
+                         </div>
+                       )}
+
                        <div className="flex items-center gap-10 pt-6 mt-6 border-t border-[var(--border-color)]">
                           <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors"><Heart size={20}/> <span className="text-xs font-black">{post.likes}</span></button>
                           <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors"><MessageCircle size={20}/> <span className="text-xs font-black">{post.commentsCount}</span></button>

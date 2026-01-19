@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { 
-  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar
+  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
@@ -9,6 +9,7 @@ export const NAV_ITEMS = [
   { id: 'home', label: 'Global Pulse', icon: <Home size={22} /> },
   { id: 'search', label: 'Search', icon: <Search size={22} /> },
   { id: 'calendar', label: 'Calendar', icon: <Calendar size={22} /> },
+  { id: 'resources', label: 'Resource Lab', icon: <BookOpen size={22} /> },
   { id: 'explore', label: 'Explore', icon: <Compass size={22} /> },
   { id: 'messages', label: 'Messages', icon: <MessageCircle size={22} /> },
   { id: 'groups', label: 'Colleges', icon: <LayoutGrid size={22} /> },
@@ -48,7 +49,7 @@ export const MOCK_POSTS: Post[] = [
     isEventBroadcast: true,
     eventId: 'ev-1',
     eventTitle: '89th Guild Inauguration Ceremony',
-    eventFlyer: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200',
+    eventFlyer: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvr2YhoOthHq7cV6DqnFdb9h0thE2b9DxHCA&s',
     eventDate: '2025-05-15',
     eventTime: '14:00',
     eventLocation: 'Main Hall, Makerere University',

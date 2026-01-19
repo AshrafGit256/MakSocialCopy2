@@ -13,6 +13,7 @@ import Events from './components/Events';
 import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
+import Resources from './components/Resources';
 import { db } from './db';
 import { Menu, X } from 'lucide-react';
 
@@ -106,6 +107,7 @@ const App: React.FC = () => {
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={navigateToProfile} onNavigateToPost={navigateToPost} />;
+      case 'resources': return <Resources />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }

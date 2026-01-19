@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent, Notification } from './types';
+import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent, Notification, Resource } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -8,8 +8,16 @@ const DB_KEYS = {
   LOGGED_IN_ID: 'maksocial_current_user_id',
   CALENDAR: 'maksocial_calendar_v5',
   COLLEGE_STATS: 'maksocial_college_stats_v13',
-  TIMELINE: 'maksocial_timeline_v6'
+  TIMELINE: 'maksocial_timeline_v6',
+  RESOURCES: 'maksocial_resources_v1'
 };
+
+const INITIAL_RESOURCES: Resource[] = [
+  { id: 'res-1', title: 'Data Structures Past Paper 2023', category: 'Past Paper', college: 'COCIS', author: 'Dr. John Kizito', downloads: 1240, fileType: 'PDF', timestamp: '2024-01-10' },
+  { id: 'res-2', title: 'Constitutional Law Summary Notes', category: 'Notes', college: 'LAW', author: 'Opio Samuel', downloads: 850, fileType: 'PDF', timestamp: '2024-02-15' },
+  { id: 'res-3', title: 'Structural Engineering Design Guide', category: 'Research', college: 'CEDAT', author: 'Eng. Sarah Nakato', downloads: 450, fileType: 'DOCX', timestamp: '2024-03-05' },
+  { id: 'res-4', title: 'Graduate Trainee Roadmap 2025', category: 'Career', college: 'Global', author: 'Career Office', downloads: 3200, fileType: 'PDF', timestamp: '2024-04-20' },
+];
 
 const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
@@ -21,7 +29,7 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
     location: 'Main Hall, Makerere University',
     category: 'Social',
     createdBy: 'super_admin',
-    image: 'https://www.independent.co.ug/wp-content/uploads/2023/02/Makerere-Guild-polls.jpg',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvr2YhoOthHq7cV6DqnFdb9h0thE2b9DxHCA&s',
     attendeeIds: ['u1', 'admin_cocis'],
     registrationLink: 'https://mak.ac.ug/guild'
   },
@@ -37,19 +45,6 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
     image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200',
     attendeeIds: ['u1'],
     registrationLink: 'https://innovate.mak.ac.ug'
-  },
-  {
-    id: 'ev-3',
-    title: 'Inter-College Sports Gala Finals',
-    description: 'The annual sports showdown. Watch your college battle for the championship trophy.',
-    date: '2025-05-20',
-    time: '16:00',
-    location: 'University Freedom Square',
-    category: 'Sports',
-    createdBy: 'super_admin',
-    image: 'https://images.unsplash.com/photo-1541252260730-0412e8e2108e?auto=format&fit=crop&w=1200',
-    attendeeIds: [],
-    registrationLink: 'https://sports.mak.ac.ug'
   }
 ];
 
@@ -172,12 +167,13 @@ export const db = {
   },
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
-    // Prevent duplicate entries by checking title and date
-    const exists = events.some(e => e.title === event.title && e.date === event.date);
-    if (exists) return;
-    
-    const updated = [...events, event];
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+    const existsIndex = events.findIndex(e => e.id === event.id);
+    if (existsIndex !== -1) {
+       events[existsIndex] = event;
+    } else {
+       events.push(event);
+    }
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
   },
   deleteCalendarEvent: (eventId: string) => {
     const events = db.getCalendarEvents();
@@ -196,6 +192,15 @@ export const db = {
       return e;
     });
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+  },
+
+  getResources: (): Resource[] => {
+    const saved = localStorage.getItem(DB_KEYS.RESOURCES);
+    return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
+  },
+  addResource: (res: Resource) => {
+    const resources = db.getResources();
+    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([res, ...resources]));
   },
 
   updateCollegeLeadership: (collegeId: College, leadership: LeadershipMember[]) => {

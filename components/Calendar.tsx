@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { CalendarEvent, Post, User, College } from '../types';
 import { 
   Calendar as CalendarIcon, Clock, MapPin, Plus, Trash2, 
   ChevronLeft, ChevronRight, Zap, Info, Camera,
   AlertCircle, Bell, ArrowRight, X, ExternalLink, CalendarDays,
-  CheckCircle2, Users, LayoutGrid
+  CheckCircle2, Users, LayoutGrid, Image as ImageIcon, CalendarCheck
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -68,15 +68,19 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
   const [currentUser, setCurrentUser] = useState<User>(db.getUser());
   const [repostTarget, setRepostTarget] = useState<College | 'Global'>('Global');
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState<Partial<CalendarEvent>>({
     title: '', description: '', date: '', time: '', location: '', category: 'Social', registrationLink: '', image: ''
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const sync = () => {
       setEvents(db.getCalendarEvents());
       setCurrentUser(db.getUser());
-    }, 2000);
+    };
+    sync();
+    const interval = setInterval(sync, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -86,15 +90,27 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
   const handlePrevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
   const handleNextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm({ ...form, image: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddEvent = () => {
     if (!form.title || !form.date) return;
     const newEvent: CalendarEvent = {
       ...form as CalendarEvent,
       id: Date.now().toString(),
-      createdBy: 'admin',
+      createdBy: currentUser.id,
       attendeeIds: []
     };
     db.saveCalendarEvent(newEvent);
+    setEvents(db.getCalendarEvents());
     setIsAdding(false);
     setForm({ title: '', description: '', date: '', time: '', location: '', category: 'Social', registrationLink: '', image: '' });
   };
@@ -110,21 +126,22 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
     const broadcast: Post = {
       id: `broadcast-${Date.now()}`,
       author: 'Campus Events',
-      authorId: 'admin',
+      authorId: currentUser.id,
       authorRole: 'Official Channel',
       authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
       timestamp: 'Just now',
       content: event.description,
-      images: event.image ? [event.image] : undefined,
+      eventFlyer: event.image,
       hashtags: ['#MakEvent', `#${event.category}`],
       likes: 0,
       commentsCount: 0,
       comments: [],
-      views: 0,
+      views: 1,
       flags: [],
       isOpportunity: false,
       college: repostTarget,
       isEventBroadcast: true,
+      eventId: event.id,
       eventDate: event.date,
       eventTime: event.time,
       eventLocation: event.location,
@@ -132,7 +149,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
       eventRegistrationLink: event.registrationLink
     };
     db.addPost(broadcast);
-    alert(`Broadcast pushed to ${repostTarget} Hub.`);
+    alert(`Protocol Broadcast pushed to ${repostTarget} Hub Registry.`);
     setSelectedEvent(null);
   };
 
@@ -190,16 +207,16 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
            <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.4em] text-[10px] mt-2 ml-1">Universal Campus Registry Protocol</p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 w-full md:w-auto">
            {isAdmin && (
-             <button onClick={() => setIsAdding(true)} className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 flex items-center gap-2">
+             <button onClick={() => setIsAdding(true)} className="flex-1 md:flex-none bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 flex items-center justify-center gap-2">
                <Plus size={16} /> New Event
              </button>
            )}
            <div className="flex bg-[var(--bg-secondary)] rounded-2xl p-1 border border-[var(--border-color)] shadow-sm">
               <button onClick={handlePrevMonth} className="p-3 text-slate-500 hover:text-indigo-600 transition-colors"><ChevronLeft size={20}/></button>
-              <div className="px-6 flex items-center justify-center min-w-[180px]">
-                 <span className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)]">
+              <div className="px-6 flex items-center justify-center min-w-[150px]">
+                 <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)]">
                    {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
                  </span>
               </div>
@@ -220,7 +237,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
 
       {selectedEvent && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 animate-in fade-in duration-300 backdrop-blur-md">
-           <div className="glass-card w-full max-w-5xl overflow-hidden flex flex-col md:flex-row shadow-2xl border-[var(--border-color)]">
+           <div className="glass-card w-full max-w-5xl overflow-hidden flex flex-col md:flex-row shadow-2xl border-[var(--border-color)] bg-[var(--sidebar-bg)]">
               <div className="md:w-1/2 relative h-80 md:h-auto overflow-hidden">
                  <img src={selectedEvent.image || 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200'} className="w-full h-full object-cover" />
                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
@@ -255,8 +272,8 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                     </div>
                  </div>
 
-                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed border-l-2 border-indigo-500 pl-4">
-                   {selectedEvent.description}
+                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed border-l-2 border-indigo-500 pl-4 font-medium italic">
+                   "{selectedEvent.description}"
                  </p>
 
                  <div className="flex flex-col gap-3 pt-4">
@@ -265,12 +282,12 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                       disabled={isRegistered}
                       className={`w-full p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all ${
                         isRegistered 
-                        ? 'bg-emerald-500 text-white' 
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        ? 'bg-emerald-600 text-white' 
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/30'
                       }`}
                     >
                       {isRegistered ? <CheckCircle2 size={16}/> : <Zap size={16}/>}
-                      {isRegistered ? 'Registration Confirmed (Check Signal Stream)' : 'Register for Event'}
+                      {isRegistered ? 'Identity Logged (Validated)' : 'Register for Event'}
                     </button>
                     
                     {isAdmin && (
@@ -279,7 +296,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                             <button 
                                onClick={() => setRepostTarget('Global')}
-                               className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all ${repostTarget === 'Global' ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-500'}`}
+                               className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${repostTarget === 'Global' ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-500'}`}
                             >
                                Global Hub
                             </button>
@@ -287,7 +304,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                                <button 
                                   key={c}
                                   onClick={() => setRepostTarget(c)}
-                                  className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all ${repostTarget === c ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-500'}`}
+                                  className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all whitespace-nowrap ${repostTarget === c ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-500'}`}
                                >
                                   {c} Wing
                                </button>
@@ -295,7 +312,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                          </div>
                          <button 
                             onClick={() => pushToFeed(selectedEvent)}
-                            className="w-full bg-rose-600 text-white p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-rose-700"
+                            className="w-full bg-rose-600 text-white p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-rose-700 shadow-rose-600/20"
                          >
                             <ExternalLink size={14}/> Push Command to {repostTarget}
                          </button>
@@ -308,24 +325,62 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
       )}
 
       {isAdding && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 backdrop-blur-md">
-           <div className="glass-card w-full max-w-xl p-8 border-[var(--border-color)] shadow-2xl space-y-6 bg-[var(--sidebar-bg)]">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Add New Event</h2>
-                <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500"><X size={24}/></button>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 backdrop-blur-md animate-in fade-in duration-300">
+           <div className="glass-card w-full max-w-xl p-10 border-[var(--border-color)] shadow-2xl space-y-6 bg-[var(--sidebar-bg)] rounded-[3rem] overflow-y-auto max-h-[90vh] no-scrollbar">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Initialize Event</h2>
+                <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 p-2 transition-colors"><X size={28}/></button>
               </div>
-              <div className="space-y-4">
-                 <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" placeholder="Event Title" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-                 <div className="grid grid-cols-2 gap-4">
-                    <input type="date" className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
-                    <input type="time" className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
-                 </div>
-                 <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" placeholder="Location" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
-                 <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" placeholder="Flyer Image URL" value={form.image} onChange={e => setForm({...form, image: e.target.value})} />
-                 <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none h-24 resize-none" placeholder="Brief Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+              <div className="space-y-5">
                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Category</label>
-                    <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none appearance-none" value={form.category} onChange={e => setForm({...form, category: e.target.value as any})}>
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Title</label>
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" placeholder="e.g. Research Seminar" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
+                 </div>
+                 
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Date</label>
+                       <input type="date" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Time</label>
+                       <input type="time" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
+                    </div>
+                 </div>
+
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Venue Protocol</label>
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" placeholder="e.g. COCIS Block B" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
+                 </div>
+
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Flyer (PC/Device Upload)</label>
+                    <div className="flex gap-4">
+                       <button 
+                         onClick={() => fileInputRef.current?.click()}
+                         className="flex-1 p-4 rounded-2xl border-2 border-dashed border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5 transition-all flex flex-col items-center justify-center gap-2 group"
+                       >
+                          {form.image ? (
+                             <img src={form.image} className="h-16 w-full object-cover rounded-xl" />
+                          ) : (
+                             <>
+                                <ImageIcon size={24} className="text-slate-400 group-hover:text-indigo-600" />
+                                <span className="text-[9px] font-black uppercase text-slate-500">Pick from Device</span>
+                             </>
+                          )}
+                       </button>
+                       <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
+                    </div>
+                 </div>
+
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Event Logic</label>
+                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none h-24 resize-none font-bold" placeholder="Mission details..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+                 </div>
+
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Category Protocol</label>
+                    <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none appearance-none font-bold" value={form.category} onChange={e => setForm({...form, category: e.target.value as any})}>
                        <option>Academic</option>
                        <option>Social</option>
                        <option>Sports</option>
@@ -334,7 +389,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                     </select>
                  </div>
               </div>
-              <button onClick={handleAddEvent} className="w-full bg-indigo-600 p-5 rounded-2xl text-white font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 transition-all">Save Event</button>
+              <button onClick={handleAddEvent} className="w-full bg-indigo-600 p-6 rounded-3xl text-white font-black text-xs uppercase tracking-[0.3em] shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 transition-all active:scale-[0.98]">Save Protocol to Registry</button>
            </div>
         </div>
       )}

@@ -15,7 +15,7 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-1',
     title: '89th Guild Inauguration Ceremony',
-    description: 'The official swearing-in of the 89th Guild Government. Join us for this historic evening of leadership transition and academic excellence.',
+    description: 'The official swearing-in of the 89th Guild Government. A historic day for student leadership at Makerere.',
     date: '2025-05-15',
     time: '14:00',
     location: 'Main Hall, Makerere University',
@@ -28,7 +28,7 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-2',
     title: 'MAK Innovation Challenge 2025',
-    description: 'Presenting the brightest tech solutions from COCIS and CEDAT. Win funding for your startup and connect with industry leaders.',
+    description: 'Pitch your research and tech solutions to a panel of industrial experts. Funding and mentoring up for grabs.',
     date: '2025-06-10',
     time: '09:00',
     location: 'COCIS Conference Room',
@@ -41,7 +41,7 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-3',
     title: 'Inter-College Sports Gala Finals',
-    description: 'The final showdown of the semester. COCIS vs LAW in the football finals. Wear your college colors!',
+    description: 'The annual sports showdown. Watch your college battle for the championship trophy.',
     date: '2025-05-20',
     time: '16:00',
     location: 'University Freedom Square',
@@ -50,19 +50,6 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
     image: 'https://images.unsplash.com/photo-1541252260730-0412e8e2108e?auto=format&fit=crop&w=1200',
     attendeeIds: [],
     registrationLink: 'https://sports.mak.ac.ug'
-  },
-  {
-    id: 'ev-4',
-    title: 'Graduate Career Fair 2025',
-    description: 'Connecting finalists with over 50 top employers in Uganda. Bring your CV and prepare for on-spot interviews.',
-    date: '2025-07-05',
-    time: '10:00',
-    location: 'Business School Grounds',
-    category: 'Academic',
-    createdBy: 'super_admin',
-    image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200',
-    attendeeIds: [],
-    registrationLink: 'https://careers.mak.ac.ug'
   }
 ];
 
@@ -76,14 +63,8 @@ const INITIAL_LEADERSHIP: Record<College, LeadershipMember[]> = {
 };
 
 const INITIAL_COLLEGE_STATS: CollegeStats[] = [
-  { id: 'COCIS', followers: 1250, postCount: 450, dean: 'Prof. Tonny Oyana', description: 'Center for Computing and Information Sciences.', leadership: INITIAL_LEADERSHIP.COCIS },
-  { id: 'CEDAT', followers: 850, postCount: 320, dean: 'Prof. Henry Alinaitwe', description: 'Engineering, Design, Art and Technology.', leadership: [] },
-  { id: 'CHUSS', followers: 920, postCount: 280, dean: 'Dr. Josephine Ahikire', description: 'Humanities and Social Sciences.', leadership: [] },
-  { id: 'CHS', followers: 1500, postCount: 600, dean: 'Prof. Damalie Nakanjako', description: 'College of Health Sciences.', leadership: [] },
-  { id: 'CONAS', followers: 640, postCount: 150, dean: 'Prof. J.Y.T. Mugisha', description: 'College of Natural Sciences.', leadership: [] },
-  { id: 'CAES', followers: 510, postCount: 120, dean: 'Prof. Bernard Bashaasha', description: 'Agricultural and Environmental Sciences.', leadership: [] },
-  { id: 'COBAMS', followers: 1100, postCount: 410, dean: 'Prof. Eria Hisali', description: 'Business and Management Sciences.', leadership: [] },
-  { id: 'CEES', followers: 730, postCount: 210, dean: 'Prof. Anthony Muwagga Mugagga', description: 'Education and External Studies.', leadership: [] },
+  { id: 'COCIS', followers: 1250, postCount: 450, dean: 'Prof. Tonny Oyana', description: 'Computing and Info Sciences.', leadership: INITIAL_LEADERSHIP.COCIS },
+  { id: 'CEDAT', followers: 850, postCount: 320, dean: 'Prof. Henry Alinaitwe', description: 'Engineering, Design, Art and Tech.', leadership: [] },
   { id: 'LAW', followers: 1300, postCount: 500, dean: 'Dr. Ronald Naluwairo', description: 'The School of Law.', leadership: [] }
 ];
 
@@ -101,23 +82,6 @@ const INITIAL_USERS: User[] = [
     followersCount: 1420,
     followingCount: 382,
     totalLikesCount: 4500,
-    badges: [],
-    appliedTo: []
-  },
-  {
-    id: 'admin_cocis',
-    name: 'COCIS Admin',
-    role: 'College Administrator',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
-    connections: 1000,
-    college: 'COCIS',
-    status: 'Masters',
-    email: 'admin.cocis@mak.ac.ug',
-    joinedColleges: ['COCIS'],
-    postsCount: 0,
-    followersCount: 0,
-    followingCount: 0,
-    totalLikesCount: 0,
     badges: [],
     appliedTo: []
   },
@@ -172,19 +136,7 @@ export const db = {
   getPosts: (filter?: College | 'Global', showExpired = false): Post[] => {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
     let posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
-    
-    if (!showExpired) {
-      const now = new Date();
-      posts = posts.filter(p => {
-        if (p.isEventBroadcast && p.eventDate) {
-          const eventTime = new Date(`${p.eventDate}T${p.eventTime || '23:59'}`);
-          return eventTime > now;
-        }
-        return true;
-      });
-    }
-
-    if (filter) posts = posts.filter(p => p.college === filter || p.isAd || p.isMakTV);
+    if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter || p.isAd);
     return posts;
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
@@ -205,36 +157,13 @@ export const db = {
     const updatedUsers = users.map(u => {
       if (u.id === userId) {
         const joined = u.joinedColleges || [];
-        if (!joined.includes(collegeId)) {
-          return { ...u, joinedColleges: [...joined, collegeId] };
-        }
+        if (!joined.includes(collegeId)) return { ...u, joinedColleges: [...joined, collegeId] };
       }
       return u;
     });
-    const updatedStats = stats.map(s => {
-      if (s.id === collegeId) return { ...s, followers: s.followers + 1 };
-      return s;
-    });
+    const updatedStats = stats.map(s => s.id === collegeId ? { ...s, followers: s.followers + 1 } : s);
     db.saveUsers(updatedUsers);
     db.saveCollegeStats(updatedStats);
-  },
-
-  updateCollegeLeadership: (collegeId: College, leadership: LeadershipMember[]) => {
-    const stats = db.getCollegeStats();
-    const updated = stats.map(s => s.id === collegeId ? { ...s, leadership } : s);
-    db.saveCollegeStats(updated);
-  },
-
-  logTimelineEvent: (event: Omit<TimelineEvent, 'id' | 'timestamp'>) => {
-    const saved = localStorage.getItem(DB_KEYS.TIMELINE);
-    const timeline = saved ? JSON.parse(saved) : [];
-    const newEvent = { ...event, id: Date.now().toString(), timestamp: new Date().toISOString() };
-    localStorage.setItem(DB_KEYS.TIMELINE, JSON.stringify([newEvent, ...timeline].slice(0, 50)));
-  },
-
-  getTimeline: (): TimelineEvent[] => {
-    const saved = localStorage.getItem(DB_KEYS.TIMELINE);
-    return saved ? JSON.parse(saved) : [];
   },
 
   getCalendarEvents: (): CalendarEvent[] => {
@@ -254,48 +183,21 @@ export const db = {
     const events = db.getCalendarEvents();
     const event = events.find(e => e.id === eventId);
     if (!event) return;
-
-    const users = db.getUsers();
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-
-    if (!event.attendeeIds?.includes(userId)) {
-      event.attendeeIds = [...(event.attendeeIds || []), userId];
-    }
-
-    const now = new Date();
-    const target = new Date(`${event.date}T${event.time || '00:00'}`);
-    const diff = target.getTime() - now.getTime();
-    
-    let timeText = "Event starting soon";
-    if (diff > 0) {
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      timeText = `${days} days and ${hours} hours remaining`;
-    }
-
-    const notification: Notification = {
-      id: `notif-${Date.now()}`,
-      text: `Identity Verified: ${user.name}, your registration for "${event.title}" is officially logged in the registry. This message serves as your digital admission proof. ${timeText} until deployment.`,
-      timestamp: 'Just now',
-      isRead: false
-    };
-
-    user.notifications = [notification, ...(user.notifications || [])];
-    localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+    if (!event.attendeeIds?.includes(userId)) event.attendeeIds = [...(event.attendeeIds || []), userId];
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
   },
 
-  getEvents: (): LiveEvent[] => [
-    {
-      id: 'live-1',
-      title: 'Makerere Innovation Hub Seminar',
-      youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      organizer: 'Mak Innovation Lab',
-      isLive: true
-    }
-  ],
+  // Added updateCollegeLeadership to fix errors in Feed component where it was being called but not defined.
+  updateCollegeLeadership: (collegeId: College, leadership: LeadershipMember[]) => {
+    const stats = db.getCollegeStats();
+    const updatedStats = stats.map(s => s.id === collegeId ? { ...s, leadership } : s);
+    db.saveCollegeStats(updatedStats);
+  },
 
+  getTimeline: (): TimelineEvent[] => [],
   getViolations: (): Violation[] => [],
-  getPolls: () => []
+  getPolls: () => [],
+  getEvents: (): LiveEvent[] => [
+    { id: 'live-1', title: 'Makerere Innovation Hub Seminar', youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', organizer: 'Mak Innovation Lab', isLive: true }
+  ]
 };

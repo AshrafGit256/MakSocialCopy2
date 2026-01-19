@@ -90,20 +90,6 @@ const Chat: React.FC = () => {
               </div>
             </div>
           ))}
-          
-          {/* Example Shared Image in Chat */}
-          <div className="flex justify-start">
-             <div className="flex items-end gap-3 max-w-[70%]">
-                <img src={activeChat.user.avatar} className="w-8 h-8 rounded-full" />
-                <div className="rounded-2xl overflow-hidden border border-white/5 p-2 bg-[#1a1f2e]">
-                   <img src="https://picsum.photos/seed/project/400/250" className="rounded-xl w-full" />
-                   <div className="mt-2 px-1">
-                      <p className="text-xs font-bold text-white">Project Moodboard</p>
-                      <span className="text-[10px] text-slate-500">10.45 AM</span>
-                   </div>
-                </div>
-             </div>
-          </div>
         </div>
 
         {/* Chat Input */}
@@ -118,45 +104,6 @@ const Chat: React.FC = () => {
             <button className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl transition-colors shadow-lg shadow-blue-600/20">
               <Send size={18} />
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Shared Files Sidebar */}
-      <div className="w-80 border-l border-white/5 bg-[#0a0f18]/30 p-6 overflow-y-auto hidden xl:block">
-        <h3 className="font-bold text-white mb-6">Shared Media & Files</h3>
-        
-        <div className="space-y-6">
-          <div>
-            <h5 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Photos</h5>
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="aspect-square rounded-xl overflow-hidden bg-white/5 cursor-pointer hover:opacity-75 transition-opacity">
-                  <img src={`https://picsum.photos/seed/${i+100}/150`} className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h5 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Files</h5>
-            <div className="space-y-3">
-              {[
-                { name: 'Design_Proposal.pdf', size: '2.4 MB', icon: <FileText size={18} className="text-red-400" /> },
-                { name: 'Event_Flyer.jpg', size: '1.2 MB', icon: <ImageIcon size={18} className="text-blue-400" /> },
-                { name: 'Meeting_Notes.docx', size: '840 KB', icon: <FileText size={18} className="text-blue-500" /> },
-              ].map((file, i) => (
-                <div key={i} className="flex items-center space-x-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-colors group">
-                  <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center group-hover:bg-white/10">
-                    {file.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-300 truncate">{file.name}</p>
-                    <p className="text-[10px] text-slate-500">{file.size}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

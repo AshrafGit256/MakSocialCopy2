@@ -116,6 +116,8 @@ export interface Post {
   isAd?: boolean;
   isMakTV?: boolean;
   isEventBroadcast?: boolean;
+  eventId?: string; // Links to global calendar
+  eventFlyer?: string;
   eventDate?: string;
   eventTime?: string;
   eventLocation?: string;

@@ -9,26 +9,68 @@ import {
   Users, Loader2, Eye, MoreHorizontal, ShieldAlert, Zap, 
   GraduationCap, Briefcase, Tv, CheckCircle2, Calendar, 
   MapPin, Clock, TrendingUp, Plus, FileText, Lock,
-  ShieldCheck, Trash2, Edit3, UserPlus, ShieldAlert as Shield
+  ShieldCheck, Trash2, Edit3, UserPlus, ShieldAlert as Shield,
+  Star, Verified, Shield as ShieldIcon
 } from 'lucide-react';
 
-const VerifiedBadge: React.FC<{ role?: AuthorityRole }> = ({ role }) => {
+export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
   if (!role) return null;
   
-  const styles: Record<AuthorityRole, { bg: string, text: string }> = {
-    'Super Admin': { bg: 'bg-rose-600', text: 'text-white' },
-    'Administrator': { bg: 'bg-slate-500', text: 'text-white' },
-    'Lecturer': { bg: 'bg-slate-950', text: 'text-white' },
-    'Chairperson': { bg: 'bg-emerald-500', text: 'text-white' },
-    'GRC': { bg: 'bg-emerald-500', text: 'text-white' },
-    'Student Leader': { bg: 'bg-emerald-500', text: 'text-white' }
+  const config: Record<AuthorityRole, { 
+    bg: string, 
+    icon: React.ReactNode, 
+    glow: string,
+    border: string
+  }> = {
+    'Super Admin': { 
+      bg: 'bg-rose-600', 
+      glow: 'shadow-rose-500/40',
+      border: 'border-rose-400/50',
+      icon: <ShieldAlert size={size === 'sm' ? 10 : 14} /> 
+    },
+    'Administrator': { 
+      bg: 'bg-indigo-600', 
+      glow: 'shadow-indigo-500/40',
+      border: 'border-indigo-400/50',
+      icon: <ShieldCheck size={size === 'sm' ? 10 : 14} /> 
+    },
+    'Lecturer': { 
+      bg: 'bg-slate-900', 
+      glow: 'shadow-slate-500/40',
+      border: 'border-slate-400/50',
+      icon: <GraduationCap size={size === 'sm' ? 10 : 14} /> 
+    },
+    'Chairperson': { 
+      bg: 'bg-emerald-600', 
+      glow: 'shadow-emerald-500/40',
+      border: 'border-emerald-400/50',
+      icon: <CheckCircle2 size={size === 'sm' ? 10 : 14} /> 
+    },
+    'GRC': { 
+      bg: 'bg-sky-500', 
+      glow: 'shadow-sky-500/40',
+      border: 'border-sky-400/50',
+      icon: <Star size={size === 'sm' ? 10 : 14} fill="currentColor" /> 
+    },
+    'Student Leader': { 
+      bg: 'bg-amber-500', 
+      glow: 'shadow-amber-500/40',
+      border: 'border-amber-400/50',
+      icon: <Verified size={size === 'sm' ? 10 : 14} /> 
+    }
   };
   
-  const style = styles[role] || { bg: 'bg-slate-400', text: 'text-white' };
+  const current = config[role] || config['Administrator'];
+  const sizeClasses = size === 'sm' ? 'w-5 h-5' : 'w-7 h-7';
   
   return (
-    <div className={`${style.bg} ${style.text} p-0.5 rounded-full shadow-sm flex items-center justify-center border border-white/20`} title={role}>
-       <CheckCircle2 size={10} fill="currentColor" className="text-[var(--sidebar-bg)]" />
+    <div className={`
+      relative ${sizeClasses} rounded-full flex items-center justify-center text-white 
+      ${current.bg} ${current.glow} ${current.border} border shadow-lg
+      transition-transform hover:scale-110 cursor-help
+    `} title={`Verified ${role}`}>
+       {current.icon}
+       <div className="absolute inset-0 rounded-full animate-pulse opacity-20 bg-white"></div>
     </div>
   );
 };
@@ -51,7 +93,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const userCollegeAdminId = userCollegeAdminMatch ? userCollegeAdminMatch[1].toUpperCase() as College : null;
   const isCollegeAdmin = !!userCollegeAdminId;
 
-  // Active college determination
   const activeCollege = collegeFilter || (activeTab === 'Global' ? null : activeTab as College);
   
   useEffect(() => {
@@ -84,6 +125,10 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File too large. Max 5MB.");
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
@@ -95,22 +140,58 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const handleCreatePost = async () => {
     if (!newPostContent.trim() && !selectedImage) return;
     setIsAnalyzing(true);
+    setRejectionMessage(null);
+
     try {
-      let result = { category: 'Social', isSafe: true, reason: '' };
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
-      // If there's text, analyze it with Gemini
+      const parts: any[] = [];
+      
+      // Strict Moderation Prompt
+      let moderationPrompt = `You are the strict automated content moderator for MakSocial, the official social network of Makerere University. 
+      Analyze the provided content (text and/or image) for safety violations.
+      
+      CRITICAL RULES:
+      1. Zero tolerance for NUDITY or sexually explicit content in images.
+      2. No hate speech, harassment, or violent imagery.
+      3. Content must be relevant to university life (Academic, Social, Career, Urgent).
+      
+      Respond ONLY with a JSON object in this format:
+      {
+        "category": "Academic" | "Social" | "Finance" | "Career" | "Urgent",
+        "isSafe": boolean,
+        "reason": "Clear explanation if unsafe, otherwise empty"
+      }`;
+
       if (newPostContent.trim()) {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: `Analyze: "${newPostContent}". JSON {category: Academic/Social/Urgent, isSafe: boolean, reason: string}`,
-          config: { responseMimeType: "application/json" }
-        });
-        result = JSON.parse(response.text);
+        parts.push({ text: `Text Content: "${newPostContent}"\n\n${moderationPrompt}` });
+      } else {
+        parts.push({ text: moderationPrompt });
       }
 
+      if (selectedImage) {
+        const base64Data = selectedImage.split(',')[1];
+        const mimeType = selectedImage.split(';')[0].split(':')[1];
+        parts.push({
+          inlineData: {
+            data: base64Data,
+            mimeType: mimeType
+          }
+        });
+      }
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: { parts },
+        config: { 
+          responseMimeType: "application/json"
+        }
+      });
+
+      const result = JSON.parse(response.text || '{"isSafe": false, "reason": "Moderation error"}');
+
       if (!result.isSafe) {
-        setRejectionMessage(result.reason);
+        setRejectionMessage(result.reason || "Content violates community standards (Nudity/Safety).");
         setIsAnalyzing(false);
         return;
       }
@@ -135,24 +216,17 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
         college: activeCollege || 'Global',
         aiMetadata: { category: result.category as any, isSafe: true }
       };
+
       db.addPost(newPost);
       setNewPostContent('');
       setSelectedImage(null);
       setPosts(db.getPosts(activeCollege || undefined));
       setIsAnalyzing(false);
+
     } catch (e) { 
+      console.error("Moderation Failure:", e);
       setIsAnalyzing(false); 
-      console.error(e);
-      // Fallback post if Gemini fails
-      const fallbackPost: Post = {
-        id: Date.now().toString(), author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar,
-        timestamp: 'Just now', content: newPostContent, images: selectedImage ? [selectedImage] : undefined,
-        hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], 
-        isOpportunity: false, college: activeCollege || 'Global'
-      };
-      db.addPost(fallbackPost);
-      setNewPostContent('');
-      setSelectedImage(null);
+      setRejectionMessage("Security Protocol Offline: Content cannot be validated at this time. Please check your network or try again later.");
     }
   };
 
@@ -217,7 +291,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                           <div className="relative">
                             <img src={m.avatar} className="w-10 h-10 rounded-xl object-cover" />
                             <div className="absolute -bottom-1 -right-1">
-                               <VerifiedBadge role={m.role} />
+                               <AuthoritySeal role={m.role} />
                             </div>
                           </div>
                           <div>
@@ -311,7 +385,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              <div className="relative">
                                 <img src={post.authorAvatar} className="w-12 h-12 rounded-xl border border-[var(--border-color)] object-cover" />
                                 <div className="absolute -bottom-1 -right-1">
-                                   <VerifiedBadge role={post.authorAuthority} />
+                                   <AuthoritySeal role={post.authorAuthority} />
                                 </div>
                              </div>
                              <div>
@@ -410,7 +484,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                                 <div className="relative">
                                    <img src={m.avatar} className="w-12 h-12 rounded-xl" />
                                    <div className="absolute -bottom-1 -right-1">
-                                      <VerifiedBadge role={m.role} />
+                                      <AuthoritySeal role={m.role} />
                                    </div>
                                 </div>
                                 <div>

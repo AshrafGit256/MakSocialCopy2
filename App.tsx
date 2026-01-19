@@ -14,12 +14,14 @@ import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import { db } from './db';
+import { Menu, X } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'student' | 'admin'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Navigation states for deep linking
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -77,11 +79,18 @@ const App: React.FC = () => {
   const navigateToProfile = (userId: string) => {
     setSelectedUserId(userId);
     setView('profile');
+    setIsSidebarOpen(false);
   };
 
   const navigateToPost = (postId: string) => {
     setTargetPostId(postId);
     setView('home');
+    setIsSidebarOpen(false);
+  };
+
+  const handleSetView = (newView: AppView) => {
+    setView(newView);
+    setIsSidebarOpen(false); // Close sidebar on view change (mobile)
   };
 
   const renderContent = () => {
@@ -109,16 +118,47 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
+      {/* Sidebar Overlay for Mobile */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Component */}
       <Sidebar 
         activeView={view} 
-        setView={setView} 
+        setView={handleSetView} 
         isAdmin={userRole === 'admin'} 
         onLogout={handleLogout}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
-      <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar">
-        {renderContent()}
-      </main>
+
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Mobile Header */}
+        <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] z-50">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors"
+          >
+            <Menu size={24} />
+          </button>
+          <img
+            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
+            alt="MakSocial Logo"
+            className="h-8 grayscale brightness-0 dark:grayscale-0 dark:brightness-100"
+            onClick={() => handleSetView('home')}
+          />
+          <div className="w-10"></div> {/* Spacer for alignment */}
+        </header>
+
+        <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   );
 };

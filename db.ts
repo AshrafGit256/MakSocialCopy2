@@ -1,3 +1,4 @@
+
 import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent, Notification } from './types';
 import { MOCK_POSTS } from './constants';
 
@@ -117,7 +118,6 @@ export const db = {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
     let posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
     
-    // Auto-hide expired event posts from "public" view
     if (!showExpired) {
       const now = new Date();
       posts = posts.filter(p => {
@@ -190,6 +190,11 @@ export const db = {
     const events = db.getCalendarEvents();
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([...events, event]));
   },
+  deleteCalendarEvent: (eventId: string) => {
+    const events = db.getCalendarEvents();
+    const updated = events.filter(e => e.id !== eventId);
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+  },
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();
     const event = events.find(e => e.id === eventId);
@@ -199,12 +204,10 @@ export const db = {
     const user = users.find(u => u.id === userId);
     if (!user) return;
 
-    // Logic: If already registered, don't duplicate
     if (!event.attendeeIds?.includes(userId)) {
       event.attendeeIds = [...(event.attendeeIds || []), userId];
     }
 
-    // Proof logic: Calculate time remaining for the notification receipt
     const now = new Date();
     const target = new Date(`${event.date}T${event.time || '00:00'}`);
     const diff = target.getTime() - now.getTime();
@@ -224,8 +227,6 @@ export const db = {
     };
 
     user.notifications = [notification, ...(user.notifications || [])];
-
-    // Save state back to local storage
     localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
   },

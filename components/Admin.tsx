@@ -2,17 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { Violation, User, Post, Poll, TimelineEvent, CalendarEvent } from '../types';
+import { AuthoritySeal } from './Feed';
 import { 
   TrendingUp, Monitor, Users, Activity, ShieldAlert, Tv, 
   Trash2, Play, MessageCircle, Eye, Plus, CheckCircle2, Clock,
   DollarSign, Briefcase, Calendar, Link as LinkIcon, Image as ImageIcon,
   Youtube, Mic2, Newspaper, Radio, History, Heart, User as UserIcon, Zap, X,
-  Bell, FileText, Download, BarChart2, PieChart
+  Bell, FileText, Download, BarChart2, PieChart, Printer, AlertTriangle
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
   const [users, setUsers] = useState<User[]>(db.getUsers());
-  const [posts, setPosts] = useState<Post[]>(db.getPosts(undefined, true)); // Admins see everything including expired
+  const [posts, setPosts] = useState<Post[]>(db.getPosts(undefined, true));
   const [violations, setViolations] = useState<Violation[]>(db.getViolations());
   const [polls, setPolls] = useState<Poll[]>(db.getPolls());
   const [timeline, setTimeline] = useState<TimelineEvent[]>(db.getTimeline());
@@ -85,29 +86,48 @@ const Admin: React.FC = () => {
   const downloadReport = (event: CalendarEvent) => {
     const demo = getEventDemographics(event.attendeeIds || []);
     const reportContent = `
-      MAKSOCIAL EVENT INTELLIGENCE REPORT
-      ====================================
-      Event: ${event.title}
-      Date: ${event.date}
-      Location: ${event.location}
-      Total Registrations: ${demo.total}
+MAKSOCIAL IDENTITY REGISTRY MANIFEST
+====================================
+EVENT: ${event.title.toUpperCase()}
+DATE: ${event.date}
+LOCATION: ${event.location}
+GENERATED: ${new Date().toLocaleString()}
+REGISTRY STATUS: VALIDATED
 
-      COLLEGE BREAKDOWN:
-      ${Object.entries(demo.collegeCount).map(([col, count]) => `- ${col}: ${count} (${Math.round(count/demo.total*100)}%)`).join('\n')}
+1. AGGREGATE METRICS
+-------------------
+Total Validated Identites: ${demo.total}
+Node Engagement Score: ${(demo.total * 12.5).toFixed(0)} points
 
-      YEAR/STATUS BREAKDOWN:
-      ${Object.entries(demo.statusCount).map(([stat, count]) => `- ${stat}: ${count}`).join('\n')}
+2. COLLEGE DISTRIBUTION
+----------------------
+${Object.entries(demo.collegeCount).sort((a,b) => b[1]-a[1]).map(([col, count]) => `- ${col.padEnd(10)}: ${count} (${((count/demo.total)*100).toFixed(1)}%)`).join('\n')}
 
-      ATTENDEE LIST:
-      ${demo.users.map(u => `- ${u.name} (${u.email}) - ${u.college}`).join('\n')}
+3. STATUS BREAKDOWN
+------------------
+${Object.entries(demo.statusCount).sort((a,b) => b[1]-a[1]).map(([stat, count]) => `- ${stat.padEnd(12)}: ${count}`).join('\n')}
+
+4. PARTICIPANT MANIFEST
+----------------------
+${demo.users.map(u => `- [${u.id}] ${u.name.padEnd(25)} | ${u.college.padEnd(10)} | ${u.email}`).join('\n')}
+
+====================================
+EOF - END OF FILING
     `;
     
     const blob = new Blob([reportContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${event.title.replace(/\s+/g, '_')}_Report.txt`;
+    link.download = `MAKSOCIAL_EVENT_REPORT_${event.id}.txt`;
     link.click();
+  };
+
+  const handleDeleteEvent = (eventId: string, title: string) => {
+    if (confirm(`CRITICAL ACTION: Decommission protocol "${title}" from the registry? This action is irreversible.`)) {
+      db.deleteCalendarEvent(eventId);
+      setEvents(db.getCalendarEvents());
+    }
   };
 
   const totalAdRevenue = posts
@@ -201,8 +221,14 @@ const Admin: React.FC = () => {
       {activeTab === 'events' && (
         <div className="space-y-8 animate-in fade-in duration-500">
            <div className="flex items-center justify-between">
-              <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Event Node Registry (Master View)</h3>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Revenue Tracked Protocols: {events.length}</p>
+              <div>
+                <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Event Node Registry</h3>
+                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Validated campus engagement protocols</p>
+              </div>
+              <div className="p-4 bg-indigo-600/5 rounded-2xl border border-indigo-600/10 text-right">
+                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Total Protocols</p>
+                <p className="text-2xl font-black text-[var(--text-primary)] leading-none">{events.length}</p>
+              </div>
            </div>
 
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -212,14 +238,13 @@ const Admin: React.FC = () => {
                 return (
                   <div 
                     key={event.id} 
-                    onClick={() => setSelectedEventReport(event)}
-                    className={`glass-card p-6 border-[var(--border-color)] hover:border-indigo-500 transition-all cursor-pointer group flex flex-col justify-between h-64 ${isExpired ? 'bg-slate-50/50 dark:bg-white/[0.01]' : 'bg-[var(--sidebar-bg)] shadow-xl'}`}
+                    className={`glass-card p-6 border-[var(--border-color)] hover:border-indigo-500 transition-all group flex flex-col justify-between h-72 ${isExpired ? 'bg-slate-50/50 dark:bg-white/[0.01]' : 'bg-[var(--sidebar-bg)] shadow-sm'}`}
                   >
                     <div>
                       <div className="flex justify-between items-start mb-4">
                         <span className={`${isExpired ? 'bg-slate-400' : 'bg-indigo-600'} text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest`}>{event.category} {isExpired && '• EXPIRED'}</span>
-                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400">
-                           <Users size={14}/> {attendees.length}
+                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 bg-[var(--bg-secondary)] px-2 py-1 rounded border border-[var(--border-color)]">
+                           <Users size={12}/> {attendees.length} IDENTITIES
                         </div>
                       </div>
                       <h4 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight line-clamp-2">{event.title}</h4>
@@ -228,62 +253,82 @@ const Admin: React.FC = () => {
                       </p>
                     </div>
                     
-                    <button className="mt-6 flex items-center justify-center gap-2 w-full py-3 bg-[var(--bg-secondary)] rounded-xl text-[10px] font-black uppercase tracking-widest group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                       <BarChart2 size={14}/> Forensic Analytics
-                    </button>
+                    <div className="flex gap-2 mt-6">
+                      <button 
+                        onClick={() => setSelectedEventReport(event)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
+                      >
+                         <BarChart2 size={14}/> Analytics
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteEvent(event.id, event.title)}
+                        className="p-3 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
+                        title="Decommission protocol"
+                      >
+                         <Trash2 size={16}/>
+                      </button>
+                    </div>
                   </div>
                 );
               })}
+              {events.length === 0 && (
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-[var(--border-color)] rounded-3xl text-slate-400 font-black uppercase tracking-widest text-xs">No active event protocols found.</div>
+              )}
            </div>
         </div>
       )}
 
-      {/* Event Report Modal */}
       {selectedEventReport && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 backdrop-blur-md">
-           <div className="glass-card w-full max-w-5xl h-[85vh] overflow-hidden flex flex-col bg-[var(--sidebar-bg)] shadow-2xl border-[var(--border-color)]">
-              <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-secondary)]">
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 backdrop-blur-md print:bg-white print:p-0">
+           <div className="glass-card w-full max-w-5xl h-[85vh] overflow-hidden flex flex-col bg-[var(--sidebar-bg)] shadow-2xl border-[var(--border-color)] print:h-auto print:shadow-none print:border-none">
+              <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-secondary)] print:bg-white print:border-b-2 print:border-slate-900">
                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-indigo-600 rounded-xl text-white shadow-lg"><FileText size={24}/></div>
+                    <div className="p-3 bg-indigo-600 rounded-xl text-white shadow-lg print:hidden"><FileText size={24}/></div>
                     <div>
-                       <h2 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter">Identity Registry Analysis</h2>
-                       <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Protocol: {selectedEventReport.title}</p>
+                       <h2 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter print:text-black">Identity Registry Analysis</h2>
+                       <p className="text-xs font-bold text-slate-500 uppercase tracking-widest print:text-black">Protocol: {selectedEventReport.title}</p>
                     </div>
                  </div>
-                 <div className="flex items-center gap-3">
+                 <div className="flex items-center gap-3 print:hidden">
+                    <button 
+                      onClick={() => window.print()}
+                      className="flex items-center gap-2 px-6 py-3 bg-slate-200 dark:bg-white/10 text-[var(--text-primary)] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-300 transition-all"
+                    >
+                       <Printer size={16}/> Print PDF
+                    </button>
                     <button 
                       onClick={() => downloadReport(selectedEventReport)}
                       className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all"
                     >
-                       <Download size={16}/> Export Report
+                       <Download size={16}/> Raw Export
                     </button>
                     <button onClick={() => setSelectedEventReport(null)} className="text-slate-500 hover:text-rose-500 transition-colors p-2"><X size={24}/></button>
                  </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-10 space-y-12">
-                 {/* Stats Grid */}
+              <div className="flex-1 overflow-y-auto p-10 space-y-12 no-scrollbar print:overflow-visible">
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {(() => {
                        const demo = getEventDemographics(selectedEventReport.attendeeIds || []);
                        return (
                          <>
-                           <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)]">
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Total Participants</p>
+                           <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)] print:bg-white print:border-slate-200">
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 print:text-slate-900">Total Validated Participants</p>
                               <h3 className="text-5xl font-black text-indigo-600">{demo.total}</h3>
                            </div>
-                           <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)]">
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Leading College</p>
-                              <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight">
+                           <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)] print:bg-white print:border-slate-200">
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 print:text-slate-900">Dominant College Node</p>
+                              <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight print:text-black">
                                 {Object.entries(demo.collegeCount).sort((a,b) => b[1]-a[1])[0]?.[0] || 'N/A'}
                               </h3>
                            </div>
-                           <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)]">
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Demographic Mix</p>
+                           <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)] print:bg-white print:border-slate-200">
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 print:text-slate-900">Engagement Velocity</p>
                               <div className="flex items-center gap-2">
-                                 <div className="h-2 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                                    <div className="h-full bg-indigo-600" style={{width: '65%'}}></div>
+                                 <div className="h-2 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden print:border print:border-slate-200">
+                                    <div className="h-full bg-indigo-600" style={{width: `${Math.min(100, (demo.total/users.length)*100)}%`}}></div>
                                  </div>
+                                 <span className="text-[10px] font-black text-indigo-600">{((demo.total/users.length)*100).toFixed(1)}%</span>
                               </div>
                            </div>
                          </>
@@ -291,22 +336,21 @@ const Admin: React.FC = () => {
                     })()}
                  </div>
 
-                 {/* Detailed Demographics */}
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div className="space-y-6">
-                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
-                         <BarChart2 size={14}/> College Distribution
+                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 print:text-black">
+                         <BarChart2 size={14}/> Node Distribution (College)
                        </h4>
                        <div className="space-y-4">
                           {(() => {
                              const demo = getEventDemographics(selectedEventReport.attendeeIds || []);
                              return Object.entries(demo.collegeCount).sort((a,b) => b[1]-a[1]).map(([col, count]) => (
                                 <div key={col} className="space-y-1.5">
-                                   <div className="flex justify-between text-[11px] font-black uppercase tracking-tight">
-                                      <span className="text-[var(--text-primary)]">{col}</span>
+                                   <div className="flex justify-between text-[11px] font-black uppercase tracking-tight print:text-black">
+                                      <span className="text-[var(--text-primary)] print:text-black">{col}</span>
                                       <span className="text-slate-500">{count} Signals</span>
                                    </div>
-                                   <div className="h-1.5 w-full bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-color)]">
+                                   <div className="h-1.5 w-full bg-[var(--bg-secondary)] rounded-full overflow-hidden border border-[var(--border-color)] print:bg-slate-100 print:border-slate-200">
                                       <div className="h-full bg-indigo-500" style={{width: `${(count/demo.total)*100}%`}}></div>
                                    </div>
                                 </div>
@@ -316,16 +360,16 @@ const Admin: React.FC = () => {
                     </div>
 
                     <div className="space-y-6">
-                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
-                         <Users size={14}/> Node Year Distribution
+                       <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 print:text-black">
+                         <Users size={14}/> Student Year Stratification
                        </h4>
                        <div className="grid grid-cols-2 gap-4">
                           {(() => {
                              const demo = getEventDemographics(selectedEventReport.attendeeIds || []);
                              return Object.entries(demo.statusCount).map(([stat, count]) => (
-                                <div key={stat} className="p-4 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)] text-center">
-                                   <span className="text-xl font-black text-[var(--text-primary)] block leading-none">{count}</span>
-                                   <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 block">{stat}</span>
+                                <div key={stat} className="p-4 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)] text-center print:bg-white print:border-slate-200">
+                                   <span className="text-xl font-black text-[var(--text-primary)] block leading-none print:text-black">{count}</span>
+                                   <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1 block print:text-slate-600">{stat}</span>
                                 </div>
                              ));
                           })()}
@@ -333,33 +377,37 @@ const Admin: React.FC = () => {
                     </div>
                  </div>
 
-                 {/* Full Registry List */}
                  <div className="space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2 print:text-black">
                       <PieChart size={14}/> Participant Manifest
                     </h4>
-                    <div className="border border-[var(--border-color)] rounded-3xl overflow-hidden shadow-inner">
+                    <div className="border border-[var(--border-color)] rounded-3xl overflow-hidden shadow-inner print:border-slate-300 print:rounded-none">
                        <table className="w-full text-left">
-                          <thead className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
+                          <thead className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] print:bg-slate-100 print:border-black">
                              <tr>
-                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500">Identity</th>
-                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500">College Unit</th>
-                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500">Status</th>
-                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500">Email</th>
+                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 print:text-black">Identity</th>
+                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 print:text-black">College Unit</th>
+                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 print:text-black">Status</th>
+                                <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 print:text-black">Credential (Email)</th>
                              </tr>
                           </thead>
-                          <tbody className="divide-y divide-[var(--border-color)] bg-[var(--sidebar-bg)]">
+                          <tbody className="divide-y divide-[var(--border-color)] bg-[var(--sidebar-bg)] print:bg-white print:divide-slate-200">
                              {getEventDemographics(selectedEventReport.attendeeIds || []).users.map(u => (
-                                <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+                                <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors print:hover:bg-transparent">
                                    <td className="px-6 py-4">
                                       <div className="flex items-center gap-3">
-                                         <img src={u.avatar} className="w-8 h-8 rounded-lg object-cover" />
-                                         <span className="text-xs font-bold text-[var(--text-primary)]">{u.name}</span>
+                                         <div className="relative">
+                                           <img src={u.avatar} className="w-8 h-8 rounded-lg object-cover print:hidden" />
+                                           <div className="absolute -bottom-1 -right-1">
+                                              <AuthoritySeal role={u.badges.includes('Super Admin') ? 'Super Admin' : undefined} />
+                                           </div>
+                                         </div>
+                                         <span className="text-xs font-bold text-[var(--text-primary)] print:text-black">{u.name}</span>
                                       </div>
                                    </td>
-                                   <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-tight">{u.college}</td>
-                                   <td className="px-6 py-4 text-xs font-bold text-indigo-500">{u.status}</td>
-                                   <td className="px-6 py-4 text-xs text-slate-400">{u.email}</td>
+                                   <td className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-tight print:text-black">{u.college}</td>
+                                   <td className="px-6 py-4 text-xs font-bold text-indigo-500 print:text-black">{u.status}</td>
+                                   <td className="px-6 py-4 text-xs text-slate-400 print:text-black">{u.email}</td>
                                 </tr>
                              ))}
                           </tbody>

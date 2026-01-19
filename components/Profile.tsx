@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Notification, Post } from '../types';
+import { AuthoritySeal } from './Feed';
 import { 
   Mail, MapPin, Calendar, Link as LinkIcon, Edit3, Share2, Grid, 
   Users, Layout, Award, Save, X, Camera, Bell, ShieldAlert, 
@@ -84,7 +85,9 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
                     className="w-48 h-48 rounded-[2.2rem] object-cover border-8 border-[var(--sidebar-bg)] shadow-2xl transition-all"
                     alt="Profile"
                   />
-                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-[var(--sidebar-bg)] rounded-full shadow-lg"></div>
+                  <div className="absolute -bottom-1 -right-1">
+                     <AuthoritySeal role={user.badges.includes('Super Admin') ? 'Super Admin' : undefined} size="md" />
+                  </div>
                 </div>
               </div>
 
@@ -167,7 +170,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
         </div>
       </div>
 
-      {/* Tabs and Content (Same as before but filtered by props) */}
+      {/* Tabs and Content */}
       <div className="space-y-8">
         <div className="flex items-center gap-10 border-b border-[var(--border-color)] px-4 overflow-x-auto no-scrollbar">
            {[

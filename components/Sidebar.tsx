@@ -3,16 +3,18 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
   setView: (view: AppView) => void;
   isAdmin: boolean;
   onLogout: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onClose }) => {
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   const [currentUser, setCurrentUser] = useState<User>(db.getUser());
 
@@ -34,23 +36,39 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   };
 
   const filteredNavItems = NAV_ITEMS.filter(item => {
-    // If college admin, hide global feed and search to keep them in their wing? 
-    // Prompt says: "they only see and update college specific content"
     if (isCollegeAdmin) {
-      if (item.id === 'home') return false; // Global Pulse is for Super Admin
+      if (item.id === 'home') return false; 
     }
     return true;
   });
 
+  // Base classes for the sidebar container
+  const sidebarClasses = `
+    fixed inset-y-0 left-0 z-[70] w-72 bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
+    flex flex-col h-full shadow-2xl transition-transform duration-300 ease-in-out
+    lg:static lg:translate-x-0 lg:z-50 lg:shadow-none
+    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+  `;
+
   return (
-    <aside className="w-64 border-r border-[var(--border-color)] flex flex-col h-full bg-[var(--sidebar-bg)] z-50 transition-theme shadow-lg">
+    <aside className={sidebarClasses}>
       <div className="p-6">
-        <div className="mb-10 cursor-pointer group" onClick={() => setView(isCollegeAdmin ? 'groups' : 'home')}>
-          <img
-            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
-            alt="MakSocial Logo"
-            className="w-full grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all"
-          />
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="cursor-pointer group flex-1" onClick={() => setView(isCollegeAdmin ? 'groups' : 'home')}>
+            <img
+              src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
+              alt="MakSocial Logo"
+              className="w-32 lg:w-full grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all"
+            />
+          </div>
+          {/* Close button for mobile */}
+          <button 
+            onClick={onClose}
+            className="lg:hidden p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="space-y-1">
@@ -103,10 +121,18 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
         )}
         
         <div className="flex gap-2">
-           <button onClick={toggleTheme} className="flex-1 p-3 bg-[var(--bg-secondary)] rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all flex items-center justify-center">
+           <button 
+             onClick={toggleTheme} 
+             title="Toggle Theme"
+             className="flex-1 p-3 bg-[var(--bg-secondary)] rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all flex items-center justify-center"
+           >
              {isDark ? <Sun size={18} /> : <Moon size={18} />}
            </button>
-           <button onClick={onLogout} className="flex-1 p-3 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center">
+           <button 
+             onClick={onLogout} 
+             title="Logout"
+             className="flex-1 p-3 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center"
+           >
              <LogOut size={18} />
            </button>
         </div>

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
-import { AppView, User } from '../types';
+import { AppView, User, College } from '../types';
 import { db } from '../db';
 import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu } from 'lucide-react';
 
@@ -16,6 +16,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   const [currentUser, setCurrentUser] = useState<User>(db.getUser());
 
+  // Detect if current user is a college-specific admin
+  const isCollegeAdmin = currentUser.email?.toLowerCase().startsWith('admin.');
+  const userCollege = currentUser.email?.toLowerCase().startsWith('admin.') 
+    ? currentUser.email?.split('.')[1]?.split('@')[0]?.toUpperCase() as College 
+    : currentUser.college;
+
   useEffect(() => {
     setCurrentUser(db.getUser());
   }, [activeView]);
@@ -27,10 +33,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     else document.documentElement.classList.remove('dark');
   };
 
+  const filteredNavItems = NAV_ITEMS.filter(item => {
+    // If college admin, hide global feed and search to keep them in their wing? 
+    // Prompt says: "they only see and update college specific content"
+    if (isCollegeAdmin) {
+      if (item.id === 'home') return false; // Global Pulse is for Super Admin
+    }
+    return true;
+  });
+
   return (
     <aside className="w-64 border-r border-[var(--border-color)] flex flex-col h-full bg-[var(--sidebar-bg)] z-50 transition-theme shadow-lg">
       <div className="p-6">
-        <div className="mb-10 cursor-pointer group" onClick={() => setView('home')}>
+        <div className="mb-10 cursor-pointer group" onClick={() => setView(isCollegeAdmin ? 'groups' : 'home')}>
           <img
             src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
             alt="MakSocial Logo"
@@ -39,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
         </div>
 
         <nav className="space-y-1">
-          {NAV_ITEMS.map((item) => (
+          {filteredNavItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setView(item.id as AppView)}
@@ -53,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                 {item.icon}
               </span>
               <span className="text-[10px] tracking-widest font-black uppercase">
-                {item.id === 'groups' ? `${currentUser.college} Wing` : item.label}
+                {item.id === 'groups' ? `${userCollege} Wing` : item.label}
               </span>
             </button>
           ))}
@@ -73,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
       </div>
 
       <div className="mt-auto p-6 space-y-3">
-        {isAdmin && (
+        {isAdmin && !isCollegeAdmin && (
           <button
             onClick={() => setView('admin')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all border border-dashed ${
@@ -83,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             }`}
           >
             <Cpu size={18} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Admin Control</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">Super Control</span>
           </button>
         )}
         

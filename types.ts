@@ -6,7 +6,6 @@ export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | '
 
 export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin';
 
-/* Added missing AnalyticsData interface */
 export interface AnalyticsData {
   day: string;
   posts: number;
@@ -16,7 +15,6 @@ export interface AnalyticsData {
   engagement: number;
 }
 
-/* Added missing Chat types */
 export interface ChatMessage {
   id: string;
   text: string;
@@ -32,7 +30,6 @@ export interface ChatConversation {
   messages: ChatMessage[];
 }
 
-/* Added missing Notification interface */
 export interface Notification {
   id: string;
   text: string;
@@ -40,7 +37,6 @@ export interface Notification {
   isRead: boolean;
 }
 
-/* Added missing Violation interface */
 export interface Violation {
   id: string;
   type: string;
@@ -48,7 +44,6 @@ export interface Violation {
   timestamp: string;
 }
 
-/* Added missing LiveEvent interface */
 export interface LiveEvent {
   id: string;
   title: string;
@@ -96,7 +91,6 @@ export interface CalendarEvent {
   category: 'Academic' | 'Social' | 'Sports' | 'Exams' | 'Other';
   createdBy: string;
   attendeeIds?: string[]; 
-  /* Added missing registrationLink */
   registrationLink?: string;
 }
 
@@ -106,7 +100,7 @@ export interface Post {
   authorId: string;
   authorRole: string;
   authorAvatar: string;
-  authorAuthority?: AuthorityRole; // Added to track which badge to show
+  authorAuthority?: AuthorityRole;
   timestamp: string;
   content: string;
   images?: string[];
@@ -126,9 +120,7 @@ export interface Post {
   eventTime?: string;
   eventLocation?: string;
   eventTitle?: string;
-  /* Added missing eventRegistrationLink */
   eventRegistrationLink?: string;
-  /* Added missing MakTV and Ad specific fields */
   makTVType?: 'News' | 'Interview';
   makTVGuest?: string;
   adPartnerName?: string;
@@ -139,7 +131,6 @@ export interface Post {
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
     isSafe?: boolean;
     safetyReason?: string;
-    /* Added missing sentiment */
     sentiment?: string;
   };
 }
@@ -158,7 +149,6 @@ export interface User {
   followersCount: number;
   followingCount: number;
   totalLikesCount: number;
-  /* Added missing fields used in Profile and App components */
   badges: string[];
   appliedTo: string[];
   notifications?: Notification[];

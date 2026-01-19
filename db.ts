@@ -1,14 +1,13 @@
-
 import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v9',
-  USERS: 'maksocial_users_v9',
+  POSTS: 'maksocial_posts_v12',
+  USERS: 'maksocial_users_v12',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  CALENDAR: 'maksocial_calendar_v1',
-  COLLEGE_STATS: 'maksocial_college_stats_v9',
-  TIMELINE: 'maksocial_timeline_v2'
+  CALENDAR: 'maksocial_calendar_v4',
+  COLLEGE_STATS: 'maksocial_college_stats_v12',
+  TIMELINE: 'maksocial_timeline_v5'
 };
 
 const INITIAL_LEADERSHIP: Record<College, LeadershipMember[]> = {
@@ -32,6 +31,42 @@ const INITIAL_COLLEGE_STATS: CollegeStats[] = [
   { id: 'LAW', followers: 1300, postCount: 500, dean: 'Dr. Ronald Naluwairo', description: 'The School of Law.', leadership: [] }
 ];
 
+const INITIAL_USERS: User[] = [
+  {
+    id: 'u1',
+    name: 'Guru A.',
+    role: 'Student',
+    avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
+    connections: 245,
+    college: 'COCIS',
+    status: 'Year 2',
+    joinedColleges: ['COCIS'],
+    postsCount: 12,
+    followersCount: 1420,
+    followingCount: 382,
+    totalLikesCount: 4500,
+    badges: [],
+    appliedTo: []
+  },
+  {
+    id: 'admin_cocis',
+    name: 'COCIS Admin',
+    role: 'College Administrator',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
+    connections: 1000,
+    college: 'COCIS',
+    status: 'Masters',
+    email: 'admin.cocis@mak.ac.ug',
+    joinedColleges: ['COCIS'],
+    postsCount: 0,
+    followersCount: 0,
+    followingCount: 0,
+    totalLikesCount: 0,
+    badges: [],
+    appliedTo: []
+  }
+];
+
 export const db = {
   getCollegeStats: (): CollegeStats[] => {
     const saved = localStorage.getItem(DB_KEYS.COLLEGE_STATS);
@@ -41,20 +76,23 @@ export const db = {
 
   getUsers: (): User[] => {
     const saved = localStorage.getItem(DB_KEYS.USERS);
-    return saved ? JSON.parse(saved) : [];
+    const users: User[] = saved ? JSON.parse(saved) : INITIAL_USERS;
+    return users.map(u => ({ ...u, joinedColleges: u.joinedColleges || [] }));
   },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
 
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID) || 'u1';
-    return users.find(u => u.id === currentId) || users[0];
+    const user = users.find(u => u.id === currentId) || users[0];
+    return { ...user, joinedColleges: user.joinedColleges || [] };
   },
   saveUser: (user: User) => {
     const users = db.getUsers();
     const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) users[index] = user;
-    else users.push(user);
+    const updatedUser = { ...user, joinedColleges: user.joinedColleges || [] };
+    if (index !== -1) users[index] = updatedUser;
+    else users.push(updatedUser);
     db.saveUsers(users);
   },
 
@@ -80,8 +118,11 @@ export const db = {
     const users = db.getUsers();
     const stats = db.getCollegeStats();
     const updatedUsers = users.map(u => {
-      if (u.id === userId && !u.joinedColleges.includes(collegeId)) {
-        return { ...u, joinedColleges: [...u.joinedColleges, collegeId] };
+      if (u.id === userId) {
+        const joined = u.joinedColleges || [];
+        if (!joined.includes(collegeId)) {
+          return { ...u, joinedColleges: [...joined, collegeId] };
+        }
       }
       return u;
     });
@@ -106,7 +147,6 @@ export const db = {
     localStorage.setItem(DB_KEYS.TIMELINE, JSON.stringify([newEvent, ...timeline].slice(0, 50)));
   },
 
-  /* Added missing getTimeline */
   getTimeline: (): TimelineEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.TIMELINE);
     return saved ? JSON.parse(saved) : [];
@@ -126,7 +166,6 @@ export const db = {
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
 
-  /* Added missing getEvents */
   getEvents: (): LiveEvent[] => [
     {
       id: 'live-1',
@@ -137,8 +176,6 @@ export const db = {
     }
   ],
 
-  /* Added missing getViolations */
   getViolations: (): Violation[] => [],
-
   getPolls: () => []
 };

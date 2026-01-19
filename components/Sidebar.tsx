@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                 {item.icon}
               </span>
               <span className="text-[10px] tracking-widest font-black uppercase">
-                {item.id === 'groups' ? `${userCollege} Wing` : item.label}
+                {item.id === 'groups' ? `${userCollege} Wing` : item.id === 'resources' ? 'Academic Vault' : item.label}
               </span>
             </button>
           ))}

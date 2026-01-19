@@ -9,14 +9,26 @@ const DB_KEYS = {
   CALENDAR: 'maksocial_calendar_v5',
   COLLEGE_STATS: 'maksocial_college_stats_v13',
   TIMELINE: 'maksocial_timeline_v6',
-  RESOURCES: 'maksocial_resources_v1'
+  RESOURCES: 'maksocial_resources_v3'
+};
+
+export const COURSES_BY_COLLEGE: Record<College, string[]> = {
+  COCIS: ['BSCS', 'BSIT', 'BSSE', 'BSIS', 'BLIS'],
+  CEDAT: ['BSCV', 'BSEL', 'BSME', 'BARC', 'BIFA'],
+  CHUSS: ['BASW', 'BPSY', 'BAJR', 'BASS', 'BAAR'],
+  CHS: ['MBChB', 'BSNU', 'BPHA', 'BDSU'],
+  CONAS: ['BSPH', 'BSMA', 'BSBI', 'BSCH'],
+  CAES: ['BSAG', 'BSFS', 'BSFO'],
+  COBAMS: ['BSEC', 'BSST', 'BCOM', 'BSAS'],
+  CEES: ['BEDU', 'BAED', 'BSED'],
+  LAW: ['LLB']
 };
 
 const INITIAL_RESOURCES: Resource[] = [
-  { id: 'res-1', title: 'Data Structures Past Paper 2023', category: 'Past Paper', college: 'COCIS', author: 'Dr. John Kizito', downloads: 1240, fileType: 'PDF', timestamp: '2024-01-10' },
-  { id: 'res-2', title: 'Constitutional Law Summary Notes', category: 'Notes', college: 'LAW', author: 'Opio Samuel', downloads: 850, fileType: 'PDF', timestamp: '2024-02-15' },
-  { id: 'res-3', title: 'Structural Engineering Design Guide', category: 'Research', college: 'CEDAT', author: 'Eng. Sarah Nakato', downloads: 450, fileType: 'DOCX', timestamp: '2024-03-05' },
-  { id: 'res-4', title: 'Graduate Trainee Roadmap 2025', category: 'Career', college: 'Global', author: 'Career Office', downloads: 3200, fileType: 'PDF', timestamp: '2024-04-20' },
+  { id: 'res-1', title: 'Data Structures Exam 2023', category: 'Past Paper', college: 'COCIS', course: 'BSCS', year: 'Year 2', author: 'Dr. John Kizito', downloads: 1240, fileType: 'PDF', timestamp: '2024-01-10' },
+  { id: 'res-2', title: 'Constitution 101 Notes', category: 'Notes/Books', college: 'LAW', course: 'LLB', year: 'Year 1', author: 'Opio Samuel', downloads: 850, fileType: 'PDF', timestamp: '2024-02-15' },
+  { id: 'res-3', title: 'Circuit Analysis Lab Report', category: 'Test', college: 'CEDAT', course: 'BSEL', year: 'Year 2', author: 'Eng. Sarah Nakato', downloads: 450, fileType: 'DOCX', timestamp: '2024-03-05' },
+  { id: 'res-4', title: 'Microeconomics Finalist Guide', category: 'Career', college: 'COBAMS', course: 'BSEC', year: 'Finalist', author: 'Career Office', downloads: 3200, fileType: 'PDF', timestamp: '2024-04-20' },
 ];
 
 const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [

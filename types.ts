@@ -6,14 +6,19 @@ export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | '
 
 export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin';
 
+export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
+
 export interface Resource {
   id: string;
   title: string;
-  category: 'Past Paper' | 'Notes' | 'Research' | 'Career';
-  college: College | 'Global';
+  category: ResourceType;
+  college: College;
+  course: string;
+  year: string;
   author: string;
   downloads: number;
-  fileType: 'PDF' | 'DOCX' | 'PPTX';
+  fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
+  fileData?: string; // Base64 data for local storage
   timestamp: string;
 }
 
@@ -127,7 +132,7 @@ export interface Post {
   isAd?: boolean;
   isMakTV?: boolean;
   isEventBroadcast?: boolean;
-  eventId?: string; // Links to global calendar
+  eventId?: string; 
   eventFlyer?: string;
   eventDate?: string;
   eventTime?: string;

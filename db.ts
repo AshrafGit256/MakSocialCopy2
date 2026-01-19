@@ -1,14 +1,13 @@
-
 import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent, Notification } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v12',
-  USERS: 'maksocial_users_v12',
+  POSTS: 'maksocial_posts_v13',
+  USERS: 'maksocial_users_v13',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  CALENDAR: 'maksocial_calendar_v4',
-  COLLEGE_STATS: 'maksocial_college_stats_v12',
-  TIMELINE: 'maksocial_timeline_v5'
+  CALENDAR: 'maksocial_calendar_v5',
+  COLLEGE_STATS: 'maksocial_college_stats_v13',
+  TIMELINE: 'maksocial_timeline_v6'
 };
 
 const INITIAL_LEADERSHIP: Record<College, LeadershipMember[]> = {
@@ -65,6 +64,23 @@ const INITIAL_USERS: User[] = [
     totalLikesCount: 0,
     badges: [],
     appliedTo: []
+  },
+  {
+    id: 'super_admin',
+    name: 'System Admin',
+    role: 'University Admin',
+    avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    connections: 5000,
+    college: 'COCIS',
+    status: 'Graduate',
+    email: 'admin@admin.mak.ac.ug',
+    joinedColleges: ['COCIS', 'CEDAT', 'LAW'],
+    postsCount: 0,
+    followersCount: 10000,
+    followingCount: 0,
+    totalLikesCount: 0,
+    badges: ['Super Admin'],
+    appliedTo: []
   }
 ];
 
@@ -101,7 +117,7 @@ export const db = {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
     let posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
     
-    // Auto-hide expired event posts from "public"
+    // Auto-hide expired event posts from "public" view
     if (!showExpired) {
       const now = new Date();
       posts = posts.filter(p => {
@@ -118,7 +134,7 @@ export const db = {
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   addPost: (post: Post) => {
-    const posts = db.getPosts(undefined, true); // Keep full history in storage
+    const posts = db.getPosts(undefined, true); 
     db.savePosts([post, ...posts]);
   },
   deletePost: (postId: string, userId: string) => {
@@ -183,12 +199,12 @@ export const db = {
     const user = users.find(u => u.id === userId);
     if (!user) return;
 
-    // Add to attendees
+    // Logic: If already registered, don't duplicate
     if (!event.attendeeIds?.includes(userId)) {
       event.attendeeIds = [...(event.attendeeIds || []), userId];
     }
 
-    // Calculate time remaining for notification
+    // Proof logic: Calculate time remaining for the notification receipt
     const now = new Date();
     const target = new Date(`${event.date}T${event.time || '00:00'}`);
     const diff = target.getTime() - now.getTime();
@@ -202,14 +218,14 @@ export const db = {
 
     const notification: Notification = {
       id: `notif-${Date.now()}`,
-      text: `Protocol Confirmed: ${user.name}, you are officially registered for "${event.title}". This receipt acts as proof. ${timeText} until deployment.`,
+      text: `Identity Verified: ${user.name}, your registration for "${event.title}" is officially logged in the registry. This message serves as your digital admission proof. ${timeText} until deployment.`,
       timestamp: 'Just now',
       isRead: false
     };
 
     user.notifications = [notification, ...(user.notifications || [])];
 
-    // Save
+    // Save state back to local storage
     localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
   },

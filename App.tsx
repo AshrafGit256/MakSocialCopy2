@@ -46,7 +46,6 @@ const App: React.FC = () => {
     setUserRole('student');
     setView('home');
     
-    // Fix: Added missing joinedColleges property to User object creation
     const newUser: User = {
       id: Date.now().toString(),
       name: email.split('@')[0],
@@ -94,7 +93,7 @@ const App: React.FC = () => {
       case 'groups': return <Feed collegeFilter={currentUser?.college} />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => setSelectedUserId(null)} />;
-      case 'events': return <Events />;
+      case 'events': return <Events isAdmin={userRole === 'admin'} />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={navigateToProfile} onNavigateToPost={navigateToPost} />;

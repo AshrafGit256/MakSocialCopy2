@@ -14,18 +14,13 @@ import {
 const VerifiedBadge: React.FC<{ role?: AuthorityRole }> = ({ role }) => {
   if (!role) return null;
   
-  // Specific tick colors mapping:
-  // Red: Super Admin
-  // Grey: College Admin
-  // Black: Lecturer
-  // Green: Student Leaders (Chairperson, GRC)
   const styles: Record<AuthorityRole, { bg: string, text: string }> = {
     'Super Admin': { bg: 'bg-rose-600', text: 'text-white' },
-    'Administrator': { bg: 'bg-slate-500', text: 'text-white' }, // Grey for College Admin
-    'Lecturer': { bg: 'bg-slate-950', text: 'text-white' }, // Black for Lecturer
-    'Chairperson': { bg: 'bg-emerald-500', text: 'text-white' }, // Green
-    'GRC': { bg: 'bg-emerald-500', text: 'text-white' }, // Green
-    'Student Leader': { bg: 'bg-emerald-500', text: 'text-white' } // Green
+    'Administrator': { bg: 'bg-slate-500', text: 'text-white' },
+    'Lecturer': { bg: 'bg-slate-950', text: 'text-white' },
+    'Chairperson': { bg: 'bg-emerald-500', text: 'text-white' },
+    'GRC': { bg: 'bg-emerald-500', text: 'text-white' },
+    'Student Leader': { bg: 'bg-emerald-500', text: 'text-white' }
   };
   
   const style = styles[role] || { bg: 'bg-slate-400', text: 'text-white' };
@@ -56,12 +51,11 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   // Active college determination
   const activeCollege = collegeFilter || (activeTab === 'Global' ? null : activeTab as College);
   
-  // Restriction logic: College admins only see their wing
   useEffect(() => {
     if (isCollegeAdmin && activeTab === 'Global' && !collegeFilter) {
       setActiveTab(userCollegeAdminId as College);
     }
-  }, [isCollegeAdmin, userCollegeAdminId]);
+  }, [isCollegeAdmin, userCollegeAdminId, activeTab, collegeFilter]);
 
   const currentStats = activeCollege ? collegeStats.find(s => s.id === activeCollege) : null;
   const hasJoined = activeCollege ? (user.joinedColleges || []).includes(activeCollege) : true;
@@ -76,7 +70,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     sync();
     const interval = setInterval(sync, 4000);
     return () => clearInterval(interval);
-  }, [activeTab, collegeFilter, user.id]);
+  }, [activeTab, activeCollege, collegeFilter, user.id]);
 
   const handleJoin = (col: College) => {
     db.joinCollege(user.id, col);
@@ -112,7 +106,10 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
       setNewPostContent('');
       setPosts(db.getPosts(activeCollege || undefined));
       setIsAnalyzing(false);
-    } catch (e) { setIsAnalyzing(false); }
+    } catch (e) { 
+      setIsAnalyzing(false); 
+      console.error(e);
+    }
   };
 
   const handleDelete = (pid: string) => {
@@ -137,7 +134,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
       {activeCollege && (
         <div className="relative rounded-[2.5rem] overflow-hidden border border-[var(--border-color)] bg-[var(--sidebar-bg)] mb-10 shadow-xl group">
            <div className="h-64 sm:h-80 relative overflow-hidden">
-              <img src={COLLEGE_BANNERS[activeCollege]!} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+              <img src={activeCollege ? COLLEGE_BANNERS[activeCollege] : ""} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
            </div>
            <div className="p-8 -mt-24 relative z-10 space-y-8">
@@ -148,13 +145,13 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                     </div>
                     <div className="pt-8">
                        <h1 className="text-4xl font-black text-white tracking-tighter uppercase">{activeCollege}</h1>
-                       <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mt-1">Dean: {currentStats?.dean}</p>
+                       <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mt-1">Dean: {currentStats?.dean || "Awaiting Update"}</p>
                     </div>
                  </div>
                  <div className="flex items-center gap-3">
                     <div className="flex gap-6 bg-black/20 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 mr-4">
-                       <div className="text-center"><p className="text-xl font-black text-white">{currentStats?.followers.toLocaleString()}</p><p className="text-[7px] font-black text-white/40 uppercase">Nodes</p></div>
-                       <div className="text-center"><p className="text-xl font-black text-white">{currentStats?.postCount.toLocaleString()}</p><p className="text-[7px] font-black text-white/40 uppercase">Signals</p></div>
+                       <div className="text-center"><p className="text-xl font-black text-white">{currentStats?.followers?.toLocaleString() || 0}</p><p className="text-[7px] font-black text-white/40 uppercase">Nodes</p></div>
+                       <div className="text-center"><p className="text-xl font-black text-white">{currentStats?.postCount?.toLocaleString() || 0}</p><p className="text-[7px] font-black text-white/40 uppercase">Signals</p></div>
                     </div>
                     {isAdminOfActiveCollege && (
                        <button onClick={() => setShowManageModal(true)} className="p-4 bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white border border-[var(--border-color)] rounded-2xl hover:bg-indigo-600 hover:text-white transition-all">
@@ -257,10 +254,13 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                        <div className="flex items-center gap-10 pt-6 mt-6 border-t border-[var(--border-color)]">
                           <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors"><Heart size={20}/> <span className="text-xs font-black">{post.likes}</span></button>
                           <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors"><MessageCircle size={20}/> <span className="text-xs font-black">{post.commentsCount}</span></button>
-                          <div className="flex items-center gap-2 text-slate-400 ml-auto"><Eye size={18}/> <span className="text-[10px] font-black">{post.views.toLocaleString()}</span></div>
+                          <div className="flex items-center gap-2 text-slate-400 ml-auto"><Eye size={18}/> <span className="text-[10px] font-black">{post.views?.toLocaleString() || 0}</span></div>
                        </div>
                     </article>
                  ))}
+                 {posts.length === 0 && (
+                   <div className="py-20 text-center text-slate-500 font-black uppercase tracking-widest italic border border-dashed border-[var(--border-color)] rounded-3xl">No signals detected in this wing.</div>
+                 )}
               </div>
            </div>
 
@@ -280,7 +280,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
         </div>
       )}
 
-      {/* College Admin Registry Management Modal */}
       {showManageModal && activeCollege && isAdminOfActiveCollege && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/95 backdrop-blur-lg">
            <div className="glass-card w-full max-w-2xl bg-[var(--sidebar-bg)] border-[var(--border-color)] shadow-2xl overflow-hidden flex flex-col h-[80vh]">
@@ -351,11 +350,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              </button>
                           </div>
                        ))}
-                       {(!currentStats?.leadership || currentStats.leadership.length === 0) && (
-                          <p className="text-center py-10 text-slate-500 font-bold uppercase text-[10px] tracking-widest italic border border-dashed border-[var(--border-color)] rounded-2xl">
-                             No authority nodes registered in this registry.
-                          </p>
-                       )}
                     </div>
                  </div>
               </div>

@@ -11,7 +11,7 @@ import {
   MapPin, Clock, TrendingUp, Plus, FileText, Lock,
   ShieldCheck, Trash2, Edit3, UserPlus, ShieldAlert as Shield,
   Star, Verified, Shield as ShieldIcon, ExternalLink, CalendarPlus,
-  Bookmark, Share2
+  Bookmark, Share2, CalendarCheck
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -91,11 +91,9 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [rejectionMessage, setRejectionMessage] = useState<string | null>(null);
-  const [showManageModal, setShowManageModal] = useState(false);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(db.getCalendarEvents());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Identity logic
   const isSuperAdmin = user.email?.toLowerCase().endsWith('@admin.mak.ac.ug');
   const userCollegeAdminMatch = user.email?.toLowerCase().match(/^admin\.([a-z]+)@mak\.ac\.ug$/);
   const userCollegeAdminId = userCollegeAdminMatch ? userCollegeAdminMatch[1].toUpperCase() as College : null;
@@ -109,8 +107,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     }
   }, [isCollegeAdmin, userCollegeAdminId, activeTab, collegeFilter]);
 
-  const currentStats = activeCollege ? collegeStats.find(s => s.id === activeCollege) : null;
-  const hasJoined = activeCollege ? (user.joinedColleges || []).includes(activeCollege) : true;
   const isAdminOfActiveCollege = isCollegeAdmin && activeCollege === userCollegeAdminId;
 
   useEffect(() => {
@@ -125,37 +121,41 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     return () => clearInterval(interval);
   }, [activeTab, activeCollege, collegeFilter, user.id]);
 
-  const handleJoin = (col: College) => {
-    db.joinCollege(user.id, col);
-    setUser(db.getUser());
-    setCollegeStats(db.getCollegeStats());
-  };
-
   const handleRegister = (eventId: string) => {
     db.registerForEvent(eventId, user.id);
     setCalendarEvents(db.getCalendarEvents());
-    alert("Identity Validated: Registration successfully logged to the university registry.");
+    // The UI re-renders and shows the "Logged" state automatically because calendarEvents is in state
   };
 
-  const addToCalendar = (event: Post) => {
-    const title = encodeURIComponent(event.eventTitle || 'University Event');
-    const details = encodeURIComponent(event.content || '');
-    const location = encodeURIComponent(event.eventLocation || 'Makerere University');
-    const dateStr = (event.eventDate || '').replace(/-/g, '');
-    const startTime = `${dateStr}T${(event.eventTime || '00:00').replace(':', '')}00Z`;
-    const endTime = startTime; // Assume 1 hour if not specified? Google link needs both.
-    
-    const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startTime}/${startTime}`;
-    window.open(googleUrl, '_blank');
+  const syncToInternalCalendar = (event: Post) => {
+    // Check if it already exists in the calendar by title and date
+    const exists = calendarEvents.some(e => e.title === event.eventTitle && e.date === event.eventDate);
+    if (exists) {
+      alert("This event is already synchronized with your MakSocial Calendar.");
+      return;
+    }
+
+    const newCalendarEvent: CalendarEvent = {
+      id: event.eventId || `post-ev-${Date.now()}`,
+      title: event.eventTitle || 'University Event',
+      description: event.content || '',
+      date: event.eventDate || '',
+      time: event.eventTime || '',
+      location: event.eventLocation || 'Makerere University',
+      image: event.eventFlyer,
+      category: 'Social',
+      createdBy: event.authorId,
+      attendeeIds: []
+    };
+
+    db.saveCalendarEvent(newCalendarEvent);
+    setCalendarEvents(db.getCalendarEvents());
+    alert("Protocol Synchronized: Event added to your MakSocial Calendar registry.");
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File too large. Max 5MB.");
-        return;
-      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
@@ -171,7 +171,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      
       const parts: any[] = [];
       let moderationPrompt = `Respond ONLY with JSON: {"category": string, "isSafe": boolean, "reason": string}`;
 
@@ -227,13 +226,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     }
   };
 
-  const handleDelete = (pid: string) => {
-    if (confirm("Remove content?")) {
-      db.deletePost(pid, user.id);
-      setPosts(db.getPosts(activeCollege || undefined));
-    }
-  };
-
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-8 pb-32">
       {!collegeFilter && !isCollegeAdmin && (
@@ -257,9 +249,9 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                  <div className="flex justify-between items-center mt-4 pt-4 border-t border-[var(--border-color)]">
                     <div className="flex gap-4">
                       <input type="file" ref={fileInputRef} onChange={handleImageSelect} accept="image/*" className="hidden" />
-                      <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest"><ImageIcon size={18}/> Asset</button>
+                      <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 text-[10px] font-black uppercase tracking-widest transition-colors"><ImageIcon size={18}/> Asset</button>
                     </div>
-                    <button onClick={handleCreatePost} disabled={isAnalyzing || (!newPostContent.trim() && !selectedImage)} className="bg-indigo-600 text-white px-10 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50">
+                    <button onClick={handleCreatePost} disabled={isAnalyzing || (!newPostContent.trim() && !selectedImage)} className="bg-indigo-600 text-white px-10 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all">
                        {isAnalyzing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16}/>} Broadcast
                     </button>
                  </div>
@@ -270,10 +262,11 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                {posts.map(post => {
                  const linkedEvent = calendarEvents.find(e => e.id === post.eventId);
                  const isRegistered = linkedEvent?.attendeeIds?.includes(user.id);
+                 const isSynced = calendarEvents.some(e => e.title === post.eventTitle && e.date === post.eventDate);
                  
                  return (
-                  <article key={post.id} className={`glass-card p-0 overflow-hidden border-[var(--border-color)] shadow-sm hover:shadow-md transition-all ${post.isEventBroadcast ? 'ring-1 ring-indigo-500/30' : ''}`}>
-                     {/* Header */}
+                  <article key={post.id} className={`glass-card p-0 overflow-hidden border-[var(--border-color)] shadow-sm hover:shadow-md transition-all ${post.isEventBroadcast ? 'ring-2 ring-indigo-500/20' : ''}`}>
+                     {/* Card Header */}
                      <div className="p-8 pb-4">
                        <div className="flex justify-between items-start mb-6">
                           <div className="flex items-center gap-4">
@@ -288,54 +281,64 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                           </div>
                           <div className="flex items-center gap-3">
                              {post.isEventBroadcast && (
-                               <span className="text-[8px] font-black uppercase tracking-widest bg-amber-500 text-white px-2.5 py-1 rounded shadow-lg shadow-amber-500/20 flex items-center gap-1.5 animate-pulse">
-                                  <Star size={10} fill="currentColor"/> MakEvent
-                               </span>
+                               <div className="flex items-center gap-1.5 bg-amber-500 text-white px-3 py-1.5 rounded-lg shadow-lg shadow-amber-500/30 animate-pulse border border-amber-400/50">
+                                  <Star size={10} fill="currentColor"/>
+                                  <span className="text-[8px] font-black uppercase tracking-widest">MakEvent</span>
+                               </div>
                              )}
-                             <span className="text-[8px] font-black uppercase tracking-widest bg-[var(--bg-secondary)] px-2 py-1 rounded text-slate-500 border border-[var(--border-color)]">
-                               {post.isEventBroadcast ? 'Global Protocol' : (post.aiMetadata?.category || 'Signal')}
+                             <span className="text-[8px] font-black uppercase tracking-widest bg-[var(--bg-secondary)] px-2.5 py-1.5 rounded-lg text-slate-500 border border-[var(--border-color)]">
+                               {post.isEventBroadcast ? 'Official Command' : (post.aiMetadata?.category || 'Pulse Signal')}
                              </span>
                           </div>
                        </div>
-                       <p className="text-[var(--text-primary)] text-base font-medium leading-relaxed italic border-l-2 border-indigo-600/30 pl-6 py-1 mb-4">"{post.content}"</p>
+                       <p className="text-[var(--text-primary)] text-base font-medium leading-relaxed italic border-l-4 border-indigo-600/40 pl-6 py-2 mb-4 bg-indigo-600/5 rounded-r-2xl">
+                         "{post.content}"
+                       </p>
                      </div>
 
-                     {/* Event Flyer / Assets */}
+                     {/* Event Flyer & Controls */}
                      {post.isEventBroadcast ? (
                        <div className="px-8 pb-8 space-y-6">
                           {post.eventFlyer && (
-                            <div className="rounded-[2rem] overflow-hidden border border-[var(--border-color)] shadow-xl relative group/flyer">
-                               <img src={post.eventFlyer} className="w-full h-80 object-cover transition-transform duration-700 group-hover/flyer:scale-105" alt="Event Flyer" />
-                               <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/80 via-transparent to-transparent"></div>
-                               <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+                            <div className="rounded-[2.5rem] overflow-hidden border border-[var(--border-color)] shadow-2xl relative group/flyer">
+                               <img src={post.eventFlyer} className="w-full h-[450px] object-cover transition-transform duration-1000 group-hover/flyer:scale-105" alt="Event Flyer" />
+                               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+                               <div className="absolute bottom-8 left-8 right-8 flex items-end justify-between">
                                   <div>
-                                     <h3 className="text-2xl font-black text-white uppercase tracking-tighter">{post.eventTitle}</h3>
-                                     <div className="flex items-center gap-3 mt-1.5">
-                                        <div className="flex items-center gap-1 text-[9px] font-black text-white/80 uppercase"><Calendar size={12}/> {post.eventDate}</div>
-                                        <div className="w-1 h-1 bg-white/40 rounded-full"></div>
-                                        <div className="flex items-center gap-1 text-[9px] font-black text-white/80 uppercase"><Clock size={12}/> {post.eventTime}</div>
+                                     <h3 className="text-3xl font-black text-white uppercase tracking-tighter drop-shadow-lg">{post.eventTitle}</h3>
+                                     <div className="flex items-center gap-3 mt-3">
+                                        <div className="flex items-center gap-2 text-[9px] font-black text-white uppercase bg-white/20 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-white/20"><Calendar size={14}/> {post.eventDate}</div>
+                                        <div className="flex items-center gap-2 text-[9px] font-black text-white uppercase bg-white/20 backdrop-blur-xl px-3 py-1.5 rounded-xl border border-white/20"><Clock size={14}/> {post.eventTime}</div>
                                      </div>
                                   </div>
-                                  <button onClick={() => addToCalendar(post)} className="p-3 bg-white/10 backdrop-blur-md text-white rounded-xl border border-white/20 hover:bg-white/20 transition-all" title="Add to Calendar">
-                                     <CalendarPlus size={20}/>
+                                  <button 
+                                    onClick={() => syncToInternalCalendar(post)} 
+                                    className={`p-4 rounded-2xl border backdrop-blur-xl transition-all group/cal shadow-xl ${
+                                      isSynced 
+                                      ? 'bg-emerald-500/80 text-white border-emerald-400' 
+                                      : 'bg-white/10 text-white border-white/20 hover:bg-white/30 active:scale-95'
+                                    }`}
+                                    title={isSynced ? "Event Synchronized" : "Add to MakSocial Calendar"}
+                                  >
+                                     {isSynced ? <CalendarCheck size={24} /> : <CalendarPlus size={24} className="group-hover/cal:scale-110 transition-transform" />}
                                   </button>
                                </div>
                             </div>
                           )}
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div className="p-5 bg-indigo-600/5 rounded-2xl border border-indigo-600/10 flex items-center gap-4">
-                                <div className="p-3 bg-indigo-600 rounded-xl text-white"><MapPin size={20}/></div>
-                                <div>
-                                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Target Node</p>
-                                   <p className="text-xs font-bold text-[var(--text-primary)]">{post.eventLocation}</p>
+                             <div className="p-5 bg-indigo-600/5 rounded-2xl border border-[var(--border-color)] flex items-center gap-4 hover:border-indigo-500/30 transition-colors">
+                                <div className="p-3 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-600/20"><MapPin size={20}/></div>
+                                <div className="min-w-0">
+                                   <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Venue Protocol</p>
+                                   <p className="text-sm font-bold text-[var(--text-primary)] truncate">{post.eventLocation}</p>
                                 </div>
                              </div>
-                             <div className="p-5 bg-amber-500/5 rounded-2xl border border-amber-500/10 flex items-center gap-4">
-                                <div className="p-3 bg-amber-500 rounded-xl text-white"><Users size={20}/></div>
-                                <div>
+                             <div className="p-5 bg-amber-500/5 rounded-2xl border border-[var(--border-color)] flex items-center gap-4 hover:border-amber-500/30 transition-colors">
+                                <div className="p-3 bg-amber-500 rounded-2xl text-white shadow-lg shadow-amber-500/20"><Users size={20}/></div>
+                                <div className="min-w-0">
                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Engagement</p>
-                                   <p className="text-xs font-bold text-[var(--text-primary)]">{linkedEvent?.attendeeIds?.length || 0} Registered</p>
+                                   <p className="text-sm font-bold text-[var(--text-primary)]">{linkedEvent?.attendeeIds?.length || 0} Identities Validated</p>
                                 </div>
                              </div>
                           </div>
@@ -343,33 +346,42 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                           <button 
                             onClick={() => post.eventId && handleRegister(post.eventId)}
                             disabled={isRegistered}
-                            className={`w-full py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-xl transition-all ${
+                            className={`w-full py-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.25em] flex items-center justify-center gap-3 shadow-2xl transition-all ${
                               isRegistered 
-                              ? 'bg-emerald-500 text-white shadow-emerald-500/20' 
-                              : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/20 active:scale-[0.98]'
+                              ? 'bg-emerald-600 text-white shadow-emerald-500/30 cursor-default' 
+                              : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/40 active:scale-[0.98]'
                             }`}
                           >
-                             {isRegistered ? <CheckCircle2 size={18}/> : <Zap size={18}/>}
-                             {isRegistered ? 'Identity Validated & Logged' : 'Initialize Registration'}
+                             {isRegistered ? <CheckCircle2 size={20} className="animate-in zoom-in duration-300" /> : <Zap size={20} />}
+                             {isRegistered ? 'Registration Sequence Complete' : 'Initialize Event Registration'}
                           </button>
                        </div>
                      ) : post.images && post.images.length > 0 && (
                        <div className="px-8 pb-8">
-                          <div className="rounded-3xl overflow-hidden border border-[var(--border-color)]">
-                            <img src={post.images[0]} className="w-full object-cover max-h-[600px]" alt="Post Asset" />
+                          <div className="rounded-[2rem] overflow-hidden border border-[var(--border-color)] group/img shadow-xl">
+                            <img src={post.images[0]} className="w-full object-cover max-h-[600px] hover:scale-[1.03] transition-transform duration-700" alt="Broadcast Content" />
                           </div>
                        </div>
                      )}
 
-                     {/* Footer Actions */}
+                     {/* Interactions Footer */}
                      <div className="px-8 py-6 bg-[var(--bg-secondary)]/30 border-t border-[var(--border-color)] flex items-center justify-between">
-                        <div className="flex items-center gap-8">
-                           <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors"><Heart size={18}/> <span className="text-[10px] font-black">{post.likes}</span></button>
-                           <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors"><MessageCircle size={18}/> <span className="text-[10px] font-black">{post.commentsCount}</span></button>
-                           <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors"><Share2 size={18}/></button>
+                        <div className="flex items-center gap-10">
+                           <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors group">
+                             <Heart size={20} className="group-hover:fill-rose-500 group-active:scale-125 transition-all" /> 
+                             <span className="text-[11px] font-black">{post.likes}</span>
+                           </button>
+                           <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                             <MessageCircle size={20}/> 
+                             <span className="text-[11px] font-black">{post.commentsCount}</span>
+                           </button>
+                           <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                             <Share2 size={20}/>
+                           </button>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-400">
-                           <Eye size={16}/> <span className="text-[9px] font-black">{post.views?.toLocaleString() || 0} Nodes Scan</span>
+                        <div className="flex items-center gap-2.5 text-slate-400">
+                           <Eye size={18}/> 
+                           <span className="text-[9px] font-black tracking-widest">{post.views?.toLocaleString() || 0} NETWORK SCANS</span>
                         </div>
                      </div>
                   </article>
@@ -379,23 +391,31 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
          </div>
 
          <aside className="hidden lg:block lg:col-span-4 space-y-8 sticky top-8">
-            <div className="glass-card p-8 border-[var(--border-color)] shadow-sm bg-[var(--sidebar-bg)]">
-               <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 mb-6"><TrendingUp size={16} className="text-indigo-600"/> High Density Nodes</h3>
-               <div className="space-y-6">
-                  {calendarEvents.slice(0, 3).map(ev => (
-                    <div key={ev.id} className="flex gap-4 group cursor-pointer">
-                       <div className="w-12 h-12 rounded-xl bg-indigo-600/10 flex flex-col items-center justify-center border border-indigo-600/20">
-                          <span className="text-[10px] font-black text-indigo-600 leading-none">{ev.date.split('-')[2]}</span>
-                          <span className="text-[7px] font-black uppercase text-indigo-400 mt-1">{new Date(ev.date).toLocaleString('default', {month: 'short'})}</span>
+            <div className="glass-card p-8 border-[var(--border-color)] shadow-xl bg-[var(--sidebar-bg)] overflow-hidden relative">
+               <div className="absolute top-0 right-0 p-4 opacity-5"><Calendar size={80}/></div>
+               <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 mb-8 border-b border-[var(--border-color)] pb-4">
+                 <TrendingUp size={18} className="text-indigo-600"/> High Fidelity Nodes
+               </h3>
+               <div className="space-y-8">
+                  {calendarEvents.slice(0, 4).map(ev => (
+                    <div key={ev.id} className="flex gap-4 group cursor-pointer hover:translate-x-1 transition-transform relative">
+                       <div className="w-14 h-14 rounded-2xl bg-indigo-600/10 flex flex-col items-center justify-center border border-indigo-600/20 group-hover:bg-indigo-600 transition-colors shadow-sm">
+                          <span className="text-xs font-black text-indigo-600 group-hover:text-white leading-none">{ev.date.split('-')[2]}</span>
+                          <span className="text-[8px] font-black uppercase text-indigo-400 group-hover:text-indigo-200 mt-1">{new Date(ev.date).toLocaleString('default', {month: 'short'})}</span>
                        </div>
-                       <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-black text-[var(--text-primary)] truncate uppercase tracking-tight group-hover:text-indigo-600 transition-colors">{ev.title}</p>
-                          <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">{ev.location}</p>
+                       <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <p className="text-xs font-black text-[var(--text-primary)] truncate uppercase tracking-tight group-hover:text-indigo-600 transition-colors">{ev.title}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                             <MapPin size={10} className="text-slate-400"/>
+                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate">{ev.location}</p>
+                          </div>
                        </div>
                     </div>
                   ))}
                </div>
-               <button className="w-full mt-8 py-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-[8px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 transition-all">View Full Registry</button>
+               <button className="w-full mt-10 py-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white hover:bg-indigo-600 hover:border-transparent transition-all shadow-inner">
+                 Access Full University Registry
+               </button>
             </div>
          </aside>
       </div>

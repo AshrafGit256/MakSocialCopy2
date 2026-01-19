@@ -55,6 +55,32 @@ export const MOCK_POSTS: Post[] = [
     eventRegistrationLink: 'https://mak.ac.ug/guild'
   },
   {
+    id: 'ev-broadcast-2',
+    author: 'COCIS Admin',
+    authorId: 'admin_cocis',
+    authorRole: 'Academic Administrator',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
+    authorAuthority: 'Administrator',
+    timestamp: '2 hours ago',
+    content: 'The Innovation Challenge is now open for registration. Teams of up to 4 can apply to present their research and win significant funding.',
+    hashtags: ['#InnovateMAK', '#Tech', '#COCIS'],
+    likes: 89,
+    commentsCount: 5,
+    comments: [],
+    views: 1200,
+    flags: [],
+    isOpportunity: true,
+    college: 'COCIS',
+    isEventBroadcast: true,
+    eventId: 'ev-2',
+    eventTitle: 'MAK Innovation Challenge 2025',
+    eventFlyer: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200',
+    eventDate: '2025-06-10',
+    eventTime: '09:00',
+    eventLocation: 'COCIS Conference Room',
+    eventRegistrationLink: 'https://innovate.mak.ac.ug'
+  },
+  {
     id: 'global-1',
     author: 'Campus Admin',
     authorId: 'admin',
@@ -72,32 +98,6 @@ export const MOCK_POSTS: Post[] = [
     isOpportunity: false,
     college: 'Global',
     aiMetadata: { category: 'Social', isSafe: true }
-  },
-  {
-    id: 'ev-broadcast-2',
-    author: 'COCIS Admin',
-    authorId: 'admin_cocis',
-    authorRole: 'Academic Administrator',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
-    authorAuthority: 'Administrator',
-    timestamp: '2 hours ago',
-    content: 'The Innovation Challenge is now open for registration. Teams of up to 4 can apply to present their solutions.',
-    hashtags: ['#InnovateMAK', '#Tech', '#COCIS'],
-    likes: 89,
-    commentsCount: 5,
-    comments: [],
-    views: 1200,
-    flags: [],
-    isOpportunity: true,
-    college: 'COCIS',
-    isEventBroadcast: true,
-    eventId: 'ev-2',
-    eventTitle: 'MAK Innovation Challenge 2025',
-    eventFlyer: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200',
-    eventDate: '2025-06-10',
-    eventTime: '09:00',
-    eventLocation: 'COCIS Conference Room',
-    eventRegistrationLink: 'https://innovate.mak.ac.ug'
   }
 ];
 
@@ -106,7 +106,6 @@ export const ANALYTICS: AnalyticsData[] = [
   { day: 'Tue', posts: 150, activeUsers: 520, messages: 1400, revenue: 600, engagement: 1530 },
   { day: 'Wed', posts: 200, activeUsers: 600, messages: 1800, revenue: 550, engagement: 1900 },
   { day: 'Thu', posts: 180, activeUsers: 580, messages: 1600, revenue: 800, engagement: 1770 },
-  // Fixed error: Removed 'minute' property as it is not part of AnalyticsData type
   { day: 'Fri', posts: 250, activeUsers: 720, messages: 2100, revenue: 1200, engagement: 2330 },
   { day: 'Sat', posts: 100, activeUsers: 300, messages: 800, revenue: 400, engagement: 950 },
   { day: 'Sun', posts: 80, activeUsers: 250, messages: 600, revenue: 300, engagement: 775 },

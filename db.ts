@@ -21,7 +21,7 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
     location: 'Main Hall, Makerere University',
     category: 'Social',
     createdBy: 'super_admin',
-    image: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200',
+    image: 'https://www.independent.co.ug/wp-content/uploads/2023/02/Makerere-Guild-polls.jpg',
     attendeeIds: ['u1', 'admin_cocis'],
     registrationLink: 'https://mak.ac.ug/guild'
   },
@@ -172,7 +172,12 @@ export const db = {
   },
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([...events, event]));
+    // Prevent duplicate entries by checking title and date
+    const exists = events.some(e => e.title === event.title && e.date === event.date);
+    if (exists) return;
+    
+    const updated = [...events, event];
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
   deleteCalendarEvent: (eventId: string) => {
     const events = db.getCalendarEvents();
@@ -181,13 +186,18 @@ export const db = {
   },
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();
-    const event = events.find(e => e.id === eventId);
-    if (!event) return;
-    if (!event.attendeeIds?.includes(userId)) event.attendeeIds = [...(event.attendeeIds || []), userId];
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
+    const updated = events.map(e => {
+      if (e.id === eventId) {
+        const attendees = e.attendeeIds || [];
+        if (!attendees.includes(userId)) {
+          return { ...e, attendeeIds: [...attendees, userId] };
+        }
+      }
+      return e;
+    });
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
 
-  // Added updateCollegeLeadership to fix errors in Feed component where it was being called but not defined.
   updateCollegeLeadership: (collegeId: College, leadership: LeadershipMember[]) => {
     const stats = db.getCollegeStats();
     const updatedStats = stats.map(s => s.id === collegeId ? { ...s, leadership } : s);

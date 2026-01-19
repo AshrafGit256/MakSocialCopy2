@@ -1,13 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { CalendarEvent, Post, User } from '../types';
+import { CalendarEvent, Post, User, College } from '../types';
 import { 
   Calendar as CalendarIcon, Clock, MapPin, Plus, Trash2, 
   ChevronLeft, ChevronRight, Zap, Info, Camera,
   AlertCircle, Bell, ArrowRight, X, ExternalLink, CalendarDays,
-  CheckCircle2, Users
+  CheckCircle2, Users, LayoutGrid
 } from 'lucide-react';
+
+const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
 
 const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
   const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
@@ -63,14 +65,18 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [currentUser] = useState<User>(db.getUser());
+  const [currentUser, setCurrentUser] = useState<User>(db.getUser());
+  const [repostTarget, setRepostTarget] = useState<College | 'Global'>('Global');
   
   const [form, setForm] = useState<Partial<CalendarEvent>>({
     title: '', description: '', date: '', time: '', location: '', category: 'Social', registrationLink: '', image: ''
   });
 
   useEffect(() => {
-    const interval = setInterval(() => setEvents(db.getCalendarEvents()), 2000);
+    const interval = setInterval(() => {
+      setEvents(db.getCalendarEvents());
+      setCurrentUser(db.getUser());
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -96,7 +102,6 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
   const handleRegister = (eventId: string) => {
     db.registerForEvent(eventId, currentUser.id);
     setEvents(db.getCalendarEvents());
-    // Refresh selected event to show updated state
     const updatedEvent = db.getCalendarEvents().find(e => e.id === eventId);
     if (updatedEvent) setSelectedEvent(updatedEvent);
   };
@@ -118,7 +123,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
       views: 0,
       flags: [],
       isOpportunity: false,
-      college: 'Global' as any,
+      college: repostTarget,
       isEventBroadcast: true,
       eventDate: event.date,
       eventTime: event.time,
@@ -127,7 +132,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
       eventRegistrationLink: event.registrationLink
     };
     db.addPost(broadcast);
-    alert("Broadcast pushed to hub.");
+    alert(`Broadcast pushed to ${repostTarget} Hub.`);
     setSelectedEvent(null);
   };
 
@@ -215,7 +220,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
 
       {selectedEvent && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 animate-in fade-in duration-300 backdrop-blur-md">
-           <div className="glass-card w-full max-w-4xl overflow-hidden flex flex-col md:flex-row shadow-2xl border-[var(--border-color)]">
+           <div className="glass-card w-full max-w-5xl overflow-hidden flex flex-col md:flex-row shadow-2xl border-[var(--border-color)]">
               <div className="md:w-1/2 relative h-80 md:h-auto overflow-hidden">
                  <img src={selectedEvent.image || 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200'} className="w-full h-full object-cover" />
                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
@@ -224,7 +229,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                  </div>
               </div>
 
-              <div className="md:w-1/2 p-10 space-y-8 bg-[var(--sidebar-bg)]">
+              <div className="md:w-1/2 p-10 space-y-8 bg-[var(--sidebar-bg)] overflow-y-auto no-scrollbar">
                  <div className="flex justify-between items-start">
                     <div className="space-y-1">
                        <span className="bg-indigo-600 text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest">{selectedEvent.category}</span>
@@ -265,16 +270,36 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                       }`}
                     >
                       {isRegistered ? <CheckCircle2 size={16}/> : <Zap size={16}/>}
-                      {isRegistered ? 'Registration Confirmed' : 'Register for Event'}
+                      {isRegistered ? 'Registration Confirmed (Check Signal Stream)' : 'Register for Event'}
                     </button>
                     
                     {isAdmin && (
-                      <button 
-                        onClick={() => pushToFeed(selectedEvent)}
-                        className="w-full bg-rose-600 text-white p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-rose-700"
-                      >
-                         <ExternalLink size={14}/> Push to Global Feed
-                      </button>
+                      <div className="space-y-4 pt-6 border-t border-[var(--border-color)]">
+                         <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><LayoutGrid size={14}/> Repost to Hub Wing</h4>
+                         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                            <button 
+                               onClick={() => setRepostTarget('Global')}
+                               className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all ${repostTarget === 'Global' ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-500'}`}
+                            >
+                               Global Hub
+                            </button>
+                            {COLLEGES.map(c => (
+                               <button 
+                                  key={c}
+                                  onClick={() => setRepostTarget(c)}
+                                  className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all ${repostTarget === c ? 'bg-indigo-600 text-white border-transparent' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-500'}`}
+                               >
+                                  {c} Wing
+                               </button>
+                            ))}
+                         </div>
+                         <button 
+                            onClick={() => pushToFeed(selectedEvent)}
+                            className="w-full bg-rose-600 text-white p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-rose-700"
+                         >
+                            <ExternalLink size={14}/> Push Command to {repostTarget}
+                         </button>
+                      </div>
                     )}
                  </div>
               </div>
@@ -298,6 +323,16 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                  <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" placeholder="Location" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
                  <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none" placeholder="Flyer Image URL" value={form.image} onChange={e => setForm({...form, image: e.target.value})} />
                  <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none h-24 resize-none" placeholder="Brief Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Category</label>
+                    <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[var(--text-primary)] text-sm outline-none appearance-none" value={form.category} onChange={e => setForm({...form, category: e.target.value as any})}>
+                       <option>Academic</option>
+                       <option>Social</option>
+                       <option>Sports</option>
+                       <option>Exams</option>
+                       <option>Other</option>
+                    </select>
+                 </div>
               </div>
               <button onClick={handleAddEvent} className="w-full bg-indigo-600 p-5 rounded-2xl text-white font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 transition-all">Save Event</button>
            </div>

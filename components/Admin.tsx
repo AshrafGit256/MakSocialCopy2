@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { Violation, User, Post, Poll, TimelineEvent, CalendarEvent } from '../types';
@@ -11,7 +12,7 @@ import {
 
 const Admin: React.FC = () => {
   const [users, setUsers] = useState<User[]>(db.getUsers());
-  const [posts, setPosts] = useState<Post[]>(db.getPosts());
+  const [posts, setPosts] = useState<Post[]>(db.getPosts(undefined, true)); // Admins see everything including expired
   const [violations, setViolations] = useState<Violation[]>(db.getViolations());
   const [polls, setPolls] = useState<Poll[]>(db.getPolls());
   const [timeline, setTimeline] = useState<TimelineEvent[]>(db.getTimeline());
@@ -28,7 +29,7 @@ const Admin: React.FC = () => {
   useEffect(() => {
     const sync = () => {
       setViolations(db.getViolations());
-      setPosts(db.getPosts());
+      setPosts(db.getPosts(undefined, true));
       setUsers(db.getUsers());
       setTimeline(db.getTimeline());
       setEvents(db.getCalendarEvents());
@@ -62,7 +63,7 @@ const Admin: React.FC = () => {
       makTVGuest: makType === 'Interview' ? makGuest : undefined
     };
     db.addPost(newMedia);
-    setPosts(db.getPosts());
+    setPosts(db.getPosts(undefined, true));
     setMakContent('');
     setMakVideoUrl('');
     setMakGuest('');
@@ -120,7 +121,6 @@ const Admin: React.FC = () => {
     return acc;
   }, {} as Record<string, TimelineEvent[]>);
 
-  /* Fix: Added missing getEventColorClass helper function to fix compilation error */
   const getEventColorClass = (type: string) => {
     switch (type) {
       case 'like': return 'bg-rose-500/10';
@@ -187,7 +187,7 @@ const Admin: React.FC = () => {
              { label: 'Total Engagement', val: posts.reduce((a,c) => a+c.views, 0).toLocaleString(), icon: <Activity/>, color: 'text-indigo-600 dark:text-indigo-500' },
              { label: 'Ad Revenue', val: `UGX ${totalAdRevenue.toLocaleString()}`, icon: <DollarSign/>, color: 'text-emerald-600 dark:text-emerald-500' },
              { label: 'Active Ads', val: posts.filter(p => p.isAd).length, icon: <Briefcase/>, color: 'text-amber-600 dark:text-amber-500' },
-             { label: 'Live Events', val: events.length, icon: <Calendar/>, color: 'text-rose-600 dark:text-rose-400' },
+             { label: 'Total Events History', val: events.length, icon: <Calendar/>, color: 'text-rose-600 dark:text-rose-400' },
            ].map((s,i) => (
              <div key={i} className="glass-card p-8 shadow-sm bg-[var(--sidebar-bg)] border-[var(--border-color)] group hover:border-indigo-500 transition-all">
                 <div className={`p-3 rounded-xl bg-[var(--bg-secondary)] w-fit mb-6 ${s.color}`}>{s.icon}</div>
@@ -201,22 +201,23 @@ const Admin: React.FC = () => {
       {activeTab === 'events' && (
         <div className="space-y-8 animate-in fade-in duration-500">
            <div className="flex items-center justify-between">
-              <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Event Node Registry</h3>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Active Event Protocols: {events.length}</p>
+              <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Event Node Registry (Master View)</h3>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Revenue Tracked Protocols: {events.length}</p>
            </div>
 
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {events.map(event => {
                 const attendees = event.attendeeIds || [];
+                const isExpired = new Date(event.date) < new Date();
                 return (
                   <div 
                     key={event.id} 
                     onClick={() => setSelectedEventReport(event)}
-                    className="glass-card p-6 bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-500 transition-all cursor-pointer group flex flex-col justify-between h-64"
+                    className={`glass-card p-6 border-[var(--border-color)] hover:border-indigo-500 transition-all cursor-pointer group flex flex-col justify-between h-64 ${isExpired ? 'bg-slate-50/50 dark:bg-white/[0.01]' : 'bg-[var(--sidebar-bg)] shadow-xl'}`}
                   >
                     <div>
                       <div className="flex justify-between items-start mb-4">
-                        <span className="bg-indigo-600 text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest">{event.category}</span>
+                        <span className={`${isExpired ? 'bg-slate-400' : 'bg-indigo-600'} text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest`}>{event.category} {isExpired && '• EXPIRED'}</span>
                         <div className="flex items-center gap-2 text-[10px] font-black text-slate-400">
                            <Users size={14}/> {attendees.length}
                         </div>
@@ -228,7 +229,7 @@ const Admin: React.FC = () => {
                     </div>
                     
                     <button className="mt-6 flex items-center justify-center gap-2 w-full py-3 bg-[var(--bg-secondary)] rounded-xl text-[10px] font-black uppercase tracking-widest group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                       <BarChart2 size={14}/> Analyze Registry
+                       <BarChart2 size={14}/> Forensic Analytics
                     </button>
                   </div>
                 );
@@ -462,7 +463,7 @@ const Admin: React.FC = () => {
                       <div className="flex-1 min-w-0">
                          <div className="flex justify-between items-start">
                             <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">{p.makTVType}</span>
-                            <button onClick={() => { db.deletePost(p.id, 'admin'); setPosts(db.getPosts()); }} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
+                            <button onClick={() => { db.deletePost(p.id, 'admin'); setPosts(db.getPosts(undefined, true)); }} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={16}/></button>
                          </div>
                          <h4 className="text-[var(--text-primary)] text-xs font-black mt-2 truncate uppercase tracking-tight">{p.makTVGuest || 'CAMPUS NEWS'}</h4>
                          <p className="text-[10px] text-slate-400 line-clamp-1 mt-1">"{p.content}"</p>

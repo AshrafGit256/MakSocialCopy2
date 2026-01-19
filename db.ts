@@ -1,4 +1,5 @@
-import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent } from './types';
+
+import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent, Notification } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -96,19 +97,32 @@ export const db = {
     db.saveUsers(users);
   },
 
-  getPosts: (filter?: College | 'Global'): Post[] => {
+  getPosts: (filter?: College | 'Global', showExpired = false): Post[] => {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
     let posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
+    
+    // Auto-hide expired event posts from "public"
+    if (!showExpired) {
+      const now = new Date();
+      posts = posts.filter(p => {
+        if (p.isEventBroadcast && p.eventDate) {
+          const eventTime = new Date(`${p.eventDate}T${p.eventTime || '23:59'}`);
+          return eventTime > now;
+        }
+        return true;
+      });
+    }
+
     if (filter) posts = posts.filter(p => p.college === filter || p.isAd || p.isMakTV);
     return posts;
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   addPost: (post: Post) => {
-    const posts = db.getPosts();
+    const posts = db.getPosts(undefined, true); // Keep full history in storage
     db.savePosts([post, ...posts]);
   },
   deletePost: (postId: string, userId: string) => {
-    const posts = db.getPosts();
+    const posts = db.getPosts(undefined, true);
     const updated = posts.filter(p => p.id !== postId);
     db.savePosts(updated);
     return updated;
@@ -162,8 +176,42 @@ export const db = {
   },
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();
-    const updated = events.map(e => e.id === eventId ? { ...e, attendeeIds: [...(e.attendeeIds || []), userId] } : e);
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+
+    const users = db.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+
+    // Add to attendees
+    if (!event.attendeeIds?.includes(userId)) {
+      event.attendeeIds = [...(event.attendeeIds || []), userId];
+    }
+
+    // Calculate time remaining for notification
+    const now = new Date();
+    const target = new Date(`${event.date}T${event.time || '00:00'}`);
+    const diff = target.getTime() - now.getTime();
+    
+    let timeText = "Event starting soon";
+    if (diff > 0) {
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      timeText = `${days} days and ${hours} hours remaining`;
+    }
+
+    const notification: Notification = {
+      id: `notif-${Date.now()}`,
+      text: `Protocol Confirmed: ${user.name}, you are officially registered for "${event.title}". This receipt acts as proof. ${timeText} until deployment.`,
+      timestamp: 'Just now',
+      isRead: false
+    };
+
+    user.notifications = [notification, ...(user.notifications || [])];
+
+    // Save
+    localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
   },
 
   getEvents: (): LiveEvent[] => [

@@ -10,7 +10,7 @@ import {
   GraduationCap, Briefcase, Tv, CheckCircle2, Calendar, 
   MapPin, Clock, TrendingUp, Plus, FileText, Lock,
   ShieldCheck, Trash2, Edit3, UserPlus, ShieldAlert as Shield,
-  Star, Verified, Shield as ShieldIcon
+  Star, Verified, Shield as ShieldIcon, ExternalLink
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -20,57 +20,63 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' 
     bg: string, 
     icon: React.ReactNode, 
     glow: string,
-    border: string
+    border: string,
+    textColor: string
   }> = {
     'Super Admin': { 
       bg: 'bg-rose-600', 
       glow: 'shadow-rose-500/40',
       border: 'border-rose-400/50',
-      icon: <ShieldAlert size={size === 'sm' ? 10 : 14} /> 
+      textColor: 'text-white',
+      icon: <ShieldAlert size={size === 'sm' ? 10 : 12} /> 
     },
     'Administrator': { 
       bg: 'bg-indigo-600', 
       glow: 'shadow-indigo-500/40',
       border: 'border-indigo-400/50',
-      icon: <ShieldCheck size={size === 'sm' ? 10 : 14} /> 
+      textColor: 'text-white',
+      icon: <ShieldCheck size={size === 'sm' ? 10 : 12} /> 
     },
     'Lecturer': { 
-      bg: 'bg-slate-900', 
+      bg: 'bg-slate-800', 
       glow: 'shadow-slate-500/40',
       border: 'border-slate-400/50',
-      icon: <GraduationCap size={size === 'sm' ? 10 : 14} /> 
+      textColor: 'text-white',
+      icon: <GraduationCap size={size === 'sm' ? 10 : 12} /> 
     },
     'Chairperson': { 
       bg: 'bg-emerald-600', 
       glow: 'shadow-emerald-500/40',
       border: 'border-emerald-400/50',
-      icon: <CheckCircle2 size={size === 'sm' ? 10 : 14} /> 
+      textColor: 'text-white',
+      icon: <CheckCircle2 size={size === 'sm' ? 10 : 12} /> 
     },
     'GRC': { 
       bg: 'bg-sky-500', 
       glow: 'shadow-sky-500/40',
       border: 'border-sky-400/50',
-      icon: <Star size={size === 'sm' ? 10 : 14} fill="currentColor" /> 
+      textColor: 'text-white',
+      icon: <Star size={size === 'sm' ? 10 : 12} fill="currentColor" /> 
     },
     'Student Leader': { 
       bg: 'bg-amber-500', 
       glow: 'shadow-amber-500/40',
       border: 'border-amber-400/50',
-      icon: <Verified size={size === 'sm' ? 10 : 14} /> 
+      textColor: 'text-white',
+      icon: <Verified size={size === 'sm' ? 10 : 12} /> 
     }
   };
   
   const current = config[role] || config['Administrator'];
-  const sizeClasses = size === 'sm' ? 'w-5 h-5' : 'w-7 h-7';
+  const sizeClasses = size === 'sm' ? 'h-4 px-1.5' : 'h-5 px-2';
   
   return (
     <div className={`
-      relative ${sizeClasses} rounded-full flex items-center justify-center text-white 
-      ${current.bg} ${current.glow} ${current.border} border shadow-lg
-      transition-transform hover:scale-110 cursor-help
+      inline-flex items-center gap-1 rounded-full ${sizeClasses} ${current.bg} ${current.textColor} 
+      border ${current.border} shadow-sm transition-all hover:brightness-110 ml-1 select-none
     `} title={`Verified ${role}`}>
        {current.icon}
-       <div className="absolute inset-0 rounded-full animate-pulse opacity-20 bg-white"></div>
+       <span className="text-[7px] font-black uppercase tracking-widest">{role}</span>
     </div>
   );
 };
@@ -290,12 +296,12 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                        <div key={m.id} className="flex items-center gap-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] px-5 py-3 rounded-2xl shrink-0">
                           <div className="relative">
                             <img src={m.avatar} className="w-10 h-10 rounded-xl object-cover" />
-                            <div className="absolute -bottom-1 -right-1">
-                               <AuthoritySeal role={m.role} />
-                            </div>
                           </div>
                           <div>
-                             <p className="text-[11px] font-black text-[var(--text-primary)] leading-none">{m.name}</p>
+                             <div className="flex items-center">
+                                <p className="text-[11px] font-black text-[var(--text-primary)] leading-none">{m.name}</p>
+                                <AuthoritySeal role={m.role} />
+                             </div>
                              <p className="text-[8px] font-black text-indigo-600 uppercase tracking-widest mt-1.5">{m.role}</p>
                           </div>
                        </div>
@@ -379,22 +385,24 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
 
               <div className="space-y-6">
                  {posts.map(post => (
-                    <article key={post.id} className={`glass-card p-8 border-[var(--border-color)] shadow-sm hover:shadow-md transition-all ${post.isAd ? 'bg-amber-500/[0.04]' : ''}`}>
+                    <article key={post.id} className={`glass-card p-8 border-[var(--border-color)] shadow-sm hover:shadow-md transition-all ${post.isAd ? 'bg-amber-500/[0.04]' : ''} ${post.isEventBroadcast ? 'border-l-4 border-l-indigo-600' : ''}`}>
                        <div className="flex justify-between items-start mb-6">
                           <div className="flex items-center gap-4">
                              <div className="relative">
                                 <img src={post.authorAvatar} className="w-12 h-12 rounded-xl border border-[var(--border-color)] object-cover" />
-                                <div className="absolute -bottom-1 -right-1">
-                                   <AuthoritySeal role={post.authorAuthority} />
-                                </div>
                              </div>
                              <div>
-                                <h4 className="font-extrabold text-[var(--text-primary)] text-sm uppercase tracking-tight">{post.author}</h4>
+                                <div className="flex items-center">
+                                   <h4 className="font-extrabold text-[var(--text-primary)] text-sm uppercase tracking-tight">{post.author}</h4>
+                                   <AuthoritySeal role={post.authorAuthority} />
+                                </div>
                                 <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{post.timestamp} • {post.college}</p>
                              </div>
                           </div>
                           <div className="flex items-center gap-3">
-                             <span className="text-[8px] font-black uppercase tracking-widest bg-[var(--bg-secondary)] px-2 py-1 rounded text-slate-500 border border-[var(--border-color)]">{post.aiMetadata?.category || 'Social'}</span>
+                             <span className="text-[8px] font-black uppercase tracking-widest bg-[var(--bg-secondary)] px-2 py-1 rounded text-slate-500 border border-[var(--border-color)]">
+                               {post.isEventBroadcast ? 'Event Broadcast' : (post.aiMetadata?.category || 'Social')}
+                             </span>
                              {(isSuperAdmin || (isAdminOfActiveCollege && post.college === activeCollege)) && (
                                 <button onClick={() => handleDelete(post.id)} className="text-rose-500 p-2 hover:bg-rose-500/10 rounded-xl transition-all"><Trash2 size={18}/></button>
                              )}
@@ -403,6 +411,32 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                        
                        <p className="text-[var(--text-primary)] text-base font-medium leading-relaxed italic border-l-2 border-indigo-600/30 pl-6 py-1">"{post.content}"</p>
                        
+                       {post.isEventBroadcast && (
+                          <div className="mt-6 p-6 bg-indigo-600/5 rounded-2xl border border-indigo-600/10 space-y-4">
+                             <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-black text-indigo-600 uppercase tracking-tighter">{post.eventTitle}</h3>
+                                <div className="p-2 bg-indigo-600 text-white rounded-lg"><Calendar size={18}/></div>
+                             </div>
+                             <div className="grid grid-cols-2 gap-4">
+                                <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase">
+                                   <Clock size={14} className="text-indigo-600"/> {post.eventDate} @ {post.eventTime}
+                                </div>
+                                <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase">
+                                   <MapPin size={14} className="text-indigo-600"/> {post.eventLocation}
+                                </div>
+                             </div>
+                             {post.eventRegistrationLink && (
+                                <a 
+                                  href={post.eventRegistrationLink} 
+                                  target="_blank" 
+                                  className="w-full flex items-center justify-center gap-2 py-4 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20"
+                                >
+                                   Secure Your Slot <ExternalLink size={14}/>
+                                </a>
+                             )}
+                          </div>
+                       )}
+
                        {post.images && post.images.length > 0 && (
                          <div className="mt-6 rounded-2xl overflow-hidden border border-[var(--border-color)]">
                             <img src={post.images[0]} className="w-full object-cover max-h-[600px] hover:scale-[1.02] transition-transform duration-700" alt="Signal Asset" />
@@ -483,13 +517,11 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              <div className="flex items-center gap-4">
                                 <div className="relative">
                                    <img src={m.avatar} className="w-12 h-12 rounded-xl" />
-                                   <div className="absolute -bottom-1 -right-1">
-                                      <AuthoritySeal role={m.role} />
-                                   </div>
                                 </div>
                                 <div>
-                                   <div className="flex items-center gap-2">
+                                   <div className="flex items-center">
                                       <p className="text-[13px] font-black text-[var(--text-primary)]">{m.name}</p>
+                                      <AuthoritySeal role={m.role} />
                                    </div>
                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{m.role} • {m.email}</p>
                                 </div>

@@ -11,6 +11,61 @@ const DB_KEYS = {
   TIMELINE: 'maksocial_timeline_v6'
 };
 
+const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
+  {
+    id: 'ev-1',
+    title: '89th Guild Inauguration Ceremony',
+    description: 'The official swearing-in of the 89th Guild Government. Join us for this historic evening of leadership transition and academic excellence.',
+    date: '2025-05-15',
+    time: '14:00',
+    location: 'Main Hall, Makerere University',
+    category: 'Social',
+    createdBy: 'super_admin',
+    image: 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200',
+    attendeeIds: ['u1', 'admin_cocis'],
+    registrationLink: 'https://mak.ac.ug/guild'
+  },
+  {
+    id: 'ev-2',
+    title: 'MAK Innovation Challenge 2025',
+    description: 'Presenting the brightest tech solutions from COCIS and CEDAT. Win funding for your startup and connect with industry leaders.',
+    date: '2025-06-10',
+    time: '09:00',
+    location: 'COCIS Conference Room',
+    category: 'Academic',
+    createdBy: 'admin_cocis',
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200',
+    attendeeIds: ['u1'],
+    registrationLink: 'https://innovate.mak.ac.ug'
+  },
+  {
+    id: 'ev-3',
+    title: 'Inter-College Sports Gala Finals',
+    description: 'The final showdown of the semester. COCIS vs LAW in the football finals. Wear your college colors!',
+    date: '2025-05-20',
+    time: '16:00',
+    location: 'University Freedom Square',
+    category: 'Sports',
+    createdBy: 'super_admin',
+    image: 'https://images.unsplash.com/photo-1541252260730-0412e8e2108e?auto=format&fit=crop&w=1200',
+    attendeeIds: [],
+    registrationLink: 'https://sports.mak.ac.ug'
+  },
+  {
+    id: 'ev-4',
+    title: 'Graduate Career Fair 2025',
+    description: 'Connecting finalists with over 50 top employers in Uganda. Bring your CV and prepare for on-spot interviews.',
+    date: '2025-07-05',
+    time: '10:00',
+    location: 'Business School Grounds',
+    category: 'Academic',
+    createdBy: 'super_admin',
+    image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200',
+    attendeeIds: [],
+    registrationLink: 'https://careers.mak.ac.ug'
+  }
+];
+
 const INITIAL_LEADERSHIP: Record<College, LeadershipMember[]> = {
   COCIS: [
     { id: 'l1', name: 'Dr. John Kizito', role: 'Lecturer', email: 'john.kizito@mak.ac.ug', avatar: 'https://i.pravatar.cc/150?u=l1' },
@@ -184,7 +239,7 @@ export const db = {
 
   getCalendarEvents: (): CalendarEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.CALENDAR);
-    return saved ? JSON.parse(saved) : [];
+    return saved ? JSON.parse(saved) : INITIAL_CALENDAR_EVENTS;
   },
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();

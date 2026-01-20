@@ -1,11 +1,12 @@
 
-import { Post, User, College, UserStatus, CollegeStats, LeadershipMember, TimelineEvent, CalendarEvent, Violation, LiveEvent, Notification, Resource } from './types';
+import { Post, User, College, UserStatus, ChatConversation, ChatMessage, Resource, CalendarEvent, CollegeStats, TimelineEvent, Violation, Poll, Notification, LiveEvent } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
   POSTS: 'maksocial_posts_v13',
-  USERS: 'maksocial_users_v13',
+  USERS: 'maksocial_users_v14',
   LOGGED_IN_ID: 'maksocial_current_user_id',
+  CONVERSATIONS: 'maksocial_chats_v6',
   CALENDAR: 'maksocial_calendar_v5',
   COLLEGE_STATS: 'maksocial_college_stats_v13',
   TIMELINE: 'maksocial_timeline_v6',
@@ -13,121 +14,32 @@ const DB_KEYS = {
 };
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
-  COCIS: ['BSCS', 'BSIT', 'BSSE', 'BSIS', 'BLIS'],
-  CEDAT: ['BSCV', 'BSEL', 'BSME', 'BARC', 'BIFA'],
-  CHUSS: ['BASW', 'BPSY', 'BAJR', 'BASS', 'BAAR'],
-  CHS: ['MBChB', 'BSNU', 'BPHA', 'BDSU'],
-  CONAS: ['BSPH', 'BSMA', 'BSBI', 'BSCH'],
-  CAES: ['BSAG', 'BSFS', 'BSFO'],
-  COBAMS: ['BSEC', 'BSST', 'BCOM', 'BSAS'],
-  CEES: ['BEDU', 'BAED', 'BSED'],
-  LAW: ['LLB']
+  COCIS: ['Computer Science', 'Information Technology', 'Software Engineering', 'Information Systems'],
+  CEDAT: ['Architecture', 'Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering', 'Fine Art'],
+  CHUSS: ['Psychology', 'Social Work', 'Literature', 'Journalism', 'Philosophy'],
+  CONAS: ['Mathematics', 'Physics', 'Biology', 'Chemistry', 'Geology'],
+  CHS: ['Medicine', 'Nursing', 'Pharmacy', 'Dentistry', 'Public Health'],
+  CAES: ['Agriculture', 'Environmental Science', 'Forestry', 'Food Science'],
+  COBAMS: ['Economics', 'Business Administration', 'Statistics', 'Commerce'],
+  CEES: ['Education', 'Adult Education', 'Human Resource Management'],
+  LAW: ['Bachelor of Laws']
 };
-
-const INITIAL_RESOURCES: Resource[] = [
-  { id: 'res-1', title: 'Data Structures Exam 2023', category: 'Past Paper', college: 'COCIS', course: 'BSCS', year: 'Year 2', author: 'Dr. John Kizito', downloads: 1240, fileType: 'PDF', timestamp: '2024-01-10' },
-  { id: 'res-2', title: 'Constitution 101 Notes', category: 'Notes/Books', college: 'LAW', course: 'LLB', year: 'Year 1', author: 'Opio Samuel', downloads: 850, fileType: 'PDF', timestamp: '2024-02-15' },
-  { id: 'res-3', title: 'Circuit Analysis Lab Report', category: 'Test', college: 'CEDAT', course: 'BSEL', year: 'Year 2', author: 'Eng. Sarah Nakato', downloads: 450, fileType: 'DOCX', timestamp: '2024-03-05' },
-  { id: 'res-4', title: 'Microeconomics Finalist Guide', category: 'Career', college: 'COBAMS', course: 'BSEC', year: 'Finalist', author: 'Career Office', downloads: 3200, fileType: 'PDF', timestamp: '2024-04-20' },
-];
-
-const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
-  {
-    id: 'ev-1',
-    title: '89th Guild Inauguration Ceremony',
-    description: 'The official swearing-in of the 89th Guild Government. A historic day for student leadership at Makerere.',
-    date: '2025-05-15',
-    time: '14:00',
-    location: 'Main Hall, Makerere University',
-    category: 'Social',
-    createdBy: 'super_admin',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvr2YhoOthHq7cV6DqnFdb9h0thE2b9DxHCA&s',
-    attendeeIds: ['u1', 'admin_cocis'],
-    registrationLink: 'https://mak.ac.ug/guild'
-  },
-  {
-    id: 'ev-2',
-    title: 'MAK Innovation Challenge 2025',
-    description: 'Pitch your research and tech solutions to a panel of industrial experts. Funding and mentoring up for grabs.',
-    date: '2025-06-10',
-    time: '09:00',
-    location: 'COCIS Conference Room',
-    category: 'Academic',
-    createdBy: 'admin_cocis',
-    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200',
-    attendeeIds: ['u1'],
-    registrationLink: 'https://innovate.mak.ac.ug'
-  }
-];
-
-const INITIAL_LEADERSHIP: Record<College, LeadershipMember[]> = {
-  COCIS: [
-    { id: 'l1', name: 'Dr. John Kizito', role: 'Lecturer', email: 'john.kizito@mak.ac.ug', avatar: 'https://i.pravatar.cc/150?u=l1' },
-    { id: 'l2', name: 'Prof. Jude Lubega', role: 'Administrator', email: 'admin.cocis@mak.ac.ug', avatar: 'https://i.pravatar.cc/150?u=l2' },
-    { id: 'l3', name: 'Opio Samuel', role: 'Chairperson', email: 'opio.s@mak.ac.ug', avatar: 'https://i.pravatar.cc/150?u=l3' }
-  ],
-  CEDAT: [], CHUSS: [], CHS: [], CONAS: [], CAES: [], COBAMS: [], CEES: [], LAW: []
-};
-
-const INITIAL_COLLEGE_STATS: CollegeStats[] = [
-  { id: 'COCIS', followers: 1250, postCount: 450, dean: 'Prof. Tonny Oyana', description: 'Computing and Info Sciences.', leadership: INITIAL_LEADERSHIP.COCIS },
-  { id: 'CEDAT', followers: 850, postCount: 320, dean: 'Prof. Henry Alinaitwe', description: 'Engineering, Design, Art and Tech.', leadership: [] },
-  { id: 'LAW', followers: 1300, postCount: 500, dean: 'Dr. Ronald Naluwairo', description: 'The School of Law.', leadership: [] }
-];
 
 const INITIAL_USERS: User[] = [
   {
-    id: 'u1',
-    name: 'Guru A.',
-    role: 'Student',
-    avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
-    connections: 245,
-    college: 'COCIS',
-    status: 'Year 2',
-    joinedColleges: ['COCIS'],
-    postsCount: 12,
-    followersCount: 1420,
-    followingCount: 382,
-    totalLikesCount: 4500,
-    badges: [],
-    appliedTo: [],
-    iqCredits: 1250,
-    skills: ['React', 'Blockchain', 'AI Ethics'],
-    intellectualSignature: '#4F46E5',
-    notifications: [
-      { id: 'n1', type: 'like', text: 'Sarah N. liked your broadcast on Blockchain nodes.', timestamp: '5m ago', isRead: false, senderName: 'Sarah N.', senderAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
-      { id: 'n2', type: 'official', text: 'Guild Electoral Commission: 89th Inauguration is now mandatory for all GRCs.', timestamp: '1h ago', isRead: false, senderName: 'GEC', senderAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png' },
-      { id: 'n3', type: 'event', text: 'MakEvents: New Innovation Challenge added to Academic Vault.', timestamp: '3h ago', isRead: true }
-    ]
-  },
-  {
-    id: 'u2',
-    name: 'Sarah N.',
-    role: 'Student',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-    connections: 110,
-    college: 'CEDAT',
-    status: 'Finalist',
-    joinedColleges: ['CEDAT'],
-    postsCount: 5,
-    followersCount: 340,
-    followingCount: 120,
-    totalLikesCount: 890,
-    badges: ['Researcher'],
-    appliedTo: [],
-    iqCredits: 890,
-    skills: ['AutoCAD', 'Structural Eng', 'Sustainability'],
-    intellectualSignature: '#10B981'
-  },
-  {
     id: 'super_admin',
-    name: 'System Admin',
-    role: 'University Admin',
+    name: 'Registry Command',
+    role: 'Platform Architect',
     avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
     connections: 5000,
     college: 'COCIS',
     status: 'Graduate',
     email: 'admin@admin.mak.ac.ug',
+    isVerified: true,
+    courseAbbr: 'SYS',
+    academicLevel: 'Faculty',
+    gender: 'Other',
+    isSuspended: false,
     joinedColleges: ['COCIS', 'CEDAT', 'LAW'],
     postsCount: 0,
     followersCount: 10000,
@@ -136,131 +48,313 @@ const INITIAL_USERS: User[] = [
     badges: ['Super Admin'],
     appliedTo: [],
     iqCredits: 9999,
-    skills: ['System Gov', 'Protocol Security'],
-    intellectualSignature: '#E11D48'
+    skills: ['Security', 'Governance'],
+    intellectualSignature: '#E11D48',
+    isOnline: true,
+    connectionsList: [],
+    pendingRequests: [],
+    bookmarkedPosts: [],
+    medals: []
+  },
+  {
+    id: 'l1',
+    name: 'Dr. Mukasa J.',
+    role: 'Senior Lecturer',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mukasa',
+    connections: 450,
+    college: 'COCIS',
+    status: 'Graduate',
+    email: 'mukasa@lecturer.mak.ac.ug',
+    isVerified: true,
+    courseAbbr: 'CS',
+    academicLevel: 'Faculty',
+    gender: 'M',
+    isSuspended: false,
+    joinedColleges: ['COCIS'],
+    postsCount: 120,
+    followersCount: 1200,
+    followingCount: 50,
+    totalLikesCount: 8900,
+    badges: ['Researcher'],
+    appliedTo: [],
+    iqCredits: 5000,
+    skills: ['Algorithms', 'AI'],
+    intellectualSignature: '#4338CA',
+    isOnline: false,
+    connectionsList: [],
+    pendingRequests: [],
+    bookmarkedPosts: [],
+    medals: [{ id: 'm1', name: 'Elite Mentor', icon: '🎓' }]
+  },
+  {
+    id: 'sl1',
+    name: 'Nakamya Sarah',
+    role: 'Guild President',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SarahN',
+    connections: 890,
+    college: 'LAW',
+    status: 'Finalist',
+    email: 'sarah@guild.mak.ac.ug',
+    isVerified: true,
+    courseAbbr: 'LLB',
+    academicLevel: 'Undergrad',
+    gender: 'F',
+    isSuspended: false,
+    joinedColleges: ['LAW'],
+    postsCount: 45,
+    followersCount: 2500,
+    followingCount: 200,
+    totalLikesCount: 15000,
+    badges: ['Student Leader'],
+    appliedTo: [],
+    iqCredits: 3400,
+    skills: ['Policy', 'Oratory'],
+    intellectualSignature: '#F43F5E',
+    isOnline: true,
+    connectionsList: [],
+    pendingRequests: [],
+    bookmarkedPosts: [],
+    medals: [{ id: 'm2', name: 'Justice Pillar', icon: '⚖️' }]
+  },
+  {
+    id: 'u1',
+    name: 'Ashraf Guru',
+    role: 'Node Architect',
+    avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
+    connections: 245,
+    college: 'COCIS',
+    status: 'Year 2',
+    email: 'ashraf@students.mak.ac.ug',
+    isVerified: false,
+    courseAbbr: 'SE',
+    academicLevel: 'Undergrad',
+    gender: 'M',
+    isSuspended: false,
+    joinedColleges: ['COCIS'],
+    postsCount: 12,
+    followersCount: 1420,
+    followingCount: 382,
+    totalLikesCount: 4500,
+    badges: [],
+    appliedTo: [],
+    iqCredits: 1250,
+    skills: ['React', 'Solidity'],
+    intellectualSignature: '#4F46E5',
+    isOnline: true,
+    connectionsList: [],
+    pendingRequests: [],
+    bookmarkedPosts: [],
+    medals: []
   }
 ];
 
 export const db = {
-  getCollegeStats: (): CollegeStats[] => {
-    const saved = localStorage.getItem(DB_KEYS.COLLEGE_STATS);
-    return saved ? JSON.parse(saved) : INITIAL_COLLEGE_STATS;
-  },
-  saveCollegeStats: (stats: CollegeStats[]) => localStorage.setItem(DB_KEYS.COLLEGE_STATS, JSON.stringify(stats)),
-
   getUsers: (): User[] => {
     const saved = localStorage.getItem(DB_KEYS.USERS);
-    const users: User[] = saved ? JSON.parse(saved) : INITIAL_USERS;
-    return users.map(u => ({ ...u, joinedColleges: u.joinedColleges || [] }));
+    return saved ? JSON.parse(saved) : INITIAL_USERS;
   },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
-
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID) || 'u1';
-    const user = users.find(u => u.id === currentId) || users[0];
-    return { ...user, joinedColleges: user.joinedColleges || [] };
+    return users.find(u => u.id === currentId) || users[0];
   },
   saveUser: (user: User) => {
     const users = db.getUsers();
-    const index = users.findIndex(u => u.id === user.id);
-    const updatedUser = { ...user, joinedColleges: user.joinedColleges || [] };
-    if (index !== -1) users[index] = updatedUser;
-    else users.push(updatedUser);
+    const idx = users.findIndex(u => u.id === user.id);
+    if (idx !== -1) users[idx] = user;
     db.saveUsers(users);
   },
 
-  getPosts: (filter?: College | 'Global', showExpired = false): Post[] => {
-    const saved = localStorage.getItem(DB_KEYS.POSTS);
-    let posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
-    if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter || p.isAd);
-    return posts;
-  },
-  savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
-  addPost: (post: Post) => {
-    const posts = db.getPosts(undefined, true); 
-    db.savePosts([post, ...posts]);
-  },
-  updatePost: (updatedPost: Post) => {
-    const posts = db.getPosts(undefined, true);
-    const updated = posts.map(p => p.id === updatedPost.id ? updatedPost : p);
-    db.savePosts(updated);
-    return updated;
-  },
-  deletePost: (postId: string, userId: string) => {
-    const posts = db.getPosts(undefined, true);
-    const updated = posts.filter(p => p.id !== postId);
-    db.savePosts(updated);
-    return updated;
-  },
-
-  joinCollege: (userId: string, collegeId: College) => {
+  toggleVerification: (userId: string) => {
     const users = db.getUsers();
-    const stats = db.getCollegeStats();
-    const updatedUsers = users.map(u => {
-      if (u.id === userId) {
-        const joined = u.joinedColleges || [];
-        if (!joined.includes(collegeId)) return { ...u, joinedColleges: [...joined, collegeId] };
-      }
-      return u;
-    });
-    const updatedStats = stats.map(s => s.id === collegeId ? { ...s, followers: s.followers + 1 } : s);
-    db.saveUsers(updatedUsers);
-    db.saveCollegeStats(updatedStats);
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      user.isVerified = !user.isVerified;
+      db.saveUsers(users);
+    }
   },
 
+  suspendUser: (userId: string, durationDays: number) => {
+    const users = db.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      user.isSuspended = true;
+      const end = new Date();
+      end.setDate(end.getDate() + durationDays);
+      user.suspensionEnd = end.toISOString();
+      db.saveUsers(users);
+    }
+  },
+
+  awardMedal: (userId: string, medal: { name: string, icon: string }) => {
+    const users = db.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      user.medals.push({ id: `m-${Date.now()}`, ...medal });
+      db.saveUsers(users);
+    }
+  },
+
+  sendRequest: (fromId: string, toId: string) => {
+    const users = db.getUsers();
+    const toUser = users.find(u => u.id === toId);
+    if (toUser && !toUser.pendingRequests.includes(fromId)) {
+      toUser.pendingRequests.push(fromId);
+      db.saveUsers(users);
+      
+      const chats = db.getConversations();
+      const newChat: ChatConversation = {
+        id: `chat-${Date.now()}`,
+        participants: [fromId, toId],
+        lastMessage: 'Neural handshake protocol initiated.',
+        lastTimestamp: 'Just now',
+        unreadCount: 1,
+        connectionStatus: 'pending',
+        requestedBy: fromId,
+        messages: []
+      };
+      chats.push(newChat);
+      db.saveConversations(chats);
+    }
+  },
+
+  acceptRequest: (currentId: string, senderId: string) => {
+    const users = db.getUsers();
+    const me = users.find(u => u.id === currentId);
+    const sender = users.find(u => u.id === senderId);
+    
+    if (me && sender) {
+      me.pendingRequests = me.pendingRequests.filter(id => id !== senderId);
+      if (!me.connectionsList.includes(senderId)) me.connectionsList.push(senderId);
+      if (!sender.connectionsList.includes(currentId)) sender.connectionsList.push(currentId);
+      db.saveUsers(users);
+      
+      const chats = db.getConversations();
+      const chat = chats.find(c => c.participants.includes(currentId) && c.participants.includes(senderId));
+      if (chat) {
+        chat.connectionStatus = 'accepted';
+        chat.lastMessage = 'Synchronized. Signaling channel open.';
+        db.saveConversations(chats);
+      }
+    }
+  },
+
+  sendMessage: (chatId: string, message: Partial<ChatMessage>, fromId: string) => {
+    const chats = db.getConversations();
+    const chat = chats.find(c => c.id === chatId);
+    if (chat) {
+      const fullMsg: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        text: message.text || '',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isMe: true, 
+        type: message.type || 'text',
+        attachmentUrl: message.attachmentUrl,
+        fileName: message.fileName
+      };
+      chat.messages.push(fullMsg);
+      chat.lastMessage = message.type === 'text' ? message.text || '' : `Asset Transmission [${message.type}]`;
+      chat.lastTimestamp = fullMsg.timestamp;
+      db.saveConversations(chats);
+    }
+  },
+
+  bookmarkPost: (userId: string, postId: string) => {
+    const users = db.getUsers();
+    const me = users.find(u => u.id === userId);
+    const posts = db.getPosts();
+    const post = posts.find(p => p.id === postId);
+    
+    if (me && post) {
+      if (me.bookmarkedPosts.includes(postId)) {
+         me.bookmarkedPosts = me.bookmarkedPosts.filter(id => id !== postId);
+      } else {
+         me.bookmarkedPosts.push(postId);
+         const authorId = post.authorId;
+         const author = users.find(u => u.id === authorId);
+         if (author && authorId !== userId) {
+            const notif: Notification = {
+               id: `bookmark-notif-${Date.now()}`,
+               text: `${me.name} archived your broadcast to their vault.`,
+               timestamp: 'Just now',
+               isRead: false,
+               type: 'bookmark',
+               senderAvatar: me.avatar,
+               senderName: me.name
+            };
+            author.notifications = [notif, ...(author.notifications || [])];
+         }
+      }
+      db.saveUsers(users);
+    }
+  },
+
+  getConversations: (): ChatConversation[] => {
+    const saved = localStorage.getItem(DB_KEYS.CONVERSATIONS);
+    return saved ? JSON.parse(saved) : [];
+  },
+  saveConversations: (chats: ChatConversation[]) => localStorage.setItem(DB_KEYS.CONVERSATIONS, JSON.stringify(chats)),
+
+  getPosts: (filter?: College | 'Global', adminView?: boolean): Post[] => {
+    const saved = localStorage.getItem(DB_KEYS.POSTS);
+    const allPosts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
+    if (filter && filter !== 'Global') {
+      return allPosts.filter(p => p.college === filter);
+    }
+    return allPosts;
+  },
+  addPost: (post: Post) => {
+    const posts = db.getPosts();
+    localStorage.setItem(DB_KEYS.POSTS, JSON.stringify([post, ...posts]));
+  },
+  updatePost: (post: Post) => {
+    const posts = db.getPosts();
+    const idx = posts.findIndex(p => p.id === post.id);
+    if (idx !== -1) {
+      posts[idx] = post;
+      localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts));
+    }
+  },
+  deletePost: (id: string, role?: string) => {
+    const posts = db.getPosts();
+    const updated = posts.filter(p => p.id !== id);
+    localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(updated));
+  },
   getCalendarEvents: (): CalendarEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.CALENDAR);
-    return saved ? JSON.parse(saved) : INITIAL_CALENDAR_EVENTS;
+    return saved ? JSON.parse(saved) : [];
   },
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
-    const existsIndex = events.findIndex(e => e.id === event.id);
-    if (existsIndex !== -1) {
-       events[existsIndex] = event;
-    } else {
-       events.push(event);
-    }
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...events]));
   },
-  deleteCalendarEvent: (eventId: string) => {
+  deleteCalendarEvent: (id: string) => {
     const events = db.getCalendarEvents();
-    const updated = events.filter(e => e.id !== eventId);
+    const updated = events.filter(e => e.id !== id);
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();
-    const updated = events.map(e => {
-      if (e.id === eventId) {
-        const attendees = e.attendeeIds || [];
-        if (!attendees.includes(userId)) {
-          return { ...e, attendeeIds: [...attendees, userId] };
-        }
+    const idx = events.findIndex(e => e.id === eventId);
+    if (idx !== -1) {
+      if (!events[idx].attendeeIds.includes(userId)) {
+        events[idx].attendeeIds.push(userId);
+        localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
       }
-      return e;
-    });
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+    }
   },
-
   getResources: (): Resource[] => {
     const saved = localStorage.getItem(DB_KEYS.RESOURCES);
-    return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
+    return saved ? JSON.parse(saved) : [];
   },
   addResource: (res: Resource) => {
     const resources = db.getResources();
     localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([res, ...resources]));
   },
-
-  updateCollegeLeadership: (collegeId: College, leadership: LeadershipMember[]) => {
-    const stats = db.getCollegeStats();
-    const updatedStats = stats.map(s => s.id === collegeId ? { ...s, leadership } : s);
-    db.saveCollegeStats(updatedStats);
-  },
-
+  getCollegeStats: (): CollegeStats[] => [],
   getTimeline: (): TimelineEvent[] => [],
   getViolations: (): Violation[] => [],
-  getPolls: () => [],
-  getEvents: (): LiveEvent[] => [
-    { id: 'live-1', title: 'Makerere Innovation Hub Seminar', youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', organizer: 'Mak Innovation Lab', isLive: true }
-  ]
+  getPolls: (): Poll[] => [],
+  getEvents: (): LiveEvent[] => []
 };

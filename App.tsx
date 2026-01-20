@@ -100,6 +100,7 @@ const App: React.FC = () => {
     setUserRole('student');
     setView('home');
     
+    // Fix: Added missing properties to satisfy User interface from types.ts
     const newUser: User = {
       id: Date.now().toString(),
       name: email.split('@')[0],
@@ -119,7 +120,16 @@ const App: React.FC = () => {
       notifications: [],
       iqCredits: 100,
       skills: [],
-      intellectualSignature: '#6366f1'
+      intellectualSignature: '#6366f1',
+      connectionsList: [],
+      pendingRequests: [],
+      bookmarkedPosts: [],
+      isVerified: false,
+      courseAbbr: 'GEN',
+      academicLevel: 'Undergrad',
+      gender: 'Other',
+      isSuspended: false,
+      medals: []
     };
     
     db.saveUsers([...db.getUsers(), newUser]);

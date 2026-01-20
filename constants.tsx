@@ -118,13 +118,16 @@ export const ANALYTICS: AnalyticsData[] = [
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
-    user: { name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg'},
+    participants: ['u1', 'guru_a'],
     lastMessage: 'The notes are on the portal.',
+    lastTimestamp: '10:10 AM',
     unreadCount: 2,
+    connectionStatus: 'accepted',
+    requestedBy: 'guru_a',
     messages: [
-      { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false },
-      { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true },
-      { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false },
+      { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false, type: 'text' },
+      { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true, type: 'text' },
+      { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false, type: 'text' },
     ]
   }
 ];

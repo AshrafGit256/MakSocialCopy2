@@ -11,73 +11,16 @@ import {
   MapPin, Clock, TrendingUp, Plus, FileText, Lock,
   ShieldCheck, Trash2, Edit3, UserPlus, ShieldAlert as Shield,
   Star, Verified, Shield as ShieldIcon, ExternalLink, CalendarPlus,
-  Bookmark, Share2, CalendarCheck
+  Bookmark, Share2, CalendarCheck, Save
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
   if (!role) return null;
   
-  const config: Record<AuthorityRole, { 
-    bg: string, 
-    icon: React.ReactNode, 
-    glow: string,
-    border: string,
-    textColor: string
-  }> = {
-    'Super Admin': { 
-      bg: 'bg-rose-600', 
-      glow: 'shadow-rose-500/40',
-      border: 'border-rose-400/50',
-      textColor: 'text-white',
-      icon: <ShieldAlert size={size === 'sm' ? 10 : 12} /> 
-    },
-    'Administrator': { 
-      bg: 'bg-indigo-600', 
-      glow: 'shadow-indigo-500/40',
-      border: 'border-indigo-400/50',
-      textColor: 'text-white',
-      icon: <ShieldCheck size={size === 'sm' ? 10 : 12} /> 
-    },
-    'Lecturer': { 
-      bg: 'bg-slate-800', 
-      glow: 'shadow-slate-500/40',
-      border: 'border-slate-400/50',
-      textColor: 'text-white',
-      icon: <GraduationCap size={size === 'sm' ? 10 : 12} /> 
-    },
-    'Chairperson': { 
-      bg: 'bg-emerald-600', 
-      glow: 'shadow-emerald-500/40',
-      border: 'border-emerald-400/50',
-      textColor: 'text-white',
-      icon: <CheckCircle2 size={size === 'sm' ? 10 : 12} /> 
-    },
-    'GRC': { 
-      bg: 'bg-sky-500', 
-      glow: 'shadow-sky-500/40',
-      border: 'border-sky-400/50',
-      textColor: 'text-white',
-      icon: <Star size={size === 'sm' ? 10 : 12} fill="currentColor" /> 
-    },
-    'Student Leader': { 
-      bg: 'bg-amber-500', 
-      glow: 'shadow-amber-500/40',
-      border: 'border-amber-400/50',
-      textColor: 'text-white',
-      icon: <Verified size={size === 'sm' ? 10 : 12} /> 
-    }
-  };
-  
-  const current = config[role] || config['Administrator'];
-  const sizeClasses = size === 'sm' ? 'h-4 px-1.5' : 'h-5 px-2';
-  
+  // Simplified to a blue checkmark badge per user request
   return (
-    <div className={`
-      inline-flex items-center gap-1 rounded-full ${sizeClasses} ${current.bg} ${current.textColor} 
-      border ${current.border} shadow-sm transition-all hover:brightness-110 ml-1 select-none
-    `} title={`Verified ${role}`}>
-       {current.icon}
-       <span className="text-[7px] font-black uppercase tracking-widest">{role}</span>
+    <div className="inline-flex items-center justify-center text-blue-500 ml-1 select-none" title={`Verified ${role}`}>
+       <Verified size={size === 'sm' ? 14 : 18} fill="currentColor" className="text-blue-500" />
     </div>
   );
 };
@@ -93,6 +36,10 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const [rejectionMessage, setRejectionMessage] = useState<string | null>(null);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(db.getCalendarEvents());
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   const isSuperAdmin = user.email?.toLowerCase().endsWith('@admin.mak.ac.ug');
   const userCollegeAdminMatch = user.email?.toLowerCase().match(/^admin\.([a-z]+)@mak\.ac\.ug$/);
@@ -124,11 +71,9 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const handleRegister = (eventId: string) => {
     db.registerForEvent(eventId, user.id);
     setCalendarEvents(db.getCalendarEvents());
-    // The UI re-renders and shows the "Logged" state automatically because calendarEvents is in state
   };
 
   const syncToInternalCalendar = (event: Post) => {
-    // Check if it already exists in the calendar by title and date
     const exists = calendarEvents.some(e => e.title === event.eventTitle && e.date === event.eventDate);
     if (exists) {
       alert("This event is already synchronized with your MakSocial Calendar.");
@@ -226,6 +171,54 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     }
   };
 
+  const startEditing = (post: Post) => {
+    setEditingPostId(post.id);
+    setEditContent(post.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingPostId(null);
+    setEditContent('');
+  };
+
+  const saveEdit = async (post: Post) => {
+    if (!editContent.trim()) return;
+    setIsSavingEdit(true);
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      let moderationPrompt = `Respond ONLY with JSON: {"isSafe": boolean, "reason": string}. Check if this edited text is safe: "${editContent}"`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: moderationPrompt,
+        config: { responseMimeType: "application/json" }
+      });
+
+      const result = JSON.parse(response.text || '{"isSafe": false, "reason": "Moderation error"}');
+      if (!result.isSafe) {
+        alert(`Content Moderation Rejection: ${result.reason}`);
+        setIsSavingEdit(false);
+        return;
+      }
+
+      const updatedPost: Post = {
+        ...post,
+        content: editContent,
+        timestamp: `${post.timestamp} (Edited)`
+      };
+
+      db.updatePost(updatedPost);
+      setPosts(db.getPosts(activeCollege || undefined));
+      setEditingPostId(null);
+      setEditContent('');
+      setIsSavingEdit(false);
+    } catch (e) {
+      alert("System Error during broadcast modification.");
+      setIsSavingEdit(false);
+    }
+  };
+
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-8 pb-32">
       {!collegeFilter && !isCollegeAdmin && (
@@ -243,9 +236,14 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
             {(!isCollegeAdmin || activeCollege) && (
               <div className="glass-card p-6 border-[var(--border-color)] bg-[var(--card-bg)] shadow-sm">
                  <div className="flex gap-4">
-                    <img src={user.avatar} className="w-12 h-12 rounded-xl object-cover border border-[var(--border-color)]" />
+                    <img src={user.avatar} className="w-12 h-12 rounded-full object-cover border border-[var(--border-color)] shadow-sm" />
                     <textarea value={newPostContent} onChange={e => setNewPostContent(e.target.value)} className="flex-1 bg-transparent border-none focus:outline-none text-[15px] font-medium resize-none h-24 placeholder:text-slate-400 text-[var(--text-primary)]" placeholder={`Broadcast to ${activeCollege || 'the Hill'}...`} />
                  </div>
+                 {rejectionMessage && (
+                   <div className="mt-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-600 text-xs font-bold uppercase tracking-tight">
+                      <Shield size={16}/> {rejectionMessage}
+                   </div>
+                 )}
                  <div className="flex justify-between items-center mt-4 pt-4 border-t border-[var(--border-color)]">
                     <div className="flex gap-4">
                       <input type="file" ref={fileInputRef} onChange={handleImageSelect} accept="image/*" className="hidden" />
@@ -263,14 +261,15 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                  const linkedEvent = calendarEvents.find(e => e.id === post.eventId);
                  const isRegistered = linkedEvent?.attendeeIds?.includes(user.id);
                  const isSynced = calendarEvents.some(e => e.title === post.eventTitle && e.date === post.eventDate);
+                 const isAuthor = post.authorId === user.id;
+                 const isEditing = editingPostId === post.id;
                  
                  return (
                   <article key={post.id} className={`glass-card p-0 overflow-hidden border-[var(--border-color)] shadow-sm hover:shadow-md transition-all ${post.isEventBroadcast ? 'ring-2 ring-indigo-500/20' : ''}`}>
-                     {/* Card Header */}
                      <div className="p-8 pb-4">
                        <div className="flex justify-between items-start mb-6">
                           <div className="flex items-center gap-4">
-                             <img src={post.authorAvatar} className="w-12 h-12 rounded-xl border border-[var(--border-color)] object-cover" />
+                             <img src={post.authorAvatar} className="w-12 h-12 rounded-full border border-[var(--border-color)] object-cover shadow-sm" />
                              <div>
                                 <div className="flex items-center">
                                    <h4 className="font-extrabold text-[var(--text-primary)] text-sm uppercase tracking-tight">{post.author}</h4>
@@ -280,6 +279,11 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              </div>
                           </div>
                           <div className="flex items-center gap-3">
+                             {isAuthor && !isEditing && (
+                               <button onClick={() => startEditing(post)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-600/5 rounded-lg transition-all" title="Modify broadcast">
+                                  <Edit3 size={16}/>
+                               </button>
+                             )}
                              {post.isEventBroadcast && (
                                <div className="flex items-center gap-1.5 bg-amber-500 text-white px-3 py-1.5 rounded-lg shadow-lg shadow-amber-500/30 animate-pulse border border-amber-400/50">
                                   <Star size={10} fill="currentColor"/>
@@ -291,12 +295,28 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              </span>
                           </div>
                        </div>
-                       <p className="text-[var(--text-primary)] text-base font-medium leading-relaxed italic border-l-4 border-indigo-600/40 pl-6 py-2 mb-4 bg-indigo-600/5 rounded-r-2xl">
-                         "{post.content}"
-                       </p>
+                       
+                       {isEditing ? (
+                         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                           <textarea 
+                             value={editContent} 
+                             onChange={e => setEditContent(e.target.value)} 
+                             className="w-full bg-[var(--bg-secondary)] border border-indigo-600/30 rounded-2xl p-6 text-[var(--text-primary)] text-base font-medium outline-none focus:ring-2 focus:ring-indigo-600/20 min-h-[120px] transition-all"
+                           />
+                           <div className="flex justify-end gap-3">
+                              <button onClick={cancelEditing} className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">Cancel</button>
+                              <button onClick={() => saveEdit(post)} disabled={isSavingEdit || !editContent.trim()} className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20">
+                                 {isSavingEdit ? <Loader2 size={14} className="animate-spin" /> : <Save size={14}/>} Save Changes
+                              </button>
+                           </div>
+                         </div>
+                       ) : (
+                         <p className="text-[var(--text-primary)] text-base font-normal leading-relaxed border-l-4 border-indigo-600/40 pl-6 py-2 mb-4 bg-indigo-600/5 rounded-r-2xl font-sans">
+                           {post.content}
+                         </p>
+                       )}
                      </div>
 
-                     {/* Event Flyer & Controls */}
                      {post.isEventBroadcast ? (
                        <div className="px-8 pb-8 space-y-6">
                           {post.eventFlyer && (
@@ -364,7 +384,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                        </div>
                      )}
 
-                     {/* Interactions Footer */}
                      <div className="px-8 py-6 bg-[var(--bg-secondary)]/30 border-t border-[var(--border-color)] flex items-center justify-between">
                         <div className="flex items-center gap-10">
                            <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors group">

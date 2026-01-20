@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Sun, Moon, Cpu, X, BookOpen, Rocket, Menu } from 'lucide-react';
+import { ShieldCheck, LogOut, Sun, Moon, Cpu, X, BookOpen, Rocket, Menu, Bell } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             </div>
             
             <div className="mt-2 flex items-center gap-3 px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-               <img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-[var(--border-color)]" />
+               <img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] object-cover shadow-sm" />
                <div className="min-w-0">
                   <p className="text-[10px] font-black text-[var(--text-primary)] truncate uppercase">{currentUser.name}</p>
                   <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">{currentUser.college}</p>

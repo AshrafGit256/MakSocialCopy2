@@ -90,7 +90,12 @@ const INITIAL_USERS: User[] = [
     followingCount: 382,
     totalLikesCount: 4500,
     badges: [],
-    appliedTo: []
+    appliedTo: [],
+    notifications: [
+      { id: 'n1', type: 'like', text: 'Sarah N. liked your broadcast on Blockchain nodes.', timestamp: '5m ago', isRead: false, senderName: 'Sarah N.', senderAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
+      { id: 'n2', type: 'official', text: 'Guild Electoral Commission: 89th Inauguration is now mandatory for all GRCs.', timestamp: '1h ago', isRead: false, senderName: 'GEC', senderAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png' },
+      { id: 'n3', type: 'event', text: 'MakEvents: New Innovation Challenge added to Academic Vault.', timestamp: '3h ago', isRead: true }
+    ]
   },
   {
     id: 'super_admin',
@@ -150,6 +155,12 @@ export const db = {
   addPost: (post: Post) => {
     const posts = db.getPosts(undefined, true); 
     db.savePosts([post, ...posts]);
+  },
+  updatePost: (updatedPost: Post) => {
+    const posts = db.getPosts(undefined, true);
+    const updated = posts.map(p => p.id === updatedPost.id ? updatedPost : p);
+    db.savePosts(updated);
+    return updated;
   },
   deletePost: (postId: string, userId: string) => {
     const posts = db.getPosts(undefined, true);

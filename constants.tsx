@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { 
-  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen, Rocket
+  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen, Rocket, Bell
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
 export const NAV_ITEMS = [
   { id: 'home', label: 'Global Pulse', icon: <Home size={22} /> },
   { id: 'search', label: 'Search', icon: <Search size={22} /> },
+  { id: 'notifications', label: 'Notifications', icon: <Bell size={22} /> },
   { id: 'calendar', label: 'Calendar', icon: <Calendar size={22} /> },
   { id: 'resources', label: 'Academic Vault', icon: <BookOpen size={22} /> },
   { id: 'nexus', label: 'Project Nexus', icon: <Rocket size={22} /> },
@@ -81,6 +82,25 @@ export const MOCK_POSTS: Post[] = [
     eventTime: '09:00',
     eventLocation: 'COCIS Conference Room',
     eventRegistrationLink: 'https://innovate.mak.ac.ug'
+  },
+  {
+    id: 'global-1',
+    author: 'Campus Admin',
+    authorId: 'admin',
+    authorRole: 'University Admin',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    authorAuthority: 'Administrator',
+    timestamp: '1 hour ago',
+    content: 'Welcome to the updated MakSocial! Please remember to join your college community to stay updated with academic news. Only global updates appear here.',
+    hashtags: ['#MakSocial', '#Global', '#Makerere'],
+    likes: 1200,
+    comments: [],
+    commentsCount: 200,
+    views: 15000,
+    flags: [],
+    isOpportunity: false,
+    college: 'Global',
+    aiMetadata: { category: 'Social', isSafe: true }
   }
 ];
 
@@ -90,6 +110,8 @@ export const ANALYTICS: AnalyticsData[] = [
   { day: 'Wed', posts: 200, activeUsers: 600, messages: 1800, revenue: 550, engagement: 1900 },
   { day: 'Thu', posts: 180, activeUsers: 580, messages: 1600, revenue: 800, engagement: 1770 },
   { day: 'Fri', posts: 250, activeUsers: 720, messages: 2100, revenue: 1200, engagement: 2330 },
+  { day: 'Sat', posts: 100, activeUsers: 300, messages: 800, revenue: 400, engagement: 950 },
+  { day: 'Sun', posts: 80, activeUsers: 250, messages: 600, revenue: 300, engagement: 775 },
 ];
 
 export const MOCK_CHATS: ChatConversation[] = [
@@ -100,6 +122,7 @@ export const MOCK_CHATS: ChatConversation[] = [
     unreadCount: 2,
     messages: [
       { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false },
+      { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true },
       { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false },
     ]
   }

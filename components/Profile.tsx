@@ -78,14 +78,14 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
           <div className="flex flex-col lg:flex-row items-center lg:items-end justify-between gap-8">
             <div className="flex flex-col lg:flex-row items-center lg:items-end gap-8">
               <div className="relative group/avatar">
-                <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-600 via-purple-500 to-rose-500 rounded-[2.5rem] blur opacity-40 group-hover/avatar:opacity-100 transition duration-1000 group-hover/avatar:duration-200"></div>
+                <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-600 via-purple-500 to-rose-500 rounded-full blur opacity-40 group-hover/avatar:opacity-100 transition duration-1000 group-hover/avatar:duration-200"></div>
                 <div className="relative">
                   <img 
                     src={isEditing && editForm ? editForm.avatar : user.avatar} 
-                    className="w-48 h-48 rounded-[2.2rem] object-cover border-8 border-[var(--sidebar-bg)] shadow-2xl transition-all"
+                    className="w-48 h-48 rounded-full object-cover border-8 border-[var(--sidebar-bg)] shadow-2xl transition-all"
                     alt="Profile"
                   />
-                  <div className="absolute -bottom-1 -right-1">
+                  <div className="absolute bottom-2 right-2 scale-150">
                      <AuthoritySeal role={user.badges.includes('Super Admin') ? 'Super Admin' : undefined} size="md" />
                   </div>
                 </div>
@@ -110,7 +110,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
                 ) : (
                   <>
                     <div className="flex items-center gap-3 justify-center lg:justify-start">
-                       <h1 className="text-5xl font-extrabold text-[var(--text-primary)] dark:text-white tracking-tighter uppercase">{user.name}</h1>
+                       <h1 className="text-5xl font-extrabold text-[var(--text-primary)] dark:text-white tracking-tighter uppercase leading-none">{user.name}</h1>
                        <Award className="text-indigo-600 dark:text-indigo-500" size={24} />
                     </div>
                     <p className="text-xl text-indigo-600 dark:text-indigo-400 font-bold tracking-wide uppercase">{user.role}</p>
@@ -163,14 +163,13 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
           </div>
 
           <div className="mt-10 px-4">
-             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium italic max-w-4xl border-l-4 border-indigo-600 pl-8 py-2">
+             <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-normal max-w-4xl border-l-4 border-indigo-600 pl-8 py-2 font-sans">
                {user.bio || 'Node active. Awaiting biography sequence initialization from the hub master.'}
              </p>
           </div>
         </div>
       </div>
 
-      {/* Tabs and Content */}
       <div className="space-y-8">
         <div className="flex items-center gap-10 border-b border-[var(--border-color)] px-4 overflow-x-auto no-scrollbar">
            {[
@@ -200,7 +199,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
                            <span className="text-[8px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 rounded">Broadcast</span>
                            <button className="text-slate-300 hover:text-rose-500"><MoreVertical size={16}/></button>
                         </div>
-                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-4 font-medium italic">"{post.content}"</p>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-4 font-normal font-sans">{post.content}</p>
                         {post.images?.[0] && (
                            <div className="rounded-2xl overflow-hidden border border-[var(--border-color)] aspect-video mt-4 shadow-md">
                               <img src={post.images[0]} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110" />
@@ -210,7 +209,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
                   </div>
                 ))}
                 {posts.length === 0 && (
-                    <div className="col-span-full py-20 text-center text-slate-400 italic font-black text-xs uppercase tracking-widest">No active signals found for this node.</div>
+                    <div className="col-span-full py-20 text-center text-slate-400 font-black text-xs uppercase tracking-widest">No active signals found for this node.</div>
                 )}
              </div>
            )}

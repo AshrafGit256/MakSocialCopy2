@@ -26,10 +26,32 @@ const Nexus: React.FC = () => {
     // Mock initializer for Project Nexus
     const initialProjects: Project[] = [
       { 
-        id: 'prj-1', title: 'MakChain: Campus Ledger', description: 'Building a decentralized voting system for Guild elections using blockchain.', college: 'COCIS', ownerId: 'u1', ownerName: 'Guru A.', status: 'Building', tags: ['Blockchain', 'Solidity'], rolesNeeded: ['Frontend Dev'], team: [{ id: 'u1', name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg' }], timestamp: '2024-03-20', progress: 65 
+        id: 'prj-1', 
+        title: 'MakChain: Campus Ledger', 
+        description: 'Building a decentralized voting system for Guild elections using blockchain.', 
+        college: 'COCIS', 
+        ownerId: 'u1', 
+        ownerName: 'Guru A.', 
+        status: 'Building', 
+        tags: ['Blockchain', 'Solidity'], 
+        rolesNeeded: ['Frontend Dev'], 
+        team: [{ id: 'u1', name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg' }], 
+        timestamp: '2024-03-20', 
+        progress: 65 
       },
       { 
-        id: 'prj-2', title: 'Eco-Brick Initiative', description: 'Recycling campus plastic waste into durable construction bricks.', college: 'CEDAT', ownerId: 'u2', ownerName: 'Sarah N.', status: 'Recruiting', tags: ['Civil', 'Eco'], rolesNeeded: ['Lab Tech'], team: [], timestamp: '2024-04-05', progress: 20 
+        id: 'prj-2', 
+        title: 'Eco-Brick Initiative', 
+        description: 'Recycling campus plastic waste into durable construction bricks.', 
+        college: 'CEDAT', 
+        ownerId: 'u2', 
+        ownerName: 'Sarah N.', 
+        status: 'Recruiting', 
+        tags: ['Civil', 'Eco'], 
+        rolesNeeded: ['Lab Tech'], 
+        team: [], 
+        timestamp: '2024-04-05', 
+        progress: 20 
       }
     ];
     setProjects(initialProjects);
@@ -117,7 +139,7 @@ const Nexus: React.FC = () => {
                  <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter line-clamp-2 leading-none mb-4">
                     {prj.title}
                  </h3>
-                 <p className="text-xs text-slate-500 font-medium italic mb-6 line-clamp-3 leading-relaxed">"{prj.description}"</p>
+                 <p className="text-xs text-slate-500 font-medium mb-6 line-clamp-3 leading-relaxed">{prj.description}</p>
               </div>
 
               <div className="space-y-6 pt-6 border-t border-[var(--border-color)]">

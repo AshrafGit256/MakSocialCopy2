@@ -52,17 +52,18 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   return (
     <aside className={sidebarClasses}>
       <div className="flex flex-col h-full overflow-hidden">
-        <div className="p-6 h-24 flex items-center justify-between border-b border-[var(--border-color)] shrink-0">
-          <div className="cursor-pointer flex items-center gap-3 overflow-hidden" onClick={() => setView(isCollegeAdmin ? 'groups' : 'home')}>
-            <div className="w-8 h-8 shrink-0 flex items-center justify-center">
-               <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" className="w-8 h-8 object-contain" />
-            </div>
-            <span className="text-3xl font-cursive text-indigo-600 whitespace-nowrap pt-1">
-              MakSocial
-            </span>
+        {/* Sidebar Header - Only Image Logo for Desktop/Tablet */}
+        <div className="p-6 h-32 flex items-center justify-between border-b border-[var(--border-color)] shrink-0">
+          <div className="cursor-pointer flex items-center justify-center w-full" onClick={() => setView(isCollegeAdmin ? 'groups' : 'home')}>
+            <img 
+              src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
+              className="w-20 h-20 object-contain hover:scale-105 transition-transform" 
+              alt="MakSocial Logo"
+            />
           </div>
-          <button onClick={onClose} className="lg:hidden p-2 text-slate-500 hover:text-rose-500 rounded-xl">
-            <X size={20} />
+          {/* Close button only visible on mobile overlay */}
+          <button onClick={onClose} className="lg:hidden p-2 text-slate-500 hover:text-rose-500 rounded-xl absolute top-6 right-6">
+            <X size={24} />
           </button>
         </div>
 

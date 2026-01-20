@@ -1,478 +1,392 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { Violation, User, Post, Poll, TimelineEvent, CalendarEvent, College, UserStatus, AuthorityRole } from '../types';
-import { AuthoritySeal } from './Feed';
+import { User, Post, College, CalendarEvent } from '../types';
 import { 
-  TrendingUp, Monitor, Users, Activity, ShieldAlert, Tv, 
-  Trash2, Play, MessageCircle, Eye, Plus, CheckCircle2, Clock,
-  DollarSign, Briefcase, Calendar, Link as LinkIcon, Image as ImageIcon,
-  Youtube, Mic2, Newspaper, Radio, History, Heart, User as UserIcon, Zap, X,
-  Bell, FileText, Download, BarChart2, PieChart, Printer, AlertTriangle,
-  Award, ShieldCheck, UserMinus, Shield, Verified, UserPlus, RefreshCw
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, Cell
+} from 'recharts';
+import { 
+  Users, Activity, ShieldAlert, Trash2, 
+  MessageCircle, Eye, Plus, Clock,
+  DollarSign, Calendar, Youtube, History, Heart, User as UserIcon, Zap, X,
+  FileText, BarChart2, AlertTriangle, ShieldCheck, UserMinus, 
+  LayoutDashboard, List, Settings, Database, Server, Terminal,
+  ChevronRight, Search, Menu, Bell, ArrowRight, UserPlus, Download
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'timeline' | 'reports'>('dashboard');
   const [users, setUsers] = useState<User[]>(db.getUsers());
   const [posts, setPosts] = useState<Post[]>(db.getPosts(undefined, true));
-  const [violations, setViolations] = useState<Violation[]>(db.getViolations());
-  const [timeline, setTimeline] = useState<TimelineEvent[]>(db.getTimeline());
-  const [events, setEvents] = useState<CalendarEvent[]>(db.getCalendarEvents());
-  const [activeTab, setActiveTab] = useState<'intelligence' | 'registry' | 'maktv' | 'nodes' | 'events'>('intelligence');
-  
-  // Selection States
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showMedalModal, setShowMedalModal] = useState(false);
-  const [showSuspendModal, setShowSuspendModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  
-  const [suspendDays, setSuspendDays] = useState(7);
-  const [medalName, setMedalName] = useState('');
-  const [medalIcon, setMedalIcon] = useState('🏅');
-
-  // Register Form State
-  const [regForm, setRegForm] = useState<Partial<User>>({
-    name: '',
-    email: '',
-    role: 'Lecturer',
-    college: 'COCIS',
-    status: 'Graduate',
-    courseAbbr: 'GEN',
-    academicLevel: 'Faculty',
-    gender: 'M',
-    isVerified: true
-  });
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const sync = () => {
       setUsers(db.getUsers());
       setPosts(db.getPosts(undefined, true));
-      setEvents(db.getCalendarEvents());
     };
     sync();
-    const interval = setInterval(sync, 3000);
+    const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleVerify = (userId: string) => {
-    db.toggleVerification(userId);
+  // Mock Chart Data
+  const chartData = [
+    { name: 'Mon', visits: 400, posts: 240 },
+    { name: 'Tue', visits: 300, posts: 139 },
+    { name: 'Wed', visits: 200, posts: 980 },
+    { name: 'Thu', visits: 278, posts: 390 },
+    { name: 'Fri', visits: 189, posts: 480 },
+    { name: 'Sat', visits: 239, posts: 380 },
+    { name: 'Sun', visits: 349, posts: 430 },
+  ];
+
+  const handleVerify = (uid: string) => {
+    db.toggleVerification(uid);
     setUsers(db.getUsers());
   };
 
-  const handleSuspend = () => {
-    if (selectedUser) {
-      db.suspendUser(selectedUser.id, suspendDays);
-      setUsers(db.getUsers());
-      setShowSuspendModal(false);
-    }
-  };
-
-  const handleUnsuspend = (userId: string) => {
-    if (window.confirm("Lift suspension protocol for this node? Authority confirmation required.")) {
-      db.unsuspendUser(userId);
+  const handleSuspend = (uid: string) => {
+    if(confirm("Confirm temporary node deactivation?")) {
+      db.suspendUser(uid, 7);
       setUsers(db.getUsers());
     }
   };
-
-  const handleAwardMedal = () => {
-    if (selectedUser && medalName) {
-      db.awardMedal(selectedUser.id, { name: medalName, icon: medalIcon });
-      setUsers(db.getUsers());
-      setShowMedalModal(false);
-      setMedalName('');
-    }
-  };
-
-  const handleRegisterNode = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!regForm.name || !regForm.email) return;
-    
-    // Auto-verify if they are high-profile
-    const isHighProfile = regForm.role === 'Lecturer' || regForm.role === 'Administrator' || regForm.role === 'Student Leader';
-    
-    db.registerNode({
-      ...regForm,
-      isVerified: isHighProfile || regForm.isVerified
-    });
-    
-    setUsers(db.getUsers());
-    setShowRegisterModal(false);
-    setRegForm({
-      name: '', email: '', role: 'Lecturer', college: 'COCIS', status: 'Graduate', 
-      courseAbbr: 'GEN', academicLevel: 'Faculty', gender: 'M', isVerified: true
-    });
-    alert("Node registered and validated in the central registry.");
-  };
-
-  const medalsOptions = ['🏅', '🔬', '🏆', '💡', '🎓', '⚖️', '⚽', '🎨'];
 
   return (
-    <div className="p-8 lg:p-12 max-w-[1600px] mx-auto space-y-12 pb-40">
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-             <div className="p-2.5 bg-indigo-600 rounded-xl shadow-xl shadow-indigo-600/30 transition-theme"><Monitor className="text-white" size={26}/></div>
-             <h1 className="text-5xl font-black tracking-tighter text-[var(--text-primary)] uppercase">Command</h1>
+    <div className="flex h-full bg-[#f4f6f9] text-[#212529] font-sans">
+      {/* AdminLTE Dark Sidebar */}
+      <aside className={`bg-[#343a40] text-[#c2c7d0] transition-all duration-300 flex flex-col ${isSidebarCollapsed ? 'w-16' : 'w-64'}`}>
+        <div className="h-14 flex items-center px-4 border-b border-[#4b545c]">
+          <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3 shrink-0">
+            <Terminal size={18} className="text-white" />
           </div>
-          <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px] pl-1">Forensic Intelligence & Governance</p>
+          {!isSidebarCollapsed && <span className="font-bold text-lg text-white uppercase tracking-tight">MakAdmin <span className="font-light">v3.2</span></span>}
         </div>
-        
-        <div className="flex bg-[var(--bg-secondary)] p-1.5 rounded-2xl border border-[var(--border-color)] shadow-inner overflow-x-auto no-scrollbar transition-theme">
-          {[
-            { id: 'intelligence', label: 'Stats', icon: <TrendingUp size={16}/> },
-            { id: 'nodes', label: 'Node Registry', icon: <Shield size={16}/> },
-            { id: 'registry', label: 'Signal Feed', icon: <Activity size={16}/> },
-            { id: 'events', label: 'Events Hub', icon: <Calendar size={16}/> },
-            { id: 'maktv', label: 'MakTV', icon: <Tv size={16}/> }
-          ].map((tab) => (
-            <button 
-              key={tab.id} 
-              onClick={() => setActiveTab(tab.id as any)} 
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {tab.icon} {tab.label}
+
+        <div className="p-4 flex items-center border-b border-[#4b545c]">
+          <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" className="w-8 h-8 rounded-full bg-white p-1 mr-3 shrink-0" />
+          {!isSidebarCollapsed && (
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-white truncate">Platform Architect</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <span className="text-[10px] uppercase font-bold text-[#c2c7d0]">Online</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <nav className="flex-1 py-4 overflow-y-auto no-scrollbar">
+          <ul className="space-y-1 px-2">
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18}/> },
+              { id: 'users', label: 'User Management', icon: <Users size={18}/> },
+              { id: 'timeline', label: 'System Timeline', icon: <History size={18}/> },
+              { id: 'reports', label: 'Analytics Reports', icon: <BarChart2 size={18}/> },
+            ].map(item => (
+              <li key={item.id}>
+                <button 
+                  onClick={() => setActiveTab(item.id as any)}
+                  className={`w-full flex items-center px-3 py-2.5 rounded transition-colors ${activeTab === item.id ? 'bg-indigo-600 text-white' : 'hover:bg-white/5'}`}
+                >
+                  <div className="shrink-0">{item.icon}</div>
+                  {!isSidebarCollapsed && <span className="ml-3 text-sm font-medium">{item.label}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Navbar */}
+        <header className="h-14 bg-white border-b border-[#dee2e6] flex items-center justify-between px-4 shrink-0">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="p-2 hover:bg-black/5 rounded text-[#495057]"><Menu size={20}/></button>
+            <nav className="hidden md:flex gap-4 text-sm font-medium text-[#495057]">
+              <button className="hover:text-indigo-600">Home</button>
+              <button className="hover:text-indigo-600">Contact</button>
+            </nav>
+          </div>
+          <div className="flex items-center gap-4 text-[#495057]">
+            <button className="relative p-2 hover:bg-black/5 rounded"><Search size={20}/></button>
+            <button className="relative p-2 hover:bg-black/5 rounded">
+              <MessageCircle size={20}/>
+              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#dc3545] text-white text-[9px] flex items-center justify-center rounded-full font-bold">3</span>
             </button>
-          ))}
-        </div>
-      </header>
+            <button className="relative p-2 hover:bg-black/5 rounded">
+              <Bell size={20}/>
+              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#ffc107] text-white text-[9px] flex items-center justify-center rounded-full font-bold">15</span>
+            </button>
+          </div>
+        </header>
 
-      {/* Registry Tab */}
-      {activeTab === 'nodes' && (
-        <div className="space-y-8 animate-in fade-in duration-500">
-           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div>
-                <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Global Node Registry</h3>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Strata management and biometric validation</p>
+        {/* Content Canvas */}
+        <main className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar">
+          {/* Breadcrumbs */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-normal text-[#212529] capitalize">{activeTab}</h1>
+            <nav className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase tracking-widest">
+              <span className="hover:text-indigo-600 cursor-pointer">Admin</span>
+              <ChevronRight size={12}/>
+              <span className="text-[#6c757d]">{activeTab}</span>
+            </nav>
+          </div>
+
+          {activeTab === 'dashboard' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              {/* Info Boxes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { label: 'New Nodes', val: users.length, icon: <Users size={32}/>, bg: 'bg-[#17a2b8]', labelColor: 'text-white' },
+                  { label: 'Total Broadcasts', val: posts.length, icon: <Activity size={32}/>, bg: 'bg-[#28a745]', labelColor: 'text-white' },
+                  { label: 'Node Registry', val: '44', icon: <UserIcon size={32}/>, bg: 'bg-[#ffc107]', labelColor: 'text-[#212529]' },
+                  { label: 'System Alerts', val: '65', icon: <ShieldAlert size={32}/>, bg: 'bg-[#dc3545]', labelColor: 'text-white' },
+                ].map((box, i) => (
+                  <div key={i} className={`${box.bg} ${box.labelColor} rounded shadow-md relative overflow-hidden flex flex-col justify-between h-32`}>
+                    <div className="p-4 flex justify-between items-start">
+                      <div>
+                        <h3 className="text-3xl font-bold">{box.val}</h3>
+                        <p className="text-sm opacity-90">{box.label}</p>
+                      </div>
+                      <div className="opacity-20 translate-x-4 -translate-y-2">{box.icon}</div>
+                    </div>
+                    <button className="w-full py-1 bg-black/10 hover:bg-black/20 text-center text-xs font-medium flex items-center justify-center gap-2">
+                      More info <ArrowRight size={12}/>
+                    </button>
+                  </div>
+                ))}
               </div>
-              <div className="flex gap-4 w-full md:w-auto">
-                 <div className="p-4 bg-emerald-600/5 rounded-2xl border border-emerald-600/10 flex-1 md:flex-none">
-                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Active Nodes</p>
-                    <p className="text-2xl font-black text-[var(--text-primary)]">{users.length}</p>
+
+              {/* Charts & Tables Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Main Graph Card */}
+                <div className="bg-white border-t-4 border-indigo-500 rounded shadow-md overflow-hidden">
+                  <div className="p-4 border-b border-[#dee2e6] flex items-center justify-between">
+                    <h3 className="text-lg font-medium flex items-center gap-2"><BarChart2 size={18}/> Engagement Signals</h3>
+                    <div className="flex gap-1">
+                      <button className="px-2 py-1 bg-[#f8f9fa] border border-[#ced4da] rounded text-[10px] uppercase font-bold text-[#6c757d]">Week</button>
+                      <button className="px-2 py-1 bg-[#f8f9fa] border border-[#ced4da] rounded text-[10px] uppercase font-bold text-[#6c757d]">Month</button>
+                    </div>
+                  </div>
+                  <div className="p-6 h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData}>
+                        <defs>
+                          <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Area type="monotone" dataKey="visits" stroke="#8884d8" fillOpacity={1} fill="url(#colorVisits)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Signal Traffic Card */}
+                <div className="bg-white border-t-4 border-[#28a745] rounded shadow-md overflow-hidden">
+                   <div className="p-4 border-b border-[#dee2e6]">
+                     <h3 className="text-lg font-medium flex items-center gap-2"><Server size={18}/> Node Traffic</h3>
+                   </div>
+                   <div className="p-6 h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false}/>
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="posts" fill="#28a745" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                   </div>
+                </div>
+              </div>
+
+              {/* Recent Nodes Card */}
+              <div className="bg-white border-t-4 border-indigo-500 rounded shadow-md overflow-hidden">
+                 <div className="p-4 border-b border-[#dee2e6]">
+                   <h3 className="text-lg font-medium flex items-center gap-2"><Database size={18}/> Latest Node Registrations</h3>
                  </div>
-                 <button 
-                   onClick={() => setShowRegisterModal(true)}
-                   className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all active:scale-95"
-                 >
-                    <UserPlus size={18}/> Register New Node
-                 </button>
-              </div>
-           </div>
-
-           <div className="glass-card overflow-x-auto border-[var(--border-color)] no-scrollbar">
-              <table className="w-full text-left min-w-[1000px]">
-                 <thead className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
-                    <tr>
-                       <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-slate-500">Identity Protocol</th>
-                       <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-slate-500">Academic Stratum</th>
-                       <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-slate-500">Biometric Details</th>
-                       <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-slate-500">Link Status</th>
-                       <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-slate-500">Command Actions</th>
-                    </tr>
-                 </thead>
-                 <tbody className="divide-y divide-[var(--border-color)] bg-[var(--sidebar-bg)]">
-                    {users.map(u => (
-                       <tr key={u.id} className={`hover:bg-indigo-600/[0.02] transition-colors ${u.isSuspended ? 'bg-rose-500/[0.03]' : ''}`}>
-                          <td className="px-8 py-5">
-                             <div className="flex items-center gap-4">
-                                <div className="relative">
-                                   <img src={u.avatar} className="w-12 h-12 rounded-2xl object-cover border border-[var(--border-color)]" />
-                                   {u.isVerified && (
-                                     <div className="absolute -bottom-1 -right-1">
-                                        <AuthoritySeal isVerified={true} size="sm" />
+                 <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                       <thead className="bg-[#f8f9fa] border-b border-[#dee2e6]">
+                          <tr>
+                             <th className="p-4 font-bold text-[#495057]">ID</th>
+                             <th className="p-4 font-bold text-[#495057]">Node</th>
+                             <th className="p-4 font-bold text-[#495057]">Status</th>
+                             <th className="p-4 font-bold text-[#495057]">Intelligence</th>
+                          </tr>
+                       </thead>
+                       <tbody className="divide-y divide-[#dee2e6]">
+                          {users.slice(0, 5).map(u => (
+                            <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                               <td className="p-4 text-[#007bff] font-medium">{u.id.substring(0, 8)}</td>
+                               <td className="p-4 flex items-center gap-3">
+                                  <img src={u.avatar} className="w-8 h-8 rounded-full border border-slate-200" />
+                                  <div>
+                                    <p className="font-bold">{u.name}</p>
+                                    <p className="text-[10px] text-slate-500 uppercase">{u.college}</p>
+                                  </div>
+                               </td>
+                               <td className="p-4">
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${u.isVerified ? 'bg-[#28a745] text-white' : 'bg-[#6c757d] text-white'}`}>
+                                    {u.isVerified ? 'Verified' : 'Pending'}
+                                  </span>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center gap-2">
+                                     <div className="flex-1 bg-slate-100 rounded-full h-2">
+                                        <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${(u.iqCredits / 10000) * 100}%` }}></div>
                                      </div>
-                                   )}
-                                </div>
-                                <div>
-                                   <p className="text-sm font-black text-[var(--text-primary)] uppercase tracking-tight">{u.name}</p>
-                                   <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">{u.email}</p>
-                                </div>
-                             </div>
+                                     <span className="text-[10px] font-bold text-slate-500">{u.iqCredits} IQ</span>
+                                  </div>
+                                </td>
+                            </tr>
+                          ))}
+                       </tbody>
+                    </table>
+                 </div>
+                 <div className="p-4 border-t border-[#dee2e6] bg-[#f8f9fa] text-center">
+                    <button className="text-sm font-bold text-indigo-600 hover:underline">View All Users</button>
+                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'users' && (
+            <div className="bg-white border-t-4 border-indigo-500 rounded shadow-md overflow-hidden animate-in slide-in-from-bottom-5 duration-500">
+               <div className="p-4 border-b border-[#dee2e6] flex items-center justify-between">
+                  <h3 className="text-lg font-medium">Node Registry Management</h3>
+                  <div className="relative">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
+                    <input className="pl-9 pr-4 py-1.5 border border-[#ced4da] rounded text-sm outline-none focus:border-indigo-500 transition-all" placeholder="Search registry..."/>
+                  </div>
+               </div>
+               <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-[#f8f9fa] border-b border-[#dee2e6]">
+                      <tr>
+                        <th className="p-4">Name</th>
+                        <th className="p-4">College</th>
+                        <th className="p-4">Rank</th>
+                        <th className="p-4">Protocol Status</th>
+                        <th className="p-4 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#dee2e6]">
+                      {users.map(u => (
+                        <tr key={u.id} className="hover:bg-slate-50">
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <img src={u.avatar} className="w-10 h-10 rounded-lg border border-slate-200" />
+                              <div className="min-w-0">
+                                <p className="font-bold text-[#212529]">{u.name}</p>
+                                <p className="text-[10px] text-[#6c757d] uppercase truncate">{u.email}</p>
+                              </div>
+                            </div>
                           </td>
-                          <td className="px-8 py-5">
-                             <div className="space-y-1">
-                                <p className="text-xs font-black text-indigo-600 uppercase">{u.role}</p>
-                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{u.college} • {u.courseAbbr}</p>
-                             </div>
+                          <td className="p-4">
+                             <p className="font-bold text-[#495057]">{u.college}</p>
+                             <p className="text-[10px] uppercase text-slate-500">{u.courseAbbr}</p>
                           </td>
-                          <td className="px-8 py-5">
-                             <div className="flex items-center gap-3">
-                                <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-widest ${u.gender === 'M' ? 'bg-blue-500/10 text-blue-600' : 'bg-rose-500/10 text-rose-600'}`}>Gen: {u.gender}</span>
-                                <span className="px-2 py-1 bg-slate-100 dark:bg-white/5 rounded text-[8px] font-black uppercase tracking-widest text-slate-500">{u.academicLevel}</span>
-                             </div>
+                          <td className="p-4">
+                             <span className="text-xs font-bold text-indigo-600 uppercase">{u.role}</span>
                           </td>
-                          <td className="px-8 py-5">
+                          <td className="p-4">
                              {u.isSuspended ? (
-                                <div className="flex items-center gap-2 text-rose-500 animate-pulse">
-                                   <AlertTriangle size={14}/>
-                                   <span className="text-[9px] font-black uppercase tracking-widest">Protocol Halted</span>
-                                </div>
+                               <span className="bg-[#dc3545] text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">Deactivated</span>
                              ) : (
-                                <div className="flex items-center gap-2 text-emerald-500">
-                                   <ShieldCheck size={14}/>
-                                   <span className="text-[9px] font-black uppercase tracking-widest">Active Link</span>
-                                </div>
+                               <span className="bg-[#28a745] text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">Active</span>
                              )}
                           </td>
-                          <td className="px-8 py-5">
-                             <div className="flex items-center gap-2">
-                                <button 
-                                  onClick={() => handleVerify(u.id)}
-                                  className={`p-2.5 rounded-xl border transition-all ${u.isVerified ? 'bg-blue-600 text-white border-blue-500' : 'bg-[var(--bg-secondary)] text-slate-400 border-[var(--border-color)] hover:text-blue-500'}`}
-                                  title="Validate Identity"
-                                >
-                                   <Verified size={18}/>
-                                </button>
-                                <button 
-                                  onClick={() => { setSelectedUser(u); setShowMedalModal(true); }}
-                                  className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 hover:bg-amber-500 hover:text-white transition-all"
-                                  title="Award Honor Medal"
-                                >
-                                   <Award size={18}/>
-                                </button>
-                                {u.isSuspended ? (
-                                  <button 
-                                    onClick={() => handleUnsuspend(u.id)}
-                                    className="p-2.5 rounded-xl bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-600/20 animate-in zoom-in"
-                                    title="Restore Signal"
-                                  >
-                                     <RefreshCw size={18}/>
-                                  </button>
-                                ) : (
-                                  <button 
-                                    onClick={() => { setSelectedUser(u); setShowSuspendModal(true); }}
-                                    className="p-2.5 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-600 hover:text-white transition-all"
-                                    title="Suspend Protocol"
-                                  >
-                                     <UserMinus size={18}/>
-                                  </button>
-                                )}
+                          <td className="p-4">
+                             <div className="flex items-center justify-center gap-2">
+                                <button onClick={() => handleVerify(u.id)} className="p-2 bg-[#007bff]/10 text-[#007bff] hover:bg-[#007bff] hover:text-white rounded transition-colors" title="Verify Node"><ShieldCheck size={16}/></button>
+                                <button onClick={() => handleSuspend(u.id)} className="p-2 bg-[#dc3545]/10 text-[#dc3545] hover:bg-[#dc3545] hover:text-white rounded transition-colors" title="Deactivate"><UserMinus size={16}/></button>
+                                <button className="p-2 bg-[#6c757d]/10 text-[#6c757d] hover:bg-[#6c757d] hover:text-white rounded transition-colors" title="Edit Properties"><Settings size={16}/></button>
                              </div>
                           </td>
-                       </tr>
-                    ))}
-                 </tbody>
-              </table>
-           </div>
-        </div>
-      )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+               </div>
+            </div>
+          )}
 
-      {/* Modal - Register New Node */}
-      {showRegisterModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/95 backdrop-blur-xl animate-in fade-in duration-300">
-           <div className="glass-card w-full max-w-2xl p-10 bg-[var(--sidebar-bg)] border-[var(--border-color)] rounded-[3rem] shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
-              <div className="flex justify-between items-center mb-8">
-                 <div>
-                    <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">Register High-Profile Node</h2>
-                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Authorized creation of administrative & faculty identities</p>
-                 </div>
-                 <button onClick={() => setShowRegisterModal(false)} className="text-slate-500 hover:text-rose-500 p-2"><X size={28}/></button>
-              </div>
+          {activeTab === 'timeline' && (
+            <div className="max-w-4xl mx-auto space-y-8 animate-in slide-in-from-right-5 duration-500">
+               <h3 className="text-xl font-bold border-b border-[#dee2e6] pb-4">Global System Events</h3>
+               
+               <div className="relative pl-8 space-y-12 before:absolute before:left-3 before:top-0 before:bottom-0 before:w-0.5 before:bg-[#dee2e6]">
+                  {[
+                    { type: 'user', time: '5 mins ago', title: 'New Peer Node Registered', content: 'Ashraf Guru synchronized with the COCIS wing.', icon: <UserPlus size={14}/>, color: 'bg-[#17a2b8]' },
+                    { type: 'post', time: '12 mins ago', title: 'Official Broadcast Decrypted', content: 'Guild EC published 89th Inauguration protocol.', icon: <Zap size={14}/>, color: 'bg-[#ffc107]' },
+                    { type: 'alert', time: '1 hour ago', title: 'Content Security Filter Triggered', content: 'AI model blocked a non-compliant broadcast in the Global hub.', icon: <AlertTriangle size={14}/>, color: 'bg-[#dc3545]' },
+                    { type: 'admin', time: '2 hours ago', title: 'Registry Backup Verified', content: 'System state archived to University central servers.', icon: <Database size={14}/>, color: 'bg-[#6c757d]' },
+                    { type: 'stat', time: '3 hours ago', title: 'Engagement Threshold Reached', content: 'Platform traffic exceeded 15,000 active pulses today.', icon: <Activity size={14}/>, color: 'bg-[#28a745]' },
+                  ].map((evt, i) => (
+                    <div key={i} className="relative">
+                       <div className={`absolute -left-11 top-0 w-8 h-8 ${evt.color} text-white rounded-full flex items-center justify-center shadow z-10`}>
+                          {evt.icon}
+                       </div>
+                       <div className="bg-white rounded shadow-sm border border-[#dee2e6] overflow-hidden">
+                          <div className="p-3 border-b border-[#dee2e6] flex items-center justify-between">
+                             <h4 className="text-sm font-bold text-[#212529]">{evt.title}</h4>
+                             <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1"><Clock size={10}/> {evt.time}</span>
+                          </div>
+                          <div className="p-4 text-sm text-[#495057]">
+                             {evt.content}
+                          </div>
+                          <div className="p-2 bg-[#f8f9fa] border-t border-[#dee2e6] flex gap-2">
+                             <button className="text-[10px] font-bold text-indigo-600 bg-white border border-[#ced4da] px-2 py-1 rounded hover:bg-slate-50 transition-colors">Inspect Signal</button>
+                             <button className="text-[10px] font-bold text-rose-500 bg-white border border-[#ced4da] px-2 py-1 rounded hover:bg-slate-50 transition-colors">Dismiss</button>
+                          </div>
+                       </div>
+                    </div>
+                  ))}
+               </div>
 
-              <form onSubmit={handleRegisterNode} className="space-y-6">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Legal Name</label>
-                       <input 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-indigo-600 transition-all"
-                         required
-                         value={regForm.name}
-                         onChange={e => setRegForm({...regForm, name: e.target.value})}
-                         placeholder="Dr. Jane Doe"
-                       />
-                    </div>
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">University Email</label>
-                       <input 
-                         type="email"
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-indigo-600 transition-all"
-                         required
-                         value={regForm.email}
-                         onChange={e => setRegForm({...regForm, email: e.target.value})}
-                         placeholder="jane.doe@staff.mak.ac.ug"
-                       />
-                    </div>
-                 </div>
+               <div className="text-center py-10">
+                  <button className="bg-[#6c757d] text-white px-8 py-2.5 rounded text-sm font-bold shadow-md hover:bg-[#5a6268] transition-colors">Load Archive Events</button>
+               </div>
+            </div>
+          )}
 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Authority Stratum (Role)</label>
-                       <select 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
-                         value={regForm.role}
-                         onChange={e => setRegForm({...regForm, role: e.target.value as any})}
-                       >
-                          <option value="Lecturer">Lecturer / Faculty</option>
-                          <option value="Administrator">University Administrator</option>
-                          <option value="Student Leader">Student Leader (GRC/Guild)</option>
-                          <option value="Student">Special Student Node</option>
-                       </select>
-                    </div>
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Level</label>
-                       <select 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
-                         value={regForm.academicLevel}
-                         onChange={e => setRegForm({...regForm, academicLevel: e.target.value as any})}
-                       >
-                          <option value="Faculty">Faculty Member</option>
-                          <option value="PhD">Doctoral Level</option>
-                          <option value="Postgrad">Postgraduate Level</option>
-                          <option value="Undergrad">Undergraduate Level</option>
-                       </select>
-                    </div>
-                 </div>
+          {activeTab === 'reports' && (
+            <div className="py-20 text-center space-y-8 animate-in zoom-in duration-700">
+               <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto shadow-inner border border-[#dee2e6] text-slate-300">
+                  <BarChart2 size={56} className="animate-pulse" />
+               </div>
+               <div>
+                  <h3 className="text-3xl font-bold text-[#6c757d]">Module Registry Under Sync</h3>
+                  <p className="text-sm font-medium text-slate-500 mt-2 max-w-sm mx-auto">Analytical reports and automated forensic outputs are currently being generated for the weekly governance audit.</p>
+                  <button className="mt-8 bg-indigo-600 text-white px-10 py-3 rounded text-sm font-bold shadow-xl hover:bg-indigo-700 transition-all flex items-center gap-2 mx-auto">
+                    <Download size={16}/> Force Signal Export
+                  </button>
+               </div>
+            </div>
+          )}
+        </main>
 
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">College Unit</label>
-                       <select 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
-                         value={regForm.college}
-                         onChange={e => setRegForm({...regForm, college: e.target.value as any})}
-                       >
-                          {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                       </select>
-                    </div>
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Course Abbr.</label>
-                       <input 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none"
-                         value={regForm.courseAbbr}
-                         onChange={e => setRegForm({...regForm, courseAbbr: e.target.value})}
-                         placeholder="e.g. CS, LAW, SE"
-                       />
-                    </div>
-                    <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Gender</label>
-                       <select 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
-                         value={regForm.gender}
-                         onChange={e => setRegForm({...regForm, gender: e.target.value as any})}
-                       >
-                          <option value="M">Male Node</option>
-                          <option value="F">Female Node</option>
-                          <option value="Other">Other Protocol</option>
-                       </select>
-                    </div>
-                 </div>
-
-                 <div className="flex items-center gap-3 p-4 bg-indigo-600/5 rounded-2xl border border-indigo-600/10">
-                    <ShieldCheck size={20} className="text-indigo-600"/>
-                    <div className="flex-1">
-                       <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Automatic Validation Policy</p>
-                       <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">High-profile nodes are biometrically verified by default upon registration.</p>
-                    </div>
-                    <input 
-                       type="checkbox" 
-                       className="w-6 h-6 rounded-lg border-indigo-600" 
-                       checked={regForm.isVerified} 
-                       onChange={e => setRegForm({...regForm, isVerified: e.target.checked})}
-                    />
-                 </div>
-
-                 <div className="flex gap-4 pt-4">
-                    <button type="button" onClick={() => setShowRegisterModal(false)} className="flex-1 py-4 bg-[var(--bg-secondary)] text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest">Abort Process</button>
-                    <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-indigo-600/40 hover:bg-indigo-700">Deploy Node Signal</button>
-                 </div>
-              </form>
-           </div>
-        </div>
-      )}
-
-      {/* Modal - Award Medal */}
-      {showMedalModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/90 backdrop-blur-md">
-           <div className="glass-card w-full max-w-md p-8 bg-[var(--sidebar-bg)] border-[var(--border-color)] rounded-[2.5rem] shadow-2xl">
-              <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter mb-2">Award Merit Protocol</h3>
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-8">Recognize node excellence in {selectedUser?.name}</p>
-              
-              <div className="space-y-6">
-                 <div>
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Medal Identity</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all" placeholder="e.g. Innovation Lead" value={medalName} onChange={e => setMedalName(e.target.value)} />
-                 </div>
-                 <div>
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Icon Frequency</label>
-                    <div className="grid grid-cols-4 gap-3">
-                       {medalsOptions.map(m => (
-                          <button key={m} onClick={() => setMedalIcon(m)} className={`p-4 rounded-xl text-2xl border transition-all ${medalIcon === m ? 'bg-indigo-600 border-indigo-500 shadow-lg' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-500'}`}>{m}</button>
-                       ))}
-                    </div>
-                 </div>
-                 <div className="flex gap-4 pt-4">
-                    <button onClick={() => setShowMedalModal(false)} className="flex-1 py-4 bg-[var(--bg-secondary)] text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest">Abort</button>
-                    <button onClick={handleAwardMedal} className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30">Commit Signal</button>
-                 </div>
-              </div>
-           </div>
-        </div>
-      )}
-
-      {/* Modal - Suspend Protocol */}
-      {showSuspendModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-rose-900/40 backdrop-blur-md">
-           <div className="glass-card w-full max-w-md p-8 bg-[var(--sidebar-bg)] border-rose-500/20 rounded-[2.5rem] shadow-2xl">
-              <div className="w-16 h-16 bg-rose-500/10 rounded-2xl flex items-center justify-center text-rose-500 mb-6">
-                 <ShieldAlert size={32}/>
-              </div>
-              <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter mb-2">Suspend Node Protocol</h3>
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-8">Halting link synchronization for {selectedUser?.name}</p>
-              
-              <div className="space-y-6">
-                 <div>
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Suspension Duration (Days)</label>
-                    <div className="flex gap-2">
-                       {[3, 7, 30, 90].map(d => (
-                          <button key={d} onClick={() => setSuspendDays(d)} className={`flex-1 py-3 rounded-xl text-[10px] font-black border transition-all ${suspendDays === d ? 'bg-rose-600 text-white border-rose-500' : 'bg-[var(--bg-secondary)] text-slate-500 border-[var(--border-color)]'}`}>{d}D</button>
-                       ))}
-                    </div>
-                 </div>
-                 <div className="p-4 bg-rose-500/5 rounded-2xl border border-rose-500/10">
-                    <p className="text-[10px] font-bold text-rose-600 uppercase tracking-widest leading-relaxed">WARNING: Node will lose access to broadcast feed and resource vault until the suspension registry clears.</p>
-                 </div>
-                 <div className="flex gap-4 pt-4">
-                    <button onClick={() => setShowSuspendModal(false)} className="flex-1 py-4 bg-[var(--bg-secondary)] text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest">Cancel</button>
-                    <button onClick={handleSuspend} className="flex-1 py-4 bg-rose-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-600/30">Confirm Deactivation</button>
-                 </div>
-              </div>
-           </div>
-        </div>
-      )}
-
-      {/* Intelligence Tab */}
-      {activeTab === 'intelligence' && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-in fade-in duration-500">
-           {[
-             { label: 'Total Engagement', val: posts.reduce((a,c) => a+c.views, 0).toLocaleString(), icon: <Activity/>, color: 'text-indigo-600 dark:text-indigo-500' },
-             { label: 'Platform Revenue', val: `UGX 1.2M`, icon: <DollarSign/>, color: 'text-emerald-600 dark:text-emerald-500' },
-             { label: 'Validated Nodes', val: users.length, icon: <ShieldCheck/>, color: 'text-amber-600 dark:text-amber-500' },
-             { label: 'Official Protocols', val: events.length, icon: <Calendar/>, color: 'text-rose-600 dark:text-rose-400' },
-           ].map((s,i) => (
-             <div key={i} className="glass-card p-8 shadow-sm bg-[var(--sidebar-bg)] border-[var(--border-color)] group hover:border-indigo-500 transition-all">
-                <div className={`p-3 rounded-xl bg-[var(--bg-secondary)] w-fit mb-6 ${s.color}`}>{s.icon}</div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{s.label}</p>
-                <h3 className="text-4xl font-black mt-1 text-[var(--text-primary)]">{s.val}</h3>
-             </div>
-           ))}
-        </div>
-      )}
-
-      {/* Placeholder for other tabs */}
-      {(activeTab === 'maktv' || activeTab === 'registry' || activeTab === 'events') && (
-        <div className="py-40 text-center space-y-8 animate-in zoom-in duration-700">
-           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner border border-[var(--border-color)] text-slate-300">
-              <RefreshCw size={56} className="animate-spin-slow" />
-           </div>
+        {/* Footer */}
+        <footer className="h-14 bg-white border-t border-[#dee2e6] px-6 flex items-center justify-between text-sm text-[#495057] shrink-0">
            <div>
-              <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Module Registry Under Construction</h3>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-1">This tactical command module is currently being synchronized with the main grid.</p>
+             <span className="font-bold">Copyright &copy; 2025 <span className="text-indigo-600">MakSocial</span>.</span> All nodes secured.
            </div>
-        </div>
-      )}
+           <div className="hidden sm:block">
+             <span className="font-bold">Version</span> 3.2.0-stable
+           </div>
+        </footer>
+      </div>
     </div>
   );
 };

@@ -91,11 +91,33 @@ const INITIAL_USERS: User[] = [
     totalLikesCount: 4500,
     badges: [],
     appliedTo: [],
+    iqCredits: 1250,
+    skills: ['React', 'Blockchain', 'AI Ethics'],
+    intellectualSignature: '#4F46E5',
     notifications: [
       { id: 'n1', type: 'like', text: 'Sarah N. liked your broadcast on Blockchain nodes.', timestamp: '5m ago', isRead: false, senderName: 'Sarah N.', senderAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
       { id: 'n2', type: 'official', text: 'Guild Electoral Commission: 89th Inauguration is now mandatory for all GRCs.', timestamp: '1h ago', isRead: false, senderName: 'GEC', senderAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png' },
       { id: 'n3', type: 'event', text: 'MakEvents: New Innovation Challenge added to Academic Vault.', timestamp: '3h ago', isRead: true }
     ]
+  },
+  {
+    id: 'u2',
+    name: 'Sarah N.',
+    role: 'Student',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    connections: 110,
+    college: 'CEDAT',
+    status: 'Finalist',
+    joinedColleges: ['CEDAT'],
+    postsCount: 5,
+    followersCount: 340,
+    followingCount: 120,
+    totalLikesCount: 890,
+    badges: ['Researcher'],
+    appliedTo: [],
+    iqCredits: 890,
+    skills: ['AutoCAD', 'Structural Eng', 'Sustainability'],
+    intellectualSignature: '#10B981'
   },
   {
     id: 'super_admin',
@@ -112,7 +134,10 @@ const INITIAL_USERS: User[] = [
     followingCount: 0,
     totalLikesCount: 0,
     badges: ['Super Admin'],
-    appliedTo: []
+    appliedTo: [],
+    iqCredits: 9999,
+    skills: ['System Gov', 'Protocol Security'],
+    intellectualSignature: '#E11D48'
   }
 ];
 

@@ -14,8 +14,10 @@ import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
 import Nexus from './components/Nexus';
+import Synapse from './components/Synapse';
 import { db } from './db';
-import { Menu, Home, BookOpen, LayoutGrid, User as UserIcon, Bell, X, Heart, UserPlus, Zap, ShieldAlert } from 'lucide-react';
+// Added Orbit and Rocket to lucide-react imports
+import { Menu, Home, BookOpen, LayoutGrid, User as UserIcon, Bell, X, Heart, UserPlus, Zap, ShieldAlert, Orbit, Rocket } from 'lucide-react';
 
 const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user: User, onClear: () => void }> = ({ isOpen, onClose, user, onClear }) => {
   return (
@@ -114,7 +116,10 @@ const App: React.FC = () => {
       followingCount: 0,
       totalLikesCount: 0,
       joinedColleges: [college],
-      notifications: []
+      notifications: [],
+      iqCredits: 100,
+      skills: [],
+      intellectualSignature: '#6366f1'
     };
     
     db.saveUsers([...db.getUsers(), newUser]);
@@ -158,6 +163,7 @@ const App: React.FC = () => {
       case 'search': return <Search onNavigateToProfile={(uid) => { setSelectedUserId(uid); setView('profile'); }} onNavigateToPost={(pid) => { setTargetPostId(pid); setView('home'); }} />;
       case 'resources': return <Resources />;
       case 'nexus': return <Nexus />;
+      case 'synapse': return <Synapse />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }
@@ -221,8 +227,8 @@ const App: React.FC = () => {
         <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-[var(--card-bg)] border border-[var(--border-color)] backdrop-blur-2xl rounded-[2.5rem] p-3 flex items-center justify-around shadow-2xl z-[55] ring-1 ring-white/5">
            {[
              { id: 'home', icon: <Home size={22} />, label: 'Pulse' },
-             { id: 'resources', icon: <BookOpen size={22} />, label: 'Vault' },
-             { id: 'groups', icon: <LayoutGrid size={22} />, label: 'Wing' },
+             { id: 'synapse', icon: <Orbit size={22} />, label: 'AI' },
+             { id: 'nexus', icon: <Rocket size={22} />, label: 'Nexus' },
              { id: 'profile', icon: <UserIcon size={22} />, label: 'Self' }
            ].map(item => (
              <button

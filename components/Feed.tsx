@@ -11,7 +11,7 @@ import {
   MapPin, Clock, TrendingUp, Plus, FileText, Lock,
   ShieldCheck, Trash2, Edit3, UserPlus, ShieldAlert as Shield,
   Star, Verified, Shield as ShieldIcon, ExternalLink, CalendarPlus,
-  Bookmark, Share2, CalendarCheck, Save
+  Bookmark, Share2, CalendarCheck, Save, Orbit, Brain
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -80,6 +80,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
       return;
     }
 
+    // Fixed property names mapping from Post type to CalendarEvent type
     const newCalendarEvent: CalendarEvent = {
       id: event.eventId || `post-ev-${Date.now()}`,
       title: event.eventTitle || 'University Event',
@@ -388,7 +389,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                         <div className="flex items-center gap-10">
                            <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors group">
                              <Heart size={20} className="group-hover:fill-rose-500 group-active:scale-125 transition-all" /> 
-                             <span className="text-[11px] font-black">{post.likes}</span>
+                             <span className="text-11px] font-black">{post.likes}</span>
                            </button>
                            <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors">
                              <MessageCircle size={20}/> 
@@ -410,6 +411,32 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
          </div>
 
          <aside className="hidden lg:block lg:col-span-4 space-y-8 sticky top-8">
+            {/* New Innovation Score Card */}
+            <div className="glass-card p-8 bg-indigo-600 text-white border-indigo-500 shadow-2xl relative overflow-hidden group">
+               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+               <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] opacity-70">Intelligence Velocity</h3>
+                    <p className="text-4xl font-black mt-2">{user.iqCredits || 0} IQ-C</p>
+                  </div>
+                  <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-xl">
+                    <Brain size={24}/>
+                  </div>
+               </div>
+               <div className="space-y-4">
+                  <div className="flex justify-between text-[8px] font-black uppercase tracking-widest opacity-80">
+                     <span>Platform Capacity</span>
+                     <span>Elite Node</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
+                     <div className="h-full bg-white w-3/4 animate-pulse"></div>
+                  </div>
+               </div>
+               <button className="w-full mt-6 py-4 bg-white text-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                 <Orbit size={14}/> Re-Sync Synapse
+               </button>
+            </div>
+
             <div className="glass-card p-8 border-[var(--border-color)] shadow-xl bg-[var(--sidebar-bg)] overflow-hidden relative">
                <div className="absolute top-0 right-0 p-4 opacity-5"><Calendar size={80}/></div>
                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 mb-8 border-b border-[var(--border-color)] pb-4">

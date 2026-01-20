@@ -16,7 +16,8 @@ import Resources from './components/Resources';
 import { db } from './db';
 import { 
   Menu, Home, BookOpen, LayoutGrid, User as UserIcon, Bell, X, Heart, 
-  UserPlus, Zap, ShieldAlert, Compass, Search as SearchIcon, Calendar 
+  UserPlus, Zap, ShieldAlert, Compass, Search as SearchIcon, Calendar,
+  MessageCircle, Plus
 } from 'lucide-react';
 
 const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user: User, onClear: () => void }> = ({ isOpen, onClose, user, onClear }) => {
@@ -184,7 +185,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
-      {/* Overlay for small screens when sidebar is open */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden transition-opacity" onClick={() => setIsSidebarOpen(false)} />
       )}
@@ -193,7 +193,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] transition-opacity" onClick={() => setIsNotifPanelOpen(false)} />
       )}
 
-      {/* Sidebar - Visible on Laptop/Tablet, adapts to icon-only on desktop hover or mobile trigger */}
+      {/* Sidebar - Always visible on tablets and laptops, fixed width */}
       <Sidebar 
         activeView={view} 
         setView={handleSetView} 
@@ -213,17 +213,12 @@ const App: React.FC = () => {
       )}
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Header - Mobile Only */}
+        {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] z-50">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors">
             <Menu size={24} />
           </button>
-          <img
-            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
-            alt="MakSocial Logo"
-            className="h-8 grayscale brightness-0 dark:grayscale-0 dark:brightness-100"
-            onClick={() => handleSetView('home')}
-          />
+          <span className="text-3xl font-cursive text-indigo-600">MakSocial</span>
           <button onClick={() => setIsNotifPanelOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl relative transition-colors">
             <Bell size={24} />
             {currentUser?.notifications?.some(n => !n.isRead) && <div className="absolute top-2 right-2 w-2 h-2 bg-indigo-600 rounded-full border border-white"></div>}
@@ -234,22 +229,29 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
 
-        {/* Bottom Nav - Mobile Only Icons */}
-        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-[var(--card-bg)] border border-[var(--border-color)] backdrop-blur-2xl rounded-[2.5rem] p-3 flex items-center justify-around shadow-2xl z-[55] ring-1 ring-white/5">
+        {/* X-like Floating Bottom Navbar (Mobile Only) */}
+        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-black/90 dark:bg-[#020617]/95 border border-white/10 backdrop-blur-2xl rounded-full px-2 py-3 flex items-center justify-between shadow-2xl z-[55] ring-1 ring-white/5">
            {[
              { id: 'home', icon: <Home size={22} />, label: 'Home' },
-             { id: 'explore', icon: <Compass size={22} />, label: 'Discover' },
-             { id: 'search', icon: <SearchIcon size={22} />, label: 'Search' },
-             { id: 'profile', icon: <UserIcon size={22} />, label: 'Profile' }
+             { id: 'explore', icon: <Compass size={22} />, label: 'Search' },
+             { id: 'messages', icon: <MessageCircle size={22} />, label: 'Chat' },
+             { id: 'profile', icon: <UserIcon size={22} />, label: 'Me' }
            ].map(item => (
              <button
                key={item.id}
                onClick={() => handleSetView(item.id as AppView)}
-               className={`flex flex-col items-center gap-1 p-3 rounded-2xl transition-all ${view === item.id ? 'bg-indigo-600 text-white shadow-lg scale-110' : 'text-slate-500'}`}
+               className={`flex-1 flex flex-col items-center gap-1 transition-all rounded-full py-2 ${view === item.id ? 'text-indigo-500 scale-110' : 'text-slate-500'}`}
              >
                 {item.icon}
              </button>
            ))}
+           {/* Center 'X' style plus button if needed, but keeping original turn logic */}
+           <button 
+              onClick={() => handleSetView('home')}
+              className="bg-indigo-600 text-white p-3 rounded-full shadow-lg shadow-indigo-600/30 active:scale-90 transition-transform mr-1"
+           >
+              <Plus size={20} />
+           </button>
         </nav>
       </div>
     </div>

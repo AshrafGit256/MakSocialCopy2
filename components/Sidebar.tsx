@@ -41,12 +41,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     return true;
   });
 
-  // Adaptation: Hidden on mobile (lg:hidden flex), Sidebar intact for Tablet/Laptop (lg:static).
-  // On Desktop hover, it expands from 20 to 72.
+  // Persistent sidebar on tablets/laptops (lg:w-72 fixed width)
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-[70] h-full bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
     flex flex-col shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
-    lg:static lg:translate-x-0 lg:z-50 lg:shadow-none lg:w-20 lg:hover:w-72 group
+    lg:static lg:translate-x-0 lg:z-50 lg:shadow-none lg:w-72
     ${isOpen ? 'translate-x-0 w-72' : '-translate-x-full lg:translate-x-0'}
   `;
 
@@ -58,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             <div className="w-8 h-8 shrink-0 flex items-center justify-center">
                <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" className="w-8 h-8 object-contain" />
             </div>
-            <span className="text-xl font-black uppercase tracking-tighter transition-all opacity-0 group-hover:opacity-100 whitespace-nowrap">
+            <span className="text-3xl font-cursive text-indigo-600 whitespace-nowrap pt-1">
               MakSocial
             </span>
           </div>
@@ -78,10 +77,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                 : 'text-slate-500 hover:bg-indigo-600/5 hover:text-indigo-600'
               }`}
             >
-              <div className="w-6 h-6 shrink-0 flex items-center justify-center transition-transform group-hover:scale-110">
+              <div className="w-6 h-6 shrink-0 flex items-center justify-center">
                 {item.icon}
               </div>
-              <span className="text-[10px] tracking-[0.2em] font-black uppercase whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <span className="text-[10px] tracking-[0.2em] font-black uppercase whitespace-nowrap opacity-100 transition-opacity duration-200">
                 {item.id === 'groups' ? `${userCollege} Wing` : item.label}
               </span>
               
@@ -102,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                 }`}
               >
                 <div className="w-6 h-6 shrink-0 flex items-center justify-center"><Cpu size={20}/></div>
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-200">Console</span>
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-100 transition-opacity duration-200">Console</span>
               </button>
             )}
             
@@ -115,11 +114,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
               </button>
             </div>
             
-            <div className="mt-2 flex items-center gap-3 px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-               <img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] object-cover shadow-sm" />
+            <div className="mt-4 flex items-center gap-3 px-2 py-2 bg-indigo-600/5 rounded-2xl border border-indigo-600/10">
+               <img src={currentUser.avatar} className="w-10 h-10 rounded-full border border-indigo-600/20 object-cover shadow-sm" />
                <div className="min-w-0">
-                  <p className="text-[10px] font-black text-[var(--text-primary)] truncate uppercase">{currentUser.name}</p>
-                  <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">{currentUser.college}</p>
+                  <p className="text-[11px] font-black text-[var(--text-primary)] truncate uppercase leading-tight">{currentUser.name}</p>
+                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">{currentUser.college}</p>
                </div>
             </div>
           </div>

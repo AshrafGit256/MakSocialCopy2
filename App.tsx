@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppView, User, College, UserStatus, Notification } from './types';
+import { AppView, User, College, UserStatus } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -11,18 +11,16 @@ import Profile from './components/Profile';
 import Admin from './components/Admin';
 import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
-import Search from './components/Search';
 import Resources from './components/Resources';
 import { db } from './db';
 import { 
-  Menu, Home, BookOpen, LayoutGrid, User as UserIcon, Bell, X, Heart, 
-  UserPlus, Zap, ShieldAlert, Compass, Search as SearchIcon, Calendar,
-  MessageCircle, Plus
+  Menu, Bell, X, Heart, UserPlus, Zap, ShieldAlert, Search as SearchIcon,
+  MessageCircle, Plus, Home, Compass, User as UserIcon, ArrowRight
 } from 'lucide-react';
 
 const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user: User, onClear: () => void }> = ({ isOpen, onClose, user, onClear }) => {
   return (
-    <div className={`fixed inset-y-0 left-0 z-[100] w-full max-w-sm bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] shadow-2xl transition-transform duration-500 ease-out transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <div className={`fixed inset-y-0 left-0 z-[110] w-full max-w-sm bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] shadow-2xl transition-transform duration-500 ease-out transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="h-full flex flex-col">
         <div className="p-6 h-24 flex items-center justify-between border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
@@ -48,7 +46,6 @@ const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user:
                     <p className="text-sm font-medium text-[var(--text-primary)] leading-tight">{n.text}</p>
                     <span className="text-[10px] font-black uppercase text-slate-500 mt-2 block">{n.timestamp}</span>
                  </div>
-                 {!n.isRead && <div className="w-2 h-2 bg-indigo-600 rounded-full shrink-0 mt-2 shadow-lg shadow-indigo-600/50"></div>}
               </div>
             ))
           ) : (
@@ -56,16 +53,83 @@ const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user:
                <div className="w-20 h-20 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center text-slate-300">
                   <Bell size={40}/>
                </div>
-               <p className="text-xs font-black uppercase text-slate-500 tracking-widest leading-relaxed">System Quiet: No signals detected in the notification registry.</p>
+               <p className="text-xs font-black uppercase text-slate-500 tracking-widest leading-relaxed">System Quiet.</p>
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+};
 
-        {user.notifications && user.notifications.length > 0 && (
-          <div className="p-6 border-t border-[var(--border-color)]">
-             <button onClick={onClear} className="w-full py-4 rounded-2xl border border-rose-500/20 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all">Clear All Signals</button>
-          </div>
-        )}
+const SearchPanel: React.FC<{ isOpen: boolean, onClose: () => void, onNavigateToProfile: (uid: string) => void }> = ({ isOpen, onClose, onNavigateToProfile }) => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+    const q = query.toLowerCase();
+    const users = db.getUsers().filter(u => 
+      u.name.toLowerCase().includes(q) || 
+      u.college.toLowerCase().includes(q) ||
+      u.courseAbbr.toLowerCase().includes(q)
+    );
+    setResults(users);
+  }, [query]);
+
+  return (
+    <div className={`fixed inset-y-0 left-0 z-[110] w-full max-w-sm bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] shadow-2xl transition-transform duration-500 ease-out transform ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className="h-full flex flex-col">
+        <div className="p-6 h-24 flex items-center justify-between border-b border-[var(--border-color)]">
+          <h2 className="text-2xl font-black uppercase tracking-tighter italic">Search Nodes</h2>
+          <button onClick={onClose} className="p-2 text-slate-500 hover:text-rose-500 rounded-xl">
+            <X size={24} />
+          </button>
+        </div>
+        
+        <div className="p-4">
+           <div className="relative group">
+              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+              <input 
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search people..."
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all"
+                autoFocus
+              />
+           </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+          {results.length > 0 ? (
+            results.map(u => (
+              <button 
+                key={u.id}
+                onClick={() => { onNavigateToProfile(u.id); onClose(); }}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-indigo-600/5 transition-all group border border-transparent hover:border-indigo-600/10"
+              >
+                <img src={u.avatar} className="w-12 h-12 rounded-xl object-cover border border-[var(--border-color)]" />
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-sm font-black text-[var(--text-primary)] uppercase truncate leading-none">{u.name}</p>
+                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1 truncate">{u.college} • {u.status}</p>
+                </div>
+                <ArrowRight size={16} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
+              </button>
+            ))
+          ) : query ? (
+            <div className="py-20 text-center opacity-50">
+               <p className="text-[10px] font-black uppercase tracking-widest">No nodes discovered</p>
+            </div>
+          ) : (
+            <div className="py-20 text-center opacity-30 flex flex-col items-center gap-4">
+               <SearchIcon size={48} />
+               <p className="text-[10px] font-black uppercase tracking-widest">Awaiting signal...</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -78,9 +142,9 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifPanelOpen, setIsNotifPanelOpen] = useState(false);
+  const [isSearchPanelOpen, setIsSearchPanelOpen] = useState(false);
   
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [targetPostId, setTargetPostId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -100,39 +164,7 @@ const App: React.FC = () => {
     setIsLoggedIn(true);
     setUserRole('student');
     setView('home');
-    
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: email.split('@')[0],
-      role: 'University Student',
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-      connections: 0,
-      email: email,
-      college: college,
-      status: status,
-      badges: [],
-      appliedTo: [],
-      postsCount: 0,
-      followersCount: 0,
-      followingCount: 0,
-      totalLikesCount: 0,
-      joinedColleges: [college],
-      notifications: [],
-      iqCredits: 100,
-      skills: [],
-      intellectualSignature: '#6366f1',
-      connectionsList: [],
-      pendingRequests: [],
-      bookmarkedPosts: [],
-      isVerified: false,
-      courseAbbr: 'GEN',
-      academicLevel: 'Undergrad',
-      gender: 'Other',
-      isSuspended: false,
-      medals: []
-    };
-    
-    db.saveUsers([...db.getUsers(), newUser]);
+    const newUser = db.registerNode({ name: email.split('@')[0], email, college, status });
     localStorage.setItem('maksocial_current_user_id', newUser.id);
     setCurrentUser(newUser);
   };
@@ -147,16 +179,12 @@ const App: React.FC = () => {
        setIsNotifPanelOpen(true);
        return;
     }
+    if (newView === 'search') {
+       setIsSearchPanelOpen(true);
+       return;
+    }
     setView(newView);
     setIsSidebarOpen(false);
-  };
-
-  const handleClearNotifs = () => {
-    if (currentUser) {
-       const updatedUser = { ...currentUser, notifications: [] };
-       db.saveUser(updatedUser);
-       setCurrentUser(updatedUser);
-    }
   };
 
   const renderContent = () => {
@@ -164,13 +192,12 @@ const App: React.FC = () => {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed targetPostId={targetPostId} onClearTarget={() => setTargetPostId(null)} />;
+      case 'home': return <Feed />;
       case 'groups': return <Feed collegeFilter={currentUser?.college} />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => setSelectedUserId(null)} />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search onNavigateToProfile={(uid) => { setSelectedUserId(uid); setView('profile'); }} onNavigateToPost={(pid) => { setTargetPostId(pid); setView('home'); }} />;
       case 'resources': return <Resources />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
@@ -185,15 +212,10 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
-      {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden transition-opacity" onClick={() => setIsSidebarOpen(false)} />
-      )}
-      
-      {isNotifPanelOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] transition-opacity" onClick={() => setIsNotifPanelOpen(false)} />
+      {(isSidebarOpen || isNotifPanelOpen || isSearchPanelOpen) && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] transition-opacity" onClick={() => { setIsSidebarOpen(false); setIsNotifPanelOpen(false); setIsSearchPanelOpen(false); }} />
       )}
 
-      {/* Sidebar - Always visible on tablets and laptops, fixed width */}
       <Sidebar 
         activeView={view} 
         setView={handleSetView} 
@@ -204,22 +226,29 @@ const App: React.FC = () => {
       />
       
       {currentUser && (
-        <NotificationsPanel 
-          isOpen={isNotifPanelOpen} 
-          onClose={() => setIsNotifPanelOpen(false)} 
-          user={currentUser}
-          onClear={handleClearNotifs}
-        />
+        <>
+          <NotificationsPanel 
+            isOpen={isNotifPanelOpen} 
+            onClose={() => setIsNotifPanelOpen(false)} 
+            user={currentUser}
+            onClear={() => {}}
+          />
+          <SearchPanel 
+            isOpen={isSearchPanelOpen} 
+            onClose={() => setIsSearchPanelOpen(false)} 
+            onNavigateToProfile={(uid) => { setSelectedUserId(uid); setView('profile'); }}
+          />
+        </>
       )}
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Mobile Header */}
+        {/* Mobile Header: Text Logo "MakSocial" */}
         <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] z-50">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors">
             <Menu size={24} />
           </button>
           <span className="text-3xl font-cursive text-indigo-600">MakSocial</span>
-          <button onClick={() => setIsNotifPanelOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl relative transition-colors">
+          <button onClick={() => setIsNotifPanelOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl relative">
             <Bell size={24} />
             {currentUser?.notifications?.some(n => !n.isRead) && <div className="absolute top-2 right-2 w-2 h-2 bg-indigo-600 rounded-full border border-white"></div>}
           </button>
@@ -230,12 +259,13 @@ const App: React.FC = () => {
         </main>
 
         {/* X-like Floating Bottom Navbar (Mobile Only) */}
-        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-black/90 dark:bg-[#020617]/95 border border-white/10 backdrop-blur-2xl rounded-full px-2 py-3 flex items-center justify-between shadow-2xl z-[55] ring-1 ring-white/5">
+        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-black/90 dark:bg-[#020617]/95 border border-white/10 backdrop-blur-2xl rounded-full px-2 py-3 flex items-center justify-between shadow-2xl z-[55]">
            {[
-             { id: 'home', icon: <Home size={22} />, label: 'Home' },
-             { id: 'explore', icon: <Compass size={22} />, label: 'Search' },
-             { id: 'messages', icon: <MessageCircle size={22} />, label: 'Chat' },
-             { id: 'profile', icon: <UserIcon size={22} />, label: 'Me' }
+             { id: 'home', icon: <Home size={22} /> },
+             { id: 'search', icon: <SearchIcon size={22} /> },
+             { id: 'explore', icon: <Compass size={22} /> },
+             { id: 'messages', icon: <MessageCircle size={22} /> },
+             { id: 'profile', icon: <UserIcon size={22} /> }
            ].map(item => (
              <button
                key={item.id}
@@ -245,7 +275,6 @@ const App: React.FC = () => {
                 {item.icon}
              </button>
            ))}
-           {/* Center 'X' style plus button if needed, but keeping original turn logic */}
            <button 
               onClick={() => handleSetView('home')}
               className="bg-indigo-600 text-white p-3 rounded-full shadow-lg shadow-indigo-600/30 active:scale-90 transition-transform mr-1"

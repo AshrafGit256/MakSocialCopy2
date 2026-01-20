@@ -8,20 +8,16 @@ import {
   Image as ImageIcon, Heart, MessageCircle, Sparkles, AlertCircle, X, 
   Users, Loader2, Eye, Verified, Zap, Calendar, 
   MapPin, Clock, Plus, Share2, CalendarPlus,
-  Bookmark, CalendarCheck, Save, Brain, Edit3, ArrowLeft
+  Bookmark, CalendarCheck, Save, Brain, Edit3, ArrowLeft, Search as SearchIcon, Filter
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ isVerified?: boolean, role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ isVerified, role, size = 'sm' }) => {
   const isAuthorized = isVerified || role === 'Super Admin' || role === 'Lecturer' || role === 'Student Leader' || role === 'Administrator';
   if (!isAuthorized) return null;
-  
   const dim = size === 'sm' ? 'w-4 h-4' : 'w-6 h-6';
-  
   return (
     <div className={`inline-flex items-center justify-center ml-1.5 select-none relative group ${dim}`} title={`Verified ${role || 'Student'}`}>
-       {/* High-visibility Glow */}
        <div className="absolute inset-0 bg-blue-500 blur-[3px] opacity-40 rounded-full group-hover:opacity-70 transition-opacity"></div>
-       
        <svg viewBox="0 0 24 24" className={`${dim} text-blue-500 fill-current drop-shadow-md z-10`} xmlns="http://www.w3.org/2000/svg">
          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
        </svg>
@@ -37,7 +33,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [rejectionMessage, setRejectionMessage] = useState<string | null>(null);
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(db.getCalendarEvents());
+  const [postSearchQuery, setPostSearchQuery] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
@@ -50,13 +46,21 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   useEffect(() => {
     const sync = () => {
       setUser(db.getUser());
-      setPosts(db.getPosts(activeCollege || undefined));
-      setCalendarEvents(db.getCalendarEvents());
+      let fetchedPosts = db.getPosts(activeCollege || undefined);
+      if (postSearchQuery.trim()) {
+        const q = postSearchQuery.toLowerCase();
+        fetchedPosts = fetchedPosts.filter(p => 
+          p.content.toLowerCase().includes(q) || 
+          p.author.toLowerCase().includes(q) ||
+          p.hashtags.some(h => h.toLowerCase().includes(q))
+        );
+      }
+      setPosts(fetchedPosts);
     };
     sync();
     const interval = setInterval(sync, 4000);
     return () => clearInterval(interval);
-  }, [activeTab, activeCollege, collegeFilter, user.id]);
+  }, [activeTab, activeCollege, collegeFilter, user.id, postSearchQuery]);
 
   const handleBookmark = (postId: string) => {
     db.bookmarkPost(user.id, postId);
@@ -163,15 +167,31 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
         </div>
       )}
 
-      {!collegeFilter && (
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mb-8 p-1.5 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)]">
-          {['Global', 'COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map((c: any) => (
-            <button key={c} onClick={() => setActiveTab(c)} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === c ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}>
-              {c}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+         {!collegeFilter && (
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar p-1.5 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)] flex-shrink-0">
+               {['Global', 'COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map((c: any) => (
+                  <button key={c} onClick={() => setActiveTab(c)} className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === c ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}>
+                  {c}
+                  </button>
+               ))}
+            </div>
+         )}
+         
+         {/* Post-specific Search Bar */}
+         <div className="relative flex-1 w-full group">
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+            <input 
+               value={postSearchQuery}
+               onChange={e => setPostSearchQuery(e.target.value)}
+               placeholder={`Search for content in ${activeCollege || 'Global Hub'}...`}
+               className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all shadow-inner"
+            />
+            {postSearchQuery && (
+               <button onClick={() => setPostSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500"><X size={16}/></button>
+            )}
+         </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
          <div className="lg:col-span-8 space-y-8">
@@ -197,7 +217,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                  const isBookmarked = user.bookmarkedPosts.includes(post.id);
                  const isAuthor = user.id === post.authorId;
                  const isEditing = editingPostId === post.id;
-
                  return (
                   <article key={post.id} className="glass-card p-0 overflow-hidden border-[var(--border-color)] shadow-sm hover:shadow-md transition-all">
                      <div className="p-8 pb-4">
@@ -223,20 +242,12 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              </span>
                           </div>
                        </div>
-                       
                        {isEditing ? (
-                         <textarea 
-                           className="w-full bg-[var(--bg-secondary)] border border-indigo-600/20 rounded-xl p-4 text-sm font-medium outline-none h-32 mb-4"
-                           value={editContent}
-                           onChange={e => setEditContent(e.target.value)}
-                         />
+                         <textarea className="w-full bg-[var(--bg-secondary)] border border-indigo-600/20 rounded-xl p-4 text-sm font-medium outline-none h-32 mb-4" value={editContent} onChange={e => setEditContent(e.target.value)} />
                        ) : (
-                         <p className="text-[var(--text-primary)] text-base font-normal leading-relaxed border-l-4 border-indigo-600/40 pl-6 py-2 mb-4 bg-indigo-600/5 rounded-r-2xl font-sans">
-                           {post.content}
-                         </p>
+                         <p className="text-[var(--text-primary)] text-base font-normal leading-relaxed border-l-4 border-indigo-600/40 pl-6 py-2 mb-4 bg-indigo-600/5 rounded-r-2xl font-sans">{post.content}</p>
                        )}
                      </div>
-
                      {post.images && post.images.length > 0 && (
                        <div className="px-8 pb-8">
                           <div className="rounded-[2rem] overflow-hidden border border-[var(--border-color)] group/img shadow-xl">
@@ -244,7 +255,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                           </div>
                        </div>
                      )}
-
                      <div className="px-8 py-6 bg-[var(--bg-secondary)]/30 border-t border-[var(--border-color)] flex items-center justify-between">
                         <div className="flex items-center gap-10">
                            <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors group">
@@ -255,10 +265,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                              <MessageCircle size={20}/> 
                              <span className="text-[11px] font-black">{post.commentsCount}</span>
                            </button>
-                           <button 
-                             onClick={() => handleBookmark(post.id)}
-                             className={`flex items-center gap-2 transition-all ${isBookmarked ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`}
-                           >
+                           <button onClick={() => handleBookmark(post.id)} className={`flex items-center gap-2 transition-all ${isBookmarked ? 'text-indigo-600' : 'text-slate-500 hover:text-indigo-600'}`} >
                              <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
                              <span className="text-[11px] font-black">{isBookmarked ? 'Archived' : 'Archive'}</span>
                            </button>
@@ -271,9 +278,14 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                   </article>
                  );
                })}
+               {posts.length === 0 && (
+                  <div className="py-20 text-center space-y-4 bg-[var(--bg-secondary)]/30 rounded-[3rem] border-2 border-dashed border-[var(--border-color)]">
+                     <AlertCircle size={48} className="mx-auto text-slate-300"/>
+                     <p className="text-xs font-black uppercase text-slate-500 tracking-widest">No matching broadcasts detected.</p>
+                  </div>
+               )}
             </div>
          </div>
-
          <aside className="hidden lg:block lg:col-span-4 space-y-8 sticky top-8">
             <div className="glass-card p-8 bg-indigo-600 text-white border-indigo-500 shadow-2xl relative overflow-hidden group">
                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
@@ -285,7 +297,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                   <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-xl"><Brain size={24}/></div>
                </div>
             </div>
-
             <div className="glass-card p-8 bg-[var(--sidebar-bg)] border-[var(--border-color)]">
                <h3 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-3">
                   <Verified className="text-indigo-600" size={18}/> Prominent Nodes

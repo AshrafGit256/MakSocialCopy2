@@ -4,23 +4,34 @@ import { db, COURSES_BY_COLLEGE } from '../db';
 import { Resource, College, ResourceType } from '../types';
 import { 
   FileText, Search, Download, Plus, BookOpen, 
-  Filter, GraduationCap, Briefcase, FileCode,
-  FileArchive, Clock, Layers, Trash2, X, ChevronDown,
-  ChevronRight, CalendarDays, Book, Eye, Upload, File
+  Briefcase, FileCode, FileArchive, Clock, Layers, 
+  X, ChevronRight, Book, Eye, Upload, Folder, 
+  Home, History, Database, ArrowLeft, ShieldAlert,
+  Zap, Filter, GraduationCap
 } from 'lucide-react';
 
 const CATEGORIES: ResourceType[] = ['Test', 'Past Paper', 'Notes/Books', 'Research', 'Career'];
-const YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Finalist', 'Masters', 'Graduate'];
+const VAULT_YEARS = ['2021', '2022', '2023', '2024', '2025'];
+const STUDY_YEARS = ['Year I', 'Year II', 'Year III', 'Year IV', 'Year V'];
+const SEMESTERS = ['Semester 1', 'Semester 2'] as const;
+
+type VaultView = 'years' | 'courses' | 'studyLevels' | 'semesters' | 'files';
 
 const Resources: React.FC = () => {
   const [currentUser] = useState(db.getUser());
-  const [currentCollege, setCurrentCollege] = useState<College>(currentUser.college);
+  const [currentCollege] = useState<College>(currentUser.college);
   const [resources, setResources] = useState<Resource[]>(db.getResources());
   
+  // Hierarchy Navigation State
+  const [view, setView] = useState<VaultView>('years');
+  const [selectedVaultYear, setSelectedVaultYear] = useState<string | null>(null);
+  const [selectedVaultCourse, setSelectedVaultCourse] = useState<string | null>(null);
+  const [selectedStudyYear, setSelectedStudyYear] = useState<string | null>(null);
+  const [selectedVaultSemester, setSelectedVaultSemester] = useState<'Semester 1' | 'Semester 2' | null>(null);
+
+  // Discovery / Filtering State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedCourse, setSelectedCourse] = useState<string>('All');
-  const [selectedYear, setSelectedYear] = useState<string>('All');
+  const [activeDiscoveryCategory, setActiveDiscoveryCategory] = useState<string>('All');
   
   const [isAdding, setIsAdding] = useState(false);
   const [previewResource, setPreviewResource] = useState<Resource | null>(null);
@@ -30,7 +41,9 @@ const Resources: React.FC = () => {
   const [uploadForm, setUploadForm] = useState({
     title: '',
     course: '',
-    year: 'Year 1',
+    academicYear: '2025',
+    yearOfStudy: 'Year I',
+    semester: 'Semester 1' as 'Semester 1' | 'Semester 2',
     category: 'Notes/Books' as ResourceType,
     fileType: 'PDF' as any,
     fileData: ''
@@ -40,16 +53,31 @@ const Resources: React.FC = () => {
     setResources(db.getResources());
   }, []);
 
-  const collegeResources = resources.filter(res => res.college === currentCollege);
+  // Simplified Filtering Logic
+  const getFilteredFiles = () => {
+    let base = resources.filter(res => res.college === currentCollege);
 
-  const filteredResources = collegeResources.filter(res => {
-    const matchesSearch = res.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          res.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || res.category === selectedCategory;
-    const matchesCourse = selectedCourse === 'All' || res.course === selectedCourse;
-    const matchesYear = selectedYear === 'All' || res.year === selectedYear;
-    return matchesSearch && matchesCategory && matchesCourse && matchesYear;
-  });
+    // Discovery Mode: If user is searching or has a category selected (not All), show direct results
+    if (searchQuery.trim() || activeDiscoveryCategory !== 'All') {
+      return base.filter(res => {
+        const matchesSearch = res.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              res.course.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = activeDiscoveryCategory === 'All' || res.category === activeDiscoveryCategory;
+        return matchesSearch && matchesCategory;
+      });
+    }
+
+    // Strict Hierarchy Mode
+    if (selectedVaultYear) base = base.filter(r => r.academicYear === selectedVaultYear);
+    if (selectedVaultCourse) base = base.filter(r => r.course === selectedVaultCourse);
+    if (selectedStudyYear) base = base.filter(r => r.yearOfStudy === selectedStudyYear);
+    if (selectedVaultSemester) base = base.filter(r => r.semester === selectedVaultSemester);
+
+    return base;
+  };
+
+  const currentFiles = getFilteredFiles();
+  const isDiscoveryMode = searchQuery.trim() !== '' || activeDiscoveryCategory !== 'All';
 
   const getIcon = (category: ResourceType) => {
     switch (category) {
@@ -78,8 +106,8 @@ const Resources: React.FC = () => {
   };
 
   const handleUpload = () => {
-    if (!uploadForm.title || !uploadForm.course) {
-      alert("Required Signal: Title and Course must be defined.");
+    if (!uploadForm.title || !uploadForm.course || !uploadForm.fileData) {
+      alert("Missing data. Title, Course, and File are required.");
       return;
     }
 
@@ -89,7 +117,9 @@ const Resources: React.FC = () => {
       category: uploadForm.category,
       college: currentCollege,
       course: uploadForm.course,
-      year: uploadForm.year,
+      academicYear: uploadForm.academicYear,
+      semester: uploadForm.semester,
+      yearOfStudy: uploadForm.yearOfStudy, 
       author: currentUser.name,
       downloads: 0,
       fileType: uploadForm.fileType,
@@ -100,25 +130,17 @@ const Resources: React.FC = () => {
     db.addResource(newResource);
     setResources(db.getResources());
     setIsAdding(false);
-    setUploadForm({ title: '', course: '', year: 'Year 1', category: 'Notes/Books', fileType: 'PDF', fileData: '' });
+    setUploadForm({ title: '', course: '', academicYear: '2025', yearOfStudy: 'Year I', semester: 'Semester 1', category: 'Notes/Books', fileType: 'PDF', fileData: '' });
   };
 
-  const handleDownload = (res: Resource) => {
-    if (!res.fileData) {
-      alert("Asset Data Nullified: No local file content found for this mock entry.");
-      return;
-    }
-    const link = document.createElement('a');
-    link.href = res.fileData;
-    link.download = `${res.title.replace(/\s+/g, '_')}.${res.fileType.toLowerCase()}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Increment downloads in mock DB
-    const updated = resources.map(r => r.id === res.id ? {...r, downloads: r.downloads + 1} : r);
-    setResources(updated);
-    // Persist if using real local storage logic in db.ts
+  const resetHierarchy = () => {
+    setView('years');
+    setSelectedVaultYear(null);
+    setSelectedVaultCourse(null);
+    setSelectedStudyYear(null);
+    setSelectedVaultSemester(null);
+    setSearchQuery('');
+    setActiveDiscoveryCategory('All');
   };
 
   return (
@@ -126,13 +148,13 @@ const Resources: React.FC = () => {
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10">
         <div className="space-y-4">
            <div className="flex items-center gap-3 bg-indigo-600/10 text-indigo-600 px-3 py-1.5 rounded-xl w-fit border border-indigo-600/20">
-              <GraduationCap size={16}/>
-              <span className="text-[10px] font-black uppercase tracking-widest">{currentCollege} WING RESOURCE LAB</span>
+              <Database size={16}/>
+              <span className="text-[10px] font-black uppercase tracking-widest">{currentCollege} CENTRAL REGISTRY</span>
            </div>
            <h1 className="text-6xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">
              Academic Vault
            </h1>
-           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 ml-1">Secure Repository for Course Assets & Intelligence</p>
+           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 ml-1">Archive Synchronized since Epoch 2021</p>
         </div>
 
         <div className="flex gap-4 w-full lg:w-auto">
@@ -141,339 +163,261 @@ const Resources: React.FC = () => {
               <input 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search vault signals..."
+                placeholder="Scan Course or Asset Title..."
                 className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all"
               />
            </div>
            <button onClick={() => setIsAdding(true)} className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30 flex items-center gap-3 hover:bg-indigo-700 transition-all active:scale-95">
-              <Plus size={18} /> Initialize Upload
+              <Plus size={18} /> Push Asset
            </button>
         </div>
       </header>
 
-      {/* Dynamic Filters Bar */}
-      <div className="glass-card p-6 bg-[var(--sidebar-bg)] border-[var(--border-color)] shadow-sm space-y-6">
-         <div className="flex flex-wrap items-center gap-8">
-            <div className="space-y-2">
-               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Wing Selection</label>
-               <select 
-                  className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-2 text-[10px] font-black uppercase outline-none"
-                  value={currentCollege}
-                  onChange={(e) => setCurrentCollege(e.target.value as College)}
-               >
-                  {Object.keys(COURSES_BY_COLLEGE).map(c => <option key={c} value={c}>{c} Wing</option>)}
-               </select>
-            </div>
-
-            <div className="space-y-2 flex-1 min-w-[200px]">
-               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Course Logic</label>
-               <select 
-                  className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-2 text-[10px] font-black uppercase outline-none"
-                  value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
-               >
-                  <option value="All">All Courses in Wing</option>
-                  {COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
-               </select>
-            </div>
-
-            <div className="space-y-2">
-               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Year Stratum</label>
-               <select 
-                  className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-2 text-[10px] font-black uppercase outline-none"
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-               >
-                  <option value="All">All Levels</option>
-                  {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-               </select>
-            </div>
-         </div>
-
-         <div className="flex items-center gap-3 pt-4 border-t border-[var(--border-color)] overflow-x-auto no-scrollbar">
+      {/* Simplified Filter Chips - One click discovery */}
+      <div className="flex flex-col space-y-4">
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Quick Discovery Mode</label>
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+          <button 
+            onClick={() => setActiveDiscoveryCategory('All')} 
+            className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeDiscoveryCategory === 'All' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-[var(--bg-secondary)] text-slate-500'}`}
+          >
+            Browse Hierarchy
+          </button>
+          {CATEGORIES.map(cat => (
             <button 
-               onClick={() => setSelectedCategory('All')}
-               className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${selectedCategory === 'All' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-[var(--bg-secondary)] text-slate-500'}`}
+              key={cat} 
+              onClick={() => {
+                setActiveDiscoveryCategory(cat);
+                // Fix: Removed unnecessary check 'cat !== All' since CATEGORIES only contains ResourceType values, and 'All' is not one of them.
+                setSearchQuery(''); 
+              }} 
+              className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${activeDiscoveryCategory === cat ? 'bg-indigo-600 text-white border-transparent shadow-lg' : 'bg-[var(--bg-secondary)] text-slate-500 border-[var(--border-color)] hover:border-indigo-500'}`}
             >
-               All Signals
+              All {cat}s
             </button>
-            {CATEGORIES.map(cat => (
-              <button 
-                key={cat} 
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-[var(--bg-secondary)] text-slate-500 border border-[var(--border-color)] hover:border-indigo-500 hover:text-indigo-600'}`}
-              >
-                {cat}
-              </button>
-            ))}
-         </div>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-         {filteredResources.map(res => (
-           <div key={res.id} className="glass-card group bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-500/50 shadow-sm hover:shadow-2xl hover:translate-y-[-4px] transition-all flex flex-col justify-between min-h-[380px]">
-              <div className="p-8">
-                 <div className="flex justify-between items-start mb-6">
-                    <div className="p-4 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)] transition-all group-hover:scale-110 group-hover:shadow-lg">
-                       {getIcon(res.category)}
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                       <span className="text-[8px] font-black uppercase bg-indigo-600 text-white px-2 py-1 rounded shadow-md">{res.fileType}</span>
-                       <span className="text-[7px] font-black uppercase text-slate-400">{res.timestamp}</span>
-                    </div>
-                 </div>
+      {/* Breadcrumbs / Path */}
+      {!isDiscoveryMode && (
+        <nav className="flex items-center gap-3 overflow-x-auto no-scrollbar py-4 border-b border-[var(--border-color)]">
+           <button onClick={resetHierarchy} className="p-2 bg-[var(--bg-secondary)] rounded-lg text-slate-500 hover:text-indigo-600 transition-colors"><Home size={18}/></button>
+           <ChevronRight size={14} className="text-slate-300"/>
+           <button onClick={() => setView('years')} className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${view === 'years' ? 'text-indigo-600' : 'text-slate-400'}`}>Timeline</button>
+           
+           {selectedVaultYear && (
+             <>
+              <ChevronRight size={14} className="text-slate-300"/>
+              <button onClick={() => setView('courses')} className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${view === 'courses' ? 'text-indigo-600' : 'text-slate-400'}`}>{selectedVaultYear}</button>
+             </>
+           )}
+           {selectedVaultCourse && (
+             <>
+              <ChevronRight size={14} className="text-slate-300"/>
+              <button onClick={() => setView('studyLevels')} className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${view === 'studyLevels' ? 'text-indigo-600' : 'text-slate-400'}`}>{selectedVaultCourse}</button>
+             </>
+           )}
+           {selectedStudyYear && (
+             <>
+              <ChevronRight size={14} className="text-slate-300"/>
+              <button onClick={() => setView('semesters')} className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap ${view === 'semesters' ? 'text-indigo-600' : 'text-slate-400'}`}>{selectedStudyYear}</button>
+             </>
+           )}
+           {selectedVaultSemester && (
+             <>
+              <ChevronRight size={14} className="text-slate-300"/>
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 whitespace-nowrap">{selectedVaultSemester}</span>
+             </>
+           )}
+        </nav>
+      )}
 
-                 <div className="space-y-1 mb-4">
-                    <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{res.course}</p>
-                    <h3 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tighter line-clamp-2 leading-tight">
-                       {res.title}
-                    </h3>
-                 </div>
-                 
-                 <div className="flex flex-wrap gap-2">
-                    <span className="text-[8px] font-black uppercase px-2 py-1 bg-slate-100 dark:bg-white/5 text-slate-500 rounded border border-[var(--border-color)]">{res.year}</span>
-                    <span className="text-[8px] font-black uppercase px-2 py-1 bg-amber-500/10 text-amber-600 rounded border border-amber-500/20">{res.category}</span>
-                 </div>
-              </div>
+      {/* Hierarchy Explorer */}
+      {!isDiscoveryMode && (
+        <div className="animate-in fade-in duration-500">
+           {view === 'years' && (
+             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                {VAULT_YEARS.map(y => (
+                  <button key={y} onClick={() => { setSelectedVaultYear(y); setView('courses'); }} className="glass-card group p-10 bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-600 hover:shadow-2xl transition-all flex flex-col items-center gap-6">
+                     <div className="w-16 h-16 bg-indigo-600/5 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all"><History size={32} /></div>
+                     <span className="text-3xl font-black text-[var(--text-primary)] tracking-tighter">{y}</span>
+                  </button>
+                ))}
+             </div>
+           )}
 
-              <div className="p-8 space-y-3 bg-slate-50/50 dark:bg-white/[0.02] border-t border-[var(--border-color)]">
-                 <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                       <div className="w-8 h-8 rounded-full bg-indigo-600/10 flex items-center justify-center text-indigo-600 font-black text-[10px]">{res.author[0]}</div>
-                       <div className="min-w-0">
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Source</p>
-                          <p className="text-[10px] font-bold text-[var(--text-primary)] truncate uppercase">{res.author}</p>
-                       </div>
-                    </div>
-                    <div className="text-right">
-                       <p className="text-[14px] font-black text-[var(--text-primary)] leading-none">{res.downloads.toLocaleString()}</p>
-                       <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mt-1">Logs</p>
-                    </div>
-                 </div>
-                 <div className="flex gap-2">
-                    <button 
-                      onClick={() => setPreviewResource(res)}
-                      className="flex-1 py-3 bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-600/5 hover:border-indigo-600 transition-all active:scale-95"
-                    >
-                       <Eye size={14}/> Preview
-                    </button>
-                    <button 
-                      onClick={() => handleDownload(res)}
-                      className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 hover:bg-indigo-700 active:scale-95 transition-all"
-                    >
-                       <Download size={14} /> Download
-                    </button>
-                 </div>
-              </div>
-           </div>
-         ))}
-      </div>
+           {view === 'courses' && (
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <button onClick={() => setView('years')} className="glass-card p-8 border-dashed border-2 flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-indigo-600 transition-all"><ArrowLeft size={32}/><span className="text-[10px] font-black uppercase">Back</span></button>
+                {COURSES_BY_COLLEGE[currentCollege].map(c => (
+                  <button key={c} onClick={() => { setSelectedVaultCourse(c); setView('studyLevels'); }} className="glass-card group p-8 bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-600 transition-all text-left">
+                     <Folder className="text-slate-300 group-hover:text-indigo-600 mb-4 transition-colors" size={32} fill="currentColor"/>
+                     <h3 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tighter">{c}</h3>
+                  </button>
+                ))}
+             </div>
+           )}
 
-      {filteredResources.length === 0 && (
-        <div className="py-40 text-center space-y-8 animate-in zoom-in duration-500">
-           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner border border-[var(--border-color)] text-slate-300">
-              <Search size={56} />
-           </div>
-           <div>
-              <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Vault Data Nullified</h3>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-1">No signals matching your current stratum parameters.</p>
-           </div>
-           <button onClick={() => { setSelectedCourse('All'); setSelectedYear('All'); setSelectedCategory('All'); setSearchQuery(''); }} className="text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:underline">Flush All Filters</button>
+           {view === 'studyLevels' && (
+             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <button onClick={() => setView('courses')} className="glass-card p-8 border-dashed border-2 flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-indigo-600 transition-all"><ArrowLeft size={32}/></button>
+                {STUDY_YEARS.map(sy => (
+                  <button key={sy} onClick={() => { setSelectedStudyYear(sy); setView('semesters'); }} className="glass-card group p-10 bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-600 transition-all flex flex-col items-center gap-6">
+                     <div className="w-16 h-16 bg-emerald-600/5 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all"><GraduationCap size={32} /></div>
+                     <span className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tighter">{sy}</span>
+                  </button>
+                ))}
+             </div>
+           )}
+
+           {view === 'semesters' && (
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {SEMESTERS.map(sem => (
+                  <button key={sem} onClick={() => { setSelectedVaultSemester(sem); setView('files'); }} className="glass-card group p-12 bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-600 transition-all flex flex-col items-center gap-6">
+                     <Layers className="text-indigo-600" size={48}/>
+                     <h3 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">{sem}</h3>
+                  </button>
+                ))}
+             </div>
+           )}
         </div>
       )}
 
-      {/* Preview Modal */}
-      {previewResource && (
-        <div className="fixed inset-0 z-[200] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="glass-card w-full max-w-5xl h-[85vh] bg-[var(--sidebar-bg)] p-0 rounded-[3rem] shadow-2xl border-[var(--border-color)] overflow-hidden flex flex-col">
-            <div className="p-8 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-secondary)]/50">
-               <div className="flex items-center gap-4">
-                  <div className="p-3 bg-indigo-600 rounded-2xl text-white shadow-lg">
-                    {getIcon(previewResource.category)}
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">
-                      {previewResource.title}
-                    </h2>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">
-                       {previewResource.course} • {previewResource.year} • {previewResource.fileType} Format
-                    </p>
-                  </div>
-               </div>
-               <div className="flex items-center gap-3">
-                  <button 
-                    onClick={() => handleDownload(previewResource)}
-                    className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 transition-all active:scale-95"
-                  >
-                     <Download size={18} /> Confirm Download
-                  </button>
-                  <button onClick={() => setPreviewResource(null)} className="text-slate-500 hover:text-rose-500 transition-colors p-2">
-                    <X size={28}/>
-                  </button>
-               </div>
-            </div>
-            
-            <div className="flex-1 bg-slate-900/50 flex items-center justify-center p-12 overflow-hidden">
-               {previewResource.fileData ? (
-                  previewResource.fileType === 'PDF' ? (
-                    <iframe 
-                      src={previewResource.fileData} 
-                      className="w-full h-full rounded-2xl border-4 border-white shadow-2xl bg-white"
-                      title="Asset Preview"
-                    />
-                  ) : (
-                    <div className="text-center space-y-6">
-                       <div className="p-10 bg-white/10 rounded-full border border-white/20 text-white/40 mx-auto w-fit">
-                          <File size={80}/>
-                       </div>
-                       <div>
-                          <h4 className="text-2xl font-black text-white uppercase tracking-tighter">Native Preview Unavailable</h4>
-                          <p className="text-sm text-slate-400 font-medium">This document format ({previewResource.fileType}) requires external decryption. Please download to view.</p>
-                       </div>
-                    </div>
-                  )
-               ) : (
-                  <div className="text-center space-y-4">
-                    <div className="p-8 bg-rose-500/10 rounded-full border border-rose-500/20 text-rose-500 mx-auto w-fit">
-                       <ShieldAlert size={48}/>
-                    </div>
-                    <div>
-                       <h3 className="text-xl font-black text-white uppercase tracking-tighter leading-none">Intelligence Signal Nullified</h3>
-                       <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-2">Asset data not cached in local stratum.</p>
-                    </div>
-                  </div>
-               )}
-            </div>
-          </div>
+      {/* Discovery Results / File View */}
+      {(view === 'files' || isDiscoveryMode) && (
+        <div className="space-y-10 animate-in slide-in-from-bottom-5 duration-500">
+           <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-3">
+                 <Zap className="text-indigo-600" size={24}/> 
+                 {isDiscoveryMode ? `Discovery: ${activeDiscoveryCategory}s` : `${selectedVaultCourse} • ${selectedStudyYear} • ${selectedVaultSemester}`}
+              </h3>
+              {isDiscoveryMode && (
+                <button onClick={resetHierarchy} className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline">Exit Discovery</button>
+              )}
+           </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {currentFiles.map(res => (
+                <div key={res.id} className="glass-card group bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-500/50 shadow-sm hover:shadow-2xl transition-all flex flex-col justify-between min-h-[380px]">
+                   <div className="p-8">
+                      <div className="flex justify-between items-start mb-6">
+                         <div className="p-4 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)]">{getIcon(res.category)}</div>
+                         <div className="text-right">
+                            <span className="text-[8px] font-black uppercase bg-indigo-600 text-white px-2 py-1 rounded">{res.fileType}</span>
+                            <p className="text-[7px] font-black uppercase text-slate-400 mt-2">{res.academicYear} • {res.yearOfStudy}</p>
+                         </div>
+                      </div>
+                      <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">{res.course}</p>
+                      <h3 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tighter line-clamp-2 leading-tight mt-1">{res.title}</h3>
+                   </div>
+                   <div className="p-8 space-y-3 bg-slate-50/50 dark:bg-white/[0.02] border-t border-[var(--border-color)]">
+                      <div className="flex items-center justify-between mb-2">
+                         <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{res.author}</p>
+                         <p className="text-[10px] font-black text-[var(--text-primary)]">{res.downloads} Logs</p>
+                      </div>
+                      <div className="flex gap-2">
+                         <button onClick={() => setPreviewResource(res)} className="flex-1 py-3 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-600/5 hover:border-indigo-600 transition-all"><Eye size={14}/> Preview</button>
+                         <button onClick={() => {}} className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 hover:bg-indigo-700 transition-all"><Download size={14} /> Fetch</button>
+                      </div>
+                   </div>
+                </div>
+              ))}
+           </div>
+           {currentFiles.length === 0 && (
+             <div className="py-20 text-center space-y-4">
+                <ShieldAlert className="mx-auto text-slate-300" size={48}/>
+                <p className="text-slate-500 font-black uppercase text-xs tracking-widest">No assets found in this stratum.</p>
+             </div>
+           )}
         </div>
       )}
 
       {/* Upload Modal */}
       {isAdding && (
-        <div className="fixed inset-0 z-[150] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[250] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="glass-card w-full max-w-xl bg-[var(--sidebar-bg)] p-10 rounded-[3rem] shadow-2xl border-[var(--border-color)] overflow-y-auto max-h-[90vh] no-scrollbar">
             <div className="flex justify-between items-center mb-10">
-              <div>
-                <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">
-                  Asset Manifest
-                </h2>
-                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">Initialize University Knowledge Synchronization</p>
-              </div>
-              <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 transition-colors p-2">
-                <X size={28}/>
-              </button>
+              <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">Vault Ingest</h2>
+              <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 transition-colors"><X size={28}/></button>
             </div>
-
             <div className="space-y-6">
               <div className="space-y-1">
-                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Document Protocol Title</label>
-                <input
-                  className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none focus:border-indigo-600 transition-all font-bold"
-                  placeholder="e.g. Data Structures Test 1 - 2024"
-                  value={uploadForm.title}
-                  onChange={e => setUploadForm({ ...uploadForm, title: e.target.value })}
-                />
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Signal Title</label>
+                <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" placeholder="e.g. Intro to Logic Notes" value={uploadForm.title} onChange={e => setUploadForm({ ...uploadForm, title: e.target.value })} />
               </div>
-
-              <div className="space-y-1">
-                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Unit (Course)</label>
-                <select 
-                  className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold appearance-none"
-                  value={uploadForm.course}
-                  onChange={e => setUploadForm({ ...uploadForm, course: e.target.value })}
-                >
-                  <option value="">Select Target Course</option>
-                  {COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
-                 <div className="space-y-1">
-                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Year Stratum</label>
-                   <select 
-                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold appearance-none"
-                     value={uploadForm.year}
-                     onChange={e => setUploadForm({ ...uploadForm, year: e.target.value })}
-                   >
-                     {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                   </select>
-                 </div>
-                 <div className="space-y-1">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Course ID</label>
+                  <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none" value={uploadForm.course} onChange={e => setUploadForm({ ...uploadForm, course: e.target.value })}>
+                    <option value="">Select Course</option>
+                    {COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1">
                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Category</label>
-                   <select 
-                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold appearance-none"
-                     value={uploadForm.category}
-                     onChange={e => setUploadForm({ ...uploadForm, category: e.target.value as ResourceType })}
-                   >
+                   <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none" value={uploadForm.category} onChange={e => setUploadForm({ ...uploadForm, category: e.target.value as ResourceType })}>
                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                    </select>
-                 </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Digital Asset Selection (PDF/DOCX)</label>
-                <div className="flex gap-4">
-                   <button 
-                     onClick={() => fileInputRef.current?.click()}
-                     className="flex-1 p-6 rounded-2xl border-2 border-dashed border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5 transition-all flex flex-col items-center justify-center gap-3 group"
-                   >
-                      {uploadForm.fileData ? (
-                         <div className="flex items-center gap-3">
-                            <FileCheck size={24} className="text-emerald-500" />
-                            <div className="text-left">
-                               <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Protocol Uploaded</p>
-                               <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Format: {uploadForm.fileType}</p>
-                            </div>
-                         </div>
-                      ) : (
-                         <>
-                            <Upload size={24} className="text-slate-400 group-hover:text-indigo-600" />
-                            <span className="text-[9px] font-black uppercase text-slate-500">Pick Signal from Device</span>
-                         </>
-                      )}
-                   </button>
-                   <input 
-                     type="file" 
-                     ref={fileInputRef} 
-                     onChange={handleFileSelect} 
-                     accept=".pdf,.docx,.pptx,.zip" 
-                     className="hidden" 
-                   />
                 </div>
               </div>
-
-              <div className="pt-6">
-                <button
-                  onClick={handleUpload}
-                  className="w-full bg-indigo-600 py-6 rounded-3xl text-white font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-indigo-600/40 hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-                >
-                  <Plus size={20}/> Push Asset to Vault
-                </button>
-                <p className="text-[8px] font-black text-slate-500 uppercase text-center mt-6 tracking-[0.2em]">Synchronizing with the {currentCollege} Central Registry</p>
+              <div className="grid grid-cols-3 gap-4">
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Calendar Year</label>
+                   <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none" value={uploadForm.academicYear} onChange={e => setUploadForm({ ...uploadForm, academicYear: e.target.value })}>
+                     {VAULT_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                   </select>
+                 </div>
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Year of Study</label>
+                   <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none" value={uploadForm.yearOfStudy} onChange={e => setUploadForm({ ...uploadForm, yearOfStudy: e.target.value })}>
+                     {STUDY_YEARS.map(sy => <option key={sy} value={sy}>{sy}</option>)}
+                   </select>
+                 </div>
+                 <div className="space-y-1">
+                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Semester</label>
+                   <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none" value={uploadForm.semester} onChange={e => setUploadForm({ ...uploadForm, semester: e.target.value as any })}>
+                     {SEMESTERS.map(s => <option key={s} value={s}>{s}</option>)}
+                   </select>
+                 </div>
               </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">File Asset</label>
+                <button onClick={() => fileInputRef.current?.click()} className="w-full p-6 rounded-2xl border-2 border-dashed border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5 transition-all flex flex-col items-center justify-center gap-2 group">
+                   {uploadForm.fileData ? <div className="text-emerald-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2"><Plus size={16}/> Ready for Ingest</div> : <><Upload size={24} className="text-slate-400 group-hover:text-indigo-600"/><span className="text-[9px] font-black uppercase text-slate-500">Pick from Device</span></>}
+                </button>
+                <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" />
+              </div>
+              <button onClick={handleUpload} className="w-full bg-indigo-600 py-6 rounded-3xl text-white font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-indigo-600/40 hover:bg-indigo-700 transition-all active:scale-[0.98]">Commence Asset Transfer</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewResource && (
+        <div className="fixed inset-0 z-[300] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+           <div className="glass-card w-full max-w-4xl bg-[var(--sidebar-bg)] p-10 rounded-[3rem] shadow-2xl border-[var(--border-color)] space-y-8">
+              <div className="flex justify-between items-start">
+                 <div className="flex items-center gap-6">
+                    <div className="p-4 bg-indigo-600 rounded-3xl text-white shadow-xl">{getIcon(previewResource.category)}</div>
+                    <div>
+                       <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">{previewResource.title}</h2>
+                       <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{previewResource.course} • {previewResource.yearOfStudy} • {previewResource.semester}</p>
+                    </div>
+                 </div>
+                 <button onClick={() => setPreviewResource(null)} className="text-slate-500 hover:text-rose-500 transition-colors"><X size={32}/></button>
+              </div>
+              <div className="p-20 bg-[var(--bg-secondary)] rounded-[2.5rem] border-2 border-dashed border-[var(--border-color)] flex flex-col items-center justify-center text-center gap-4">
+                 <FileText size={64} className="text-slate-300"/>
+                 <p className="text-sm text-slate-500 font-medium leading-relaxed">Encrypted Signal Protocol: Native preview restricted for {previewResource.fileType} formats. <br/> Access the source data through a direct fetch.</p>
+                 <button onClick={() => {}} className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30">Download Asset</button>
+              </div>
+           </div>
         </div>
       )}
     </div>
   );
 };
-
-// Internal icon helper
-const FileCheck = ({size, className}: {size: number, className: string}) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <path d="m9 15 2 2 4-4"/>
-  </svg>
-);
-
-const ShieldAlert = ({size}: {size: number}) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/>
-    <line x1="12" y1="9" x2="12" y2="13"/>
-    <line x1="12" y1="17" x2="12.01" y2="17"/>
-  </svg>
-);
 
 export default Resources;

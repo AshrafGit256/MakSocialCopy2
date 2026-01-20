@@ -13,8 +13,10 @@ export interface Resource {
   title: string;
   category: ResourceType;
   college: College;
-  course: string;
-  year: string;
+  course: string; // Course name e.g. "BSSE", "BIT"
+  academicYear: string; // The year the vault entry belongs to e.g. "2021", "2022"
+  semester: 'Semester 1' | 'Semester 2';
+  yearOfStudy: string; // e.g. "Year 1", "Year 2" (Student level)
   author: string;
   downloads: number;
   fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';

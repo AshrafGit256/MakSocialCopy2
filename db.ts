@@ -10,11 +10,11 @@ const DB_KEYS = {
   CALENDAR: 'maksocial_calendar_v5',
   COLLEGE_STATS: 'maksocial_college_stats_v13',
   TIMELINE: 'maksocial_timeline_v6',
-  RESOURCES: 'maksocial_resources_v3'
+  RESOURCES: 'maksocial_resources_v4'
 };
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
-  COCIS: ['Computer Science', 'Information Technology', 'Software Engineering', 'Information Systems'],
+  COCIS: ['BSSE', 'BIT', 'BSCS', 'BSIS'],
   CEDAT: ['Architecture', 'Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering', 'Fine Art'],
   CHUSS: ['Psychology', 'Social Work', 'Literature', 'Journalism', 'Philosophy'],
   CONAS: ['Mathematics', 'Physics', 'Biology', 'Chemistry', 'Geology'],

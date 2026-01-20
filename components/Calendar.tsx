@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
-import { CalendarEvent, Post, User, College } from '../types';
+import { CalendarEvent, Post, User, College, Notification } from '../types';
 import { 
   Calendar as CalendarIcon, Clock, MapPin, Plus, Trash2, 
   ChevronLeft, ChevronRight, Zap, Info, Camera,
   AlertCircle, Bell, ArrowRight, X, ExternalLink, CalendarDays,
-  CheckCircle2, Users, LayoutGrid, Image as ImageIcon, CalendarCheck
+  CheckCircle2, Users, LayoutGrid, Image as ImageIcon, CalendarCheck,
+  Lock, Unlock, ShieldCheck, User as UserIcon
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -76,13 +77,42 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
 
   useEffect(() => {
     const sync = () => {
-      setEvents(db.getCalendarEvents());
+      const allEvents = db.getCalendarEvents();
+      // Filter logic: show official events AND my personal events
+      const myEvents = allEvents.filter(e => e.createdBy === 'super_admin' || e.createdBy === 'admin' || e.createdBy === currentUser.id);
+      setEvents(myEvents);
       setCurrentUser(db.getUser());
+      
+      // Auto-Reminder Logic
+      checkReminders(myEvents);
     };
     sync();
-    const interval = setInterval(sync, 2000);
+    const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentUser.id]);
+
+  const checkReminders = (currentEvents: CalendarEvent[]) => {
+    const today = new Date().toISOString().split('T')[0];
+    const todaysEvents = currentEvents.filter(e => e.date === today && e.createdBy === currentUser.id);
+    
+    todaysEvents.forEach(ev => {
+      const reminderId = `reminder-${ev.id}`;
+      const hasNotified = localStorage.getItem(reminderId);
+      
+      if (!hasNotified) {
+        const newNotif: Notification = {
+          id: Date.now().toString() + Math.random(),
+          type: 'synapse',
+          text: `Neural Alert: Your personal protocol "${ev.title}" is scheduled for today at ${ev.time}.`,
+          timestamp: 'Just now',
+          isRead: false
+        };
+        const updatedUser = { ...currentUser, notifications: [newNotif, ...(currentUser.notifications || [])] };
+        db.saveUser(updatedUser);
+        localStorage.setItem(reminderId, 'true');
+      }
+    });
+  };
 
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
@@ -106,13 +136,14 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
     const newEvent: CalendarEvent = {
       ...form as CalendarEvent,
       id: Date.now().toString(),
-      createdBy: currentUser.id,
-      attendeeIds: []
+      createdBy: currentUser.id, // Log current user as creator
+      attendeeIds: [currentUser.id]
     };
     db.saveCalendarEvent(newEvent);
     setEvents(db.getCalendarEvents());
     setIsAdding(false);
     setForm({ title: '', description: '', date: '', time: '', location: '', category: 'Social', registrationLink: '', image: '' });
+    alert("Personal Protocol Synchronized: Reminders initialized.");
   };
 
   const handleRegister = (eventId: string) => {
@@ -122,13 +153,21 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
     if (updatedEvent) setSelectedEvent(updatedEvent);
   };
 
+  const handleDeleteEvent = (eventId: string) => {
+    if (window.confirm("Terminate this personal protocol?")) {
+      db.deleteCalendarEvent(eventId);
+      setEvents(db.getCalendarEvents());
+      setSelectedEvent(null);
+    }
+  };
+
   const pushToFeed = (event: CalendarEvent) => {
     const broadcast: Post = {
       id: `broadcast-${Date.now()}`,
-      author: 'Campus Events',
+      author: currentUser.name,
       authorId: currentUser.id,
       authorRole: 'Official Channel',
-      authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+      authorAvatar: currentUser.avatar,
       timestamp: 'Just now',
       content: event.description,
       eventFlyer: event.image,
@@ -154,6 +193,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
   };
 
   const isRegistered = selectedEvent?.attendeeIds?.includes(currentUser.id);
+  const isPersonal = selectedEvent?.createdBy === currentUser.id;
 
   const renderCalendar = () => {
     const days = [];
@@ -184,11 +224,18 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
           </span>
           
           <div className="flex-1 space-y-1 overflow-y-auto no-scrollbar">
-            {dayEvents.map(e => (
-              <div key={e.id} className="p-1.5 rounded-lg bg-indigo-600/10 dark:bg-indigo-600/20 border border-indigo-500/20 text-[7px] font-black uppercase text-indigo-700 dark:text-indigo-300 truncate tracking-wider">
-                 {e.title}
-              </div>
-            ))}
+            {dayEvents.map(e => {
+              const myPersonal = e.createdBy === currentUser.id;
+              return (
+                <div key={e.id} className={`p-1.5 rounded-lg border text-[7px] font-black uppercase truncate tracking-wider ${
+                  myPersonal 
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                  : 'bg-indigo-600/10 dark:bg-indigo-600/20 border-indigo-500/20 text-indigo-700 dark:text-indigo-300'
+                }`}>
+                   {e.title}
+                </div>
+              );
+            })}
           </div>
         </div>
       );
@@ -202,17 +249,19 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <h1 className="text-6xl font-black tracking-tighter text-[var(--text-primary)] uppercase flex items-center gap-4">
-             <CalendarDays className="text-indigo-500" size={48} /> Calendar
+             <CalendarDays className="text-indigo-500" size={48} /> Registry
            </h1>
            <p className="text-[var(--text-secondary)] font-bold uppercase tracking-[0.4em] text-[10px] mt-2 ml-1">Universal Campus Registry Protocol</p>
         </div>
 
         <div className="flex items-center gap-4 w-full md:w-auto">
-           {isAdmin && (
-             <button onClick={() => setIsAdding(true)} className="flex-1 md:flex-none bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 flex items-center justify-center gap-2">
-               <Plus size={16} /> New Event
-             </button>
-           )}
+           <button 
+             onClick={() => setIsAdding(true)} 
+             className="flex-1 md:flex-none bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 flex items-center justify-center gap-2"
+           >
+             <Plus size={16} /> {isAdmin ? 'Global Event' : 'Personal Protocol'}
+           </button>
+           
            <div className="flex bg-[var(--bg-secondary)] rounded-2xl p-1 border border-[var(--border-color)] shadow-sm">
               <button onClick={handlePrevMonth} className="p-3 text-slate-500 hover:text-indigo-600 transition-colors"><ChevronLeft size={20}/></button>
               <div className="px-6 flex items-center justify-center min-w-[150px]">
@@ -249,10 +298,18 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
               <div className="md:w-1/2 p-10 space-y-8 bg-[var(--sidebar-bg)] overflow-y-auto no-scrollbar">
                  <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                       <span className="bg-indigo-600 text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest">{selectedEvent.category}</span>
+                       <span className={`${isPersonal ? 'bg-emerald-600' : 'bg-indigo-600'} text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5`}>
+                         {isPersonal ? <Lock size={10}/> : <ShieldCheck size={10}/>}
+                         {isPersonal ? 'Private Protocol' : 'Official Registry'}
+                       </span>
                        <h2 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none pt-2">{selectedEvent.title}</h2>
                     </div>
-                    <button onClick={() => setSelectedEvent(null)} className="text-slate-500 hover:text-rose-500 p-2"><X size={24}/></button>
+                    <div className="flex gap-2">
+                       {isPersonal && (
+                         <button onClick={() => handleDeleteEvent(selectedEvent.id)} className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"><Trash2 size={20}/></button>
+                       )}
+                       <button onClick={() => setSelectedEvent(null)} className="text-slate-500 hover:text-rose-500 p-2"><X size={24}/></button>
+                    </div>
                  </div>
 
                  <div className="grid grid-cols-2 gap-6">
@@ -277,22 +334,24 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                  </p>
 
                  <div className="flex flex-col gap-3 pt-4">
-                    <button 
-                      onClick={() => !isRegistered && handleRegister(selectedEvent.id)}
-                      disabled={isRegistered}
-                      className={`w-full p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all ${
-                        isRegistered 
-                        ? 'bg-emerald-600 text-white' 
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/30'
-                      }`}
-                    >
-                      {isRegistered ? <CheckCircle2 size={16}/> : <Zap size={16}/>}
-                      {isRegistered ? 'Identity Logged (Validated)' : 'Register for Event'}
-                    </button>
+                    {!isPersonal && (
+                      <button 
+                        onClick={() => !isRegistered && handleRegister(selectedEvent.id)}
+                        disabled={isRegistered}
+                        className={`w-full p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all ${
+                          isRegistered 
+                          ? 'bg-emerald-600 text-white' 
+                          : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-600/30'
+                        }`}
+                      >
+                        {isRegistered ? <CheckCircle2 size={16}/> : <Zap size={16}/>}
+                        {isRegistered ? 'Identity Logged (Validated)' : 'Register for Event'}
+                      </button>
+                    )}
                     
-                    {isAdmin && (
+                    {(isAdmin || isPersonal) && (
                       <div className="space-y-4 pt-6 border-t border-[var(--border-color)]">
-                         <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><LayoutGrid size={14}/> Repost to Hub Wing</h4>
+                         <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2"><LayoutGrid size={14}/> {isPersonal ? 'Broadcast Personal Milestone' : 'Repost to Hub Wing'}</h4>
                          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                             <button 
                                onClick={() => setRepostTarget('Global')}
@@ -314,7 +373,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                             onClick={() => pushToFeed(selectedEvent)}
                             className="w-full bg-rose-600 text-white p-5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-rose-700 shadow-rose-600/20"
                          >
-                            <ExternalLink size={14}/> Push Command to {repostTarget}
+                            <ExternalLink size={14}/> {isPersonal ? 'Initialize Public Pulse' : `Push Command to ${repostTarget}`}
                          </button>
                       </div>
                     )}
@@ -328,33 +387,40 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/90 dark:bg-brand-dark/95 backdrop-blur-md animate-in fade-in duration-300">
            <div className="glass-card w-full max-w-xl p-10 border-[var(--border-color)] shadow-2xl space-y-6 bg-[var(--sidebar-bg)] rounded-[3rem] overflow-y-auto max-h-[90vh] no-scrollbar">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Initialize Event</h2>
+                <div>
+                  <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">
+                    {isAdmin ? 'Initialize Registry' : 'Neural Protocol'}
+                  </h2>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
+                    {isAdmin ? 'Global Campus Synchronization' : 'Personal Intellectual Timeline'}
+                  </p>
+                </div>
                 <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 p-2 transition-colors"><X size={28}/></button>
               </div>
               <div className="space-y-5">
                  <div className="space-y-1">
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Title</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" placeholder="e.g. Research Seminar" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold focus:border-indigo-500 transition-all" placeholder={isAdmin ? "e.g. Research Seminar" : "e.g. Logic Study Session"} value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
                  </div>
                  
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                        <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Date</label>
-                       <input type="date" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+                       <input type="date" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold focus:border-indigo-500 transition-all" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
                     </div>
                     <div className="space-y-1">
                        <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Time</label>
-                       <input type="time" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
+                       <input type="time" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold focus:border-indigo-500 transition-all" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
                     </div>
                  </div>
 
                  <div className="space-y-1">
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Venue Protocol</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold" placeholder="e.g. COCIS Block B" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none font-bold focus:border-indigo-500 transition-all" placeholder="e.g. Library Level 4 / Online" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
                  </div>
 
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Flyer (PC/Device Upload)</label>
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Flyer (Optional)</label>
                     <div className="flex gap-4">
                        <button 
                          onClick={() => fileInputRef.current?.click()}
@@ -365,7 +431,7 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                           ) : (
                              <>
                                 <ImageIcon size={24} className="text-slate-400 group-hover:text-indigo-600" />
-                                <span className="text-[9px] font-black uppercase text-slate-500">Pick from Device</span>
+                                <span className="text-[9px] font-black uppercase text-slate-500">Pick Signal from Device</span>
                              </>
                           )}
                        </button>
@@ -374,22 +440,28 @@ const Calendar: React.FC<CalendarProps> = ({ isAdmin }) => {
                  </div>
 
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Event Logic</label>
-                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none h-24 resize-none font-bold" placeholder="Mission details..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Details</label>
+                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none h-24 resize-none font-bold focus:border-indigo-500 transition-all" placeholder="Enter session objectives..." value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
                  </div>
 
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Category Protocol</label>
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Category Logic</label>
                     <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-[var(--text-primary)] text-sm outline-none appearance-none font-bold" value={form.category} onChange={e => setForm({...form, category: e.target.value as any})}>
                        <option>Academic</option>
                        <option>Social</option>
-                       <option>Sports</option>
                        <option>Exams</option>
-                       <option>Other</option>
+                       <option>Milestone</option>
                     </select>
                  </div>
               </div>
-              <button onClick={handleAddEvent} className="w-full bg-indigo-600 p-6 rounded-3xl text-white font-black text-xs uppercase tracking-[0.3em] shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 transition-all active:scale-[0.98]">Save Protocol to Registry</button>
+              <button 
+                onClick={handleAddEvent} 
+                className={`w-full p-6 rounded-3xl text-white font-black text-xs uppercase tracking-[0.3em] shadow-xl transition-all active:scale-[0.98] ${
+                  isAdmin ? 'bg-indigo-600 shadow-indigo-600/30 hover:bg-indigo-700' : 'bg-emerald-600 shadow-emerald-600/30 hover:bg-emerald-700'
+                }`}
+              >
+                Sync Protocol to Registry
+              </button>
            </div>
         </div>
       )}

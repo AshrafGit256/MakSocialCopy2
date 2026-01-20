@@ -41,6 +41,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     return true;
   });
 
+  // Adaptation: Hidden on mobile (lg:hidden flex), Sidebar intact for Tablet/Laptop (lg:static).
+  // On Desktop hover, it expands from 20 to 72.
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-[70] h-full bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
     flex flex-col shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]

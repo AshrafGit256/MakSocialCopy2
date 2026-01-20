@@ -2,12 +2,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Post, User, College, CalendarEvent, AuthorityRole } from '../types';
 import { db } from '../db';
+import { COLLEGE_BANNERS } from '../constants';
 import { GoogleGenAI } from "@google/genai";
 import { 
   Image as ImageIcon, Heart, MessageCircle, Sparkles, AlertCircle, X, 
   Users, Loader2, Eye, Verified, Zap, Calendar, 
   MapPin, Clock, Plus, Share2, CalendarPlus,
-  Bookmark, CalendarCheck, Save, Orbit, Brain, Edit3
+  Bookmark, CalendarCheck, Save, Brain, Edit3, ArrowLeft
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ isVerified?: boolean, role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ isVerified, role, size = 'sm' }) => {
@@ -60,28 +61,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
   const handleBookmark = (postId: string) => {
     db.bookmarkPost(user.id, postId);
     setUser(db.getUser());
-  };
-
-  const syncToInternalCalendar = (event: Post) => {
-    const exists = calendarEvents.some(e => e.title === event.eventTitle && e.date === event.eventDate);
-    if (exists) {
-      alert("Protocol already synchronized.");
-      return;
-    }
-    const newCalendarEvent: CalendarEvent = {
-      id: event.eventId || `post-ev-${Date.now()}`,
-      title: event.eventTitle || 'University Event',
-      description: event.content || '',
-      date: event.eventDate || '',
-      time: event.eventTime || '',
-      location: event.eventLocation || 'Makerere University',
-      image: event.eventFlyer,
-      category: 'Social',
-      createdBy: event.authorId,
-      attendeeIds: []
-    };
-    db.saveCalendarEvent(newCalendarEvent);
-    setCalendarEvents(db.getCalendarEvents());
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,6 +144,25 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
 
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-8 pb-32">
+      {/* College Banner for filtered view */}
+      {activeCollege && activeCollege !== 'Global' && (
+        <div className="relative h-64 mb-10 rounded-[3rem] overflow-hidden group shadow-2xl border border-[var(--border-color)]">
+          <img src={COLLEGE_BANNERS[activeCollege as College]} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+          <div className="absolute bottom-10 left-10 flex items-center gap-6">
+             <div className="w-20 h-20 rounded-3xl bg-indigo-600 flex items-center justify-center text-white font-black text-4xl shadow-2xl border border-white/20">
+                {activeCollege[0]}
+             </div>
+             <div>
+                <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">{activeCollege} Community Hub</h2>
+                <p className="text-white/60 font-bold uppercase tracking-[0.3em] text-[10px] mt-2 flex items-center gap-2">
+                   <Users size={12}/> {db.getUsers().filter(u => u.college === activeCollege).length} Members Synchronized
+                </p>
+             </div>
+          </div>
+        </div>
+      )}
+
       {!collegeFilter && (
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mb-8 p-1.5 bg-[var(--bg-secondary)] rounded-2xl border border-[var(--border-color)]">
           {['Global', 'COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map((c: any) => (
@@ -196,7 +194,6 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
             <div className="space-y-8">
                {posts.map(post => {
                  const postUser = db.getUsers().find(u => u.id === post.authorId);
-                 const isSynced = calendarEvents.some(e => e.title === post.eventTitle && e.date === post.eventDate);
                  const isBookmarked = user.bookmarkedPosts.includes(post.id);
                  const isAuthor = user.id === post.authorId;
                  const isEditing = editingPostId === post.id;
@@ -268,7 +265,7 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                         </div>
                         <div className="flex items-center gap-2.5 text-slate-400">
                            <Eye size={18}/> 
-                           <span className="text-[9px] font-black tracking-widest uppercase">{post.views?.toLocaleString() || 0} Network Scans</span>
+                           <span className="text-[9px] font-black tracking-widest uppercase">{post.views?.toLocaleString() || 0} Scans</span>
                         </div>
                      </div>
                   </article>
@@ -286,6 +283,23 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
                     <p className="text-4xl font-black mt-2">{user.iqCredits || 0} IQ-C</p>
                   </div>
                   <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-xl"><Brain size={24}/></div>
+               </div>
+            </div>
+
+            <div className="glass-card p-8 bg-[var(--sidebar-bg)] border-[var(--border-color)]">
+               <h3 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-3">
+                  <Verified className="text-indigo-600" size={18}/> Prominent Nodes
+               </h3>
+               <div className="space-y-6">
+                  {db.getUsers().filter(u => u.isVerified && u.id !== user.id).slice(0, 5).map(u => (
+                    <div key={u.id} className="flex items-center gap-4 group cursor-pointer">
+                       <img src={u.avatar} className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)] group-hover:border-indigo-600 transition-colors" />
+                       <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-black text-[var(--text-primary)] truncate uppercase leading-none">{u.name}</p>
+                          <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase truncate">{u.role} • {u.college}</p>
+                       </div>
+                    </div>
+                  ))}
                </div>
             </div>
          </aside>

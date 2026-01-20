@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
-import { Violation, User, Post, Poll, TimelineEvent, CalendarEvent } from '../types';
+import { Violation, User, Post, Poll, TimelineEvent, CalendarEvent, College, UserStatus, AuthorityRole } from '../types';
 import { AuthoritySeal } from './Feed';
 import { 
   TrendingUp, Monitor, Users, Activity, ShieldAlert, Tv, 
@@ -9,7 +9,7 @@ import {
   DollarSign, Briefcase, Calendar, Link as LinkIcon, Image as ImageIcon,
   Youtube, Mic2, Newspaper, Radio, History, Heart, User as UserIcon, Zap, X,
   Bell, FileText, Download, BarChart2, PieChart, Printer, AlertTriangle,
-  Award, ShieldCheck, UserMinus, Shield, Verified
+  Award, ShieldCheck, UserMinus, Shield, Verified, UserPlus, RefreshCw
 } from 'lucide-react';
 
 const Admin: React.FC = () => {
@@ -24,9 +24,24 @@ const Admin: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showMedalModal, setShowMedalModal] = useState(false);
   const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  
   const [suspendDays, setSuspendDays] = useState(7);
   const [medalName, setMedalName] = useState('');
   const [medalIcon, setMedalIcon] = useState('🏅');
+
+  // Register Form State
+  const [regForm, setRegForm] = useState<Partial<User>>({
+    name: '',
+    email: '',
+    role: 'Lecturer',
+    college: 'COCIS',
+    status: 'Graduate',
+    courseAbbr: 'GEN',
+    academicLevel: 'Faculty',
+    gender: 'M',
+    isVerified: true
+  });
 
   useEffect(() => {
     const sync = () => {
@@ -52,6 +67,13 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleUnsuspend = (userId: string) => {
+    if (window.confirm("Lift suspension protocol for this node? Authority confirmation required.")) {
+      db.unsuspendUser(userId);
+      setUsers(db.getUsers());
+    }
+  };
+
   const handleAwardMedal = () => {
     if (selectedUser && medalName) {
       db.awardMedal(selectedUser.id, { name: medalName, icon: medalIcon });
@@ -59,6 +81,27 @@ const Admin: React.FC = () => {
       setShowMedalModal(false);
       setMedalName('');
     }
+  };
+
+  const handleRegisterNode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regForm.name || !regForm.email) return;
+    
+    // Auto-verify if they are high-profile
+    const isHighProfile = regForm.role === 'Lecturer' || regForm.role === 'Administrator' || regForm.role === 'Student Leader';
+    
+    db.registerNode({
+      ...regForm,
+      isVerified: isHighProfile || regForm.isVerified
+    });
+    
+    setUsers(db.getUsers());
+    setShowRegisterModal(false);
+    setRegForm({
+      name: '', email: '', role: 'Lecturer', college: 'COCIS', status: 'Graduate', 
+      courseAbbr: 'GEN', academicLevel: 'Faculty', gender: 'M', isVerified: true
+    });
+    alert("Node registered and validated in the central registry.");
   };
 
   const medalsOptions = ['🏅', '🔬', '🏆', '💡', '🎓', '⚖️', '⚽', '🎨'];
@@ -98,21 +141,27 @@ const Admin: React.FC = () => {
       {/* Registry Tab */}
       {activeTab === 'nodes' && (
         <div className="space-y-8 animate-in fade-in duration-500">
-           <div className="flex items-center justify-between">
+           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div>
                 <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter uppercase">Global Node Registry</h3>
                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Strata management and biometric validation</p>
               </div>
-              <div className="flex gap-4">
-                 <div className="p-4 bg-emerald-600/5 rounded-2xl border border-emerald-600/10">
+              <div className="flex gap-4 w-full md:w-auto">
+                 <div className="p-4 bg-emerald-600/5 rounded-2xl border border-emerald-600/10 flex-1 md:flex-none">
                     <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Active Nodes</p>
                     <p className="text-2xl font-black text-[var(--text-primary)]">{users.length}</p>
                  </div>
+                 <button 
+                   onClick={() => setShowRegisterModal(true)}
+                   className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all active:scale-95"
+                 >
+                    <UserPlus size={18}/> Register New Node
+                 </button>
               </div>
            </div>
 
-           <div className="glass-card overflow-hidden border-[var(--border-color)]">
-              <table className="w-full text-left">
+           <div className="glass-card overflow-x-auto border-[var(--border-color)] no-scrollbar">
+              <table className="w-full text-left min-w-[1000px]">
                  <thead className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
                     <tr>
                        <th className="px-8 py-5 text-[9px] font-black uppercase tracking-widest text-slate-500">Identity Protocol</th>
@@ -182,19 +231,154 @@ const Admin: React.FC = () => {
                                 >
                                    <Award size={18}/>
                                 </button>
-                                <button 
-                                  onClick={() => { setSelectedUser(u); setShowSuspendModal(true); }}
-                                  className={`p-2.5 rounded-xl border transition-all ${u.isSuspended ? 'bg-rose-600 text-white border-rose-500' : 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-600 hover:text-white'}`}
-                                  title="Suspend Protocol"
-                                >
-                                   <UserMinus size={18}/>
-                                </button>
+                                {u.isSuspended ? (
+                                  <button 
+                                    onClick={() => handleUnsuspend(u.id)}
+                                    className="p-2.5 rounded-xl bg-emerald-600 text-white border border-emerald-500 shadow-lg shadow-emerald-600/20 animate-in zoom-in"
+                                    title="Restore Signal"
+                                  >
+                                     <RefreshCw size={18}/>
+                                  </button>
+                                ) : (
+                                  <button 
+                                    onClick={() => { setSelectedUser(u); setShowSuspendModal(true); }}
+                                    className="p-2.5 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-600 hover:text-white transition-all"
+                                    title="Suspend Protocol"
+                                  >
+                                     <UserMinus size={18}/>
+                                  </button>
+                                )}
                              </div>
                           </td>
                        </tr>
                     ))}
                  </tbody>
               </table>
+           </div>
+        </div>
+      )}
+
+      {/* Modal - Register New Node */}
+      {showRegisterModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/95 backdrop-blur-xl animate-in fade-in duration-300">
+           <div className="glass-card w-full max-w-2xl p-10 bg-[var(--sidebar-bg)] border-[var(--border-color)] rounded-[3rem] shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
+              <div className="flex justify-between items-center mb-8">
+                 <div>
+                    <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">Register High-Profile Node</h2>
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">Authorized creation of administrative & faculty identities</p>
+                 </div>
+                 <button onClick={() => setShowRegisterModal(false)} className="text-slate-500 hover:text-rose-500 p-2"><X size={28}/></button>
+              </div>
+
+              <form onSubmit={handleRegisterNode} className="space-y-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Legal Name</label>
+                       <input 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-indigo-600 transition-all"
+                         required
+                         value={regForm.name}
+                         onChange={e => setRegForm({...regForm, name: e.target.value})}
+                         placeholder="Dr. Jane Doe"
+                       />
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">University Email</label>
+                       <input 
+                         type="email"
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none focus:border-indigo-600 transition-all"
+                         required
+                         value={regForm.email}
+                         onChange={e => setRegForm({...regForm, email: e.target.value})}
+                         placeholder="jane.doe@staff.mak.ac.ug"
+                       />
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Authority Stratum (Role)</label>
+                       <select 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
+                         value={regForm.role}
+                         onChange={e => setRegForm({...regForm, role: e.target.value as any})}
+                       >
+                          <option value="Lecturer">Lecturer / Faculty</option>
+                          <option value="Administrator">University Administrator</option>
+                          <option value="Student Leader">Student Leader (GRC/Guild)</option>
+                          <option value="Student">Special Student Node</option>
+                       </select>
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Level</label>
+                       <select 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
+                         value={regForm.academicLevel}
+                         onChange={e => setRegForm({...regForm, academicLevel: e.target.value as any})}
+                       >
+                          <option value="Faculty">Faculty Member</option>
+                          <option value="PhD">Doctoral Level</option>
+                          <option value="Postgrad">Postgraduate Level</option>
+                          <option value="Undergrad">Undergraduate Level</option>
+                       </select>
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">College Unit</label>
+                       <select 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
+                         value={regForm.college}
+                         onChange={e => setRegForm({...regForm, college: e.target.value as any})}
+                       >
+                          {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                       </select>
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Course Abbr.</label>
+                       <input 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none"
+                         value={regForm.courseAbbr}
+                         onChange={e => setRegForm({...regForm, courseAbbr: e.target.value})}
+                         placeholder="e.g. CS, LAW, SE"
+                       />
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Gender</label>
+                       <select 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 text-sm font-bold outline-none appearance-none"
+                         value={regForm.gender}
+                         onChange={e => setRegForm({...regForm, gender: e.target.value as any})}
+                       >
+                          <option value="M">Male Node</option>
+                          <option value="F">Female Node</option>
+                          <option value="Other">Other Protocol</option>
+                       </select>
+                    </div>
+                 </div>
+
+                 <div className="flex items-center gap-3 p-4 bg-indigo-600/5 rounded-2xl border border-indigo-600/10">
+                    <ShieldCheck size={20} className="text-indigo-600"/>
+                    <div className="flex-1">
+                       <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Automatic Validation Policy</p>
+                       <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">High-profile nodes are biometrically verified by default upon registration.</p>
+                    </div>
+                    <input 
+                       type="checkbox" 
+                       className="w-6 h-6 rounded-lg border-indigo-600" 
+                       checked={regForm.isVerified} 
+                       onChange={e => setRegForm({...regForm, isVerified: e.target.checked})}
+                    />
+                 </div>
+
+                 <div className="flex gap-4 pt-4">
+                    <button type="button" onClick={() => setShowRegisterModal(false)} className="flex-1 py-4 bg-[var(--bg-secondary)] text-slate-500 rounded-2xl font-black text-[10px] uppercase tracking-widest">Abort Process</button>
+                    <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-indigo-600/40 hover:bg-indigo-700">Deploy Node Signal</button>
+                 </div>
+              </form>
            </div>
         </div>
       )}
@@ -259,7 +443,7 @@ const Admin: React.FC = () => {
         </div>
       )}
 
-      {/* Other Tabs remain similar or updated with similar high-res styling... */}
+      {/* Intelligence Tab */}
       {activeTab === 'intelligence' && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-in fade-in duration-500">
            {[
@@ -277,7 +461,18 @@ const Admin: React.FC = () => {
         </div>
       )}
 
-      {/* MakTV, Signal Feed tabs as before... */}
+      {/* Placeholder for other tabs */}
+      {(activeTab === 'maktv' || activeTab === 'registry' || activeTab === 'events') && (
+        <div className="py-40 text-center space-y-8 animate-in zoom-in duration-700">
+           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner border border-[var(--border-color)] text-slate-300">
+              <RefreshCw size={56} className="animate-spin-slow" />
+           </div>
+           <div>
+              <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Module Registry Under Construction</h3>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-1">This tactical command module is currently being synchronized with the main grid.</p>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

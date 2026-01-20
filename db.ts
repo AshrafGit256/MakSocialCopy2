@@ -166,6 +166,43 @@ export const db = {
     db.saveUsers(users);
   },
 
+  registerNode: (userData: Partial<User>) => {
+    const users = db.getUsers();
+    const newUser: User = {
+      id: `u-${Date.now()}`,
+      name: userData.name || 'Unknown Node',
+      role: userData.role || 'Student',
+      avatar: userData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}`,
+      connections: 0,
+      email: userData.email,
+      college: userData.college || 'COCIS',
+      status: userData.status || 'Year 1',
+      joinedColleges: [userData.college || 'COCIS'],
+      postsCount: 0,
+      followersCount: 0,
+      followingCount: 0,
+      totalLikesCount: 0,
+      badges: userData.badges || [],
+      appliedTo: [],
+      iqCredits: 500,
+      skills: [],
+      intellectualSignature: '#6366f1',
+      connectionsList: [],
+      pendingRequests: [],
+      bookmarkedPosts: [],
+      isVerified: userData.isVerified || false,
+      courseAbbr: userData.courseAbbr || 'GEN',
+      academicLevel: userData.academicLevel || 'Undergrad',
+      gender: userData.gender || 'Other',
+      isSuspended: false,
+      medals: [],
+      ...userData
+    };
+    users.push(newUser);
+    db.saveUsers(users);
+    return newUser;
+  },
+
   toggleVerification: (userId: string) => {
     const users = db.getUsers();
     const user = users.find(u => u.id === userId);
@@ -183,6 +220,16 @@ export const db = {
       const end = new Date();
       end.setDate(end.getDate() + durationDays);
       user.suspensionEnd = end.toISOString();
+      db.saveUsers(users);
+    }
+  },
+
+  unsuspendUser: (userId: string) => {
+    const users = db.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      user.isSuspended = false;
+      user.suspensionEnd = undefined;
       db.saveUsers(users);
     }
   },

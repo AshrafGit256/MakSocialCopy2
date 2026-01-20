@@ -13,11 +13,11 @@ import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
-import Nexus from './components/Nexus';
-import Synapse from './components/Synapse';
 import { db } from './db';
-// Added Orbit and Rocket to lucide-react imports
-import { Menu, Home, BookOpen, LayoutGrid, User as UserIcon, Bell, X, Heart, UserPlus, Zap, ShieldAlert, Orbit, Rocket } from 'lucide-react';
+import { 
+  Menu, Home, BookOpen, LayoutGrid, User as UserIcon, Bell, X, Heart, 
+  UserPlus, Zap, ShieldAlert, Compass, Search as SearchIcon, Calendar 
+} from 'lucide-react';
 
 const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user: User, onClear: () => void }> = ({ isOpen, onClose, user, onClear }) => {
   return (
@@ -100,7 +100,6 @@ const App: React.FC = () => {
     setUserRole('student');
     setView('home');
     
-    // Fix: Added missing properties to satisfy User interface from types.ts
     const newUser: User = {
       id: Date.now().toString(),
       name: email.split('@')[0],
@@ -172,8 +171,6 @@ const App: React.FC = () => {
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={(uid) => { setSelectedUserId(uid); setView('profile'); }} onNavigateToPost={(pid) => { setTargetPostId(pid); setView('home'); }} />;
       case 'resources': return <Resources />;
-      case 'nexus': return <Nexus />;
-      case 'synapse': return <Synapse />;
       case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
       default: return <Feed />;
     }
@@ -187,6 +184,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
+      {/* Overlay for small screens when sidebar is open */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden transition-opacity" onClick={() => setIsSidebarOpen(false)} />
       )}
@@ -195,6 +193,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] transition-opacity" onClick={() => setIsNotifPanelOpen(false)} />
       )}
 
+      {/* Sidebar - Visible on Laptop/Tablet, adapts to icon-only on desktop hover or mobile trigger */}
       <Sidebar 
         activeView={view} 
         setView={handleSetView} 
@@ -214,6 +213,7 @@ const App: React.FC = () => {
       )}
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Header - Mobile Only */}
         <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] z-50">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors">
             <Menu size={24} />
@@ -234,12 +234,13 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
 
+        {/* Bottom Nav - Mobile Only Icons */}
         <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-[var(--card-bg)] border border-[var(--border-color)] backdrop-blur-2xl rounded-[2.5rem] p-3 flex items-center justify-around shadow-2xl z-[55] ring-1 ring-white/5">
            {[
-             { id: 'home', icon: <Home size={22} />, label: 'Pulse' },
-             { id: 'synapse', icon: <Orbit size={22} />, label: 'AI' },
-             { id: 'nexus', icon: <Rocket size={22} />, label: 'Nexus' },
-             { id: 'profile', icon: <UserIcon size={22} />, label: 'Self' }
+             { id: 'home', icon: <Home size={22} />, label: 'Home' },
+             { id: 'explore', icon: <Compass size={22} />, label: 'Discover' },
+             { id: 'search', icon: <SearchIcon size={22} />, label: 'Search' },
+             { id: 'profile', icon: <UserIcon size={22} />, label: 'Profile' }
            ].map(item => (
              <button
                key={item.id}
@@ -247,7 +248,6 @@ const App: React.FC = () => {
                className={`flex flex-col items-center gap-1 p-3 rounded-2xl transition-all ${view === item.id ? 'bg-indigo-600 text-white shadow-lg scale-110' : 'text-slate-500'}`}
              >
                 {item.icon}
-                <span className="text-[7px] font-black uppercase tracking-widest">{item.label}</span>
              </button>
            ))}
         </nav>

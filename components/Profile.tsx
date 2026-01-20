@@ -90,7 +90,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
       <div className="relative group rounded-[3rem] overflow-hidden bg-[var(--sidebar-bg)] shadow-xl border border-[var(--border-color)] transition-theme">
         <div className="h-72 w-full relative overflow-hidden">
           <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Makerere_University_Main_Building.jpg" 
+            src="https://cocis.mak.ac.ug/wp-content/uploads/2023/11/cropped-310964315_406158288372038_8724847734355824283_n.jpg" 
             className="w-full h-full object-cover brightness-90 dark:brightness-75 transition-transform duration-1000 group-hover:scale-105"
             alt="University Banner"
           />

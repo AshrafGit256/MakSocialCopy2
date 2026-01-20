@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'nexus' | 'notifications' | 'synapse';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'notifications';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -79,7 +79,6 @@ export interface User {
   connectionsList: string[]; 
   pendingRequests: string[]; 
   bookmarkedPosts: string[]; 
-  // New Fields
   isVerified: boolean;
   courseAbbr: string;
   academicLevel: 'Undergrad' | 'Postgrad' | 'PhD' | 'Faculty';

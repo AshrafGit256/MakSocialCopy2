@@ -1,16 +1,15 @@
 
 import React from 'react';
 import { 
-  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen, Bell
+  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
 export const NAV_ITEMS = [
-  { id: 'home', label: 'Intelligence Hub', icon: <Home size={22} /> },
+  { id: 'home', label: 'Global Pulse', icon: <Home size={22} /> },
   { id: 'search', label: 'Search', icon: <Search size={22} /> },
-  { id: 'notifications', label: 'Notifications', icon: <Bell size={22} /> },
   { id: 'calendar', label: 'Calendar', icon: <Calendar size={22} /> },
-  { id: 'resources', label: 'Academic Vault', icon: <BookOpen size={22} /> },
+  { id: 'resources', label: 'Resource Lab', icon: <BookOpen size={22} /> },
   { id: 'explore', label: 'Explore', icon: <Compass size={22} /> },
   { id: 'messages', label: 'Messages', icon: <MessageCircle size={22} /> },
   { id: 'groups', label: 'Colleges', icon: <LayoutGrid size={22} /> },
@@ -116,16 +115,13 @@ export const ANALYTICS: AnalyticsData[] = [
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
-    participants: ['u1', 'guru_a'],
+    user: { name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg'},
     lastMessage: 'The notes are on the portal.',
-    lastTimestamp: '10:10 AM',
     unreadCount: 2,
-    connectionStatus: 'accepted',
-    requestedBy: 'guru_a',
     messages: [
-      { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false, type: 'text' },
-      { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true, type: 'text' },
-      { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false, type: 'text' },
+      { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false },
+      { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true },
+      { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false },
     ]
   }
 ];

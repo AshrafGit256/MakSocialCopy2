@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'notifications';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -13,15 +13,22 @@ export interface Resource {
   title: string;
   category: ResourceType;
   college: College;
-  course: string; // Course name e.g. "BSSE", "BIT"
-  academicYear: string; // The year the vault entry belongs to e.g. "2021", "2022"
-  semester: 'Semester 1' | 'Semester 2';
-  yearOfStudy: string; // e.g. "Year 1", "Year 2" (Student level)
+  course: string;
+  year: string;
   author: string;
   downloads: number;
   fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
-  fileData?: string;
+  fileData?: string; // Base64 data for local storage
   timestamp: string;
+}
+
+export interface AnalyticsData {
+  day: string;
+  posts: number;
+  activeUsers: number;
+  messages: number;
+  revenue: number;
+  engagement: number;
 }
 
 export interface ChatMessage {
@@ -29,20 +36,14 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
   isMe: boolean;
-  type: 'text' | 'image' | 'file' | 'emoji';
-  attachmentUrl?: string;
-  fileName?: string;
 }
 
 export interface ChatConversation {
   id: string;
-  participants: string[]; 
+  user: { name: string; avatar: string };
   lastMessage: string;
-  lastTimestamp: string;
   unreadCount: number;
   messages: ChatMessage[];
-  connectionStatus: 'pending' | 'accepted';
-  requestedBy: string; 
 }
 
 export interface Notification {
@@ -50,9 +51,106 @@ export interface Notification {
   text: string;
   timestamp: string;
   isRead: boolean;
-  type: 'like' | 'request' | 'event' | 'official' | 'mention' | 'synapse' | 'bookmark';
-  senderAvatar?: string;
-  senderName?: string;
+}
+
+export interface Violation {
+  id: string;
+  type: string;
+  description: string;
+  timestamp: string;
+}
+
+export interface LiveEvent {
+  id: string;
+  title: string;
+  youtubeUrl: string;
+  organizer: string;
+  isLive: boolean;
+}
+
+export interface LeadershipMember {
+  id: string;
+  name: string;
+  role: AuthorityRole;
+  email: string;
+  avatar?: string;
+}
+
+export interface CollegeStats {
+  id: College;
+  followers: number;
+  postCount: number;
+  dean: string;
+  description: string;
+  leadership: LeadershipMember[];
+}
+
+export interface TimelineEvent {
+  id: string;
+  type: 'like' | 'comment' | 'profile_update' | 'new_post' | 'ad_created' | 'poll_created' | 'event_scheduled' | 'event_reminder';
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  targetId?: string;
+  description: string;
+  timestamp: string; 
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description: string;
+  date: string; 
+  time: string;
+  location: string;
+  image?: string;
+  category: 'Academic' | 'Social' | 'Sports' | 'Exams' | 'Other';
+  createdBy: string;
+  attendeeIds?: string[]; 
+  registrationLink?: string;
+}
+
+export interface Post {
+  id: string;
+  author: string;
+  authorId: string;
+  authorRole: string;
+  authorAvatar: string;
+  authorAuthority?: AuthorityRole;
+  timestamp: string;
+  content: string;
+  images?: string[];
+  video?: string;
+  hashtags: string[];
+  likes: number;
+  commentsCount: number;
+  comments: Comment[];
+  views: number;
+  flags: string[]; 
+  isOpportunity: boolean;
+  college: College | 'Global';
+  isAd?: boolean;
+  isMakTV?: boolean;
+  isEventBroadcast?: boolean;
+  eventId?: string; 
+  eventFlyer?: string;
+  eventDate?: string;
+  eventTime?: string;
+  eventLocation?: string;
+  eventTitle?: string;
+  eventRegistrationLink?: string;
+  makTVType?: 'News' | 'Interview';
+  makTVGuest?: string;
+  adPartnerName?: string;
+  adCtaText?: string;
+  adLink?: string;
+  adAmountPaid?: number;
+  aiMetadata?: {
+    category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
+    isSafe?: boolean;
+    safetyReason?: string;
+    sentiment?: string;
+  };
 }
 
 export interface User {
@@ -73,130 +171,20 @@ export interface User {
   appliedTo: string[];
   notifications?: Notification[];
   bio?: string;
-  iqCredits: number;
-  skills: string[];
-  intellectualSignature: string;
-  isOnline?: boolean;
-  lastSeen?: string;
-  connectionsList: string[]; 
-  pendingRequests: string[]; 
-  bookmarkedPosts: string[]; 
-  isVerified: boolean;
-  courseAbbr: string;
-  academicLevel: 'Undergrad' | 'Postgrad' | 'PhD' | 'Faculty';
-  gender: 'M' | 'F' | 'Other';
-  isSuspended: boolean;
-  suspensionEnd?: string;
-  medals: { id: string; name: string; icon: string }[];
 }
 
-export interface Post {
+export interface Comment {
   id: string;
   author: string;
-  authorId: string;
-  authorRole: string;
   authorAvatar: string;
-  authorAuthority?: AuthorityRole;
-  timestamp: string;
-  content: string;
-  hashtags: string[];
-  likes: number;
-  commentsCount: number;
-  comments: any[];
-  views: number;
-  flags: string[];
-  isOpportunity: boolean;
-  college: College | 'Global';
-  isEventBroadcast?: boolean;
-  eventId?: string;
-  eventTitle?: string;
-  eventFlyer?: string;
-  eventDate?: string;
-  eventTime?: string;
-  eventLocation?: string;
-  eventRegistrationLink?: string;
-  aiMetadata?: { category: string; isSafe: boolean };
-  images?: string[];
-  video?: string;
-  isMakTV?: boolean;
-  makTVType?: 'News' | 'Interview';
-  makTVGuest?: string;
-  isAd?: boolean;
-  adAmountPaid?: number;
-}
-
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  category: string;
-  image?: string;
-  createdBy: string;
-  attendeeIds: string[];
-  registrationLink?: string;
-}
-
-export interface CollegeStats {
-  college: College;
-  members: number;
-  posts: number;
-  engagement: number;
-}
-
-export interface TimelineEvent {
-  id: string;
-  type: string;
-  userName: string;
-  userAvatar: string;
-  description: string;
-  timestamp: string;
-}
-
-export interface Violation {
-  id: string;
-  postId: string;
-  userId: string;
-  reason: string;
+  text: string;
   timestamp: string;
 }
 
 export interface Poll {
   id: string;
   question: string;
-  options: { text: string; votes: number }[];
-  totalVotes: number;
-}
-
-export interface LiveEvent {
-  id: string;
-  title: string;
-  organizer: string;
-  youtubeUrl: string;
-}
-
-export interface AnalyticsData {
-  day: string;
-  posts: number;
-  activeUsers: number;
-  messages: number;
-  revenue: number;
-  engagement: number;
-}
-
-export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  college: College;
-  ownerId: string;
-  ownerName: string;
-  status: string;
-  tags: string[];
-  rolesNeeded: string[];
-  team: { id: string; name: string; avatar: string }[];
-  timestamp: string;
-  progress: number;
+  options: { id: string, text: string, votes: number }[];
+  isActive: boolean;
+  expiresAt: string;
 }

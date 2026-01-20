@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { User, Post, College, CalendarEvent } from '../types';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell
+  BarChart, Bar, Cell, PieChart, Pie
 } from 'recharts';
 import { 
   Users, Activity, ShieldAlert, Trash2, 
@@ -12,14 +12,31 @@ import {
   DollarSign, Calendar, Youtube, History, Heart, User as UserIcon, Zap, X,
   FileText, BarChart2, AlertTriangle, ShieldCheck, UserMinus, 
   LayoutDashboard, List, Settings, Database, Server, Terminal,
-  ChevronRight, Search, Menu, Bell, ArrowRight, UserPlus, Download
+  ChevronRight, Search, Menu, Bell, ArrowRight, UserPlus, Download,
+  Sun, Moon, LogOut, Globe, CheckCircle2, MoreVertical, Maximize,
+  Flag, Megaphone, Smartphone, ExternalLink, Sliders, Info, Trash,
+  Lock, Key, RefreshCcw, EyeOff, Save, ImageIcon,
+  // Fix: Added missing icon imports Edit3 and ChevronLeft
+  Edit3, ChevronLeft
 } from 'lucide-react';
 
-const Admin: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'timeline' | 'reports'>('dashboard');
+interface AdminProps {
+  onToggleView?: () => void;
+  onLogout?: () => void;
+}
+
+const Admin: React.FC<AdminProps> = ({ onToggleView, onLogout }) => {
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'ads' | 'moderation' | 'events' | 'settings'>('dashboard');
   const [users, setUsers] = useState<User[]>(db.getUsers());
   const [posts, setPosts] = useState<Post[]>(db.getPosts(undefined, true));
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isAdminDark, setIsAdminDark] = useState(false);
+
+  // Form states for Admin tools
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [eventForm, setEventForm] = useState<Partial<CalendarEvent>>({
+    title: '', description: '', date: '', time: '', location: '', category: 'Official'
+  });
 
   useEffect(() => {
     const sync = () => {
@@ -31,15 +48,21 @@ const Admin: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Mock Chart Data
   const chartData = [
-    { name: 'Mon', visits: 400, posts: 240 },
-    { name: 'Tue', visits: 300, posts: 139 },
-    { name: 'Wed', visits: 200, posts: 980 },
-    { name: 'Thu', visits: 278, posts: 390 },
-    { name: 'Fri', visits: 189, posts: 480 },
-    { name: 'Sat', visits: 239, posts: 380 },
-    { name: 'Sun', visits: 349, posts: 430 },
+    { name: 'Mon', visits: 400, posts: 240, revenue: 120 },
+    { name: 'Tue', visits: 300, posts: 139, revenue: 210 },
+    { name: 'Wed', visits: 200, posts: 980, revenue: 150 },
+    { name: 'Thu', visits: 278, posts: 390, revenue: 300 },
+    { name: 'Fri', visits: 189, posts: 480, revenue: 450 },
+    { name: 'Sat', visits: 239, posts: 380, revenue: 200 },
+    { name: 'Sun', visits: 349, posts: 430, revenue: 180 },
+  ];
+
+  const collegeData = [
+    { name: 'COCIS', value: 450 },
+    { name: 'CEDAT', value: 300 },
+    { name: 'CHUSS', value: 200 },
+    { name: 'LAW', value: 150 },
   ];
 
   const handleVerify = (uid: string) => {
@@ -54,25 +77,34 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleDeletePost = (pid: string) => {
+    if(confirm("Permanently purge this signal from registry?")) {
+      db.deletePost(pid);
+      setPosts(db.getPosts(undefined, true));
+    }
+  };
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
   return (
-    <div className="flex h-full bg-[#f4f6f9] text-[#212529] font-sans">
+    <div className={`flex h-screen w-full transition-colors duration-300 ${isAdminDark ? 'bg-[#454d55] text-white dark-mode' : 'bg-[#f4f6f9] text-[#212529]'}`}>
       {/* AdminLTE Dark Sidebar */}
-      <aside className={`bg-[#343a40] text-[#c2c7d0] transition-all duration-300 flex flex-col ${isSidebarCollapsed ? 'w-16' : 'w-64'}`}>
+      <aside className={`bg-[#343a40] text-[#c2c7d0] transition-all duration-300 flex flex-col shrink-0 ${isSidebarCollapsed ? 'w-16' : 'w-64'}`}>
         <div className="h-14 flex items-center px-4 border-b border-[#4b545c]">
           <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center mr-3 shrink-0">
-            <Terminal size={18} className="text-white" />
+            <ShieldCheck size={18} className="text-white" />
           </div>
-          {!isSidebarCollapsed && <span className="font-bold text-lg text-white uppercase tracking-tight">MakAdmin <span className="font-light">v3.2</span></span>}
+          {!isSidebarCollapsed && <span className="font-bold text-lg text-white uppercase tracking-tight">MakAdmin <span className="font-light">v3.5</span></span>}
         </div>
 
         <div className="p-4 flex items-center border-b border-[#4b545c]">
           <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" className="w-8 h-8 rounded-full bg-white p-1 mr-3 shrink-0" />
           {!isSidebarCollapsed && (
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-white truncate">Platform Architect</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-white truncate">SysArch-01</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <span className="text-[10px] uppercase font-bold text-[#c2c7d0]">Online</span>
+                <span className="text-[10px] uppercase font-bold text-[#c2c7d0]">Registry Open</span>
               </div>
             </div>
           )}
@@ -82,45 +114,53 @@ const Admin: React.FC = () => {
           <ul className="space-y-1 px-2">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18}/> },
-              { id: 'users', label: 'User Management', icon: <Users size={18}/> },
-              { id: 'timeline', label: 'System Timeline', icon: <History size={18}/> },
-              { id: 'reports', label: 'Analytics Reports', icon: <BarChart2 size={18}/> },
+              { id: 'users', label: 'Node Registry', icon: <Users size={18}/> },
+              { id: 'ads', label: 'Ad Campaigns', icon: <Megaphone size={18}/> },
+              { id: 'events', label: 'Campus Calendar', icon: <Calendar size={18}/> },
+              { id: 'moderation', label: 'Moderation Hub', icon: <Flag size={18}/> },
+              { id: 'settings', label: 'System Settings', icon: <Settings size={18}/> },
             ].map(item => (
               <li key={item.id}>
                 <button 
                   onClick={() => setActiveTab(item.id as any)}
-                  className={`w-full flex items-center px-3 py-2.5 rounded transition-colors ${activeTab === item.id ? 'bg-indigo-600 text-white' : 'hover:bg-white/5'}`}
+                  className={`w-full flex items-center px-3 py-2.5 rounded transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-white/5'}`}
                 >
                   <div className="shrink-0">{item.icon}</div>
                   {!isSidebarCollapsed && <span className="ml-3 text-sm font-medium">{item.label}</span>}
+                  {!isSidebarCollapsed && item.id === 'moderation' && <span className="ml-auto bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded font-black">9+</span>}
                 </button>
               </li>
             ))}
           </ul>
         </nav>
+        
+        <div className="p-4 mt-auto border-t border-[#4b545c]">
+           <button onClick={onToggleView} className="w-full bg-[#6c757d] hover:bg-[#5a6268] text-white py-2.5 rounded text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all">
+              <LogOut size={14} className="rotate-180"/> {!isSidebarCollapsed && "Exit Admin"}
+           </button>
+        </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Navbar */}
-        <header className="h-14 bg-white border-b border-[#dee2e6] flex items-center justify-between px-4 shrink-0">
+        <header className={`h-14 flex items-center justify-between px-4 shrink-0 border-b ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white border-[#dee2e6]'}`}>
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="p-2 hover:bg-black/5 rounded text-[#495057]"><Menu size={20}/></button>
-            <nav className="hidden md:flex gap-4 text-sm font-medium text-[#495057]">
-              <button className="hover:text-indigo-600">Home</button>
-              <button className="hover:text-indigo-600">Contact</button>
+            <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="p-2 hover:bg-black/5 rounded text-[#495057] dark:text-slate-300"><Menu size={20}/></button>
+            <nav className="hidden md:flex gap-4 text-sm font-medium text-[#495057] dark:text-slate-300">
+              <button onClick={onToggleView} className="hover:text-indigo-600 flex items-center gap-2">Social Feed</button>
+              <button className="hover:text-indigo-600">Contact Support</button>
             </nav>
           </div>
-          <div className="flex items-center gap-4 text-[#495057]">
-            <button className="relative p-2 hover:bg-black/5 rounded"><Search size={20}/></button>
-            <button className="relative p-2 hover:bg-black/5 rounded">
-              <MessageCircle size={20}/>
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#dc3545] text-white text-[9px] flex items-center justify-center rounded-full font-bold">3</span>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setIsAdminDark(!isAdminDark)} className="p-2 hover:bg-black/5 rounded text-[#495057] dark:text-slate-300">
+               {isAdminDark ? <Sun size={18}/> : <Moon size={18}/>}
             </button>
             <button className="relative p-2 hover:bg-black/5 rounded">
               <Bell size={20}/>
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#ffc107] text-white text-[9px] flex items-center justify-center rounded-full font-bold">15</span>
+              <span className="absolute top-1 right-1 w-4 h-4 bg-[#ffc107] text-white text-[9px] flex items-center justify-center rounded-full font-bold">12</span>
             </button>
+            <button onClick={onLogout} className="p-2 hover:bg-rose-500/10 rounded text-rose-500"><LogOut size={20}/></button>
           </div>
         </header>
 
@@ -128,190 +168,211 @@ const Admin: React.FC = () => {
         <main className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar">
           {/* Breadcrumbs */}
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-normal text-[#212529] capitalize">{activeTab}</h1>
-            <nav className="flex items-center gap-2 text-xs font-medium text-slate-500 uppercase tracking-widest">
-              <span className="hover:text-indigo-600 cursor-pointer">Admin</span>
+            <h1 className={`text-2xl font-light capitalize ${isAdminDark ? 'text-white' : 'text-[#212529]'}`}>{activeTab} <span className="text-slate-400 font-extralight text-sm">Control Panel</span></h1>
+            <nav className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <button onClick={() => setActiveTab('dashboard')} className="hover:text-indigo-600">Admin</button>
               <ChevronRight size={12}/>
-              <span className="text-[#6c757d]">{activeTab}</span>
+              <span className={isAdminDark ? 'text-slate-300' : 'text-[#6c757d]'}>{activeTab}</span>
             </nav>
           </div>
 
           {activeTab === 'dashboard' && (
             <div className="space-y-8 animate-in fade-in duration-500">
-              {/* Info Boxes */}
+              {/* Info Boxes / Small Boxes */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { label: 'New Nodes', val: users.length, icon: <Users size={32}/>, bg: 'bg-[#17a2b8]', labelColor: 'text-white' },
-                  { label: 'Total Broadcasts', val: posts.length, icon: <Activity size={32}/>, bg: 'bg-[#28a745]', labelColor: 'text-white' },
-                  { label: 'Node Registry', val: '44', icon: <UserIcon size={32}/>, bg: 'bg-[#ffc107]', labelColor: 'text-[#212529]' },
-                  { label: 'System Alerts', val: '65', icon: <ShieldAlert size={32}/>, bg: 'bg-[#dc3545]', labelColor: 'text-white' },
+                  { label: 'Active Nodes', val: users.length, icon: <Users size={48}/>, bg: 'bg-[#17a2b8]', link: 'users' },
+                  { label: 'Network Pulse', val: '92%', icon: <Activity size={48}/>, bg: 'bg-[#28a745]', link: 'moderation' },
+                  { label: 'Pending Checks', val: users.filter(u => !u.isVerified).length, icon: <ShieldAlert size={48}/>, bg: 'bg-[#ffc107]', text: 'text-dark' },
+                  { label: 'Campaign Hits', val: '12.4k', icon: <Megaphone size={48}/>, bg: 'bg-[#dc3545]', link: 'ads' },
                 ].map((box, i) => (
-                  <div key={i} className={`${box.bg} ${box.labelColor} rounded shadow-md relative overflow-hidden flex flex-col justify-between h-32`}>
+                  <div key={i} className={`${box.bg} ${box.text === 'text-dark' ? 'text-[#212529]' : 'text-white'} rounded shadow-lg overflow-hidden flex flex-col justify-between h-36 group relative`}>
                     <div className="p-4 flex justify-between items-start">
                       <div>
-                        <h3 className="text-3xl font-bold">{box.val}</h3>
-                        <p className="text-sm opacity-90">{box.label}</p>
+                        <h3 className="text-4xl font-black">{box.val}</h3>
+                        <p className="text-sm font-bold opacity-80 uppercase tracking-wider">{box.label}</p>
                       </div>
-                      <div className="opacity-20 translate-x-4 -translate-y-2">{box.icon}</div>
+                      <div className="absolute right-2 top-2 opacity-10 group-hover:scale-110 group-hover:rotate-12 transition-transform">{box.icon}</div>
                     </div>
-                    <button className="w-full py-1 bg-black/10 hover:bg-black/20 text-center text-xs font-medium flex items-center justify-center gap-2">
-                      More info <ArrowRight size={12}/>
+                    <button 
+                      onClick={() => box.link && setActiveTab(box.link as any)}
+                      className="w-full py-1.5 bg-black/10 hover:bg-black/20 text-center text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                    >
+                      Audit Records <ArrowRight size={12}/>
                     </button>
                   </div>
                 ))}
               </div>
 
-              {/* Charts & Tables Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Main Graph Card */}
-                <div className="bg-white border-t-4 border-indigo-500 rounded shadow-md overflow-hidden">
-                  <div className="p-4 border-b border-[#dee2e6] flex items-center justify-between">
-                    <h3 className="text-lg font-medium flex items-center gap-2"><BarChart2 size={18}/> Engagement Signals</h3>
+              {/* Advanced Graphs Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* User Engagement Area Chart */}
+                <div className={`lg:col-span-2 rounded shadow-md border-t-4 border-indigo-500 overflow-hidden ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                  <div className="p-4 border-b border-[#dee2e6] dark:border-[#4b545c] flex items-center justify-between">
+                    <h3 className="font-bold flex items-center gap-2"><BarChart2 size={18}/> Registry Interaction Log</h3>
                     <div className="flex gap-1">
-                      <button className="px-2 py-1 bg-[#f8f9fa] border border-[#ced4da] rounded text-[10px] uppercase font-bold text-[#6c757d]">Week</button>
-                      <button className="px-2 py-1 bg-[#f8f9fa] border border-[#ced4da] rounded text-[10px] uppercase font-bold text-[#6c757d]">Month</button>
+                      <button className="px-2 py-1 bg-indigo-500 text-white rounded text-[10px] font-bold uppercase">Signals</button>
+                      <button className="px-2 py-1 bg-[#f8f9fa] dark:bg-white/5 border border-[#ced4da] rounded text-[10px] font-bold uppercase">Traffic</button>
                     </div>
                   </div>
                   <div className="p-6 h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={chartData}>
                         <defs>
-                          <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                          <linearGradient id="colorEng" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Area type="monotone" dataKey="visits" stroke="#8884d8" fillOpacity={1} fill="url(#colorVisits)" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isAdminDark ? "#4b545c" : "#eee"} />
+                        <XAxis dataKey="name" stroke={isAdminDark ? "#c2c7d0" : "#6c757d"} fontSize={10} />
+                        <YAxis stroke={isAdminDark ? "#c2c7d0" : "#6c757d"} fontSize={10} />
+                        <Tooltip contentStyle={{ backgroundColor: isAdminDark ? '#343a40' : '#fff', border: 'none' }} />
+                        <Area type="monotone" dataKey="visits" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorEng)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                {/* Signal Traffic Card */}
-                <div className="bg-white border-t-4 border-[#28a745] rounded shadow-md overflow-hidden">
-                   <div className="p-4 border-b border-[#dee2e6]">
-                     <h3 className="text-lg font-medium flex items-center gap-2"><Server size={18}/> Node Traffic</h3>
+                {/* College Distribution Pie Chart */}
+                <div className={`rounded shadow-md border-t-4 border-[#ffc107] overflow-hidden ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                   <div className="p-4 border-b border-[#dee2e6] dark:border-[#4b545c]">
+                     <h3 className="font-bold flex items-center gap-2"><Globe size={18}/> Wing Distribution</h3>
                    </div>
                    <div className="p-6 h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false}/>
-                        <XAxis dataKey="name" />
-                        <YAxis />
+                      <PieChart>
+                        <Pie data={collegeData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                          {collegeData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
                         <Tooltip />
-                        <Bar dataKey="posts" fill="#28a745" radius={[4, 4, 0, 0]} />
-                      </BarChart>
+                      </PieChart>
                     </ResponsiveContainer>
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                       {collegeData.map((c, i) => (
+                         <div key={i} className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
+                            {c.name}
+                         </div>
+                       ))}
+                    </div>
                    </div>
                 </div>
               </div>
 
-              {/* Recent Nodes Card */}
-              <div className="bg-white border-t-4 border-indigo-500 rounded shadow-md overflow-hidden">
-                 <div className="p-4 border-b border-[#dee2e6]">
-                   <h3 className="text-lg font-medium flex items-center gap-2"><Database size={18}/> Latest Node Registrations</h3>
+              {/* Advanced Status Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                 {/* System Logs */}
+                 <div className={`rounded shadow-md border-t-4 border-[#28a745] overflow-hidden ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                    <div className="p-4 border-b border-[#dee2e6] dark:border-[#4b545c] flex justify-between">
+                       <h3 className="font-bold">Protocol Forensics</h3>
+                       <button className="text-indigo-600 text-[10px] font-bold uppercase">View Terminal</button>
+                    </div>
+                    <div className="p-4 space-y-4">
+                       {[
+                         { msg: 'Ad Campaign ID: 2940 started', type: 'info', time: '1m' },
+                         { msg: 'High traffic detected in COCIS hub', type: 'warning', time: '12m' },
+                         { msg: 'Registry sync successful (204 nodes)', type: 'success', time: '1h' },
+                         { msg: 'Security filter blocked 2 flags', type: 'danger', time: '3h' },
+                       ].map((log, i) => (
+                         <div key={i} className="flex items-center gap-4 group">
+                            <div className={`w-2 h-2 rounded-full ${
+                              log.type === 'info' ? 'bg-[#17a2b8]' : 
+                              log.type === 'warning' ? 'bg-[#ffc107]' : 
+                              log.type === 'danger' ? 'bg-[#dc3545]' : 'bg-[#28a745]'
+                            }`}></div>
+                            <span className="flex-1 text-sm font-medium opacity-80">{log.msg}</span>
+                            <span className="text-[10px] font-bold text-slate-400">{log.time}</span>
+                         </div>
+                       ))}
+                    </div>
                  </div>
-                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                       <thead className="bg-[#f8f9fa] border-b border-[#dee2e6]">
-                          <tr>
-                             <th className="p-4 font-bold text-[#495057]">ID</th>
-                             <th className="p-4 font-bold text-[#495057]">Node</th>
-                             <th className="p-4 font-bold text-[#495057]">Status</th>
-                             <th className="p-4 font-bold text-[#495057]">Intelligence</th>
-                          </tr>
-                       </thead>
-                       <tbody className="divide-y divide-[#dee2e6]">
-                          {users.slice(0, 5).map(u => (
-                            <tr key={u.id} className="hover:bg-slate-50 transition-colors">
-                               <td className="p-4 text-[#007bff] font-medium">{u.id.substring(0, 8)}</td>
-                               <td className="p-4 flex items-center gap-3">
-                                  <img src={u.avatar} className="w-8 h-8 rounded-full border border-slate-200" />
-                                  <div>
-                                    <p className="font-bold">{u.name}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase">{u.college}</p>
-                                  </div>
-                               </td>
-                               <td className="p-4">
-                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${u.isVerified ? 'bg-[#28a745] text-white' : 'bg-[#6c757d] text-white'}`}>
-                                    {u.isVerified ? 'Verified' : 'Pending'}
-                                  </span>
-                                </td>
-                                <td className="p-4">
-                                  <div className="flex items-center gap-2">
-                                     <div className="flex-1 bg-slate-100 rounded-full h-2">
-                                        <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${(u.iqCredits / 10000) * 100}%` }}></div>
-                                     </div>
-                                     <span className="text-[10px] font-bold text-slate-500">{u.iqCredits} IQ</span>
-                                  </div>
-                                </td>
-                            </tr>
-                          ))}
-                       </tbody>
-                    </table>
-                 </div>
-                 <div className="p-4 border-t border-[#dee2e6] bg-[#f8f9fa] text-center">
-                    <button className="text-sm font-bold text-indigo-600 hover:underline">View All Users</button>
+
+                 {/* Browser/Device Usage */}
+                 <div className={`rounded shadow-md border-t-4 border-[#17a2b8] overflow-hidden ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                    <div className="p-4 border-b border-[#dee2e6] dark:border-[#4b545c]">
+                       <h3 className="font-bold">Device Access Registry</h3>
+                    </div>
+                    <div className="p-6 space-y-6">
+                       {[
+                         { label: 'Mobile Pulse', val: 78, color: 'bg-[#dc3545]' },
+                         { label: 'Desktop Sync', val: 12, color: 'bg-[#007bff]' },
+                         { label: 'Tablet Terminal', val: 10, color: 'bg-[#28a745]' },
+                       ].map((dev, i) => (
+                         <div key={i} className="space-y-1">
+                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                               <span>{dev.label}</span>
+                               <span>{dev.val}%</span>
+                            </div>
+                            <div className="h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                               <div className={`${dev.color} h-full`} style={{ width: `${dev.val}%` }}></div>
+                            </div>
+                         </div>
+                       ))}
+                    </div>
                  </div>
               </div>
             </div>
           )}
 
           {activeTab === 'users' && (
-            <div className="bg-white border-t-4 border-indigo-500 rounded shadow-md overflow-hidden animate-in slide-in-from-bottom-5 duration-500">
-               <div className="p-4 border-b border-[#dee2e6] flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Node Registry Management</h3>
-                  <div className="relative">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
-                    <input className="pl-9 pr-4 py-1.5 border border-[#ced4da] rounded text-sm outline-none focus:border-indigo-500 transition-all" placeholder="Search registry..."/>
+            <div className={`rounded shadow-md border-t-4 border-indigo-500 overflow-hidden animate-in slide-in-from-bottom-5 duration-500 ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+               <div className="p-4 border-b border-[#dee2e6] dark:border-[#4b545c] flex items-center justify-between">
+                  <h3 className="font-bold">Full Node Directory</h3>
+                  <div className="flex gap-4">
+                     <button className="px-4 py-1.5 bg-[#28a745] text-white rounded text-[10px] font-black uppercase tracking-widest">Add Node</button>
+                     <div className="relative">
+                       <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/>
+                       <input className={`pl-9 pr-4 py-1.5 border rounded text-sm outline-none focus:border-indigo-500 transition-all ${isAdminDark ? 'bg-white/5 border-white/10' : 'border-[#ced4da]'}`} placeholder="Filter signals..."/>
+                     </div>
                   </div>
                </div>
                <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-[#f8f9fa] border-b border-[#dee2e6]">
+                    <thead className={`border-b ${isAdminDark ? 'bg-white/5 border-white/10' : 'bg-[#f8f9fa] border-[#dee2e6]'}`}>
                       <tr>
-                        <th className="p-4">Name</th>
-                        <th className="p-4">College</th>
-                        <th className="p-4">Rank</th>
-                        <th className="p-4">Protocol Status</th>
-                        <th className="p-4 text-center">Actions</th>
+                        <th className="p-4 font-black uppercase tracking-widest text-[10px]">Registry Entity</th>
+                        <th className="p-4 font-black uppercase tracking-widest text-[10px]">Network Wing</th>
+                        <th className="p-4 font-black uppercase tracking-widest text-[10px]">Rank</th>
+                        <th className="p-4 font-black uppercase tracking-widest text-[10px]">Clearance</th>
+                        <th className="p-4 font-black uppercase tracking-widest text-[10px] text-center">Protocol Cmd</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#dee2e6]">
+                    <tbody className={`divide-y ${isAdminDark ? 'divide-white/5' : 'divide-[#dee2e6]'}`}>
                       {users.map(u => (
-                        <tr key={u.id} className="hover:bg-slate-50">
+                        <tr key={u.id} className="hover:bg-indigo-500/5">
                           <td className="p-4">
                             <div className="flex items-center gap-3">
                               <img src={u.avatar} className="w-10 h-10 rounded-lg border border-slate-200" />
                               <div className="min-w-0">
-                                <p className="font-bold text-[#212529]">{u.name}</p>
-                                <p className="text-[10px] text-[#6c757d] uppercase truncate">{u.email}</p>
+                                <p className="font-bold">{u.name}</p>
+                                <p className="text-[10px] opacity-60 uppercase">{u.email}</p>
                               </div>
                             </div>
                           </td>
                           <td className="p-4">
-                             <p className="font-bold text-[#495057]">{u.college}</p>
-                             <p className="text-[10px] uppercase text-slate-500">{u.courseAbbr}</p>
+                             <p className="font-bold">{u.college}</p>
+                             <p className="text-[10px] uppercase opacity-50">{u.courseAbbr}</p>
                           </td>
                           <td className="p-4">
-                             <span className="text-xs font-bold text-indigo-600 uppercase">{u.role}</span>
+                             <span className="text-xs font-bold text-indigo-500 uppercase">{u.role}</span>
                           </td>
                           <td className="p-4">
                              {u.isSuspended ? (
-                               <span className="bg-[#dc3545] text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">Deactivated</span>
+                               <span className="bg-[#dc3545] text-white px-2 py-0.5 rounded text-[10px] font-black uppercase">Terminated</span>
+                             ) : u.isVerified ? (
+                               <span className="bg-[#28a745] text-white px-2 py-0.5 rounded text-[10px] font-black uppercase">Authorized</span>
                              ) : (
-                               <span className="bg-[#28a745] text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase">Active</span>
+                               <span className="bg-[#ffc107] text-[#212529] px-2 py-0.5 rounded text-[10px] font-black uppercase">Review Required</span>
                              )}
                           </td>
                           <td className="p-4">
                              <div className="flex items-center justify-center gap-2">
-                                <button onClick={() => handleVerify(u.id)} className="p-2 bg-[#007bff]/10 text-[#007bff] hover:bg-[#007bff] hover:text-white rounded transition-colors" title="Verify Node"><ShieldCheck size={16}/></button>
-                                <button onClick={() => handleSuspend(u.id)} className="p-2 bg-[#dc3545]/10 text-[#dc3545] hover:bg-[#dc3545] hover:text-white rounded transition-colors" title="Deactivate"><UserMinus size={16}/></button>
-                                <button className="p-2 bg-[#6c757d]/10 text-[#6c757d] hover:bg-[#6c757d] hover:text-white rounded transition-colors" title="Edit Properties"><Settings size={16}/></button>
+                                <button onClick={() => handleVerify(u.id)} className="p-2 bg-[#007bff]/10 text-[#007bff] hover:bg-[#007bff] hover:text-white rounded transition-colors" title="Toggle Authorization"><ShieldCheck size={16}/></button>
+                                <button onClick={() => handleSuspend(u.id)} className="p-2 bg-[#dc3545]/10 text-[#dc3545] hover:bg-[#dc3545] hover:text-white rounded transition-colors" title="Emergency Lock"><UserMinus size={16}/></button>
+                                <button className="p-2 bg-slate-500/10 text-slate-500 hover:bg-slate-500 hover:text-white rounded transition-colors"><Settings size={16}/></button>
                              </div>
                           </td>
                         </tr>
@@ -322,71 +383,286 @@ const Admin: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'timeline' && (
-            <div className="max-w-4xl mx-auto space-y-8 animate-in slide-in-from-right-5 duration-500">
-               <h3 className="text-xl font-bold border-b border-[#dee2e6] pb-4">Global System Events</h3>
+          {activeTab === 'ads' && (
+            <div className="space-y-8 animate-in zoom-in duration-500">
+               <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold uppercase tracking-tight">Campaign Intelligence</h3>
+                  <button className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-600/20 flex items-center gap-2 hover:bg-emerald-700">
+                     <Plus size={16}/> New Campaign
+                  </button>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className={`p-8 rounded-3xl shadow-md border-l-8 border-indigo-600 ${isAdminDark ? 'bg-[#343a40]' : 'bg-white'}`}>
+                     <div className="flex justify-between items-start mb-6">
+                        <DollarSign className="text-indigo-600" size={32}/>
+                        <span className="bg-indigo-100 text-indigo-600 px-2 py-1 rounded text-[10px] font-black uppercase">Revenue</span>
+                     </div>
+                     <p className="text-4xl font-black tracking-tighter">$1,240.00</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Fiscal Cycle 2025</p>
+                  </div>
+                  <div className={`p-8 rounded-3xl shadow-md border-l-8 border-emerald-600 ${isAdminDark ? 'bg-[#343a40]' : 'bg-white'}`}>
+                     <div className="flex justify-between items-start mb-6">
+                        <Eye className="text-emerald-600" size={32}/>
+                        <span className="bg-emerald-100 text-emerald-600 px-2 py-1 rounded text-[10px] font-black uppercase">Visibility</span>
+                     </div>
+                     <p className="text-4xl font-black tracking-tighter">84.2k</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Network Impression Hits</p>
+                  </div>
+                  <div className={`p-8 rounded-3xl shadow-md border-l-8 border-rose-600 ${isAdminDark ? 'bg-[#343a40]' : 'bg-white'}`}>
+                     <div className="flex justify-between items-start mb-6">
+                        <Zap className="text-rose-600" size={32}/>
+                        <span className="bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-black uppercase">Engagement</span>
+                     </div>
+                     <p className="text-4xl font-black tracking-tighter">3.2%</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Conversion CTR Signal</p>
+                  </div>
+               </div>
+
+               <div className={`rounded shadow-md border-t-4 border-indigo-500 ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                  <div className="p-4 border-b border-[#dee2e6] dark:border-[#4b545c]">
+                     <h4 className="font-bold uppercase tracking-widest text-sm">Active Broadcast Campaigns</h4>
+                  </div>
+                  <div className="overflow-x-auto">
+                     <table className="w-full text-left text-sm">
+                        <thead className={`border-b ${isAdminDark ? 'bg-white/5 border-white/10' : 'bg-[#f8f9fa] border-[#dee2e6]'}`}>
+                           <tr>
+                              <th className="p-4 font-black uppercase text-[10px]">Partner Node</th>
+                              <th className="p-4 font-black uppercase text-[10px]">Asset Payload</th>
+                              <th className="p-4 font-black uppercase text-[10px]">Investment</th>
+                              <th className="p-4 font-black uppercase text-[10px]">Status</th>
+                              <th className="p-4 font-black uppercase text-[10px] text-center">Command</th>
+                           </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#dee2e6] dark:divide-white/5">
+                           {[
+                             { client: 'MTN Pulse', asset: 'Summer Gigabytes', spent: '$450', status: 'Active', target: 'COCIS' },
+                             { client: 'Stanbic Bank', asset: 'Student Savings', spent: '$800', status: 'Paused', target: 'Global' },
+                             { client: 'Jumia Food', asset: 'Campus Discounts', spent: '$120', status: 'Completed', target: 'Global' },
+                           ].map((ad, i) => (
+                             <tr key={i} className="hover:bg-slate-500/5">
+                                <td className="p-4 font-bold">{ad.client}</td>
+                                <td className="p-4 text-xs opacity-70">{ad.asset} <br/> <span className="text-[10px] text-indigo-500 font-black uppercase">T: {ad.target}</span></td>
+                                <td className="p-4 font-bold text-emerald-600">{ad.spent}</td>
+                                <td className="p-4">
+                                   <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                                     ad.status === 'Active' ? 'bg-[#28a745] text-white' : 
+                                     ad.status === 'Paused' ? 'bg-[#ffc107] text-dark' : 'bg-[#6c757d] text-white'
+                                   }`}>{ad.status}</span>
+                                </td>
+                                <td className="p-4">
+                                   <div className="flex items-center justify-center gap-2">
+                                      <button className="p-2 hover:bg-indigo-600/10 text-indigo-600 rounded"><Edit3 size={16}/></button>
+                                      <button className="p-2 hover:bg-rose-600/10 text-rose-500 rounded"><Trash size={16}/></button>
+                                   </div>
+                                </td>
+                             </tr>
+                           ))}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+          ))}
+
+          {activeTab === 'events' && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-left-5 duration-500">
+               <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold uppercase tracking-tight">Official Campus Calendar</h3>
+                  <button onClick={() => setShowEventModal(true)} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/30 flex items-center gap-2">
+                     <Plus size={16}/> Initialize Ceremony
+                  </button>
+               </div>
                
-               <div className="relative pl-8 space-y-12 before:absolute before:left-3 before:top-0 before:bottom-0 before:w-0.5 before:bg-[#dee2e6]">
-                  {[
-                    { type: 'user', time: '5 mins ago', title: 'New Peer Node Registered', content: 'Ashraf Guru synchronized with the COCIS wing.', icon: <UserPlus size={14}/>, color: 'bg-[#17a2b8]' },
-                    { type: 'post', time: '12 mins ago', title: 'Official Broadcast Decrypted', content: 'Guild EC published 89th Inauguration protocol.', icon: <Zap size={14}/>, color: 'bg-[#ffc107]' },
-                    { type: 'alert', time: '1 hour ago', title: 'Content Security Filter Triggered', content: 'AI model blocked a non-compliant broadcast in the Global hub.', icon: <AlertTriangle size={14}/>, color: 'bg-[#dc3545]' },
-                    { type: 'admin', time: '2 hours ago', title: 'Registry Backup Verified', content: 'System state archived to University central servers.', icon: <Database size={14}/>, color: 'bg-[#6c757d]' },
-                    { type: 'stat', time: '3 hours ago', title: 'Engagement Threshold Reached', content: 'Platform traffic exceeded 15,000 active pulses today.', icon: <Activity size={14}/>, color: 'bg-[#28a745]' },
-                  ].map((evt, i) => (
-                    <div key={i} className="relative">
-                       <div className={`absolute -left-11 top-0 w-8 h-8 ${evt.color} text-white rounded-full flex items-center justify-center shadow z-10`}>
-                          {evt.icon}
-                       </div>
-                       <div className="bg-white rounded shadow-sm border border-[#dee2e6] overflow-hidden">
-                          <div className="p-3 border-b border-[#dee2e6] flex items-center justify-between">
-                             <h4 className="text-sm font-bold text-[#212529]">{evt.title}</h4>
-                             <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1"><Clock size={10}/> {evt.time}</span>
+               <div className={`rounded shadow-md border-t-4 border-rose-500 ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 divide-x divide-[#dee2e6] dark:divide-white/5">
+                     <div className="p-8 space-y-6">
+                        <h4 className="font-black text-xs uppercase tracking-widest text-slate-400">Scheduled Signals</h4>
+                        <div className="space-y-4">
+                           {db.getCalendarEvents().slice(0, 4).map(ev => (
+                             <div key={ev.id} className="p-4 bg-[var(--bg-secondary)] dark:bg-white/5 rounded-2xl border border-[var(--border-color)] group hover:border-indigo-500 transition-all cursor-pointer">
+                                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-1">{ev.date} @ {ev.time}</p>
+                                <h5 className="font-bold text-sm leading-tight">{ev.title}</h5>
+                                <p className="text-[10px] text-slate-400 mt-2 uppercase">{ev.location}</p>
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                     <div className="md:col-span-2 p-8">
+                        <div className="flex items-center justify-between mb-8">
+                           <h4 className="font-black text-xs uppercase tracking-widest text-slate-400">Registry Visualizer</h4>
+                           <div className="flex gap-2">
+                              <button className="p-2 hover:bg-black/5 rounded"><ChevronLeft size={16}/></button>
+                              <span className="text-sm font-bold">April 2025</span>
+                              <button className="p-2 hover:bg-black/5 rounded"><ChevronRight size={16}/></button>
+                           </div>
+                        </div>
+                        <div className="grid grid-cols-7 gap-px bg-[#dee2e6] dark:bg-white/10 border border-[#dee2e6] dark:border-white/10 rounded-xl overflow-hidden shadow-inner">
+                           {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
+                             <div key={d} className={`h-8 flex items-center justify-center text-[10px] font-black text-slate-500 ${isAdminDark ? 'bg-[#343a40]' : 'bg-[#f8f9fa]'}`}>{d}</div>
+                           ))}
+                           {Array.from({ length: 35 }).map((_, i) => (
+                             <div key={i} className={`h-16 p-1 flex flex-col justify-between ${isAdminDark ? 'bg-[#343a40]' : 'bg-white'} hover:bg-indigo-500/5 transition-colors`}>
+                                <span className="text-[9px] text-slate-400 font-bold">{i % 31 + 1}</span>
+                                {i === 12 && <div className="w-full h-1.5 bg-indigo-500 rounded-full"></div>}
+                                {i === 24 && <div className="w-full h-1.5 bg-rose-500 rounded-full"></div>}
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+          )}
+
+          {activeTab === 'moderation' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-rose-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
+                     <ShieldAlert size={24}/>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black uppercase tracking-tight">Signal Quarantine Hub</h3>
+                    <p className="text-[10px] font-black uppercase text-rose-500 tracking-widest mt-1">9 Pending Compliance Reviews Detected</p>
+                  </div>
+               </div>
+
+               <div className="grid grid-cols-1 gap-6">
+                  {posts.filter(p => p.flags.length > 0 || p.content.includes('flagged')).map(p => (
+                    <div key={p.id} className={`rounded-3xl shadow-md border-t-4 border-rose-600 overflow-hidden ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white'}`}>
+                       <div className="p-6 flex flex-col md:flex-row gap-8 items-start">
+                          <div className="flex-1 space-y-4">
+                             <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                   <img src={p.authorAvatar} className="w-10 h-10 rounded-full border border-slate-200" />
+                                   <div>
+                                      <p className="text-sm font-bold uppercase tracking-tight">{p.author}</p>
+                                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Post Protocol ID: {p.id}</p>
+                                   </div>
+                                </div>
+                                <span className="px-3 py-1 bg-rose-100 text-rose-600 rounded-full text-[9px] font-black uppercase tracking-widest">Flagged by AI</span>
+                             </div>
+                             <p className={`text-sm leading-relaxed p-4 rounded-2xl border-2 border-dashed ${isAdminDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'} font-medium`}>
+                                "{p.content}"
+                             </p>
+                             <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                <span className="flex items-center gap-2"><Eye size={14}/> {p.views} Scans</span>
+                                <span className="flex items-center gap-2 text-rose-500"><AlertTriangle size={14}/> Violation of Code-304</span>
+                             </div>
                           </div>
-                          <div className="p-4 text-sm text-[#495057]">
-                             {evt.content}
-                          </div>
-                          <div className="p-2 bg-[#f8f9fa] border-t border-[#dee2e6] flex gap-2">
-                             <button className="text-[10px] font-bold text-indigo-600 bg-white border border-[#ced4da] px-2 py-1 rounded hover:bg-slate-50 transition-colors">Inspect Signal</button>
-                             <button className="text-[10px] font-bold text-rose-500 bg-white border border-[#ced4da] px-2 py-1 rounded hover:bg-slate-50 transition-colors">Dismiss</button>
+                          <div className="w-full md:w-64 flex flex-col gap-3 shrink-0">
+                             <button onClick={() => handleDeletePost(p.id)} className="w-full bg-[#dc3545] text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 hover:bg-rose-700 transition-all">
+                                <Trash2 size={16}/> Purge Signal
+                             </button>
+                             <button className="w-full bg-[#28a745] text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all">
+                                <CheckCircle2 size={16}/> Verify Compliance
+                             </button>
+                             <button onClick={() => handleSuspend(p.authorId)} className="w-full border border-[#dee2e6] dark:border-white/10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black/5 transition-all">
+                                Suspend Node
+                             </button>
                           </div>
                        </div>
                     </div>
                   ))}
                </div>
-
-               <div className="text-center py-10">
-                  <button className="bg-[#6c757d] text-white px-8 py-2.5 rounded text-sm font-bold shadow-md hover:bg-[#5a6268] transition-colors">Load Archive Events</button>
-               </div>
             </div>
           )}
 
-          {activeTab === 'reports' && (
-            <div className="py-20 text-center space-y-8 animate-in zoom-in duration-700">
-               <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center mx-auto shadow-inner border border-[#dee2e6] text-slate-300">
-                  <BarChart2 size={56} className="animate-pulse" />
-               </div>
-               <div>
-                  <h3 className="text-3xl font-bold text-[#6c757d]">Module Registry Under Sync</h3>
-                  <p className="text-sm font-medium text-slate-500 mt-2 max-w-sm mx-auto">Analytical reports and automated forensic outputs are currently being generated for the weekly governance audit.</p>
-                  <button className="mt-8 bg-indigo-600 text-white px-10 py-3 rounded text-sm font-bold shadow-xl hover:bg-indigo-700 transition-all flex items-center gap-2 mx-auto">
-                    <Download size={16}/> Force Signal Export
-                  </button>
-               </div>
+          {activeTab === 'settings' && (
+            <div className="max-w-4xl space-y-12 animate-in fade-in duration-500">
+               <section className="space-y-6">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
+                     <Sliders size={18} className="text-indigo-600" /> Platform Infrastructure Toggles
+                  </h4>
+                  <div className={`rounded-3xl shadow-sm border ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white border-[#dee2e6]'} overflow-hidden`}>
+                     {[
+                       { label: 'Public Registration Registry', desc: 'Allows new node identities to establish synchronization.', status: true },
+                       { label: 'AI Signal Moderation Protocol', desc: 'Auto-scans all broadcasts for policy compliance.', status: true },
+                       { label: 'Global Private Messaging Handshake', desc: 'Requires mutual connection before transmission.', status: false },
+                       { label: 'Direct Database Write Access', desc: 'Enables real-time data persistence (Bypass cache).', status: true },
+                     ].map((set, i) => (
+                       <div key={i} className={`p-6 flex items-center justify-between border-b last:border-0 ${isAdminDark ? 'border-white/5' : 'border-[#dee2e6]'}`}>
+                          <div>
+                             <p className="font-bold text-sm tracking-tight">{set.label}</p>
+                             <p className="text-[10px] font-medium opacity-60 uppercase mt-1">{set.desc}</p>
+                          </div>
+                          <button className={`w-12 h-6 rounded-full relative transition-all ${set.status ? 'bg-indigo-600' : 'bg-slate-300'}`}>
+                             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${set.status ? 'right-1' : 'left-1'}`}></div>
+                          </button>
+                       </div>
+                     ))}
+                  </div>
+               </section>
+
+               <section className="space-y-6">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
+                     <Lock size={18} className="text-rose-500" /> Core Security & Access
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <button className={`p-6 rounded-3xl border text-left space-y-2 hover:border-indigo-600 transition-all ${isAdminDark ? 'bg-[#343a40] border-white/10' : 'bg-white border-[#dee2e6]'}`}>
+                        <Key className="text-indigo-600" size={24}/>
+                        <p className="font-black text-[10px] uppercase tracking-widest">Rotate API Sequence</p>
+                        <p className="text-[10px] opacity-60">Generate new authentication keys for node integration.</p>
+                     </button>
+                     <button className={`p-6 rounded-3xl border text-left space-y-2 hover:border-rose-600 transition-all ${isAdminDark ? 'bg-[#343a40] border-white/10' : 'bg-white border-[#dee2e6]'}`}>
+                        <RefreshCcw className="text-rose-600" size={24}/>
+                        <p className="font-black text-[10px] uppercase tracking-widest">Force Global Sync</p>
+                        <p className="text-[10px] opacity-60">Refresh all platform sessions and clear temporary registry.</p>
+                     </button>
+                  </div>
+               </section>
             </div>
           )}
         </main>
 
         {/* Footer */}
-        <footer className="h-14 bg-white border-t border-[#dee2e6] px-6 flex items-center justify-between text-sm text-[#495057] shrink-0">
+        <footer className={`h-14 border-t px-6 flex items-center justify-between text-[10px] font-black uppercase tracking-widest transition-colors shrink-0 ${isAdminDark ? 'bg-[#343a40] border-[#4b545c] text-slate-400' : 'bg-white border-[#dee2e6] text-[#6c757d]'}`}>
            <div>
-             <span className="font-bold">Copyright &copy; 2025 <span className="text-indigo-600">MakSocial</span>.</span> All nodes secured.
+             Copyright &copy; 2025 <span className="text-indigo-600">MakSocial Engineering</span>. All nodes encrypted.
            </div>
            <div className="hidden sm:block">
-             <span className="font-bold">Version</span> 3.2.0-stable
+             System Version 3.5.0-STABLE / Build 29402
            </div>
         </footer>
       </div>
+
+      {/* Admin specific modals */}
+      {showEventModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/90 backdrop-blur-md animate-in fade-in duration-300">
+           <div className={`w-full max-w-xl p-10 rounded-[3rem] shadow-2xl border ${isAdminDark ? 'bg-[#343a40] border-[#4b545c]' : 'bg-white border-[#dee2e6]'}`}>
+              <div className="flex justify-between items-center mb-8">
+                 <h2 className="text-2xl font-black uppercase tracking-tighter italic">Initialize Global Signal</h2>
+                 <button onClick={() => setShowEventModal(false)} className="p-2 hover:text-rose-500"><X size={28}/></button>
+              </div>
+              <div className="space-y-4">
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black uppercase text-slate-500">Signal Title</label>
+                    <input className={`w-full p-4 rounded-2xl outline-none focus:border-indigo-600 border transition-all ${isAdminDark ? 'bg-white/5 border-white/10' : 'bg-slate-50'}`} placeholder="e.g. 89th Guild Inauguration"/>
+                 </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black uppercase text-slate-500">Sync Date</label>
+                       <input type="date" className={`w-full p-4 rounded-2xl outline-none border transition-all ${isAdminDark ? 'bg-white/5 border-white/10' : 'bg-slate-50'}`}/>
+                    </div>
+                    <div className="space-y-1">
+                       <label className="text-[9px] font-black uppercase text-slate-500">Sync Time</label>
+                       <input type="time" className={`w-full p-4 rounded-2xl outline-none border transition-all ${isAdminDark ? 'bg-white/5 border-white/10' : 'bg-slate-50'}`}/>
+                    </div>
+                 </div>
+                 <div className="space-y-1">
+                    <label className="text-[9px] font-black uppercase text-slate-500">Visual Asset (Flyer)</label>
+                    <div className="flex gap-4">
+                       <button className={`flex-1 p-6 border-2 border-dashed rounded-2xl flex flex-col items-center gap-2 hover:bg-indigo-600/5 hover:border-indigo-600 transition-all ${isAdminDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                          <ImageIcon size={24}/>
+                          <span className="text-[9px] font-black uppercase">Ingest Signal Image</span>
+                       </button>
+                    </div>
+                 </div>
+                 <button className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 mt-6">Broadcast Ceremony to Hub</button>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

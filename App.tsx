@@ -15,7 +15,7 @@ import Resources from './components/Resources';
 import { db } from './db';
 import { 
   Menu, Bell, X, Heart, UserPlus, Zap, ShieldAlert, Search as SearchIcon,
-  MessageCircle, Plus, Home, Compass, User as UserIcon, ArrowRight
+  MessageCircle, Plus, Home, Compass, User as UserIcon, ArrowRight, Settings, Layout, Monitor
 } from 'lucide-react';
 
 const NotificationsPanel: React.FC<{ isOpen: boolean, onClose: () => void, user: User, onClear: () => void }> = ({ isOpen, onClose, user, onClear }) => {
@@ -139,6 +139,7 @@ const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'student' | 'admin'>('student');
+  const [isAdminMode, setIsAdminMode] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifPanelOpen, setIsNotifPanelOpen] = useState(false);
@@ -157,6 +158,7 @@ const App: React.FC = () => {
     setIsLoggedIn(true);
     setUserRole(isAdmin ? 'admin' : 'student');
     setView(isAdmin ? 'admin' : 'home');
+    if (isAdmin) setIsAdminMode(true);
     db.saveUser({ ...db.getUser(), email });
   };
 
@@ -171,6 +173,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setIsAdminMode(false);
     setView('landing');
   };
 
@@ -182,6 +185,10 @@ const App: React.FC = () => {
     if (newView === 'search') {
        setIsSearchPanelOpen(true);
        return;
+    }
+    if (newView === 'admin') {
+      setIsAdminMode(true);
+      return;
     }
     setView(newView);
     setIsSidebarOpen(false);
@@ -199,7 +206,7 @@ const App: React.FC = () => {
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'resources': return <Resources />;
-      case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
+      case 'admin': return <Admin onToggleView={() => setIsAdminMode(false)} onLogout={handleLogout} />;
       default: return <Feed />;
     }
   };
@@ -210,12 +217,18 @@ const App: React.FC = () => {
     return renderContent();
   }
 
+  // Admin Mode completely replaces the UI with a self-contained AdminLTE layout
+  if (isLoggedIn && isAdminMode && userRole === 'admin') {
+    return <Admin onToggleView={() => setIsAdminMode(false)} onLogout={handleLogout} />;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
       {(isSidebarOpen || isNotifPanelOpen || isSearchPanelOpen) && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] transition-opacity" onClick={() => { setIsSidebarOpen(false); setIsNotifPanelOpen(false); setIsSearchPanelOpen(false); }} />
       )}
 
+      {/* Hide platform sidebar for admins when in platform view but offering them the switch */}
       <Sidebar 
         activeView={view} 
         setView={handleSetView} 
@@ -242,7 +255,7 @@ const App: React.FC = () => {
       )}
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Mobile Header: Text Logo "MakSocial" */}
+        {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] z-50">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors">
             <Menu size={24} />
@@ -258,7 +271,7 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
 
-        {/* X-like Floating Bottom Navbar (Mobile Only) */}
+        {/* Floating Bottom Navbar (Mobile Only) */}
         <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-black/90 dark:bg-[#020617]/95 border border-white/10 backdrop-blur-2xl rounded-full px-2 py-3 flex items-center justify-between shadow-2xl z-[55]">
            {[
              { id: 'home', icon: <Home size={22} /> },
@@ -282,6 +295,17 @@ const App: React.FC = () => {
               <Plus size={20} />
            </button>
         </nav>
+
+        {/* Floating Admin Toggle Button */}
+        {userRole === 'admin' && (
+          <button 
+            onClick={() => setIsAdminMode(!isAdminMode)}
+            className="hidden lg:flex fixed bottom-10 right-10 z-[100] bg-indigo-600 text-white px-6 py-4 rounded-3xl shadow-2xl items-center gap-3 hover:scale-105 active:scale-95 transition-all font-black text-xs uppercase tracking-widest group"
+          >
+            {isAdminMode ? <Layout size={20} className="group-hover:rotate-12" /> : <Monitor size={20} className="group-hover:rotate-12" />}
+            {isAdminMode ? 'Hub View' : 'Admin Terminal'}
+          </button>
+        )}
       </div>
     </div>
   );

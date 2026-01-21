@@ -13,8 +13,9 @@ import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
+import SettingsView from './components/Settings'; // Replaced Events
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -30,6 +31,18 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isLoggedIn) {
       setCurrentUser(db.getUser());
+    }
+    
+    // Apply saved appearance settings on load
+    const saved = localStorage.getItem('maksocial_appearance');
+    if (saved) {
+      const s = JSON.parse(saved);
+      const root = document.documentElement;
+      root.style.setProperty('--brand-color', s.primaryColor);
+      root.style.setProperty('--font-main', s.fontFamily);
+      const scale = s.fontSize === 'sm' ? '0.9' : s.fontSize === 'lg' ? '1.1' : '1';
+      root.style.setProperty('--text-scale', scale);
+      root.setAttribute('data-contrast', s.contrast);
     }
   }, [isLoggedIn, view]);
 
@@ -80,7 +93,6 @@ const App: React.FC = () => {
   };
 
   const handleSetView = (newView: AppView) => {
-    // Admins are restricted only to the Admin terminal
     if (userRole === 'admin' && newView !== 'admin') {
       return; 
     }
@@ -92,7 +104,6 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
-    // If Admin is logged in, they ONLY see the Admin component
     if (isLoggedIn && userRole === 'admin') {
       return <Admin onLogout={handleLogout} />;
     }
@@ -109,6 +120,7 @@ const App: React.FC = () => {
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={(id) => { setSelectedUserId(id); setView('profile'); }} onNavigateToPost={(id) => { setTargetPostId(id); setView('home'); }} />;
       case 'resources': return <Resources />;
+      case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={handleLogout} />;
       default: return <Feed />;
     }
@@ -120,7 +132,6 @@ const App: React.FC = () => {
     return renderContent();
   }
 
-  // Final check for Admin restriction
   if (isLoggedIn && userRole === 'admin') {
     return <Admin onLogout={handleLogout} />;
   }
@@ -178,7 +189,7 @@ const App: React.FC = () => {
             { id: 'explore', icon: <SearchIcon size={22} />, label: 'Explore' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'messages', icon: <MessageCircle size={22} />, label: 'Chats' },
-            { id: 'profile', icon: <UserIcon size={22} />, label: 'Me' },
+            { id: 'settings', icon: <Settings size={22} />, label: 'UI' },
           ].map((item) => (
             <button
               key={item.id}

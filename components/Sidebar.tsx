@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -86,15 +86,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           ))}
           
           <button
-            onClick={() => setView('events')}
+            onClick={() => setView('settings')}
             className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
-              activeView === 'events' 
-              ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20' 
-              : 'text-slate-500 hover:bg-rose-500/10 hover:text-rose-600'
+              activeView === 'settings' 
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
             }`}
           >
-            <Radio size={22} />
-            <span className="text-[11px] tracking-widest font-black uppercase">Live Pulse</span>
+            <Settings size={22} />
+            <span className="text-[11px] tracking-widest font-black uppercase">Customization</span>
           </button>
         </nav>
 

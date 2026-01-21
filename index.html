@@ -15,7 +15,7 @@
               brand: {
                 dark: '#020617',
                 light: '#f8fafc',
-                accent: '#6366f1'
+                accent: 'var(--brand-color)'
               }
             },
             borderRadius: {
@@ -25,13 +25,13 @@
               '4xl': '2rem'
             },
             fontFamily: {
-              sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+              sans: ['var(--font-main)', 'Inter', 'sans-serif'],
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
           --bg-primary: #f8fafc;
@@ -42,6 +42,11 @@
           --card-bg: #ffffff;
           --sidebar-bg: #ffffff;
           --safe-area-bottom: env(safe-area-inset-bottom);
+          
+          /* Dynamic Variables */
+          --brand-color: #6366f1;
+          --font-main: "Plus Jakarta Sans";
+          --text-scale: 1;
         }
 
         .dark:root {
@@ -54,16 +59,32 @@
           --sidebar-bg: #020617;
         }
 
+        /* High Contrast Overrides */
+        [data-contrast="high"]:root {
+          --text-primary: #000000 !important;
+          --text-secondary: #000000 !important;
+          --border-color: #000000 !important;
+        }
+        .dark[data-contrast="high"]:root {
+          --bg-primary: #000000 !important;
+          --text-primary: #ffffff !important;
+          --text-secondary: #ffffff !important;
+          --border-color: #ffffff !important;
+        }
+
+        html {
+          font-size: calc(16px * var(--text-scale));
+        }
+
         body {
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            font-family: var(--font-main), 'Inter', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
             transition: background-color 0.3s ease, color 0.3s ease;
             -webkit-font-smoothing: antialiased;
-            overscroll-behavior-y: none; /* Prevent bounce for app feel */
+            overscroll-behavior-y: none;
         }
 
-        /* Bottom Nav Safe Area */
         .pb-safe {
           padding-bottom: calc(4.5rem + var(--safe-area-bottom));
         }
@@ -101,9 +122,8 @@
             letter-spacing: -0.025em;
         }
 
-        /* Active tab styling for bottom nav */
         .active-tab {
-            color: #6366f1;
+            color: var(--brand-color);
             position: relative;
         }
         .active-tab::after {
@@ -114,9 +134,16 @@
             transform: translateX(-50%);
             width: 20px;
             height: 3px;
-            background: #6366f1;
+            background: var(--brand-color);
             border-radius: 0 0 4px 4px;
         }
+
+        /* Support for text-indigo-600 to follow var */
+        .text-indigo-600 { color: var(--brand-color) !important; }
+        .bg-indigo-600 { background-color: var(--brand-color) !important; }
+        .border-indigo-600 { border-color: var(--brand-color) !important; }
+        .shadow-indigo-600\/20 { --tw-shadow-color: var(--brand-color); }
+        .ring-indigo-500\/10 { --tw-ring-color: color-mix(in srgb, var(--brand-color) 10%, transparent); }
     </style>
 <script type="importmap">
 {

@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -8,7 +8,14 @@ export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC'
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
-// FIX: Added missing AnalyticsData interface
+export interface AppSettings {
+  primaryColor: string;
+  fontFamily: string;
+  fontSize: 'sm' | 'md' | 'lg';
+  contrast: 'normal' | 'high';
+  density: 'comfortable' | 'compact';
+}
+
 export interface AnalyticsData {
   day: string;
   posts: number;
@@ -18,7 +25,6 @@ export interface AnalyticsData {
   engagement: number;
 }
 
-// FIX: Added missing ChatConversation interface
 export interface ChatConversation {
   id: string;
   user: { name: string; avatar: string };
@@ -27,7 +33,6 @@ export interface ChatConversation {
   messages: { id: string; text: string; timestamp: string; isMe: boolean }[];
 }
 
-// FIX: Added missing LiveEvent interface
 export interface LiveEvent {
   id: string;
   title: string;
@@ -117,7 +122,6 @@ export interface Post {
   eventTime?: string;
   eventLocation?: string;
   eventTitle?: string;
-  // FIX: Added missing eventRegistrationLink property
   eventRegistrationLink?: string;
   aiMetadata?: {
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
@@ -136,6 +140,5 @@ export interface CalendarEvent {
   category: 'Academic' | 'Social' | 'Sports' | 'Exams' | 'Other';
   createdBy: string;
   attendeeIds?: string[]; 
-  // FIX: Added missing registrationLink property
   registrationLink?: string;
 }

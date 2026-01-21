@@ -4,13 +4,13 @@ interface LandingProps {
   onStart: () => void;
 }
 
-const LandingV1: React.FC<LandingProps> = ({ onStart }) => {
+const LandingV2: React.FC<LandingProps> = ({ onStart }) => {
   return (
-    <div className="bg-white text-slate-800 overflow-x-hidden">
+    <div className="bg-white text-slate-900 overflow-x-hidden">
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+      <header className="absolute top-0 left-0 w-full z-50">
+        <div className="max-w-7xl mx-auto px-10 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img
               src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
@@ -21,170 +21,153 @@ const LandingV1: React.FC<LandingProps> = ({ onStart }) => {
             </span>
           </div>
 
-          <div className="hidden md:flex gap-10 text-sm font-semibold text-slate-600">
-            <a className="hover:text-indigo-600 cursor-pointer">Features</a>
-            <a className="hover:text-indigo-600 cursor-pointer">Community</a>
-            <a className="hover:text-indigo-600 cursor-pointer">Events</a>
-            <a className="hover:text-indigo-600 cursor-pointer">Alumni</a>
-          </div>
-
           <button
             onClick={onStart}
-            className="bg-indigo-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-indigo-700 transition"
+            className="bg-indigo-600 text-white px-7 py-3 rounded-full font-semibold hover:bg-indigo-700 transition"
           >
-            Get Started
+            Join Now
           </button>
         </div>
-      </nav>
+      </header>
 
       {/* HERO */}
-      <section className="pt-36 pb-28 bg-gradient-to-b from-indigo-50 to-white">
-        <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <section className="pt-40 pb-32 relative">
+        <div className="max-w-7xl mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
 
+          {/* TEXT */}
           <div>
-            <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-              The Social Network <br />
+            <h1 className="text-6xl font-extrabold leading-tight mb-6">
+              Campus Life,
+              <br />
               <span className="text-indigo-600">
-                Built for Makerere
+                Connected Digitally
               </span>
             </h1>
 
             <p className="text-lg text-slate-600 max-w-xl mb-10">
-              MakSocial connects students, lecturers, alumni, and the entire university community in one trusted digital space.
+              MakSocial is the social platform where Makerere students, lecturers, alumni, and communities connect, share updates, and discover opportunities.
             </p>
 
             <div className="flex gap-6">
               <button
                 onClick={onStart}
-                className="bg-indigo-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-indigo-700 transition"
+                className="bg-indigo-600 text-white px-10 py-4 rounded-full font-semibold hover:bg-indigo-700 transition"
               >
-                Join MakSocial
+                Get Started
               </button>
 
-              <button className="border border-slate-300 px-8 py-4 rounded-full font-semibold hover:bg-slate-100 transition">
-                Learn More
+              <button className="text-indigo-600 font-semibold">
+                See How It Works
               </button>
             </div>
           </div>
 
-          <div className="relative">
+          {/* IMAGE COLLAGE */}
+          <div className="relative h-[520px]">
+
             <img
-              src="https://images.unsplash.com/photo-1601582584375-8a78d6c47b7b"
-              className="rounded-3xl shadow-2xl"
+              src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b"
+              className="absolute top-0 left-0 w-72 rounded-3xl shadow-xl"
             />
+
+            <img
+              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+              className="absolute top-24 right-0 w-80 rounded-3xl shadow-xl"
+            />
+
+            <img
+              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+              className="absolute bottom-0 left-24 w-72 rounded-3xl shadow-xl"
+            />
+
+          </div>
+        </div>
+      </section>
+
+      {/* SOCIAL PROOF STRIP */}
+      <section className="bg-slate-50 py-20">
+        <div className="max-w-7xl mx-auto px-10 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+          <div>
+            <h3 className="text-4xl font-extrabold text-indigo-600">50k+</h3>
+            <p className="text-slate-600 mt-2">Students</p>
+          </div>
+          <div>
+            <h3 className="text-4xl font-extrabold text-indigo-600">9</h3>
+            <p className="text-slate-600 mt-2">Colleges</p>
+          </div>
+          <div>
+            <h3 className="text-4xl font-extrabold text-indigo-600">300+</h3>
+            <p className="text-slate-600 mt-2">Groups</p>
+          </div>
+          <div>
+            <h3 className="text-4xl font-extrabold text-indigo-600">100%</h3>
+            <p className="text-slate-600 mt-2">Campus Focused</p>
           </div>
         </div>
       </section>
 
       {/* FEATURES */}
-      <section className="py-28">
-        <div className="max-w-7xl mx-auto px-8">
+      <section className="py-32">
+        <div className="max-w-7xl mx-auto px-10 space-y-28">
 
-          <h2 className="text-4xl font-extrabold text-center mb-16">
-            Everything Campus Life Needs
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-
-            <div className="bg-white rounded-3xl shadow-lg p-8">
-              <img
-                src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b"
-                className="rounded-2xl mb-6"
-              />
-              <h3 className="text-xl font-bold mb-3">
-                Student Communities
-              </h3>
-              <p className="text-slate-600">
-                Join course groups, college communities, clubs, and interest spaces.
+          {/* FEATURE 1 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <img
+              src="https://images.unsplash.com/photo-1529070538774-1843cb3265df"
+              className="rounded-3xl shadow-2xl"
+            />
+            <div>
+              <h2 className="text-4xl font-extrabold mb-6">
+                One Feed for Campus Life
+              </h2>
+              <p className="text-lg text-slate-600">
+                Follow colleges, clubs, friends, and lecturers. Never miss an announcement or event.
               </p>
             </div>
+          </div>
 
-            <div className="bg-white rounded-3xl shadow-lg p-8">
-              <img
-                src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
-                className="rounded-2xl mb-6"
-              />
-              <h3 className="text-xl font-bold mb-3">
-                Academic Updates
-              </h3>
-              <p className="text-slate-600">
-                Receive announcements, notes, and lecturer communication in one place.
+          {/* FEATURE 2 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div>
+              <h2 className="text-4xl font-extrabold mb-6">
+                Discover Opportunities
+              </h2>
+              <p className="text-lg text-slate-600">
+                Internships, scholarships, events, and campus opportunities shared in real time.
               </p>
             </div>
-
-            <div className="bg-white rounded-3xl shadow-lg p-8">
-              <img
-                src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
-                className="rounded-2xl mb-6"
-              />
-              <h3 className="text-xl font-bold mb-3">
-                Opportunities
-              </h3>
-              <p className="text-slate-600">
-                Discover internships, scholarships, events, and career opportunities.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section className="bg-indigo-600 py-20 text-white">
-        <div className="max-w-7xl mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-
-          <div>
-            <h3 className="text-4xl font-extrabold">50k+</h3>
-            <p className="opacity-80 mt-2">Students</p>
-          </div>
-
-          <div>
-            <h3 className="text-4xl font-extrabold">9</h3>
-            <p className="opacity-80 mt-2">Colleges</p>
-          </div>
-
-          <div>
-            <h3 className="text-4xl font-extrabold">300+</h3>
-            <p className="opacity-80 mt-2">Communities</p>
-          </div>
-
-          <div>
-            <h3 className="text-4xl font-extrabold">100%</h3>
-            <p className="opacity-80 mt-2">Campus Focused</p>
+            <img
+              src="https://images.unsplash.com/photo-1515169067865-5387ec356754"
+              className="rounded-3xl shadow-2xl"
+            />
           </div>
 
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-28 text-center">
-        <h2 className="text-4xl font-extrabold mb-6">
-          Join the Makerere Digital Community
+      <section className="bg-indigo-600 py-32 text-center text-white">
+        <h2 className="text-5xl font-extrabold mb-6">
+          Join the MakSocial Community
         </h2>
-        <p className="text-slate-600 mb-10 max-w-xl mx-auto">
-          Be part of conversations, opportunities, and connections that shape campus life.
+        <p className="text-lg opacity-90 mb-10 max-w-xl mx-auto">
+          Your university. Your people. One digital home.
         </p>
-
         <button
           onClick={onStart}
-          className="bg-indigo-600 text-white px-10 py-4 rounded-full font-semibold hover:bg-indigo-700 transition"
+          className="bg-white text-indigo-600 px-12 py-4 rounded-full font-semibold hover:bg-slate-100 transition"
         >
-          Create Your Account
+          Create Account
         </button>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-slate-900 text-slate-400 py-16">
-        <div className="max-w-7xl mx-auto px-8 text-center">
-          <p className="font-semibold text-white mb-2">MakSocial</p>
-          <p className="text-sm">
-            © 2026 Makerere University. All rights reserved.
-          </p>
-        </div>
+      <footer className="py-14 text-center text-slate-500 text-sm">
+        © 2026 MakSocial. Makerere University.
       </footer>
 
     </div>
   );
 };
 
-export default LandingV1;
+export default LandingV2;

@@ -14,7 +14,7 @@ import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
 import { db } from './db';
-import { Menu, X, Monitor, Layout, Settings, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -80,22 +80,23 @@ const App: React.FC = () => {
   };
 
   const handleSetView = (newView: AppView) => {
-    // If Admin, they cannot switch to standard student views easily
+    // Admins are restricted only to the Admin terminal
     if (userRole === 'admin' && newView !== 'admin') {
-      // In this specific requirement, they only control the app
-      // so we might block standard navigation or force them back
-      // unless onLogout is called.
       return; 
     }
 
     setView(newView);
     setIsSidebarOpen(false);
     if ((newView as string) === 'admin') setIsAdminMode(true);
-    else if (userRole === 'admin' && (newView as string) !== 'admin') setIsAdminMode(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const renderContent = () => {
+    // If Admin is logged in, they ONLY see the Admin component
+    if (isLoggedIn && userRole === 'admin') {
+      return <Admin onLogout={handleLogout} />;
+    }
+
     switch (view) {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
@@ -108,7 +109,7 @@ const App: React.FC = () => {
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={(id) => { setSelectedUserId(id); setView('profile'); }} onNavigateToPost={(id) => { setTargetPostId(id); setView('home'); }} />;
       case 'resources': return <Resources />;
-      case 'admin': return <Admin onToggleView={() => setIsAdminMode(false)} onLogout={handleLogout} />;
+      case 'admin': return <Admin onLogout={handleLogout} />;
       default: return <Feed />;
     }
   };
@@ -119,9 +120,9 @@ const App: React.FC = () => {
     return renderContent();
   }
 
-  // Admin Terminal Mode (Forced Full Screen AdminLTE)
+  // Final check for Admin restriction
   if (isLoggedIn && userRole === 'admin') {
-    return <Admin onToggleView={() => {}} onLogout={handleLogout} />;
+    return <Admin onLogout={handleLogout} />;
   }
 
   return (
@@ -174,7 +175,7 @@ const App: React.FC = () => {
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] transition-theme lg:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
-            { id: 'explore', icon: <Layout size={22} />, label: 'Explore' },
+            { id: 'explore', icon: <SearchIcon size={22} />, label: 'Explore' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'messages', icon: <MessageCircle size={22} />, label: 'Chats' },
             { id: 'profile', icon: <UserIcon size={22} />, label: 'Me' },

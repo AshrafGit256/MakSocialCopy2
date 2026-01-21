@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Post, User, College, CollegeStats, AuthorityRole, CalendarEvent } from '../types';
+// FIX: Removed CollegeStats which was not exported from types
+import { Post, User, College, AuthorityRole, CalendarEvent } from '../types';
 import { db } from '../db';
 import { GoogleGenAI } from "@google/genai";
 import { 
@@ -8,7 +9,8 @@ import {
   Loader2, Eye, ShieldAlert, Zap, 
   GraduationCap, CheckCircle2, Calendar, 
   MapPin, Clock, TrendingUp, Plus, ShieldCheck, Trash2, Edit3, 
-  Star, Verified, Share2, Shield as ShieldIcon
+  // FIX: Added Users icon import for AuthoritySeal
+  Star, Verified, Share2, Shield as ShieldIcon, Users
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -62,6 +64,28 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' 
       border: 'border-amber-400/50',
       textColor: 'text-white',
       icon: <Verified size={size === 'sm' ? 10 : 12} /> 
+    },
+    // FIX: Added missing roles to AuthoritySeal config
+    'Graduate': { 
+      bg: 'bg-slate-500', 
+      glow: 'shadow-slate-500/40',
+      border: 'border-slate-400/50',
+      textColor: 'text-white',
+      icon: <GraduationCap size={size === 'sm' ? 10 : 12} /> 
+    },
+    'Alumni': { 
+      bg: 'bg-slate-400', 
+      glow: 'shadow-slate-400/40',
+      border: 'border-slate-300/50',
+      textColor: 'text-white',
+      icon: <Users size={size === 'sm' ? 10 : 12} /> 
+    },
+    'Staff': { 
+      bg: 'bg-slate-600', 
+      glow: 'shadow-slate-600/40',
+      border: 'border-slate-500/50',
+      textColor: 'text-white',
+      icon: <ShieldCheck size={size === 'sm' ? 10 : 12} /> 
     }
   };
   

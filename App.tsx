@@ -9,22 +9,21 @@ import Feed from './components/Feed';
 import Chat from './components/Chat';
 import Profile from './components/Profile';
 import Admin from './components/Admin';
-import Events from './components/Events';
 import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
 import { db } from './db';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Monitor, Layout, Settings } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'student' | 'admin'>('student');
+  const [isAdminMode, setIsAdminMode] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
-  // Navigation states for deep linking
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [targetPostId, setTargetPostId] = useState<string | null>(null);
 
@@ -39,6 +38,7 @@ const App: React.FC = () => {
     setIsLoggedIn(true);
     setUserRole(isAdmin ? 'admin' : 'student');
     setView(isAdmin ? 'admin' : 'home');
+    if (isAdmin) setIsAdminMode(true);
     
     const user = db.getUser();
     db.saveUser({ ...user, email });
@@ -74,24 +74,13 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setIsAdminMode(false);
     setView('landing');
-  };
-
-  const navigateToProfile = (userId: string) => {
-    setSelectedUserId(userId);
-    setView('profile');
-    setIsSidebarOpen(false);
-  };
-
-  const navigateToPost = (postId: string) => {
-    setTargetPostId(postId);
-    setView('home');
-    setIsSidebarOpen(false);
   };
 
   const handleSetView = (newView: AppView) => {
     setView(newView);
-    setIsSidebarOpen(false); // Close sidebar on view change (mobile)
+    setIsSidebarOpen(false);
   };
 
   const renderContent = () => {
@@ -103,12 +92,11 @@ const App: React.FC = () => {
       case 'groups': return <Feed collegeFilter={currentUser?.college} />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => setSelectedUserId(null)} />;
-      case 'events': return <Events isAdmin={userRole === 'admin'} />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search onNavigateToProfile={navigateToProfile} onNavigateToPost={navigateToPost} />;
+      case 'search': return <Search onNavigateToProfile={(id) => { setSelectedUserId(id); setView('profile'); }} onNavigateToPost={(id) => { setTargetPostId(id); setView('home'); }} />;
       case 'resources': return <Resources />;
-      case 'admin': return userRole === 'admin' ? <Admin /> : <Feed />;
+      case 'admin': return <Admin onToggleView={() => setIsAdminMode(false)} onLogout={handleLogout} />;
       default: return <Feed />;
     }
   };
@@ -119,17 +107,17 @@ const App: React.FC = () => {
     return renderContent();
   }
 
+  // Admin Mode Layout
+  if (isLoggedIn && isAdminMode && userRole === 'admin') {
+    return <Admin onToggleView={() => setIsAdminMode(false)} onLogout={handleLogout} />;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
-      {/* Sidebar Overlay for Mobile */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden transition-opacity"
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {/* Sidebar Component */}
       <Sidebar 
         activeView={view} 
         setView={handleSetView} 
@@ -140,26 +128,28 @@ const App: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] z-50">
-          <button 
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors"
-          >
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl transition-colors">
             <Menu size={24} />
           </button>
-          <img
-            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
-            alt="MakSocial Logo"
-            className="h-8 grayscale brightness-0 dark:grayscale-0 dark:brightness-100"
-            onClick={() => handleSetView('home')}
-          />
-          <div className="w-10"></div> {/* Spacer for alignment */}
+          <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" alt="MakSocial" className="h-8" onClick={() => handleSetView('home')} />
+          <div className="w-10"></div>
         </header>
 
-        <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar">
+        <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar pb-24 lg:pb-0">
           {renderContent()}
         </main>
+
+        {/* Mode Toggle Button for Admins */}
+        {userRole === 'admin' && (
+          <button 
+            onClick={() => setIsAdminMode(true)}
+            className="hidden lg:flex fixed bottom-10 right-10 z-[100] bg-indigo-600 text-white px-6 py-4 rounded-3xl shadow-2xl items-center gap-3 hover:scale-105 active:scale-95 transition-all font-black text-xs uppercase tracking-widest group"
+          >
+            <Monitor size={20} className="group-hover:rotate-12 transition-transform" />
+            Control Terminal
+          </button>
+        )}
       </div>
     </div>
   );

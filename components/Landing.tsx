@@ -46,13 +46,13 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
           <div className="space-y-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600/10 rounded-full border border-indigo-600/20">
               <Sparkles size={14} className="text-indigo-600" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600">The Official Hill Protocol | Live</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600">The Official Hill Protocol | Synchronizing</span>
             </div>
 
             <h1 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter uppercase italic">
               Empowering <br />
               <span className="text-indigo-600">The Hill's</span> <br />
-              Collective Intel.
+              Digital DNA.
             </h1>
 
             <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
@@ -67,7 +67,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 Initialize Profile <ArrowRight size={18} />
               </button>
               <button className="px-10 py-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-white dark:hover:bg-slate-800 transition-all active:scale-95">
-                Scan Resources
+                Scan Vault
               </button>
             </div>
 
@@ -78,7 +78,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 ))}
               </div>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                <span className="text-indigo-600 font-black">50,000+</span> Nodes Active on the Network
+                <span className="text-indigo-600 font-black">50,000+</span> Student Nodes Active
               </p>
             </div>
           </div>
@@ -86,18 +86,18 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
           <div className="relative">
             <div className="relative aspect-square rounded-[3rem] overflow-hidden border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] group">
                <img 
-                 src="https://images.unsplash.com/photo-1523050338692-7b835a07973f?auto=format&fit=crop&w=1200" 
+                 src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200" 
                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
-                 alt="Makerere Campus Architecture" 
+                 alt="Makerere Architecture" 
                />
                <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-transparent to-transparent"></div>
                
                <div className="absolute top-10 right-10 bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl animate-bounce-slow">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Protocol Sync: 100%</span>
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Protocol Hub Live</span>
                   </div>
-                  <p className="text-2xl font-black text-white mt-2 uppercase tracking-tighter">Real-time Node Activity</p>
+                  <p className="text-2xl font-black text-white mt-2 uppercase tracking-tighter">Real-time Activity</p>
                </div>
 
                <div className="absolute bottom-10 left-10 right-10 bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-[2rem] space-y-4">
@@ -106,7 +106,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                     <span className="text-[9px] font-black text-white uppercase tracking-[0.3em]">Latest Signal Broadcast</span>
                   </div>
                   <p className="text-white font-bold leading-relaxed italic text-sm">
-                    "The 89th Guild Inauguration has been synchronized. All student leaders, verify your entrance credentials in the Hub."
+                    "The 89th Guild Inauguration has been synchronized. All student leaders, verify your entrance credentials."
                   </p>
                </div>
             </div>
@@ -121,9 +121,9 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12">
           {[
             { label: 'Active Nodes', val: '50k+', icon: <Users size={24}/> },
-            { label: 'Academic Wings', val: '9 Colleges', icon: <GraduationCap size={24}/> },
+            { label: 'Academic Units', val: '9 Wings', icon: <GraduationCap size={24}/> },
             { label: 'Asset Scans', val: '1.2M+', icon: <Globe size={24}/> },
-            { label: 'Network Uptime', val: '99.9%', icon: <ShieldCheck size={24}/> },
+            { label: 'Uptime Protocol', val: '99.9%', icon: <ShieldCheck size={24}/> },
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center text-center space-y-2 text-white group">
                <div className="p-3 bg-white/10 rounded-2xl group-hover:scale-110 transition-transform">
@@ -140,8 +140,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <section id="features" className="py-32 px-6">
         <div className="max-w-7xl mx-auto space-y-20">
           <div className="text-center space-y-4 max-w-2xl mx-auto">
-            <h2 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.5em]">System Protocols</h2>
-            <h3 className="text-5xl font-black tracking-tighter uppercase italic">Engineered for the Student Body.</h3>
+            <h2 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.5em]">System Architecture</h2>
+            <h3 className="text-5xl font-black tracking-tighter uppercase italic">Built for the Global Student.</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -155,8 +155,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white">
                     <Search size={24} />
                   </div>
-                  <h4 className="text-4xl font-black text-white uppercase tracking-tighter italic">Intelligence Discovery</h4>
-                  <p className="text-slate-300 max-w-sm font-medium">Scan the global pulse for opportunities, research grants, and high-density academic signals shared in real-time by your peers.</p>
+                  <h4 className="text-4xl font-black text-white uppercase tracking-tighter italic">Signal Discovery</h4>
+                  <p className="text-slate-300 max-w-sm font-medium">Scan the global pulse for research grants, research papers, and high-density academic signals shared in real-time.</p>
                </div>
             </div>
 
@@ -165,9 +165,9 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   <MessageSquare size={32} />
                </div>
                <div className="space-y-4">
-                  <h4 className="text-3xl font-black uppercase tracking-tighter italic leading-none">Node Communication</h4>
-                  <p className="text-white/80 font-medium text-sm">Encrypted direct messaging and college wing channels for seamless collaboration across departments.</p>
-                  <button className="text-[10px] font-black uppercase tracking-widest bg-white/10 w-fit px-6 py-2 rounded-full border border-white/20">Open Channel</button>
+                  <h4 className="text-3xl font-black uppercase tracking-tighter italic leading-none">Node Sync</h4>
+                  <p className="text-white/80 font-medium text-sm">Encrypted direct messaging and college wing channels for seamless research collaboration.</p>
+                  <button className="text-[10px] font-black uppercase tracking-widest bg-white/10 w-fit px-6 py-2 rounded-full border border-white/20">Initialize Sync</button>
                </div>
             </div>
 
@@ -177,17 +177,17 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                </div>
                <div className="space-y-4">
                   <h4 className="text-3xl font-black uppercase tracking-tighter italic leading-none text-[var(--text-primary)]">The Vault</h4>
-                  <p className="text-slate-500 font-medium text-sm">Access the secure repository of past papers, research assets, and course-specific intelligence curated by Pro nodes.</p>
+                  <p className="text-slate-500 font-medium text-sm">Access the secure repository of past papers, research assets, and scholarly intelligence curated by the Hill.</p>
                   <div className="flex -space-x-2">
                     {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />)}
-                    <div className="w-8 h-8 rounded-full border-2 border-white bg-indigo-600 flex items-center justify-center text-white text-[8px] font-bold">+2k</div>
+                    <div className="w-8 h-8 rounded-full border-2 border-white bg-indigo-600 flex items-center justify-center text-white text-[8px] font-bold">+1k</div>
                   </div>
                </div>
             </div>
 
             <div className="md:col-span-2 relative h-[500px] rounded-[3rem] overflow-hidden border border-[var(--border-color)] group shadow-xl bg-emerald-950">
                <img 
-                 src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200" 
+                 src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200" 
                  className="w-full h-full object-cover grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000" 
                />
                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-transparent to-transparent"></div>
@@ -195,8 +195,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white">
                     <Radio size={24} />
                   </div>
-                  <h4 className="text-4xl font-black text-white uppercase tracking-tighter italic">Wing Specific Signals</h4>
-                  <p className="text-slate-200 max-w-sm font-medium">Localized intelligence nodes for COCIS, CEDAT, LAW, and more. Your college's pulse, amplified and isolated for maximum relevance.</p>
+                  <h4 className="text-4xl font-black text-white uppercase tracking-tighter italic">Wing Broadcasts</h4>
+                  <p className="text-slate-200 max-w-sm font-medium">Localized intelligence nodes for COCIS, CEDAT, LAW, and more. Your college's pulse, amplified and isolated.</p>
                </div>
             </div>
           </div>
@@ -210,11 +210,11 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         </div>
         <div className="max-w-4xl mx-auto text-center space-y-10">
            <h2 className="text-6xl md:text-8xl font-black text-white italic tracking-tighter uppercase leading-none">
-             Initialize Your <br />
-             Hill Presence.
+             Join The <br />
+             Hill Protocol.
            </h2>
            <p className="text-xl text-white/70 font-medium max-w-2xl mx-auto leading-relaxed">
-             Join the university's only verified digital protocol. Secure your node today and connect with the Hill's collective pulse.
+             Join the university's only verified digital registry. Secure your node today and connect with the Hill's collective pulse.
            </p>
            <button
              onClick={onStart}
@@ -229,10 +229,10 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3">
             <Zap size={24} className="text-indigo-600 fill-indigo-600" />
-            <span className="text-xl font-black italic tracking-tighter uppercase text-indigo-600">MakSocial Registry</span>
+            <span className="text-xl font-black italic tracking-tighter uppercase text-indigo-600">MakSocial</span>
           </div>
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
-            © 2026 MakSocial Registry Protocol. Makerere University Main Campus, Kampala.
+            © 2026 MakSocial Registry Protocol. Makerere University.
           </p>
         </div>
       </footer>

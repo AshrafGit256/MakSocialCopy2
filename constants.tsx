@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { 
-  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen
+  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen, Newspaper
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
@@ -9,26 +9,73 @@ export const NAV_ITEMS = [
   { id: 'home', label: 'Global Pulse', icon: <Home size={22} /> },
   { id: 'search', label: 'Search', icon: <Search size={22} /> },
   { id: 'calendar', label: 'Calendar', icon: <Calendar size={22} /> },
-  { id: 'resources', label: 'Resource Lab', icon: <BookOpen size={22} /> },
+  { id: 'resources', label: 'Resource Vault', icon: <BookOpen size={22} /> },
   { id: 'explore', label: 'Explore', icon: <Compass size={22} /> },
   { id: 'messages', label: 'Messages', icon: <MessageCircle size={22} /> },
-  { id: 'groups', label: 'Colleges', icon: <LayoutGrid size={22} /> },
+  { id: 'groups', label: 'Wing Hubs', icon: <LayoutGrid size={22} /> },
   { id: 'profile', label: 'Profile', icon: <User size={22} /> },
 ];
 
 export const COLLEGE_BANNERS: Record<College, string> = {
-  COCIS: 'https://cocis.mak.ac.ug/wp-content/uploads/2023/11/cropped-310964315_406158288372038_8724847734355824283_n.jpg',
-  CEDAT: 'https://cedat.mak.ac.ug/wp-content/uploads/2025/02/CEDAT.jpg',
-  CHUSS: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-QoIkQ0nQ2N73Nul0gfVlp1dqVQGGpB6W3A&s',
-  CHS: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPL1UXf83MfnfVhZZDCSsLV7fNRedzZsgrng&s',
-  CONAS: 'https://events.mak.ac.ug/sites/default/files/styles/large_crop/public/2024-02/Makerere-CoNAS-Department-of-Chemistry-Building.jpg?itok=ggYL8H6i',
-  CAES: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ7zXQnLfR09r8ZzOWYj9HikxcCeouKtbZw&s',
-  COBAMS: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9_cgVOU3gaFxSIhXzzG_NGahErTclmQxKbQ&s',
-  CEES: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXv9VuoL5yUJD7es8560C9qzaQpQfYKF9NLA&s',
-  LAW: 'https://campusbee.ug/wp-content/uploads/2024/06/20240619_170258.jpg'
+  COCIS: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200',
+  CEDAT: 'https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&w=1200',
+  CHUSS: 'https://images.unsplash.com/photo-1491843384429-181717b8e24f?auto=format&fit=crop&w=1200',
+  CHS: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200',
+  CONAS: 'https://images.unsplash.com/photo-1532187875605-183881249611?auto=format&fit=crop&w=1200',
+  CAES: 'https://images.unsplash.com/photo-1495107336214-bca9f1d95c18?auto=format&fit=crop&w=1200',
+  COBAMS: 'https://images.unsplash.com/photo-1454165833767-02a6e30996d4?auto=format&fit=crop&w=1200',
+  CEES: 'https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200',
+  LAW: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200'
 };
 
 export const MOCK_POSTS: Post[] = [
+  {
+    id: 'art-1',
+    author: 'Prof. Sserunjogi D.',
+    authorId: 'lecturer_1',
+    authorRole: 'Senior Researcher',
+    authorAvatar: 'https://i.pravatar.cc/150?u=prof',
+    authorAuthority: 'Lecturer',
+    timestamp: '15m ago',
+    content: `The Future of Artificial Intelligence on the Hill: A Decadal Outlook.
+
+As we navigate the mid-2020s, the integration of Large Language Models within our academic framework is no longer a peripheral experiment but a central architectural necessity. Our recent studies at the COCIS Innovation Node suggest that by 2030, student-AI collaboration will account for 65% of all software engineering throughput on campus.
+
+However, the ethical stratification of these tools remains a concern. How do we ensure that the "Hill Protocol" remains a human-first experience while leveraging the high-density analytical capabilities of neural networks? We are proposing a new "Verified Intelligence" badge for academic posts that utilize AI for data synthesis but remain human-authored in their final logic. 
+
+The hill must not just adapt; it must lead. Our upcoming symposium in Freedom Square will address these precise intersections. Every node participant is encouraged to scan the full registry of this report in the Resource Vault.`,
+    hashtags: ['#AIReseach', '#MakerereInnovation', '#DeepScan'],
+    likes: 892,
+    commentsCount: 45,
+    comments: [],
+    views: 12400,
+    flags: [],
+    isOpportunity: false,
+    college: 'COCIS',
+    aiMetadata: { category: 'Academic', isSafe: true }
+  },
+  {
+    id: 'art-2',
+    author: 'Namono Grace',
+    authorId: 'u45',
+    authorRole: 'Literature Finalist',
+    authorAvatar: 'https://i.pravatar.cc/150?u=grace',
+    timestamp: '1 hour ago',
+    content: `The digital age hasn't killed the book; it has redefined the library. My thesis explores the transition of African Literature from physical scrolls and bound volumes to high-density digital nodes. 
+
+At Makerere, we see this transition most vividly. The CHUSS wing is no longer just a collection of lecture halls but a vibrant broadcast network where poetry is shared in real-time. We are seeing a resurgence of "Digital Orality"—using platforms like MakSocial to broadcast spoken word to thousands of nodes simultaneously. 
+
+Literature is no longer a solitary act of reading but a collective act of synchronization. As we move forward, the "Academic Vault" will become our most precious cultural repository, housing not just papers, but the living voice of the hill.`,
+    hashtags: ['#Literature', '#CHUSS', '#DigitalAfricanism'],
+    likes: 567,
+    commentsCount: 22,
+    comments: [],
+    views: 8900,
+    flags: [],
+    isOpportunity: false,
+    college: 'CHUSS',
+    aiMetadata: { category: 'Social', isSafe: true }
+  },
   {
     id: 'ev-broadcast-1',
     author: 'Guild Electoral Commission',
@@ -49,56 +96,9 @@ export const MOCK_POSTS: Post[] = [
     isEventBroadcast: true,
     eventId: 'ev-1',
     eventTitle: '89th Guild Inauguration Ceremony',
-    eventFlyer: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvr2YhoOthHq7cV6DqnFdb9h0thE2b9DxHCA&s',
     eventDate: '2025-05-15',
     eventTime: '14:00',
-    eventLocation: 'Main Hall, Makerere University',
-    eventRegistrationLink: 'https://mak.ac.ug/guild'
-  },
-  {
-    id: 'ev-broadcast-2',
-    author: 'COCIS Admin',
-    authorId: 'admin_cocis',
-    authorRole: 'Academic Administrator',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin',
-    authorAuthority: 'Administrator',
-    timestamp: '2 hours ago',
-    content: 'The Innovation Challenge is now open for registration. Teams of up to 4 can apply to present their research and win significant funding.',
-    hashtags: ['#InnovateMAK', '#Tech', '#COCIS'],
-    likes: 89,
-    commentsCount: 5,
-    comments: [],
-    views: 1200,
-    flags: [],
-    isOpportunity: true,
-    college: 'COCIS',
-    isEventBroadcast: true,
-    eventId: 'ev-2',
-    eventTitle: 'MAK Innovation Challenge 2025',
-    eventFlyer: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200',
-    eventDate: '2025-06-10',
-    eventTime: '09:00',
-    eventLocation: 'COCIS Conference Room',
-    eventRegistrationLink: 'https://innovate.mak.ac.ug'
-  },
-  {
-    id: 'global-1',
-    author: 'Campus Admin',
-    authorId: 'admin',
-    authorRole: 'University Admin',
-    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
-    authorAuthority: 'Administrator',
-    timestamp: '1 hour ago',
-    content: 'Welcome to the updated MakSocial! Please remember to join your college community to stay updated with academic news. Only global updates appear here.',
-    hashtags: ['#MakSocial', '#Global', '#Makerere'],
-    likes: 1200,
-    comments: [],
-    commentsCount: 200,
-    views: 15000,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global',
-    aiMetadata: { category: 'Social', isSafe: true }
+    eventLocation: 'Main Hall, Makerere University'
   }
 ];
 
@@ -116,12 +116,12 @@ export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
     user: { name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg'},
-    lastMessage: 'The notes are on the portal.',
+    lastMessage: 'The research notes are in the Vault.',
     unreadCount: 2,
     messages: [
-      { id: 'm1', text: 'Hey, did you see the new assignment?', timestamp: '10:00 AM', isMe: false },
-      { id: 'm2', text: 'Yes, just started working on it.', timestamp: '10:05 AM', isMe: true },
-      { id: 'm3', text: 'The notes are on the portal.', timestamp: '10:10 AM', isMe: false },
+      { id: 'm1', text: 'Hey, did you see the new AI thesis?', timestamp: '10:00 AM', isMe: false },
+      { id: 'm2', text: 'Yes, just synced with that node.', timestamp: '10:05 AM', isMe: true },
+      { id: 'm3', text: 'The research notes are in the Vault.', timestamp: '10:10 AM', isMe: false },
     ]
   }
 ];

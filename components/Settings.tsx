@@ -39,7 +39,11 @@ const FONTS = [
   { name: 'Outfit', value: '"Outfit"' },
   { name: 'Sora', value: '"Sora"' },
   { name: 'Playfair (Serif)', value: '"Playfair Display"' },
-  { name: 'JetBrains (Mono)', value: '"JetBrains Mono"' }
+  { name: 'JetBrains (Mono)', value: '"JetBrains Mono"' },
+  { name: 'Comic Sans', value: '"Comic Sans MS", "Comic Sans", cursive' },
+  { name: 'Impact (Heavy)', value: 'Impact, sans-serif' },
+  { name: 'Courier New', value: '"Courier New", Courier, monospace' },
+  { name: 'Arial (Legacy)', value: 'Arial, sans-serif' }
 ];
 
 const Settings: React.FC = () => {

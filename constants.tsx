@@ -37,18 +37,13 @@ export const MOCK_POSTS: Post[] = [
     authorAvatar: 'https://i.pravatar.cc/150?u=prof',
     authorAuthority: 'Lecturer',
     timestamp: '15m ago',
-    content: `The Future of Artificial Intelligence on the Hill: A Decadal Outlook.
-
-As we navigate the mid-2020s, the integration of Large Language Models within our academic framework is no longer a peripheral experiment but a central architectural necessity. Our recent studies at the COCIS Innovation Node suggest that by 2030, student-AI collaboration will account for 65% of all software engineering throughput on campus.
-
-However, the ethical stratification of these tools remains a concern. How do we ensure that the "Hill Protocol" remains a human-first experience while leveraging the high-density analytical capabilities of neural networks? We are proposing a new "Verified Intelligence" badge for academic posts that utilize AI for data synthesis but remain human-authored in their final logic. 
-
-The hill must not just adapt; it must lead. Our upcoming symposium in Freedom Square will address these precise intersections. Every node participant is encouraged to scan the full registry of this report in the Resource Vault.`,
-    hashtags: ['#AIReseach', '#MakerereInnovation', '#DeepScan'],
-    likes: 892,
-    commentsCount: 45,
+    content: `THE FUTURE OF AI: A DECADAL OUTLOOK 🔬\n\nRecent telemetry from the Hill suggests a 45% increase in neural-network assisted coding within COCIS. This post is styled in monospaced font to represent the raw data protocols we are monitoring.`,
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#AI', '#Data'],
+    likes: 1200,
+    commentsCount: 89,
     comments: [],
-    views: 12400,
+    views: 45000,
     flags: [],
     isOpportunity: false,
     college: 'COCIS',
@@ -56,49 +51,42 @@ The hill must not just adapt; it must lead. Our upcoming symposium in Freedom Sq
   },
   {
     id: 'art-2',
-    author: 'Namono Grace',
+    author: 'Literature Hub',
     authorId: 'u45',
-    authorRole: 'Literature Finalist',
-    authorAvatar: 'https://i.pravatar.cc/150?u=grace',
-    timestamp: '1 hour ago',
-    content: `The digital age hasn't killed the book; it has redefined the library. My thesis explores the transition of African Literature from physical scrolls and bound volumes to high-density digital nodes. 
-
-At Makerere, we see this transition most vividly. The CHUSS wing is no longer just a collection of lecture halls but a vibrant broadcast network where poetry is shared in real-time. We are seeing a resurgence of "Digital Orality"—using platforms like MakSocial to broadcast spoken word to thousands of nodes simultaneously. 
-
-Literature is no longer a solitary act of reading but a collective act of synchronization. As we move forward, the "Academic Vault" will become our most precious cultural repository, housing not just papers, but the living voice of the hill.`,
-    hashtags: ['#Literature', '#CHUSS', '#DigitalAfricanism'],
-    likes: 567,
-    commentsCount: 22,
+    authorRole: 'Scholarly Wing',
+    authorAvatar: 'https://i.pravatar.cc/150?u=lit',
+    timestamp: '1h ago',
+    content: `The Elegance of the Written Word.\n\nIn this creative article, we explore the intersection of classical serif typography and modern student digital culture. Note the grace of the Playfair Display font applied specifically to this intelligence report.`,
+    customFont: '"Playfair Display"',
+    hashtags: ['#LiteraryHill'],
+    likes: 892,
+    commentsCount: 34,
     comments: [],
-    views: 8900,
+    views: 12000,
     flags: [],
     isOpportunity: false,
     college: 'CHUSS',
-    aiMetadata: { category: 'Social', isSafe: true }
+    images: ['https://images.unsplash.com/photo-1491843384429-181717b8e24f?auto=format&fit=crop&w=800'],
+    aiMetadata: { category: 'Academic', isSafe: true }
   },
   {
-    id: 'ev-broadcast-1',
-    author: 'Guild Electoral Commission',
-    authorId: 'super_admin',
-    authorRole: 'Official Registry',
-    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
-    authorAuthority: 'Super Admin',
-    timestamp: 'Just now',
-    content: 'All students are invited to witness the 89th Guild Inauguration. This is a mandatory attendance event for student leaders.',
-    hashtags: ['#Guild89', '#Inauguration', '#Makerere'],
-    likes: 342,
-    commentsCount: 12,
+    id: 'comic-shoutout',
+    author: 'Meme Central',
+    authorId: 'u99',
+    authorRole: 'Social Hub',
+    authorAvatar: 'https://i.pravatar.cc/150?u=meme',
+    timestamp: '3h ago',
+    content: `OMG GUYS! THE CHICKEN TONIGHT DEALS ARE CRAZY!! 🍗✨\n\nI used Comic Sans because this post is 100% vibes and zero stress. See you at the Food Court!`,
+    customFont: '"Comic Sans MS", "Comic Sans", cursive',
+    hashtags: ['#Vibes', '#MakFood'],
+    likes: 4500,
+    commentsCount: 200,
     comments: [],
-    views: 2500,
+    views: 98000,
     flags: [],
     isOpportunity: false,
     college: 'Global',
-    isEventBroadcast: true,
-    eventId: 'ev-1',
-    eventTitle: '89th Guild Inauguration Ceremony',
-    eventDate: '2025-05-15',
-    eventTime: '14:00',
-    eventLocation: 'Main Hall, Makerere University'
+    aiMetadata: { category: 'Social', isSafe: true }
   }
 ];
 

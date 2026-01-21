@@ -29,7 +29,7 @@ export interface Ad {
   budget: number;
   spent: number;
   clicks: number;
-  deadline: string; // Used for Admin Calendar
+  deadline: string; 
 }
 
 export interface RevenuePoint {
@@ -96,7 +96,7 @@ export interface User {
   email?: string;
   college: College;
   status: UserStatus;
-  subscriptionTier: SubscriptionTier; // Logic: Pro can see Vault and join multiple colleges
+  subscriptionTier: SubscriptionTier; 
   accountStatus?: 'Active' | 'Inactive' | 'Suspended';
   verified?: boolean;
   joinedColleges: College[];
@@ -129,6 +129,7 @@ export interface Post {
   authorAuthority?: AuthorityRole;
   timestamp: string;
   content: string;
+  customFont?: string; // NEW: Per-post creative typography
   images?: string[];
   video?: string;
   hashtags: string[];

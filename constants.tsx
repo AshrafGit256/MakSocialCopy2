@@ -6,14 +6,14 @@ import {
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
 export const NAV_ITEMS = [
-  { id: 'home', label: 'Global Pulse', icon: <Home size={22} /> },
-  { id: 'search', label: 'Search', icon: <Search size={22} /> },
-  { id: 'calendar', label: 'Calendar', icon: <Calendar size={22} /> },
-  { id: 'resources', label: 'Resource Vault', icon: <BookOpen size={22} /> },
-  { id: 'explore', label: 'Explore', icon: <Compass size={22} /> },
-  { id: 'messages', label: 'Messages', icon: <MessageCircle size={22} /> },
+  { id: 'home', label: 'Home Feed', icon: <Home size={22} /> },
+  { id: 'search', label: 'Explore', icon: <Search size={22} /> },
+  { id: 'calendar', label: 'Schedule', icon: <Calendar size={22} /> },
+  { id: 'resources', label: 'The Vault', icon: <BookOpen size={22} /> },
+  { id: 'explore', label: 'Discovery', icon: <Compass size={22} /> },
+  { id: 'messages', label: 'Direct', icon: <MessageCircle size={22} /> },
   { id: 'groups', label: 'Wing Hubs', icon: <LayoutGrid size={22} /> },
-  { id: 'profile', label: 'Profile', icon: <User size={22} /> },
+  { id: 'profile', label: 'Terminal', icon: <User size={22} /> },
 ];
 
 export const COLLEGE_BANNERS: Record<College, string> = {
@@ -30,83 +30,84 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 
 export const MOCK_POSTS: Post[] = [
   {
-    id: 'res-report-1',
-    author: 'Prof. Sserunjogi D.',
-    authorId: 'lecturer_1',
-    authorRole: 'Senior Researcher',
-    authorAvatar: 'https://i.pravatar.cc/150?u=prof',
+    id: 'creative-1',
+    author: 'Literature Node Alpha',
+    authorId: 'u_lit',
+    authorRole: 'Scholarly Collective',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lit',
     authorAuthority: 'Lecturer',
-    timestamp: '15m ago',
-    content: `<h1>System Telemetry: Neural Network Efficiency 🔬</h1>
-<p>Our recent data extraction from the COCIS Cloud Cluster shows significant scaling improvements. Note the following benchmarks:</p>
-<table border="1" style="width:100%; border-collapse: collapse; margin: 15px 0; border: 1px solid #ddd;">
-  <tr style="background-color: rgba(99, 102, 241, 0.1);">
-    <th style="padding: 10px; text-align: left;">Metric</th>
-    <th style="padding: 10px; text-align: left;">Value</th>
+    timestamp: 'Just now',
+    content: `<h1>The Renaissance of the Hill</h1>
+<p style="text-align: justify;">In this thesis, we explore the <u>profound transformation</u> of academic discourse through digital synchronization. Note the following observation logs:</p>
+<blockquote style="text-align: center; border: none; font-size: 1.2rem;">"The book is a node in a much larger knowledge network."</blockquote>
+<ul>
+  <li><b>Phase I:</b> Textual Digitization</li>
+  <li><b>Phase II:</b> Collective Commentary</li>
+  <li><b>Phase III:</b> Neural Asset Management</li>
+</ul>
+<p>Visit the <a href="#">Resource Vault</a> for full telemetry.</p>`,
+    customFont: '"Playfair Display"',
+    hashtags: ['#Literature', '#CHUSS', '#Research'],
+    likes: 842,
+    commentsCount: 22,
+    comments: [],
+    views: 12400,
+    flags: [],
+    isOpportunity: false,
+    college: 'CHUSS',
+    aiMetadata: { category: 'Academic', isSafe: true }
+  },
+  {
+    id: 'creative-2',
+    author: 'Ashraf G.',
+    authorId: 'u1',
+    authorRole: 'Protocol Architect',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
+    authorAuthority: 'Super Admin',
+    timestamp: '2h ago',
+    content: `<h2>Node Benchmark Results 🚀</h2>
+<p>Current system latency logs for the COCIS Hub Wing:</p>
+<table style="width:100%; border: 1px solid #30363d; margin: 15px 0;">
+  <tr style="background: rgba(99, 102, 241, 0.1);">
+    <th style="padding: 10px; text-align: left;">Segment</th>
+    <th style="padding: 10px; text-align: left;">Latency</th>
   </tr>
   <tr>
-    <td style="padding: 10px;">Throughput</td>
-    <td style="padding: 10px;">12.4 GB/s</td>
+    <td style="padding: 10px;">Primary Uplink</td>
+    <td style="padding: 10px;">12.4ms</td>
   </tr>
   <tr>
-    <td style="padding: 10px;">Latency</td>
-    <td style="padding: 10px;">4.2 ms</td>
+    <td style="padding: 10px;">Vault Sync</td>
+    <td style="padding: 10px;">4.8ms</td>
   </tr>
 </table>
-<p>Full documentation is available in the <a href="#" style="color: #6366f1; font-weight: bold;">Academic Vault</a>.</p>`,
+<p style="text-align: right;"><b>System Status:</b> <span style="background-color: #059669; color: white; padding: 2px 8px; border-radius: 4px;">NOMINAL</span></p>`,
     customFont: '"JetBrains Mono"',
-    hashtags: ['#AI', '#Scholarly'],
+    hashtags: ['#SystemLog', '#COCIS', '#MakSocial'],
     likes: 1200,
-    commentsCount: 89,
+    commentsCount: 45,
     comments: [],
-    views: 45000,
+    views: 89000,
     flags: [],
     isOpportunity: false,
     college: 'COCIS',
     aiMetadata: { category: 'Academic', isSafe: true }
   },
   {
-    id: 'lit-thesis-1',
-    author: 'Grace Namono',
-    authorId: 'u45',
-    authorRole: 'Literature Finalist',
-    authorAvatar: 'https://i.pravatar.cc/150?u=grace',
-    timestamp: '1h ago',
-    content: `<h2 style="text-align: center;">The Dialectics of Digital Orality</h2>
-<p style="text-align: justify;">In this thesis, we explore the resurgence of traditional African storytelling through modern digital nodes. Literature students are encouraged to consider how <i>MakSocial</i> serves as a new-age library for the hill.</p>
-<ul style="margin: 20px 0;">
-  <li><b>Phase 1:</b> The transition from physical scrolls.</li>
-  <li><b>Phase 2:</b> The emergence of the Digital Voice.</li>
-  <li><b>Phase 3:</b> Collective Hill Synchronization.</li>
-</ul>
-<p>Our findings suggest a 30% increase in student poetry engagement via this platform.</p>`,
-    customFont: '"Playfair Display"',
-    hashtags: ['#LiteratureHub', '#CHUSS'],
-    likes: 892,
-    commentsCount: 34,
-    comments: [],
-    views: 12000,
-    flags: [],
-    isOpportunity: false,
-    college: 'CHUSS',
-    images: ['https://images.unsplash.com/photo-1491843384429-181717b8e24f?auto=format&fit=crop&w=800'],
-    aiMetadata: { category: 'Academic', isSafe: true }
-  },
-  {
-    id: 'comic-vibe-1',
-    author: 'Meme Central',
-    authorId: 'u99',
-    authorRole: 'Social Hub',
-    authorAvatar: 'https://i.pravatar.cc/150?u=meme',
-    timestamp: '3h ago',
-    content: `<p><span style="background-color: #fef08a; padding: 2px 8px; border-radius: 4px;">GUYS THE CHICKEN TONIGHT DEALS ARE WILD!</span> 🍗✨</p>
-<p style="text-align: right;">Seriously, don't miss out on the Bucket Signal today. See you at the Food Court! 👋</p>`,
+    id: 'creative-3',
+    author: 'Social Vibes Node',
+    authorId: 'u_vibes',
+    authorRole: 'Campus Pulse',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vibes',
+    timestamp: '5h ago',
+    content: `<p style="text-align: center;"><span style="background-color: #fef08a; padding: 10px 20px; border-radius: 10px; color: black; font-size: 1.5rem;">OMG GUYS! CHICKEN TONIGHT DEALS ARE WILD! 🍗✨</span></p>
+<p style="text-align: center;">I used <u>Comic Sans</u> because this post is <b>100% vibes</b> and <b>0% stress</b>. Meet us at the food court at 2PM for the synchronization event!</p>`,
     customFont: '"Comic Sans MS", "Comic Sans", cursive',
-    hashtags: ['#Vibes', '#MakFood'],
-    likes: 4500,
-    commentsCount: 200,
+    hashtags: ['#FoodCourt', '#MakerereVibes'],
+    likes: 450,
+    commentsCount: 18,
     comments: [],
-    views: 98000,
+    views: 4500,
     flags: [],
     isOpportunity: false,
     college: 'Global',

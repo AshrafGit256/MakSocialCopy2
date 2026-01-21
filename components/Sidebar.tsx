@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -18,7 +18,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   const [currentUser, setCurrentUser] = useState<User>(db.getUser());
 
-  // Detect if current user is a college-specific admin
   const isCollegeAdmin = currentUser.email?.toLowerCase().startsWith('admin.');
   const userCollege = currentUser.email?.toLowerCase().startsWith('admin.') 
     ? currentUser.email?.split('.')[1]?.split('@')[0]?.toUpperCase() as College 
@@ -35,107 +34,104 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     else document.documentElement.classList.remove('dark');
   };
 
-  const filteredNavItems = NAV_ITEMS.filter(item => {
-    if (isCollegeAdmin) {
-      if (item.id === 'home') return false; 
-    }
-    return true;
-  });
-
-  // Base classes for the sidebar container
   const sidebarClasses = `
-    fixed inset-y-0 left-0 z-[70] w-72 bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
-    flex flex-col h-full shadow-2xl transition-transform duration-300 ease-in-out
-    lg:static lg:translate-x-0 lg:z-50 lg:shadow-none
+    fixed inset-y-0 left-0 z-[100] w-[85%] max-w-[320px] bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
+    flex flex-col h-full shadow-[25px_0_50px_-12px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-in-out
+    lg:static lg:translate-x-0 lg:z-50 lg:shadow-none lg:w-72
     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
   `;
 
   return (
     <aside className={sidebarClasses}>
-      <div className="p-6">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="cursor-pointer group flex-1" onClick={() => setView(isCollegeAdmin ? 'groups' : 'home')}>
-            <img
-              src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
-              alt="MakSocial Logo"
-              className="w-32 lg:w-full grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all"
-            />
+      <div className="p-6 overflow-y-auto no-scrollbar flex-1">
+        {/* Mobile Close Icon */}
+        <div className="flex items-center justify-between mb-10 lg:hidden">
+          <div className="flex flex-col">
+            <h2 className="text-xl font-black italic tracking-tighter uppercase text-indigo-600">MakSocial</h2>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Navigation Control</p>
           </div>
-          {/* Close button for mobile */}
-          <button 
-            onClick={onClose}
-            className="lg:hidden p-2 text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all"
-          >
+          <button onClick={onClose} className="p-3 bg-[var(--bg-secondary)] rounded-2xl text-slate-500 active:scale-90 transition-all">
             <X size={20} />
           </button>
         </div>
 
-        <nav className="space-y-1">
-          {filteredNavItems.map((item) => (
+        {/* Desktop Logo */}
+        <div className="hidden lg:block mb-10 cursor-pointer group" onClick={() => setView('home')}>
+          <img
+            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png"
+            alt="MakSocial Logo"
+            className="w-40 grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all group-hover:scale-105"
+          />
+        </div>
+
+        <nav className="space-y-1.5">
+          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Main Signals</p>
+          {NAV_ITEMS.map((item) => (
             <button
               key={item.id}
               onClick={() => setView(item.id as AppView)}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all group ${
+              className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
                 activeView === item.id 
-                ? 'bg-indigo-600 text-white shadow-md' 
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
               }`}
             >
-              <span className={`transition-transform duration-300 group-hover:scale-110`}>
+              <span className="transition-transform duration-300 group-hover:scale-110">
                 {item.icon}
               </span>
-              <span className="text-[10px] tracking-widest font-black uppercase">
-                {item.id === 'groups' ? `${userCollege} Wing` : item.id === 'resources' ? 'Academic Vault' : item.label}
+              <span className="text-[11px] tracking-widest font-black uppercase">
+                {item.id === 'groups' ? `${userCollege} Wing` : item.id === 'resources' ? 'Vault' : item.label}
               </span>
             </button>
           ))}
           
           <button
             onClick={() => setView('events')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all group ${
+            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
               activeView === 'events' 
-              ? 'bg-rose-600 text-white shadow-md' 
-              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+              ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/20' 
+              : 'text-slate-500 hover:bg-rose-500/10 hover:text-rose-600'
             }`}
           >
-            <Radio size={20} />
-            <span className="text-[10px] tracking-widest font-black uppercase">Live Hub</span>
+            <Radio size={22} />
+            <span className="text-[11px] tracking-widest font-black uppercase">Live Pulse</span>
           </button>
         </nav>
+
+        {isAdmin && (
+          <div className="mt-10">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Authorized Area</p>
+            <button
+              onClick={() => setView('admin')}
+              className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all border border-dashed active:scale-[0.98] ${
+                activeView === 'admin' 
+                ? 'bg-slate-900 dark:bg-indigo-600 text-white border-transparent' 
+                : 'border-[var(--border-color)] text-slate-500 hover:border-indigo-500 hover:text-indigo-600'
+              }`}
+            >
+              <Cpu size={22} />
+              <span className="text-[11px] font-black uppercase tracking-widest">Control Panel</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="mt-auto p-6 space-y-3">
-        {isAdmin && !isCollegeAdmin && (
-          <button
-            onClick={() => setView('admin')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all border border-dashed ${
-              activeView === 'admin' 
-              ? 'bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-600/20' 
-              : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500 hover:text-indigo-500'
-            }`}
-          >
-            <Cpu size={18} />
-            <span className="text-[10px] font-black uppercase tracking-widest">Super Control</span>
-          </button>
-        )}
-        
+      <div className="p-6 border-t border-[var(--border-color)] space-y-4">
         <div className="flex gap-2">
            <button 
              onClick={toggleTheme} 
-             title="Toggle Theme"
-             className="flex-1 p-3 bg-[var(--bg-secondary)] rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all flex items-center justify-center"
+             className="flex-1 py-4 bg-[var(--bg-secondary)] rounded-2xl text-slate-500 transition-all flex items-center justify-center active:scale-95 shadow-sm"
            >
-             {isDark ? <Sun size={18} /> : <Moon size={18} />}
+             {isDark ? <Sun size={20} /> : <Moon size={20} />}
            </button>
            <button 
              onClick={onLogout} 
-             title="Logout"
-             className="flex-1 p-3 bg-rose-500/10 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center"
+             className="flex-1 py-4 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-sm"
            >
-             <LogOut size={18} />
+             <LogOut size={20} />
            </button>
         </div>
+        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest text-center">MakSocial Network v3.5 Stable</p>
       </div>
     </aside>
   );

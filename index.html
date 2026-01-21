@@ -3,7 +3,7 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MakSocial - Let's Connect</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,7 +21,8 @@
             borderRadius: {
               'xl': '0.75rem',
               '2xl': '1rem',
-              '3xl': '1.5rem'
+              '3xl': '1.5rem',
+              '4xl': '2rem'
             },
             fontFamily: {
               sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
@@ -38,8 +39,9 @@
           --text-primary: #0f172a;
           --text-secondary: #475569;
           --border-color: #e2e8f0;
-          --card-bg: rgba(255, 255, 255, 0.9);
+          --card-bg: #ffffff;
           --sidebar-bg: #ffffff;
+          --safe-area-bottom: env(safe-area-inset-bottom);
         }
 
         .dark:root {
@@ -48,7 +50,7 @@
           --text-primary: #f8fafc;
           --text-secondary: #94a3b8;
           --border-color: rgba(255, 255, 255, 0.08);
-          --card-bg: rgba(15, 23, 42, 0.6);
+          --card-bg: #0f172a;
           --sidebar-bg: #020617;
         }
 
@@ -58,10 +60,17 @@
             color: var(--text-primary);
             transition: background-color 0.3s ease, color 0.3s ease;
             -webkit-font-smoothing: antialiased;
+            overscroll-behavior-y: none; /* Prevent bounce for app feel */
+        }
+
+        /* Bottom Nav Safe Area */
+        .pb-safe {
+          padding-bottom: calc(4.5rem + var(--safe-area-bottom));
         }
 
         ::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
+            height: 4px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -76,10 +85,8 @@
         
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
 
         .no-scrollbar::-webkit-scrollbar {
@@ -90,9 +97,25 @@
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Modern Typography Tweaks */
         h1, h2, h3, h4 {
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
+        }
+
+        /* Active tab styling for bottom nav */
+        .active-tab {
+            color: #6366f1;
+            position: relative;
+        }
+        .active-tab::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #6366f1;
+            border-radius: 0 0 4px 4px;
         }
     </style>
 <script type="importmap">

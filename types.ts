@@ -162,6 +162,7 @@ export interface User {
   email?: string;
   college: College;
   status: UserStatus;
+  accountStatus?: 'Active' | 'Inactive' | 'Suspended';
   joinedColleges: College[];
   postsCount: number;
   followersCount: number;

@@ -58,6 +58,7 @@ const App: React.FC = () => {
       email: email,
       college: college,
       status: status,
+      accountStatus: 'Active',
       joinedColleges: [college],
       postsCount: 0,
       followersCount: 0,
@@ -79,10 +80,16 @@ const App: React.FC = () => {
   };
 
   const handleSetView = (newView: AppView) => {
+    // If Admin, they cannot switch to standard student views easily
+    if (userRole === 'admin' && newView !== 'admin') {
+      // In this specific requirement, they only control the app
+      // so we might block standard navigation or force them back
+      // unless onLogout is called.
+      return; 
+    }
+
     setView(newView);
     setIsSidebarOpen(false);
-    // Explicitly cast to string to prevent TypeScript error where it incorrectly 
-    // claims 'admin' is not part of the AppView union during comparison.
     if ((newView as string) === 'admin') setIsAdminMode(true);
     else if (userRole === 'admin' && (newView as string) !== 'admin') setIsAdminMode(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -113,8 +120,8 @@ const App: React.FC = () => {
   }
 
   // Admin Terminal Mode (Forced Full Screen AdminLTE)
-  if (isLoggedIn && isAdminMode && userRole === 'admin') {
-    return <Admin onToggleView={() => setIsAdminMode(false)} onLogout={handleLogout} />;
+  if (isLoggedIn && userRole === 'admin') {
+    return <Admin onToggleView={() => {}} onLogout={handleLogout} />;
   }
 
   return (
@@ -182,16 +189,6 @@ const App: React.FC = () => {
             </button>
           ))}
         </nav>
-
-        {userRole === 'admin' && (
-          <button 
-            onClick={() => { setIsAdminMode(true); setView('admin'); }}
-            className="hidden lg:flex fixed bottom-8 right-8 z-[100] bg-indigo-600 text-white px-6 py-3.5 rounded-full shadow-2xl items-center gap-3 hover:scale-105 active:scale-95 transition-all font-black text-[11px] uppercase tracking-widest group"
-          >
-            <Monitor size={18} className="group-hover:rotate-12 transition-transform" />
-            Admin Terminal
-          </button>
-        )}
       </div>
     </div>
   );

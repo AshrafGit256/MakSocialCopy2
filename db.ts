@@ -84,6 +84,7 @@ const INITIAL_USERS: User[] = [
     connections: 245,
     college: 'COCIS',
     status: 'Year 2',
+    accountStatus: 'Active',
     joinedColleges: ['COCIS'],
     postsCount: 12,
     followersCount: 1420,
@@ -100,6 +101,7 @@ const INITIAL_USERS: User[] = [
     connections: 5000,
     college: 'COCIS',
     status: 'Graduate',
+    accountStatus: 'Active',
     email: 'admin@admin.mak.ac.ug',
     joinedColleges: ['COCIS', 'CEDAT', 'LAW'],
     postsCount: 0,
@@ -121,7 +123,7 @@ export const db = {
   getUsers: (): User[] => {
     const saved = localStorage.getItem(DB_KEYS.USERS);
     const users: User[] = saved ? JSON.parse(saved) : INITIAL_USERS;
-    return users.map(u => ({ ...u, joinedColleges: u.joinedColleges || [] }));
+    return users.map(u => ({ ...u, joinedColleges: u.joinedColleges || [], accountStatus: u.accountStatus || 'Active' }));
   },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
 
@@ -216,9 +218,20 @@ export const db = {
     const saved = localStorage.getItem(DB_KEYS.RESOURCES);
     return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
   },
+  saveResources: (resources: Resource[]) => localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(resources)),
   addResource: (res: Resource) => {
     const resources = db.getResources();
     localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([res, ...resources]));
+  },
+  updateResource: (res: Resource) => {
+    const resources = db.getResources();
+    const updated = resources.map(r => r.id === res.id ? res : r);
+    db.saveResources(updated);
+  },
+  deleteResource: (id: string) => {
+    const resources = db.getResources();
+    const updated = resources.filter(r => r.id !== id);
+    db.saveResources(updated);
   },
 
   updateCollegeLeadership: (collegeId: College, leadership: LeadershipMember[]) => {

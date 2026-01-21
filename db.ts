@@ -82,6 +82,25 @@ const INITIAL_USERS: User[] = [
     appliedTo: []
   },
   {
+    id: 'u3',
+    name: 'Kevin M.',
+    role: 'Graduate',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin',
+    connections: 560,
+    college: 'CEDAT',
+    status: 'Graduate',
+    subscriptionTier: 'Enterprise',
+    accountStatus: 'Active',
+    verified: true,
+    joinedColleges: ['CEDAT', 'COCIS'],
+    postsCount: 25,
+    followersCount: 800,
+    followingCount: 200,
+    totalLikesCount: 2100,
+    badges: ['Alumni'],
+    appliedTo: []
+  },
+  {
     id: 'super_admin',
     name: 'System Admin',
     role: 'Super Admin',

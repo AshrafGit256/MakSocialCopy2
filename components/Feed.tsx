@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-// FIX: Removed CollegeStats which was not exported from types
 import { Post, User, College, AuthorityRole, CalendarEvent } from '../types';
 import { db } from '../db';
 import { GoogleGenAI } from "@google/genai";
@@ -9,8 +8,7 @@ import {
   Loader2, Eye, ShieldAlert, Zap, 
   GraduationCap, CheckCircle2, Calendar, 
   MapPin, Clock, TrendingUp, Plus, ShieldCheck, Trash2, Edit3, 
-  // FIX: Added Users icon import for AuthoritySeal
-  Star, Verified, Share2, Shield as ShieldIcon, Users
+  Star, Verified, Share2, Shield as ShieldIcon, Users, Lock
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -65,7 +63,6 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' 
       textColor: 'text-white',
       icon: <Verified size={size === 'sm' ? 10 : 12} /> 
     },
-    // FIX: Added missing roles to AuthoritySeal config
     'Graduate': { 
       bg: 'bg-slate-500', 
       glow: 'shadow-slate-500/40',
@@ -125,6 +122,8 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
 
   const activeCollege = collegeFilter || (activeTab === 'Global' ? null : activeTab as College);
   const isAdminOfActiveCollege = isCollegeAdmin && activeCollege === userCollegeAdminId;
+
+  const isSubscribed = user.subscriptionTier !== 'Free';
 
   useEffect(() => {
     const sync = () => {
@@ -240,25 +239,49 @@ const Feed: React.FC<{ collegeFilter?: College, targetPostId?: string | null, on
     }
   };
 
+  const COLLEGES_LIST: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
+
+  const handleTabClick = (c: College | 'Global') => {
+    if (c === 'Global' || c === user.college || isSubscribed) {
+      setActiveTab(c);
+    } else {
+      alert("UPGRADE REQUIRED: Joining multiple college nodes requires a PRO or ENTERPRISE subscription stratum.");
+    }
+  };
+
   return (
     <div className="max-w-[1440px] mx-auto pb-32 lg:px-12 lg:py-8">
       {/* Native-style Sticky Tab Header - FotMob Inspired */}
       {!collegeFilter && !isCollegeAdmin && (
         <div className="sticky top-0 lg:top-[3.75rem] z-[75] bg-[var(--bg-primary)]/90 backdrop-blur-xl border-b border-[var(--border-color)] transition-theme">
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2.5 px-4">
-            {['Global', 'COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map((c: any) => (
-              <button 
-                key={c} 
-                onClick={() => setActiveTab(c)} 
+            <button 
+                onClick={() => handleTabClick('Global')} 
                 className={`px-6 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 border ${
-                  activeTab === c 
+                  activeTab === 'Global' 
                   ? 'bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-600/20' 
                   : 'text-slate-500 bg-[var(--bg-secondary)] border-[var(--border-color)]'
                 }`}
               >
-                {c}
-              </button>
-            ))}
+                Global
+            </button>
+            {COLLEGES_LIST.map((c) => {
+              const isLocked = !isSubscribed && c !== user.college;
+              return (
+                <button 
+                  key={c} 
+                  onClick={() => handleTabClick(c)} 
+                  className={`flex items-center gap-2 px-6 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 border ${
+                    activeTab === c 
+                    ? 'bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-600/20' 
+                    : 'text-slate-500 bg-[var(--bg-secondary)] border-[var(--border-color)]'
+                  } ${isLocked ? 'opacity-70' : ''}`}
+                >
+                  {c}
+                  {isLocked && <Lock size={12} className="text-slate-400" />}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

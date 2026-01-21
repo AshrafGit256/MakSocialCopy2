@@ -86,7 +86,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
           <div className="relative">
             <div className="relative aspect-square rounded-[3rem] overflow-hidden border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.25)] group">
                <img 
-                 src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200" 
+                 src="https://github.com/AshrafGit256/MakSocialImages/blob/main/Public/makerere_at_night.webp" 
                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                  alt="Makerere Architecture" 
                />

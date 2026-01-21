@@ -11,9 +11,12 @@ export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 
 export interface AppSettings {
   primaryColor: string;
   fontFamily: string;
-  fontSize: 'sm' | 'md' | 'lg';
+  fontSize: 'sm' | 'md' | 'lg' | 'xl';
   contrast: 'normal' | 'high';
-  density: 'comfortable' | 'compact';
+  density: 'comfortable' | 'compact' | 'tight';
+  borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  animationsEnabled: boolean;
+  glassmorphism: boolean;
 }
 
 export interface AnalyticsData {

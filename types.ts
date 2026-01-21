@@ -19,6 +19,24 @@ export interface AppSettings {
   glassmorphism: boolean;
 }
 
+export interface Ad {
+  id: string;
+  clientName: string;
+  title: string;
+  reach: number;
+  status: 'Active' | 'Pending' | 'Completed';
+  budget: number;
+  spent: number;
+  clicks: number;
+}
+
+export interface RevenuePoint {
+  month: string;
+  revenue: number;
+  expenses: number;
+  subscribers: number;
+}
+
 export interface AnalyticsData {
   day: string;
   posts: number;

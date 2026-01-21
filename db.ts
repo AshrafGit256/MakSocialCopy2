@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -7,10 +7,10 @@ const DB_KEYS = {
   USERS: 'maksocial_users_v14',
   LOGGED_IN_ID: 'maksocial_current_user_id',
   RESOURCES: 'maksocial_resources_v4',
-  CALENDAR: 'maksocial_calendar_v6'
+  CALENDAR: 'maksocial_calendar_v6',
+  ADS: 'maksocial_ads_v1'
 };
 
-// FIX: Exported COURSES_BY_COLLEGE for Resources.tsx
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   COCIS: ['Computer Science', 'Software Engineering', 'Information Technology', 'Information Systems'],
   CEDAT: ['Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering', 'Fine Art'],
@@ -22,6 +22,21 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   CEES: ['Education', 'Adult Education'],
   LAW: ['Bachelor of Laws']
 };
+
+const INITIAL_ADS: Ad[] = [
+  { id: 'ad-1', clientName: 'Coke Zero', title: 'Campus Refresh Tour', reach: 45000, status: 'Active', budget: 1200000, spent: 450000, clicks: 1200 },
+  { id: 'ad-2', clientName: 'MTN Pulse', title: 'Summer Data Blast', reach: 89000, status: 'Active', budget: 2500000, spent: 1800000, clicks: 5600 },
+  { id: 'ad-3', clientName: 'Standard Chartered', title: 'Student Savings Account', reach: 12000, status: 'Pending', budget: 800000, spent: 0, clicks: 0 },
+];
+
+export const REVENUE_HISTORY: RevenuePoint[] = [
+  { month: 'Jan', revenue: 4500000, expenses: 2100000, subscribers: 1240 },
+  { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560 },
+  { month: 'Mar', revenue: 4800000, expenses: 2200000, subscribers: 1890 },
+  { month: 'Apr', revenue: 6100000, expenses: 2800000, subscribers: 2100 },
+  { month: 'May', revenue: 7800000, expenses: 3100000, subscribers: 2840 },
+  { month: 'Jun', revenue: 8900000, expenses: 3400000, subscribers: 3500 },
+];
 
 const INITIAL_USERS: User[] = [
   {
@@ -134,13 +149,24 @@ export const db = {
   },
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
-    events.push(event);
+    const existingIndex = events.findIndex(e => e.id === event.id);
+    if (existingIndex !== -1) events[existingIndex] = event;
+    else events.push(event);
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
+  },
+  deleteCalendarEvent: (id: string) => {
+    const events = db.getCalendarEvents();
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events.filter(e => e.id !== id)));
   },
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();
     const updated = events.map(e => e.id === eventId ? { ...e, attendeeIds: [...(e.attendeeIds || []), userId] } : e);
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
+  getAds: (): Ad[] => {
+    const saved = localStorage.getItem(DB_KEYS.ADS);
+    return saved ? JSON.parse(saved) : INITIAL_ADS;
+  },
+  saveAds: (ads: Ad[]) => localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads)),
   getEvents: () => []
 };

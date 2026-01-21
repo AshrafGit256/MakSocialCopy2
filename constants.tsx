@@ -30,16 +30,32 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 
 export const MOCK_POSTS: Post[] = [
   {
-    id: 'art-1',
+    id: 'res-report-1',
     author: 'Prof. Sserunjogi D.',
     authorId: 'lecturer_1',
     authorRole: 'Senior Researcher',
     authorAvatar: 'https://i.pravatar.cc/150?u=prof',
     authorAuthority: 'Lecturer',
     timestamp: '15m ago',
-    content: `THE FUTURE OF AI: A DECADAL OUTLOOK 🔬\n\nRecent telemetry from the Hill suggests a 45% increase in neural-network assisted coding within COCIS. This post is styled in monospaced font to represent the raw data protocols we are monitoring.`,
+    content: `<h1>System Telemetry: Neural Network Efficiency 🔬</h1>
+<p>Our recent data extraction from the COCIS Cloud Cluster shows significant scaling improvements. Note the following benchmarks:</p>
+<table border="1" style="width:100%; border-collapse: collapse; margin: 15px 0; border: 1px solid #ddd;">
+  <tr style="background-color: rgba(99, 102, 241, 0.1);">
+    <th style="padding: 10px; text-align: left;">Metric</th>
+    <th style="padding: 10px; text-align: left;">Value</th>
+  </tr>
+  <tr>
+    <td style="padding: 10px;">Throughput</td>
+    <td style="padding: 10px;">12.4 GB/s</td>
+  </tr>
+  <tr>
+    <td style="padding: 10px;">Latency</td>
+    <td style="padding: 10px;">4.2 ms</td>
+  </tr>
+</table>
+<p>Full documentation is available in the <a href="#" style="color: #6366f1; font-weight: bold;">Academic Vault</a>.</p>`,
     customFont: '"JetBrains Mono"',
-    hashtags: ['#AI', '#Data'],
+    hashtags: ['#AI', '#Scholarly'],
     likes: 1200,
     commentsCount: 89,
     comments: [],
@@ -50,15 +66,22 @@ export const MOCK_POSTS: Post[] = [
     aiMetadata: { category: 'Academic', isSafe: true }
   },
   {
-    id: 'art-2',
-    author: 'Literature Hub',
+    id: 'lit-thesis-1',
+    author: 'Grace Namono',
     authorId: 'u45',
-    authorRole: 'Scholarly Wing',
-    authorAvatar: 'https://i.pravatar.cc/150?u=lit',
+    authorRole: 'Literature Finalist',
+    authorAvatar: 'https://i.pravatar.cc/150?u=grace',
     timestamp: '1h ago',
-    content: `The Elegance of the Written Word.\n\nIn this creative article, we explore the intersection of classical serif typography and modern student digital culture. Note the grace of the Playfair Display font applied specifically to this intelligence report.`,
+    content: `<h2 style="text-align: center;">The Dialectics of Digital Orality</h2>
+<p style="text-align: justify;">In this thesis, we explore the resurgence of traditional African storytelling through modern digital nodes. Literature students are encouraged to consider how <i>MakSocial</i> serves as a new-age library for the hill.</p>
+<ul style="margin: 20px 0;">
+  <li><b>Phase 1:</b> The transition from physical scrolls.</li>
+  <li><b>Phase 2:</b> The emergence of the Digital Voice.</li>
+  <li><b>Phase 3:</b> Collective Hill Synchronization.</li>
+</ul>
+<p>Our findings suggest a 30% increase in student poetry engagement via this platform.</p>`,
     customFont: '"Playfair Display"',
-    hashtags: ['#LiteraryHill'],
+    hashtags: ['#LiteratureHub', '#CHUSS'],
     likes: 892,
     commentsCount: 34,
     comments: [],
@@ -70,13 +93,14 @@ export const MOCK_POSTS: Post[] = [
     aiMetadata: { category: 'Academic', isSafe: true }
   },
   {
-    id: 'comic-shoutout',
+    id: 'comic-vibe-1',
     author: 'Meme Central',
     authorId: 'u99',
     authorRole: 'Social Hub',
     authorAvatar: 'https://i.pravatar.cc/150?u=meme',
     timestamp: '3h ago',
-    content: `OMG GUYS! THE CHICKEN TONIGHT DEALS ARE CRAZY!! 🍗✨\n\nI used Comic Sans because this post is 100% vibes and zero stress. See you at the Food Court!`,
+    content: `<p><span style="background-color: #fef08a; padding: 2px 8px; border-radius: 4px;">GUYS THE CHICKEN TONIGHT DEALS ARE WILD!</span> 🍗✨</p>
+<p style="text-align: right;">Seriously, don't miss out on the Bucket Signal today. See you at the Food Court! 👋</p>`,
     customFont: '"Comic Sans MS", "Comic Sans", cursive',
     hashtags: ['#Vibes', '#MakFood'],
     likes: 4500,

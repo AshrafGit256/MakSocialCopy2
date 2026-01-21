@@ -13,15 +13,15 @@ import Explore from './components/Explore';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
-import SettingsView from './components/Settings'; // Replaced Events
+import SettingsView from './components/Settings';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings } from 'lucide-react';
+// Added Zap icon to the imports
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<'student' | 'admin'>('student');
-  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [userRole, setuserRole] = useState<'student' | 'admin'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
@@ -33,7 +33,6 @@ const App: React.FC = () => {
       setCurrentUser(db.getUser());
     }
     
-    // Apply saved appearance settings on load
     const saved = localStorage.getItem('maksocial_appearance');
     if (saved) {
       const s = JSON.parse(saved);
@@ -49,17 +48,15 @@ const App: React.FC = () => {
   const handleLogin = (email: string) => {
     const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
     setIsLoggedIn(true);
-    setUserRole(isAdmin ? 'admin' : 'student');
+    setuserRole(isAdmin ? 'admin' : 'student');
     setView(isAdmin ? 'admin' : 'home');
-    if (isAdmin) setIsAdminMode(true);
-    
     const user = db.getUser();
     db.saveUser({ ...user, email });
   };
 
   const handleRegister = (email: string, college: College, status: UserStatus) => {
     setIsLoggedIn(true);
-    setUserRole('student');
+    setuserRole('student');
     setView('home');
     
     const newUser: User = {
@@ -71,6 +68,7 @@ const App: React.FC = () => {
       email: email,
       college: college,
       status: status,
+      subscriptionTier: 'Free',
       accountStatus: 'Active',
       joinedColleges: [college],
       postsCount: 0,
@@ -88,7 +86,6 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setIsAdminMode(false);
     setView('landing');
   };
 
@@ -97,9 +94,14 @@ const App: React.FC = () => {
       return; 
     }
 
+    // SUBSCRIPTION PROTECTION: Only Pro users can access 'resources' (The Vault)
+    if (newView === 'resources' && currentUser?.subscriptionTier === 'Free') {
+       alert("PROTOCOL LOCKED: Access to the Academic Vault requires a PRO subscription strata.");
+       return;
+    }
+
     setView(newView);
     setIsSidebarOpen(false);
-    if ((newView as string) === 'admin') setIsAdminMode(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -164,6 +166,10 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-indigo-600/10 rounded-full border border-indigo-600/20 mr-2">
+               <Zap size={14} className="text-indigo-600 fill-indigo-600" />
+               <span className="text-[9px] font-black uppercase text-indigo-600">{currentUser?.subscriptionTier} Stratum</span>
+            </div>
             <button onClick={() => handleSetView('search')} className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-full transition-all active:scale-95">
               <SearchIcon size={20} />
             </button>

@@ -3,12 +3,12 @@ import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePo
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v14',
-  USERS: 'maksocial_users_v14',
+  POSTS: 'maksocial_posts_v15',
+  USERS: 'maksocial_users_v15',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  RESOURCES: 'maksocial_resources_v4',
-  CALENDAR: 'maksocial_calendar_v6',
-  ADS: 'maksocial_ads_v1'
+  RESOURCES: 'maksocial_resources_v5',
+  CALENDAR: 'maksocial_calendar_v7',
+  ADS: 'maksocial_ads_v2'
 };
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
@@ -24,18 +24,18 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
 };
 
 const INITIAL_ADS: Ad[] = [
-  { id: 'ad-1', clientName: 'Coke Zero', title: 'Campus Refresh Tour', reach: 45000, status: 'Active', budget: 1200000, spent: 450000, clicks: 1200 },
-  { id: 'ad-2', clientName: 'MTN Pulse', title: 'Summer Data Blast', reach: 89000, status: 'Active', budget: 2500000, spent: 1800000, clicks: 5600 },
-  { id: 'ad-3', clientName: 'Standard Chartered', title: 'Student Savings Account', reach: 12000, status: 'Pending', budget: 800000, spent: 0, clicks: 0 },
+  { id: 'ad-1', clientName: 'Coke Zero', title: 'Campus Refresh Tour', reach: 45000, status: 'Active', budget: 1200000, spent: 450000, clicks: 1200, deadline: '2025-05-30' },
+  { id: 'ad-2', clientName: 'MTN Pulse', title: 'Summer Data Blast', reach: 89000, status: 'Active', budget: 2500000, spent: 1800000, clicks: 5600, deadline: '2025-06-15' },
+  { id: 'ad-3', clientName: 'Standard Chartered', title: 'Student Savings Account', reach: 12000, status: 'Pending', budget: 800000, spent: 0, clicks: 0, deadline: '2025-07-01' },
 ];
 
 export const REVENUE_HISTORY: RevenuePoint[] = [
-  { month: 'Jan', revenue: 4500000, expenses: 2100000, subscribers: 1240 },
-  { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560 },
-  { month: 'Mar', revenue: 4800000, expenses: 2200000, subscribers: 1890 },
-  { month: 'Apr', revenue: 6100000, expenses: 2800000, subscribers: 2100 },
-  { month: 'May', revenue: 7800000, expenses: 3100000, subscribers: 2840 },
-  { month: 'Jun', revenue: 8900000, expenses: 3400000, subscribers: 3500 },
+  { month: 'Jan', revenue: 4500000, expenses: 2100000, subscribers: 1240, growth: 12 },
+  { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560, growth: 25 },
+  { month: 'Mar', revenue: 4800000, expenses: 2200000, subscribers: 1890, growth: 21 },
+  { month: 'Apr', revenue: 6100000, expenses: 2800000, subscribers: 2100, growth: 11 },
+  { month: 'May', revenue: 7800000, expenses: 3100000, subscribers: 2840, growth: 35 },
+  { month: 'Jun', revenue: 8900000, expenses: 3400000, subscribers: 3500, growth: 23 },
 ];
 
 const INITIAL_USERS: User[] = [
@@ -47,19 +47,39 @@ const INITIAL_USERS: User[] = [
     connections: 245,
     college: 'COCIS',
     status: 'Year 2',
+    subscriptionTier: 'Pro',
     accountStatus: 'Active',
     verified: true,
-    joinedColleges: ['COCIS'],
+    joinedColleges: ['COCIS', 'CEDAT'],
     postsCount: 12,
     followersCount: 1420,
     followingCount: 382,
     totalLikesCount: 4500,
     badges: [],
     appliedTo: [],
-    bio: 'Software Engineering student passionate about full-stack development and university innovation.',
-    education: 'B.S. in Software Engineering - Makerere University',
+    bio: 'Software Engineering student passionate about full-stack development.',
+    education: 'B.S. in Software Engineering',
     location: 'Kampala, Uganda',
-    skills: ['React', 'TypeScript', 'Node.js', 'UI Design']
+    skills: ['React', 'TypeScript', 'Node.js']
+  },
+  {
+    id: 'u2',
+    name: 'Sarah K.',
+    role: 'University Student',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    connections: 110,
+    college: 'LAW',
+    status: 'Year 1',
+    subscriptionTier: 'Free',
+    accountStatus: 'Active',
+    verified: false,
+    joinedColleges: ['LAW'],
+    postsCount: 4,
+    followersCount: 230,
+    followingCount: 150,
+    totalLikesCount: 890,
+    badges: [],
+    appliedTo: []
   },
   {
     id: 'super_admin',
@@ -69,6 +89,7 @@ const INITIAL_USERS: User[] = [
     connections: 5000,
     college: 'COCIS',
     status: 'Graduate',
+    subscriptionTier: 'Enterprise',
     accountStatus: 'Active',
     verified: true,
     email: 'admin@admin.mak.ac.ug',
@@ -79,10 +100,6 @@ const INITIAL_USERS: User[] = [
     totalLikesCount: 0,
     badges: ['Super Admin'],
     appliedTo: [],
-    bio: 'Root system administrator for the MakSocial platform.',
-    education: 'M.S. in Computer Science',
-    location: 'Makerere Main Campus',
-    skills: ['Cybersecurity', 'Cloud Infrastructure', 'Governance']
   }
 ];
 
@@ -133,11 +150,6 @@ export const db = {
   addResource: (res: Resource) => {
     const resources = db.getResources();
     db.saveResources([res, ...resources]);
-  },
-  updateResource: (res: Resource) => {
-    const resources = db.getResources();
-    const updated = resources.map(r => r.id === res.id ? res : r);
-    db.saveResources(updated);
   },
   deleteResource: (id: string) => {
     const resources = db.getResources();

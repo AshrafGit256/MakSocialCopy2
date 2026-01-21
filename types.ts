@@ -3,6 +3,7 @@ export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | '
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
+export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 
 export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff';
 
@@ -28,6 +29,7 @@ export interface Ad {
   budget: number;
   spent: number;
   clicks: number;
+  deadline: string; // Used for Admin Calendar
 }
 
 export interface RevenuePoint {
@@ -35,6 +37,7 @@ export interface RevenuePoint {
   revenue: number;
   expenses: number;
   subscribers: number;
+  growth: number;
 }
 
 export interface AnalyticsData {
@@ -93,6 +96,7 @@ export interface User {
   email?: string;
   college: College;
   status: UserStatus;
+  subscriptionTier: SubscriptionTier; // Logic: Pro can see Vault and join multiple colleges
   accountStatus?: 'Active' | 'Inactive' | 'Suspended';
   verified?: boolean;
   joinedColleges: College[];
@@ -162,4 +166,5 @@ export interface CalendarEvent {
   createdBy: string;
   attendeeIds?: string[]; 
   registrationLink?: string;
+  isPromoted?: boolean;
 }

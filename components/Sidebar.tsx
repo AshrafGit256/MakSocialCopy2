@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -66,24 +66,30 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
 
         <nav className="space-y-1.5">
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Main Signals</p>
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setView(item.id as AppView)}
-              className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
-                activeView === item.id 
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
-                : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
-              }`}
-            >
-              <span className="transition-transform duration-300 group-hover:scale-110">
-                {item.icon}
-              </span>
-              <span className="text-[11px] tracking-widest font-black uppercase">
-                {item.id === 'groups' ? `${userCollege} Wing` : item.id === 'resources' ? 'Vault' : item.label}
-              </span>
-            </button>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const isLocked = item.id === 'resources' && currentUser.subscriptionTier === 'Free';
+            return (
+              <button
+                key={item.id}
+                onClick={() => setView(item.id as AppView)}
+                className={`w-full flex items-center justify-between px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
+                  activeView === item.id 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                  : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
+                } ${isLocked ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                <div className="flex items-center space-x-4">
+                  <span className="transition-transform duration-300 group-hover:scale-110">
+                    {item.icon}
+                  </span>
+                  <span className="text-[11px] tracking-widest font-black uppercase">
+                    {item.id === 'groups' ? `${userCollege} Wing` : item.id === 'resources' ? 'Vault' : item.label}
+                  </span>
+                </div>
+                {isLocked && <Lock size={14} className="text-slate-400" />}
+              </button>
+            );
+          })}
           
           <button
             onClick={() => setView('settings')}
@@ -131,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
              <LogOut size={20} />
            </button>
         </div>
-        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest text-center">MakSocial Network v3.5 Stable</p>
+        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest text-center">MakSocial Network v4.1 Stable</p>
       </div>
     </aside>
   );

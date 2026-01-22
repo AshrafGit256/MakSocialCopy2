@@ -145,7 +145,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Centenary Bank',
     authorId: 'centenary_bank',
     authorRole: 'Financial Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Cente',
+    authorAvatar: 'https://github.com/AshrafGit256/MakSocialImages/blob/main/Public/centenary_bank.jpg',
     authorAuthority: 'Corporate',
     timestamp: '8h ago',
     content: `<p style="text-align: center;"><span style="font-size: 1.5rem; font-weight: 900; color: #1e3a8a;">CENTE-CONNECT 💳</span></p>
@@ -166,7 +166,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Stanbic Bank',
     authorId: 'stanbic_bank',
     authorRole: 'Commercial Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Stanbic',
+    authorAvatar: 'https://github.com/AshrafGit256/MakSocialImages/blob/main/Public/stanbic_bank.jpg',
     authorAuthority: 'Corporate',
     timestamp: '10h ago',
     content: `<h2>Stanbic National Championship 2025 🏆</h2>

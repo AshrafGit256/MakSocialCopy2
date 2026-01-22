@@ -38,6 +38,63 @@ export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jun', revenue: 8900000, expenses: 3400000, subscribers: 3500, growth: 23 },
 ];
 
+const getFutureDate = (days: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+};
+
+const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
+  {
+    id: 'e1',
+    title: 'COCIS Annual Hackathon 2025',
+    description: 'A 48-hour sprint for developers and innovators to build the next generation of campus solutions. Prize pool of 5M UGX.',
+    date: getFutureDate(2),
+    time: '09:00',
+    location: 'COCIS Block B Labs',
+    category: 'Academic',
+    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200',
+    createdBy: 'super_admin',
+    attendeeIds: []
+  },
+  {
+    id: 'e2',
+    title: 'Freshers Bazaar Finale',
+    description: 'The final night of the Bazaar. Live performances, vendor discounts, and networking nodes for all new arrivals.',
+    date: getFutureDate(5),
+    time: '18:00',
+    location: 'Freedom Square',
+    category: 'Social',
+    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200',
+    createdBy: 'super_admin',
+    attendeeIds: []
+  },
+  {
+    id: 'e3',
+    title: 'Career & Internship Expo',
+    description: 'Meet industry leaders from MTN, Stanbic, and Google. Secure your internship node for the upcoming semester.',
+    date: getFutureDate(12),
+    time: '10:00',
+    location: 'Main Hall',
+    category: 'Other',
+    image: 'https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?auto=format&fit=crop&w=1200',
+    createdBy: 'super_admin',
+    attendeeIds: []
+  },
+  {
+    id: 'e4',
+    title: 'Law Society Moot Court',
+    description: 'High-stakes legal simulation featuring top finalists and guest judges from the High Court.',
+    date: getFutureDate(15),
+    time: '14:00',
+    location: 'Law Auditorium',
+    category: 'Academic',
+    image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200',
+    createdBy: 'super_admin',
+    attendeeIds: []
+  }
+];
+
 const INITIAL_USERS: User[] = [
   {
     id: 'u1',
@@ -176,7 +233,7 @@ export const db = {
   },
   getCalendarEvents: (): CalendarEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.CALENDAR);
-    return saved ? JSON.parse(saved) : [];
+    return saved ? JSON.parse(saved) : INITIAL_CALENDAR_EVENTS;
   },
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();

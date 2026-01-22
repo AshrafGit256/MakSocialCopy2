@@ -74,7 +74,9 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
 
   const saveSelection = () => {
     const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) setSavedRange(sel.getRangeAt(0));
+    if (sel && sel.rangeCount > 0) {
+      setSavedRange(sel.getRangeAt(0));
+    }
   };
 
   const restoreSelection = () => {
@@ -117,7 +119,8 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        const imgHtml = `<p><img src="${base64}" class="post-image" alt="User Signal Image" /></p><p><br></p>`;
+        // Inserting block image allowing text wrap around it
+        const imgHtml = `<p><img src="${base64}" class="post-image" alt="Embedded Asset" /></p><p><br></p>`;
         exec('insertHTML', imgHtml);
       };
       reader.readAsDataURL(file);
@@ -149,7 +152,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
                    { n: 'Header 4', cmd: 'h4', style: 'text-base font-black' },
                    { n: 'Header 5', cmd: 'h5', style: 'text-sm font-black' },
                    { n: 'Header 6', cmd: 'h6', style: 'text-[10px] font-black' },
-                   { n: 'Quote', cmd: 'blockquote', style: 'italic border-l-4 border-indigo-500 pl-2 text-slate-500' }
+                   { n: 'Quote Block', cmd: 'blockquote', style: 'italic border-l-4 border-indigo-500 pl-2 text-slate-500' }
                  ].map((s, i) => (
                    <button key={i} onClick={() => exec('formatBlock', s.cmd)} className={`w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 uppercase tracking-tighter ${s.style}`}>{s.n}</button>
                  ))}
@@ -225,7 +228,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
             </button>
             {activeDropdown === 'table' && (
               <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] p-3 space-y-2">
-                 <p className="text-[8px] font-black uppercase text-slate-400 text-center tracking-widest">Select Rows x Cols</p>
+                 <p className="text-[8px] font-black uppercase text-slate-400 text-center tracking-widest">Select Dimensions</p>
                  <div className="grid grid-cols-5 gap-1">
                     {Array.from({ length: 25 }).map((_, i) => {
                       const r = Math.floor(i / 5) + 1;
@@ -251,7 +254,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
           </button>
           
           <div className="flex gap-0.5 ml-auto">
-            <button onClick={() => exec('removeFormat')} title="Clear Formatting" className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded text-slate-400 transition-all"><Eraser size={14}/></button>
+            <button onClick={() => exec('removeFormat')} title="Flush Styles" className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded text-slate-400 transition-all"><Eraser size={14}/></button>
             <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded">
                {isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}
             </button>
@@ -288,7 +291,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
          <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <div className="bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-[var(--radius-main)] w-full max-w-sm p-8 shadow-2xl space-y-6">
                <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-black uppercase tracking-widest">Link Protocol</h3>
+                  <h3 className="text-sm font-black uppercase tracking-widest text-indigo-600">Link Stratum</h3>
                   <button onClick={() => setShowLinkModal(false)} className="text-slate-400 hover:text-rose-500"><X size={20}/></button>
                </div>
                <div className="space-y-4">
@@ -297,7 +300,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
                      <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold outline-none" value={linkData.text} onChange={e => setLinkData({...linkData, text: e.target.value})} placeholder="Display name" />
                   </div>
                   <div className="space-y-1">
-                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Universal Link (URL)</label>
+                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Protocol Link (URL)</label>
                      <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold outline-none" value={linkData.url} onChange={e => setLinkData({...linkData, url: e.target.value})} placeholder="https://..." />
                   </div>
                </div>
@@ -310,11 +313,11 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
        <style>{`
          .post-image {
            max-width: 100%;
-           height: auto !important;
+           height: auto !important; /* Ensuring long images are displayed in full */
            display: block;
-           margin: 1rem 0;
+           margin: 1.5rem 0;
            border-radius: var(--radius-main);
-           box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+           box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
          }
        `}</style>
     </div>
@@ -350,9 +353,9 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
       <style>{`
         .rich-content img {
            max-width: 100%;
-           height: auto !important;
+           height: auto !important; /* Critical for long flyer display */
            display: block;
-           margin: 1rem 0;
+           margin: 1.5rem 0;
            border-radius: var(--radius-main);
         }
       `}</style>
@@ -413,7 +416,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             <div className="lg:col-span-8 space-y-6 px-4 lg:px-0">
                <div className="flex items-center gap-4 mb-6">
                   <button onClick={onBack} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full"><ArrowLeft size={20}/></button>
-                  <h2 className="text-xl font-black uppercase tracking-tighter italic">Signal Terminal</h2>
+                  <h2 className="text-xl font-black uppercase tracking-tighter italic text-indigo-600">Signal Thread</h2>
                </div>
                {threadParent && (
                  <div className="space-y-8 animate-in fade-in duration-500">
@@ -423,37 +426,46 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    <div className="pl-6 md:pl-12 border-l-2 border-indigo-600/20">
                      <Composer 
                        user={user} 
-                       placeholder={`Signal your response...`} 
+                       placeholder={`Signal your response to ${threadParent.author}...`} 
                        onPost={(c, f) => handlePost(c, f, threadId)} 
                        isAnalyzing={isAnalyzing} 
                        isFullscreen={isFullscreen} 
                        setIsFullscreen={setIsFullscreen} 
                      />
                      <div className="mt-12 space-y-6">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-[var(--border-color)] pb-3">Decrypted Replies</h3>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-[var(--border-color)] pb-3">Decrypted Signals</h3>
                         {filteredPosts.map(p => <PostItem key={p.id} post={p} onOpenThread={onOpenThread} />)}
                      </div>
                    </div>
                  </div>
                )}
             </div>
-            <aside className="hidden lg:block lg:col-span-4 sticky top-20 h-fit">
+            <aside className="hidden lg:block lg:col-span-4 sticky top-20 h-fit space-y-6">
                <div className="bg-indigo-600 rounded-[var(--radius-main)] p-8 text-white space-y-4">
                   <Zap size={32} fill="white"/>
-                  <h4 className="text-xl font-black uppercase italic tracking-tighter">Context Node</h4>
-                  <p className="text-xs font-medium text-white/80 italic">"Scanning a deep-nested signal thread."</p>
+                  <h4 className="text-xl font-black uppercase italic tracking-tighter">Deep Node Sync</h4>
+                  <p className="text-xs font-medium text-white/80 italic">"Scanning nested intelligence strata. All responses are verified nodes."</p>
                </div>
             </aside>
          </div>
       ) : (
          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-0">
-            <div className="lg:col-span-8 space-y-8">
+            <div className="lg:col-span-8 space-y-10">
+               {/* COMPOSER AS THE FIRST ELEMENT ON THE HOME FEED */}
                <Composer user={user} onPost={(c, f) => handlePost(c, f)} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
+               
                <div className="space-y-6">
+                  <div className="flex items-center justify-between px-2">
+                     <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">Synchronized Stream</h3>
+                     <div className="flex items-center gap-2 px-3 py-1 bg-indigo-600/10 border border-indigo-600/20 rounded-full text-indigo-600">
+                        <Radio size={12} className="animate-pulse" />
+                        <span className="text-[8px] font-black uppercase tracking-widest">{collegeFilter} Active</span>
+                     </div>
+                  </div>
                   {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} />)}
                </div>
             </div>
-            <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-20 h-fit">
+            <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-24 h-fit">
                <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[var(--radius-main)] p-6 shadow-sm">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
                      <TrendingUp size={14} className="text-indigo-600" /> Hot Signals

@@ -15,7 +15,6 @@ import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import { db } from './db';
-// FIX: Added Home to the lucide-react import list
 import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -143,10 +142,12 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
+      {/* Mobile Sidebar Overlay - High z-index to block main interaction */}
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden animate-in fade-in duration-300" onClick={() => setIsSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] lg:hidden animate-in fade-in duration-300" onClick={() => setIsSidebarOpen(false)} />
       )}
 
+      {/* Sidebar - z-index handled within component (usually 100) */}
       <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={handleLogout} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
@@ -156,7 +157,7 @@ const App: React.FC = () => {
               <Menu size={22} />
             </button>
             
-            {/* SECTOR SELECTOR (REPLACING BRANDING) */}
+            {/* GLOBAL SECTOR SELECTOR DROPDOWN */}
             <div className="relative">
               <button 
                 onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)}
@@ -167,7 +168,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="flex flex-col text-left overflow-hidden">
                   <span className="text-[10px] font-black uppercase tracking-tighter italic leading-none text-indigo-600 truncate">{activeSector} HUB</span>
-                  <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">Active Sector</span>
+                  <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">Current Sector</span>
                 </div>
                 <ChevronDown size={14} className={`text-slate-400 transition-transform ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -175,20 +176,21 @@ const App: React.FC = () => {
               {isSectorDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-[150]" onClick={() => setIsSectorDropdownOpen(false)}></div>
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[200] p-2 animate-in slide-in-from-top-2">
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[200] p-3 animate-in slide-in-from-top-2">
+                    <p className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3 ml-2">Switch University Wing</p>
                     <button 
-                      onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); if(view !== 'home') handleSetView('home'); }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeSector === 'Global' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}
+                      onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 ${activeSector === 'Global' ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}
                     >
                       <Globe size={14} /> <span className="text-[10px] font-black uppercase tracking-widest">Global Pulse</span>
                     </button>
                     <div className="h-px bg-[var(--border-color)] my-2"></div>
-                    <div className="grid grid-cols-2 gap-1">
+                    <div className="grid grid-cols-2 gap-1.5">
                       {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (
                         <button 
                           key={c}
-                          onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); if(view !== 'home') handleSetView('home'); }}
-                          className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}
+                          onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }}
+                          className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-indigo-600 text-white shadow-md' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}
                         >
                           {c}
                         </button>
@@ -204,11 +206,6 @@ const App: React.FC = () => {
             <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-[var(--bg-secondary)] rounded-full transition-all active:scale-90">
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-            
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-indigo-600/10 rounded-full border border-indigo-600/20 mr-2">
-               <Zap size={14} className="text-indigo-600 fill-indigo-600" />
-               <span className="text-[9px] font-black uppercase text-indigo-600">{currentUser?.subscriptionTier} Stratum</span>
-            </div>
             <button onClick={() => handleSetView('search')} className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-full transition-all active:scale-95">
               <SearchIcon size={20} />
             </button>
@@ -228,6 +225,7 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
 
+        {/* Bottom Navigation - Higher z-index than content but below sidebars/modals */}
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] transition-theme lg:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },

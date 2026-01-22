@@ -15,7 +15,8 @@ import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon } from 'lucide-react';
+// FIX: Added Home to the lucide-react import list
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -24,6 +25,8 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
+  const [activeSector, setActiveSector] = useState<College | 'Global'>('Global');
+  const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState(false);
   
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
@@ -120,7 +123,7 @@ const App: React.FC = () => {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed onOpenThread={openThread} />;
+      case 'home': return <Feed collegeFilter={activeSector} onOpenThread={openThread} />;
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={openThread} onBack={() => setView('home')} />;
       case 'groups': return <Feed collegeFilter={currentUser?.college} onOpenThread={openThread} />;
       case 'messages': return <Chat />;
@@ -131,7 +134,7 @@ const App: React.FC = () => {
       case 'resources': return <Resources />;
       case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={handleLogout} />;
-      default: return <Feed onOpenThread={openThread} />;
+      default: return <Feed collegeFilter={activeSector} onOpenThread={openThread} />;
     }
   };
 
@@ -152,14 +155,52 @@ const App: React.FC = () => {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full transition-colors active:scale-90 lg:hidden">
               <Menu size={22} />
             </button>
-            <div className="flex flex-col">
-              <h1 className="text-lg font-black tracking-tight leading-none uppercase italic text-indigo-600">MakSocial</h1>
-              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">The Hill Connect</span>
+            
+            {/* SECTOR SELECTOR (REPLACING BRANDING) */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)}
+                className="flex items-center gap-2.5 px-3 py-2 bg-[var(--bg-secondary)] hover:bg-indigo-600/10 border border-[var(--border-color)] rounded-xl transition-all group max-w-[180px] sm:max-w-none"
+              >
+                <div className="shrink-0 text-indigo-600">
+                  {activeSector === 'Global' ? <Globe size={16} /> : <LayoutGrid size={16} />}
+                </div>
+                <div className="flex flex-col text-left overflow-hidden">
+                  <span className="text-[10px] font-black uppercase tracking-tighter italic leading-none text-indigo-600 truncate">{activeSector} HUB</span>
+                  <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 whitespace-nowrap">Active Sector</span>
+                </div>
+                <ChevronDown size={14} className={`text-slate-400 transition-transform ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isSectorDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-[150]" onClick={() => setIsSectorDropdownOpen(false)}></div>
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[200] p-2 animate-in slide-in-from-top-2">
+                    <button 
+                      onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); if(view !== 'home') handleSetView('home'); }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeSector === 'Global' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}
+                    >
+                      <Globe size={14} /> <span className="text-[10px] font-black uppercase tracking-widest">Global Pulse</span>
+                    </button>
+                    <div className="h-px bg-[var(--border-color)] my-2"></div>
+                    <div className="grid grid-cols-2 gap-1">
+                      {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (
+                        <button 
+                          key={c}
+                          onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); if(view !== 'home') handleSetView('home'); }}
+                          className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            {/* Theme Toggle Button in Header */}
             <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-[var(--bg-secondary)] rounded-full transition-all active:scale-90">
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>

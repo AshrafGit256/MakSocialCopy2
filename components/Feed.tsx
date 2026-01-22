@@ -117,7 +117,6 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        // Image is inserted block-style to allow text above/below
         const imgHtml = `<p><img src="${base64}" class="post-image" alt="User Signal Image" /></p><p><br></p>`;
         exec('insertHTML', imgHtml);
       };
@@ -361,14 +360,11 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
   );
 };
 
-// FIX: Updated Feed props to allow 'Global' for collegeFilter to fix type mismatch in App.tsx
-const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onBack?: () => void }> = ({ collegeFilter, threadId, onOpenThread, onBack }) => {
+const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onBack?: () => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onBack }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
-  const [activeTab, setActiveTab] = useState<College | 'Global'>(collegeFilter || 'Global');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isSectorSelectorOpen, setIsSectorSelectorOpen] = useState(false);
   
   useEffect(() => {
     const sync = () => {
@@ -389,7 +385,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
         authorAuthority: (user as any).badges?.includes('Super Admin') ? 'Super Admin' : (user as any).badges?.includes('Official') ? 'Official' : (user as any).badges?.includes('Corporate') ? 'Corporate' : 'Administrator',
         timestamp: 'Just now', content: content, customFont: font,
         hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], 
-        isOpportunity: false, college: activeTab === 'Global' ? 'Global' : activeTab as College,
+        isOpportunity: false, college: collegeFilter,
         parentId: parentId
       };
       
@@ -406,7 +402,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
 
   const filteredPosts = threadId 
     ? posts.filter(p => p.parentId === threadId)
-    : posts.filter(p => !p.parentId && (activeTab === 'Global' || p.college === activeTab));
+    : posts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
 
   const threadParent = threadId ? posts.find(p => p.id === threadId) : null;
   
@@ -450,84 +446,37 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </aside>
          </div>
       ) : (
-         <>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-0">
-               <div className="lg:col-span-8 space-y-8">
-                  {/* Refined Sector Selector for Large Screens */}
-                  <header className="flex items-center justify-between">
-                     <div className="flex flex-col">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] mb-1">Active Signal Sector</p>
-                        <div className="relative">
-                           <button 
-                             onClick={() => setIsSectorSelectorOpen(!isSectorSelectorOpen)}
-                             className="flex items-center gap-3 bg-white dark:bg-[#0d1117] border border-[var(--border-color)] px-5 py-2.5 rounded-[var(--radius-main)] hover:border-indigo-500/50 transition-all group"
-                           >
-                              <div className="p-2 bg-indigo-600/10 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                 {activeTab === 'Global' ? <Globe size={18}/> : <LayoutGrid size={18}/>}
-                              </div>
-                              <div className="text-left">
-                                 <h2 className="text-lg font-black uppercase tracking-tighter italic leading-none">{activeTab} Hub</h2>
-                                 <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Synchronization: Linked</p>
-                              </div>
-                              <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isSectorSelectorOpen ? 'rotate-180' : ''}`} />
-                           </button>
-
-                           {isSectorSelectorOpen && (
-                             <>
-                               <div className="fixed inset-0 z-[150]" onClick={() => setIsSectorSelectorOpen(false)}></div>
-                               <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-[var(--border-color)] rounded-[var(--radius-main)] shadow-2xl z-[200] p-2 animate-in slide-in-from-top-2">
-                                  <button onClick={() => { setActiveTab('Global'); setIsSectorSelectorOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'Global' ? 'bg-indigo-600 text-white' : 'hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500'}`}>
-                                     <Globe size={16}/> <span className="text-[10px] font-black uppercase tracking-widest">Global Pulse</span>
-                                  </button>
-                                  <div className="h-px bg-[var(--border-color)] my-2"></div>
-                                  <div className="grid grid-cols-2 gap-1">
-                                     {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (
-                                       <button 
-                                         key={c} 
-                                         onClick={() => { setActiveTab(c as College); setIsSectorSelectorOpen(false); }}
-                                         className={`flex items-center justify-center py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeTab === c ? 'bg-indigo-600 text-white' : 'hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 border border-transparent'}`}
-                                       >
-                                         {c}
-                                       </button>
-                                     ))}
-                                  </div>
-                               </div>
-                             </>
-                           )}
+         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-0">
+            <div className="lg:col-span-8 space-y-8">
+               <Composer user={user} onPost={(c, f) => handlePost(c, f)} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
+               <div className="space-y-6">
+                  {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} />)}
+               </div>
+            </div>
+            <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-20 h-fit">
+               <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[var(--radius-main)] p-6 shadow-sm">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
+                     <TrendingUp size={14} className="text-indigo-600" /> Hot Signals
+                  </h3>
+                  <div className="space-y-5">
+                     {['#ResearchWeek', '#Guild89', '#COCISLabs'].map(tag => (
+                        <div key={tag} className="group cursor-pointer flex justify-between items-center">
+                           <div>
+                              <p className="text-sm font-black text-indigo-600 group-hover:underline">{tag}</p>
+                              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">High Intensity</p>
+                           </div>
+                           <ChevronRight size={14} className="text-slate-300 group-hover:text-indigo-600 translate-x-0 group-hover:translate-x-1 transition-all" />
                         </div>
-                     </div>
-                     <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500">
-                        <Radio size={14} className="animate-pulse" />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Network Online</span>
-                     </div>
-                  </header>
-
-                  <Composer user={user} onPost={(c, f) => handlePost(c, f)} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
-                  <div className="space-y-6">
-                     {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} />)}
+                     ))}
                   </div>
                </div>
-               <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-20 h-fit">
-                  <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[var(--radius-main)] p-6 shadow-sm">
-                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-                        {/* FIX: Imported TrendingUp at top of file */}
-                        <TrendingUp size={14} className="text-indigo-600" /> Hot Signals
-                     </h3>
-                     <div className="space-y-5">
-                        {['#ResearchWeek', '#Guild89', '#COCISLabs'].map(tag => (
-                          <div key={tag} className="group cursor-pointer flex justify-between items-center">
-                             <div>
-                                <p className="text-sm font-black text-indigo-600 group-hover:underline">{tag}</p>
-                                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">High Intensity</p>
-                             </div>
-                             <ChevronRight size={14} className="text-slate-300 group-hover:text-indigo-600 translate-x-0 group-hover:translate-x-1 transition-all" />
-                          </div>
-                        ))}
-                     </div>
-                  </div>
-               </aside>
-            </div>
-         </>
+               
+               <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500 w-fit">
+                  <Radio size={14} className="animate-pulse" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">Network Online</span>
+               </div>
+            </aside>
+         </div>
       )}
     </div>
   );

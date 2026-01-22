@@ -6,7 +6,6 @@ import {
   CalendarDays, MapPin, Plus, ChevronLeft, ChevronRight, Zap, X, 
   CheckCircle2, Image as ImageIcon, Activity, Users, 
   Bell, Target, Sparkles, Send, Radio, Target as TargetIcon, Clock,
-  // FIX: Imported Calendar as CalendarIcon to resolve the missing name error on line 247
   Calendar as CalendarIcon
 } from 'lucide-react';
 
@@ -87,13 +86,12 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     if (isPastA && !isPastB) return 1;
     if (!isPastA && isPastB) return -1;
     
-    // For both future or both past, sort by proximity to now
     return isPastA ? dateB - dateA : dateA - dateB;
   });
 
   const filteredEvents = sortedEvents.filter(e => {
     if (selectedDate) return e.date === selectedDate;
-    return true; // Show all for stream, ordered by proximity
+    return true; 
   });
 
   const renderCalendar = () => {
@@ -148,7 +146,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 space-y-6 pb-40 animate-in fade-in duration-500">
       
-      {/* GitHub-style Protocol Header */}
+      {/* Header section with technical styling */}
       <header className="flex items-center justify-between bg-white dark:bg-[#161b22] border border-[var(--border-color)] p-6 rounded-[6px] shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-indigo-600 rounded-[6px] text-white">
@@ -156,7 +154,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           </div>
           <div>
             <h1 className="text-xl font-black uppercase tracking-tight italic leading-none text-indigo-600">Campus Registry Hub</h1>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">Synchronization: ACTIVE / High Priority Streams</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">Synchronization: ACTIVE / Priority Signal Sorting</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -168,94 +166,11 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         </div>
       </header>
 
+      {/* Main Grid: Mobile - Grid on top, Stream below. Desktop - Stream left, Grid right. */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* LEFT: Event Poster Stream (The "Main Feed") */}
-        <main className="lg:col-span-8 space-y-4">
-           <div className="flex items-center justify-between px-2">
-              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2">
-                 <Activity size={14} className="text-indigo-600" />
-                 Signal Feed: {selectedDate ? `Date Match [${selectedDate}]` : 'Upcoming Thresholds'}
-              </h3>
-           </div>
-
-           <div ref={scrollRef} className="space-y-4">
-              {filteredEvents.length > 0 ? filteredEvents.map((event) => {
-                const isRegistered = event.attendeeIds?.includes(currentUser.id);
-                const regCount = event.attendeeIds?.length || 0;
-                const isPast = new Date(event.date).getTime() < new Date().setHours(0,0,0,0);
-
-                return (
-                  <div key={event.id} className={`group bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] overflow-hidden transition-all hover:border-indigo-500/50 shadow-sm flex flex-col md:flex-row ${isPast ? 'opacity-60' : ''}`}>
-                    <div className="md:w-56 h-40 md:h-auto relative shrink-0">
-                       <img 
-                        src={event.image || 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=800'} 
-                        className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" 
-                       />
-                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                       <div className="absolute bottom-3 left-3">
-                          <Countdown targetDate={`${event.date}T${event.time || '00:00'}:00`} />
-                       </div>
-                    </div>
-                    <div className="p-5 flex-1 flex flex-col justify-between">
-                       <div className="space-y-3">
-                          <div className="flex justify-between items-start">
-                             <div className="space-y-1">
-                                <span className="bg-indigo-600/10 text-indigo-600 px-2 py-0.5 rounded-[4px] text-[8px] font-black uppercase border border-indigo-600/20">
-                                   {event.category}
-                                </span>
-                                <h4 className="text-lg font-black uppercase tracking-tight group-hover:text-indigo-600 transition-colors leading-tight pt-1">
-                                  {event.title}
-                                </h4>
-                             </div>
-                             <div className="text-right">
-                                <p className="text-sm font-black italic tracking-tighter">{new Date(event.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
-                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{event.time || 'TBD'}</p>
-                             </div>
-                          </div>
-                          
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2 border-l-2 border-indigo-600/30 pl-3">
-                            "{event.description}"
-                          </p>
-
-                          <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                             <span className="flex items-center gap-1.5"><MapPin size={12} className="text-indigo-500"/> {event.location}</span>
-                             <span className="flex items-center gap-1.5"><Users size={12} className="text-emerald-500"/> {regCount} Registered Nodes</span>
-                          </div>
-                       </div>
-                       
-                       <div className="pt-5 flex items-center gap-3">
-                          <button 
-                            onClick={() => !isRegistered && !isPast && handleRegister(event.id)}
-                            disabled={isRegistered || isPast}
-                            className={`flex-1 py-2.5 rounded-[4px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 border ${
-                               isRegistered 
-                               ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm' 
-                               : isPast ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700 active:scale-[0.98]'
-                            }`}
-                          >
-                             {isRegistered ? <CheckCircle2 size={14}/> : <Zap size={14}/>}
-                             {isRegistered ? 'Identity Validated' : isPast ? 'Protocol Expired' : 'Confirm Attendance'}
-                          </button>
-                          <button className="p-2.5 bg-slate-50 dark:bg-white/5 border border-[var(--border-color)] rounded-[4px] text-slate-500 hover:text-indigo-600 transition-all">
-                             <Send size={16}/>
-                          </button>
-                       </div>
-                    </div>
-                  </div>
-                );
-              }) : (
-                <div className="py-20 text-center border border-dashed border-[var(--border-color)] rounded-[6px] space-y-4">
-                   <CalendarIcon size={32} className="mx-auto text-slate-300" />
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">No signals detected for the selected filter.</p>
-                   <button onClick={() => setSelectedDate(null)} className="text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:underline">Flush Registry Filter</button>
-                </div>
-              )}
-           </div>
-        </main>
-
-        {/* RIGHT: Calendar Grid & Quick Control */}
-        <aside className="lg:col-span-4 space-y-4 sticky top-20">
+        {/* RIGHT (Moved to Top on Mobile): Calendar Grid & Quick Control */}
+        <aside className="lg:col-span-4 order-1 lg:order-2 space-y-4 sticky top-20">
            <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Registry Grid</h3>
@@ -275,7 +190,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               </div>
            </div>
 
-           <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-5 space-y-4">
+           <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-5 space-y-4 hidden lg:block">
               <div className="flex items-center gap-2 mb-2">
                  <Bell size={14} className="text-indigo-600" />
                  <h4 className="text-[9px] font-black uppercase text-slate-500 tracking-widest">Registry Summary</h4>
@@ -295,6 +210,92 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               </button>
            </div>
         </aside>
+
+        {/* LEFT (Moved below Grid on Mobile): Event Poster Stream (The "Main Feed") */}
+        <main className="lg:col-span-8 order-2 lg:order-1 space-y-4">
+           <div className="flex items-center justify-between px-2">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2">
+                 <Activity size={14} className="text-indigo-600" />
+                 Signal Feed: {selectedDate ? `Date Match [${selectedDate}]` : 'Auto-Sorted by Priority'}
+              </h3>
+           </div>
+
+           <div ref={scrollRef} className="space-y-4">
+              {filteredEvents.length > 0 ? filteredEvents.map((event) => {
+                const isRegistered = event.attendeeIds?.includes(currentUser.id);
+                const regCount = event.attendeeIds?.length || 0;
+                const isPast = new Date(event.date).getTime() < new Date().setHours(0,0,0,0);
+
+                return (
+                  <div key={event.id} className={`group bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] overflow-hidden transition-all hover:border-indigo-500/50 shadow-sm flex flex-col md:flex-row ${isPast ? 'opacity-60 grayscale' : ''}`}>
+                    {/* Poster section - slightly reduced size */}
+                    <div className="md:w-52 h-36 md:h-auto relative shrink-0 overflow-hidden">
+                       <img 
+                        src={event.image || 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=800'} 
+                        className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" 
+                       />
+                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                       <div className="absolute bottom-3 left-3">
+                          <Countdown targetDate={`${event.date}T${event.time || '00:00'}:00`} />
+                       </div>
+                    </div>
+                    {/* Content section */}
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                       <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                             <div className="space-y-1">
+                                <span className="bg-indigo-600/10 text-indigo-600 px-2 py-0.5 rounded-[4px] text-[8px] font-black uppercase border border-indigo-600/20">
+                                   {event.category}
+                                </span>
+                                <h4 className="text-lg font-black uppercase tracking-tight group-hover:text-indigo-600 transition-colors leading-tight pt-1">
+                                  {event.title}
+                                </h4>
+                             </div>
+                             <div className="text-right">
+                                <p className="text-sm font-black italic tracking-tighter">{new Date(event.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
+                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{event.time || 'TBD'}</p>
+                             </div>
+                          </div>
+                          
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2 border-l-2 border-indigo-600/30 pl-3 italic">
+                            "{event.description}"
+                          </p>
+
+                          <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                             <span className="flex items-center gap-1.5"><MapPin size={12} className="text-indigo-500"/> {event.location}</span>
+                             <span className="flex items-center gap-1.5"><Users size={12} className="text-emerald-500"/> {regCount} Nodes Registered</span>
+                          </div>
+                       </div>
+                       
+                       <div className="pt-5 flex items-center gap-3">
+                          <button 
+                            onClick={() => !isRegistered && !isPast && handleRegister(event.id)}
+                            disabled={isRegistered || isPast}
+                            className={`flex-1 py-2.5 rounded-[4px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 border ${
+                               isRegistered 
+                               ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm' 
+                               : isPast ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700 active:scale-[0.98]'
+                            }`}
+                          >
+                             {isRegistered ? <CheckCircle2 size={14}/> : <Zap size={14}/>}
+                             {isRegistered ? 'Identity Logged' : isPast ? 'Protocol Closed' : 'Confirm Registration'}
+                          </button>
+                          <button className="p-2.5 bg-slate-50 dark:bg-white/5 border border-[var(--border-color)] rounded-[4px] text-slate-500 hover:text-indigo-600 transition-all active:scale-95">
+                             <Send size={16}/>
+                          </button>
+                       </div>
+                    </div>
+                  </div>
+                );
+              }) : (
+                <div className="py-20 text-center border border-dashed border-[var(--border-color)] rounded-[6px] space-y-4">
+                   <CalendarIcon size={32} className="mx-auto text-slate-300" />
+                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">No signals detected in this range.</p>
+                   <button onClick={() => setSelectedDate(null)} className="text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:underline">Clear Search Logic</button>
+                </div>
+              )}
+           </div>
+        </main>
 
       </div>
 
@@ -360,15 +361,5 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     </div>
   );
 };
-
-// Internal icon helper
-const RefreshCcw = ({size, className}: {size: number, className: string}) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-    <path d="M3 3v5h5"/>
-    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-    <path d="M16 16h5v5"/>
-  </svg>
-);
 
 export default Calendar;

@@ -15,7 +15,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onClose }) => {
-  const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   const [currentUser, setCurrentUser] = useState<User>(db.getUser());
 
   const isCollegeAdmin = currentUser.email?.toLowerCase().startsWith('admin.');
@@ -26,13 +25,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   useEffect(() => {
     setCurrentUser(db.getUser());
   }, [activeView]);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    if (newTheme) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  };
 
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-[100] w-[85%] max-w-[320px] bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
@@ -72,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
               <button
                 key={item.id}
                 onClick={() => setView(item.id as AppView)}
-                className={`w-full flex items-center justify-between px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
+                className={`w-full flex items-center justify-between px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
                   activeView === item.id 
                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
                   : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
@@ -93,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           
           <button
             onClick={() => setView('settings')}
-            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all group active:scale-[0.98] ${
+            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
               activeView === 'settings' 
               ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
               : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
@@ -109,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Authorized Area</p>
             <button
               onClick={() => setView('admin')}
-              className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[1.25rem] transition-all border border-dashed active:scale-[0.98] ${
+              className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all border border-dashed active:scale-[0.98] ${
                 activeView === 'admin' 
                 ? 'bg-slate-900 dark:bg-indigo-600 text-white border-transparent' 
                 : 'border-[var(--border-color)] text-slate-500 hover:border-indigo-500 hover:text-indigo-600'
@@ -123,20 +115,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
       </div>
 
       <div className="p-6 border-t border-[var(--border-color)] space-y-4">
-        <div className="flex gap-2">
-           <button 
-             onClick={toggleTheme} 
-             className="flex-1 py-4 bg-[var(--bg-secondary)] rounded-2xl text-slate-500 transition-all flex items-center justify-center active:scale-95 shadow-sm"
-           >
-             {isDark ? <Sun size={20} /> : <Moon size={20} />}
-           </button>
-           <button 
-             onClick={onLogout} 
-             className="flex-1 py-4 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-sm"
-           >
-             <LogOut size={20} />
-           </button>
-        </div>
+        <button 
+          onClick={onLogout} 
+          className="w-full py-4 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-sm"
+        >
+          <LogOut size={20} />
+          <span className="ml-2 text-[10px] font-black uppercase tracking-widest">Logout Signal</span>
+        </button>
         <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest text-center">MakSocial Network v4.1 Stable</p>
       </div>
     </aside>

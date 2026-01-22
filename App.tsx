@@ -15,7 +15,7 @@ import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -23,9 +23,9 @@ const App: React.FC = () => {
   const [userRole, setuserRole] = useState<'student' | 'admin'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [targetPostId, setTargetPostId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,6 +44,13 @@ const App: React.FC = () => {
       root.setAttribute('data-contrast', s.contrast);
     }
   }, [isLoggedIn, view]);
+
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    if (newTheme) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  };
 
   const handleLogin = (email: string) => {
     const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
@@ -152,6 +159,11 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Theme Toggle Button in Header */}
+            <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-indigo-600 hover:bg-[var(--bg-secondary)] rounded-full transition-all active:scale-90">
+              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-indigo-600/10 rounded-full border border-indigo-600/20 mr-2">
                <Zap size={14} className="text-indigo-600 fill-indigo-600" />
                <span className="text-[9px] font-black uppercase text-indigo-600">{currentUser?.subscriptionTier} Stratum</span>

@@ -3,6 +3,7 @@
   "description": "The official social network for university students to share opportunities, collaborate, and communicate.",
   "requestFramePermissions": [
     "camera",
-    "microphone"
+    "microphone",
+    "geolocation"
   ]
 }

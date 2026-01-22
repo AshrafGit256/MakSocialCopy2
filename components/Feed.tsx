@@ -8,9 +8,9 @@ import {
   Loader2, Eye, Zap, 
   Maximize2, Minimize2, HelpCircle, 
   Video, Type as FontIcon, ChevronDown,
-  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
-  Table, Link as LinkIcon, Eraser,
-  Send, Strikethrough, ArrowLeft, ChevronRight
+  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Table as TableIcon, Link as LinkIcon, Eraser,
+  Send, Strikethrough, ArrowLeft, ChevronRight, Quote, Palette, Highlighter
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -46,13 +46,12 @@ interface ComposerProps {
 }
 
 const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyzing, isFullscreen, setIsFullscreen }) => {
-  const [selectedFont, setSelectedFont] = useState('"Plus Jakarta Sans"');
-  const [activeDropdown, setActiveDropdown] = useState<'none' | 'style' | 'color' | 'table' | 'font' | 'align'>('none');
+  const [selectedFont, setSelectedFont] = useState('"JetBrains Mono"');
+  const [activeDropdown, setActiveDropdown] = useState<'none' | 'style' | 'color' | 'highlight' | 'table' | 'font' | 'align'>('none');
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
   const [linkData, setLinkData] = useState({ text: '', url: '' });
-  const [videoUrl, setVideoUrl] = useState('');
-  const [tableHover, setTableHover] = useState({ r: 0, c: 0 });
+  const [tableGrid, setTableGrid] = useState({ rows: 4, cols: 4 });
+  const [hoverGrid, setHoverGrid] = useState({ r: 0, c: 0 });
   const [savedRange, setSavedRange] = useState<Range | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
@@ -60,15 +59,16 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const rainbowColors = [
-    '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#f3f3f3', '#ffffff',
-    '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff'
+    '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#ffffff',
+    '#ef4444', '#f97316', '#f59e0b', '#22c55e', '#10b981', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef'
   ];
 
   const fonts = [
-    { name: 'Default', value: '"Plus Jakarta Sans"' },
-    { name: 'Comic Sans', value: '"Comic Sans MS", "Comic Sans", cursive' },
-    { name: 'Monospace', value: '"JetBrains Mono", monospace' },
-    { name: 'Serif', value: '"Playfair Display", serif' }
+    { name: 'Tactical (JetBrains)', value: '"JetBrains Mono"' },
+    { name: 'Standard (Inter)', value: '"Inter"' },
+    { name: 'Scholar (Playfair)', value: '"Playfair Display"' },
+    { name: 'Jakarta', value: '"Plus Jakarta Sans"' },
+    { name: 'Vibe (Comic Sans)', value: '"Comic Sans MS", cursive' }
   ];
 
   const saveSelection = () => {
@@ -92,14 +92,22 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
   };
 
   const handleInsertTable = (r: number, c: number) => {
-    let tableHtml = `<table style="width:100%; border-collapse: collapse; margin: 1rem 0; border: 1px solid #ced4da;">`;
+    let tableHtml = `<table style="width:100%; border-collapse: collapse; margin: 1rem 0; border: 1px solid var(--border-color);"><tbody>`;
     for (let i = 0; i < r; i++) {
       tableHtml += "<tr>";
-      for (let j = 0; j < c; j++) tableHtml += `<td style="border: 1px solid #ced4da; padding: 12px; min-height: 40px;">&nbsp;</td>`;
+      for (let j = 0; j < c; j++) tableHtml += `<td style="border: 1px solid var(--border-color); padding: 12px; min-height: 40px;">&nbsp;</td>`;
       tableHtml += "</tr>";
     }
-    tableHtml += "</table><p><br></p>";
+    tableHtml += "</tbody></table><p><br></p>";
     exec('insertHTML', tableHtml);
+  };
+
+  const handleInsertLink = () => {
+    if (!linkData.url) return;
+    const linkHtml = `<a href="${linkData.url}" target="_blank" style="color: var(--brand-color); text-decoration: underline;">${linkData.text || linkData.url}</a>`;
+    exec('insertHTML', linkHtml);
+    setShowLinkModal(false);
+    setLinkData({ text: '', url: '' });
   };
 
   const submitPost = () => {
@@ -112,54 +120,152 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
 
   return (
     <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] shadow-sm flex flex-col ${isFullscreen ? 'fixed inset-0 z-[1000] h-screen border-none rounded-none' : ''}`}>
-       <div className="bg-slate-50 dark:bg-white/5 border-b border-[var(--border-color)] px-2 py-1.5 flex flex-wrap items-center gap-0.5 z-[20]">
+       {/* SUMMERNOTE-STYLE TOOLBAR */}
+       <div className="bg-slate-50 dark:bg-white/5 border-b border-[var(--border-color)] px-2 py-1.5 flex flex-wrap items-center gap-0.5 z-[110]">
+          
+          {/* Style / Headers */}
           <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
             <button onClick={() => setActiveDropdown(activeDropdown === 'style' ? 'none' : 'style')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
-               <Eraser size={14} className="rotate-180" /> <ChevronDown size={10}/>
+               <span className="text-[10px] font-black uppercase">Style</span> <ChevronDown size={10}/>
             </button>
             {activeDropdown === 'style' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-64 p-1">
-                 {[{ n: 'Normal', cmd: 'p' }, { n: 'Blockquote', cmd: 'blockquote' }, { n: 'Code', cmd: 'pre' }, { n: 'Header 1', cmd: 'h1' }, { n: 'Header 2', cmd: 'h2' }].map((s, i) => (
-                   <button key={i} onClick={() => exec('formatBlock', s.cmd)} className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-bold">{s.n}</button>
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] w-64 p-1">
+                 {[
+                   { n: 'Normal Text', cmd: 'p', style: 'text-sm' },
+                   { n: 'Heading 1', cmd: 'h1', style: 'text-2xl font-black' },
+                   { n: 'Heading 2', cmd: 'h2', style: 'text-xl font-black' },
+                   { n: 'Heading 3', cmd: 'h3', style: 'text-lg font-black' },
+                   { n: 'Heading 4', cmd: 'h4', style: 'text-base font-black' },
+                   { n: 'Heading 5', cmd: 'h5', style: 'text-sm font-black' },
+                   { n: 'Heading 6', cmd: 'h6', style: 'text-[10px] font-black' },
+                   { n: 'Quote Block', cmd: 'blockquote', style: 'italic border-l-4 border-indigo-500 pl-2 text-slate-500' }
+                 ].map((s, i) => (
+                   <button key={i} onClick={() => exec('formatBlock', s.cmd)} className={`w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 uppercase tracking-tighter ${s.style}`}>{s.n}</button>
                  ))}
               </div>
             )}
           </div>
 
+          {/* Fonts */}
+          <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
+            <button onClick={() => setActiveDropdown(activeDropdown === 'font' ? 'none' : 'font')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
+               <FontIcon size={14}/> <ChevronDown size={10}/>
+            </button>
+            {activeDropdown === 'font' && (
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] w-56 p-1">
+                 {fonts.map((f, i) => (
+                   <button key={i} onClick={() => { setSelectedFont(f.value); setActiveDropdown('none'); }} className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 text-[10px] font-black uppercase tracking-widest" style={{ fontFamily: f.value }}>{f.name}</button>
+                 ))}
+              </div>
+            )}
+          </div>
+
+          {/* Basic Formatting */}
           <div className="flex items-center gap-0.5 border-r border-[var(--border-color)] pr-1 mr-1">
             <button onClick={() => exec('bold')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Bold size={14}/></button>
             <button onClick={() => exec('italic')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Italic size={14}/></button>
             <button onClick={() => exec('underline')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Underline size={14}/></button>
           </div>
 
+          {/* Colors (Fore & Back) */}
+          <div className="flex items-center gap-0.5 border-r border-[var(--border-color)] pr-1 mr-1">
+            <div className="relative">
+              <button onClick={() => { saveSelection(); setActiveDropdown(activeDropdown === 'color' ? 'none' : 'color'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex flex-col items-center">
+                 <Palette size={14} />
+                 <div className="h-0.5 w-3 bg-rose-500 rounded-full"></div>
+              </button>
+              {activeDropdown === 'color' && (
+                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] w-[180px] p-2 grid grid-cols-6 gap-1">
+                  {rainbowColors.map((c, i) => (
+                     <button key={i} onClick={() => exec('foreColor', c)} className="w-full aspect-square rounded-[2px]" style={{ backgroundColor: c }} />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <button onClick={() => { saveSelection(); setActiveDropdown(activeDropdown === 'highlight' ? 'none' : 'highlight'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex flex-col items-center">
+                 <Highlighter size={14} />
+                 <div className="h-0.5 w-3 bg-yellow-400 rounded-full"></div>
+              </button>
+              {activeDropdown === 'highlight' && (
+                <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] w-[180px] p-2 grid grid-cols-6 gap-1">
+                  {rainbowColors.map((c, i) => (
+                     <button key={i} onClick={() => exec('backColor', c)} className="w-full aspect-square rounded-[2px]" style={{ backgroundColor: c }} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Alignment */}
           <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
-            <button onClick={() => { saveSelection(); setActiveDropdown(activeDropdown === 'color' ? 'none' : 'color'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex flex-col items-center">
-               <span className="font-serif font-black text-xs">A</span>
-               <div className="h-0.5 w-3 bg-indigo-500 rounded-full"></div>
+            <button onClick={() => setActiveDropdown(activeDropdown === 'align' ? 'none' : 'align')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
+               <AlignLeft size={14}/> <ChevronDown size={10}/>
             </button>
-            {activeDropdown === 'color' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-[200px] p-2 grid grid-cols-4 gap-1">
-                {rainbowColors.map((c, i) => (
-                   <button key={i} onClick={() => exec('foreColor', c)} className="w-full aspect-square rounded" style={{ backgroundColor: c }} />
-                ))}
+            {activeDropdown === 'align' && (
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] flex p-1 gap-1">
+                 <button onClick={() => exec('justifyLeft')} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded"><AlignLeft size={16}/></button>
+                 <button onClick={() => exec('justifyCenter')} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded"><AlignCenter size={16}/></button>
+                 <button onClick={() => exec('justifyRight')} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded"><AlignRight size={16}/></button>
+                 <button onClick={() => exec('justifyFull')} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded"><AlignJustify size={16}/></button>
               </div>
             )}
           </div>
 
-          <button onClick={() => setActiveDropdown(activeDropdown === 'table' ? 'none' : 'table')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded border-r border-[var(--border-color)] pr-1 mr-1"><ImageIcon size={14}/></button>
+          {/* Table Grid Builder */}
+          <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
+            <button onClick={() => setActiveDropdown(activeDropdown === 'table' ? 'none' : 'table')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
+               <TableIcon size={14}/> <ChevronDown size={10}/>
+            </button>
+            {activeDropdown === 'table' && (
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[var(--border-color)] rounded-[6px] shadow-2xl z-[120] p-3 space-y-2">
+                 <p className="text-[8px] font-black uppercase text-slate-400 text-center tracking-widest">Select Dimensions</p>
+                 <div className="grid grid-cols-5 gap-1">
+                    {Array.from({ length: 25 }).map((_, i) => {
+                      const r = Math.floor(i / 5) + 1;
+                      const c = (i % 5) + 1;
+                      const isActive = r <= hoverGrid.r && c <= hoverGrid.c;
+                      return (
+                        <div 
+                          key={i} 
+                          onMouseEnter={() => setHoverGrid({ r, c })}
+                          onClick={() => handleInsertTable(r, c)}
+                          className={`w-4 h-4 rounded-[2px] border cursor-pointer transition-all ${isActive ? 'bg-indigo-600 border-indigo-400' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10'}`} 
+                        />
+                      );
+                    })}
+                 </div>
+                 <p className="text-[9px] font-black text-indigo-600 text-center">{hoverGrid.r} x {hoverGrid.c}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Link Modal Toggle */}
+          <button onClick={() => { saveSelection(); setShowLinkModal(true); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded border-r border-[var(--border-color)] pr-1 mr-1">
+            <LinkIcon size={14}/>
+          </button>
           
           <div className="flex gap-0.5 ml-auto">
+            <button onClick={() => exec('removeFormat')} title="Clear Styles" className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded text-slate-400 transition-all"><Eraser size={14}/></button>
             <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded">
                {isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}
             </button>
           </div>
        </div>
 
+       {/* EDITOR CONTENT AREA */}
        <div className={`flex-1 overflow-y-auto bg-white dark:bg-[#0d1117] ${isFullscreen ? 'p-12' : 'p-6'}`}>
           <div className={`${isFullscreen ? 'max-w-4xl mx-auto' : 'flex gap-4'}`}>
-             {!isFullscreen && <img src={user.avatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white shrink-0" />}
+             {!isFullscreen && <img src={user.avatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white shrink-0 object-cover" />}
              <div className="flex-1 space-y-4">
-               <div ref={editorRef} contentEditable onBlur={saveSelection} className={`w-full bg-transparent border-none focus:outline-none text-[14px] font-medium text-[var(--text-primary)] leading-relaxed rich-content outline-none min-h-[120px]`} style={{ fontFamily: selectedFont }} data-placeholder={placeholder || "Start crafting your signal..."} />
+               <div 
+                 ref={editorRef} 
+                 contentEditable 
+                 onBlur={saveSelection} 
+                 className={`w-full bg-transparent border-none focus:outline-none text-[14px] font-medium text-[var(--text-primary)] leading-relaxed rich-content outline-none min-h-[160px]`} 
+                 style={{ fontFamily: selectedFont }} 
+                 data-placeholder={placeholder || "Broadcast your intelligence signal..."} 
+               />
                {selectedImage && (
                  <div className="relative rounded-[6px] overflow-hidden group border border-[var(--border-color)] max-w-sm">
                    <img src={selectedImage} className="w-full object-cover" />
@@ -170,15 +276,39 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
           </div>
        </div>
        
-       <div className="px-6 py-4 bg-slate-50 dark:bg-white/5 border-t border-[var(--border-color)] flex justify-between items-center z-[30]">
+       {/* FOOTER BAR */}
+       <div className="px-6 py-4 bg-slate-50 dark:bg-white/5 border-t border-[var(--border-color)] flex justify-between items-center z-[100]">
          <div className="flex items-center gap-3">
-            <button onClick={() => fileInputRef.current?.click()} className="text-slate-400 hover:text-indigo-600 transition-colors"><ImageIcon size={18}/></button>
-            <button className="text-slate-400 hover:text-indigo-600 transition-colors"><Video size={18}/></button>
+            <button onClick={() => fileInputRef.current?.click()} className="text-slate-400 hover:text-indigo-600 transition-colors p-2"><ImageIcon size={18}/></button>
+            <button className="text-slate-400 hover:text-indigo-600 transition-colors p-2"><Video size={18}/></button>
          </div>
          <button onClick={submitPost} disabled={isAnalyzing} className="bg-indigo-600 text-white px-8 py-2.5 rounded-[4px] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md">
             {isAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Send size={14}/>} Commit Signal
          </button>
        </div>
+
+       {/* LINK MODAL */}
+       {showLinkModal && (
+         <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-[6px] w-full max-w-sm p-8 shadow-2xl space-y-6">
+               <div className="flex justify-between items-center">
+                  <h3 className="text-sm font-black uppercase tracking-widest">Insert Link Node</h3>
+                  <button onClick={() => setShowLinkModal(false)} className="text-slate-400 hover:text-rose-500"><X size={20}/></button>
+               </div>
+               <div className="space-y-4">
+                  <div className="space-y-1">
+                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Display Text</label>
+                     <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none" value={linkData.text} onChange={e => setLinkData({...linkData, text: e.target.value})} placeholder="e.g. Research Vault" />
+                  </div>
+                  <div className="space-y-1">
+                     <label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Universal Link (URL)</label>
+                     <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none" value={linkData.url} onChange={e => setLinkData({...linkData, url: e.target.value})} placeholder="https://..." />
+                  </div>
+               </div>
+               <button onClick={handleInsertLink} className="w-full bg-indigo-600 text-white py-3 rounded-[4px] font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">Synchronize Link</button>
+            </div>
+         </div>
+       )}
 
        <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => {
          const file = e.target.files?.[0];

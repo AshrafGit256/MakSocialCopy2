@@ -27,15 +27,15 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   }, [activeView]);
 
   const sidebarClasses = `
-    fixed inset-y-0 left-0 z-[100] w-[85%] max-w-[320px] bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
-    flex flex-col h-full shadow-[25px_0_50px_-12px_rgba(0,0,0,0.5)] transition-transform duration-500 ease-in-out
+    fixed inset-y-0 left-0 z-[2001] w-[85%] max-w-[320px] bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
+    flex flex-col h-full shadow-[25px_0_100px_-12px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-in-out
     lg:static lg:translate-x-0 lg:z-50 lg:shadow-none lg:w-72
     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
   `;
 
   return (
     <aside className={sidebarClasses}>
-      <div className="p-6 overflow-y-auto no-scrollbar flex-1">
+      <div className="p-6 overflow-y-auto no-scrollbar flex-1 bg-[var(--sidebar-bg)]">
         {/* Mobile Close Icon */}
         <div className="flex items-center justify-between mb-10 lg:hidden">
           <div className="flex flex-col">
@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
         )}
       </div>
 
-      <div className="p-6 border-t border-[var(--border-color)] space-y-4">
+      <div className="p-6 border-t border-[var(--border-color)] space-y-4 bg-[var(--sidebar-bg)]">
         <button 
           onClick={onLogout} 
           className="w-full py-4 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-sm"

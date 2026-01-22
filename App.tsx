@@ -142,22 +142,44 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
-      {/* Mobile Sidebar Overlay - High z-index to block main interaction */}
+      
+      {/* 
+        LAYER 2000: Mobile Sidebar Overlay 
+        Must be above all page content but below the actual sidebar (Level 2001).
+        Added backdrop-blur for better visual separation.
+      */}
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] lg:hidden animate-in fade-in duration-300" onClick={() => setIsSidebarOpen(false)} />
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden animate-in fade-in duration-300" 
+          onClick={() => setIsSidebarOpen(false)} 
+        />
       )}
 
-      {/* Sidebar - z-index handled within component (usually 100) */}
-      <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={handleLogout} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      {/* 
+        LAYER 2001+: Sidebar 
+        Internally managed level in Sidebar.tsx, set to 2001.
+      */}
+      <Sidebar 
+        activeView={view} 
+        setView={handleSetView} 
+        isAdmin={userRole === 'admin'} 
+        onLogout={handleLogout} 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between transition-theme">
+        {/* 
+          LAYER 80: Header 
+          Stays above content but far below overlays.
+        */}
+        <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between transition-theme shadow-sm">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full transition-colors active:scale-90 lg:hidden">
               <Menu size={22} />
             </button>
             
-            {/* GLOBAL SECTOR SELECTOR DROPDOWN */}
+            {/* GLOBAL SECTOR SELECTOR DROPDOWN - Level 500 to sit above common content */}
             <div className="relative">
               <button 
                 onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)}
@@ -175,8 +197,9 @@ const App: React.FC = () => {
 
               {isSectorDropdownOpen && (
                 <>
-                  <div className="fixed inset-0 z-[150]" onClick={() => setIsSectorDropdownOpen(false)}></div>
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[200] p-3 animate-in slide-in-from-top-2">
+                  {/* Backdrop for the dropdown itself - Level 450 */}
+                  <div className="fixed inset-0 z-[450]" onClick={() => setIsSectorDropdownOpen(false)}></div>
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
                     <p className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3 ml-2">Switch University Wing</p>
                     <button 
                       onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }}
@@ -225,7 +248,7 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
 
-        {/* Bottom Navigation - Higher z-index than content but below sidebars/modals */}
+        {/* BOTTOM NAV - Level 85 */}
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] transition-theme lg:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },

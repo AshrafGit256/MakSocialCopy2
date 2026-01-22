@@ -10,7 +10,7 @@ import {
   Video, Type as FontIcon, ChevronDown,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Table as TableIcon, Link as LinkIcon, Eraser,
-  Send, Strikethrough, ArrowLeft, ChevronRight, Quote, Palette, Highlighter
+  Send, Strikethrough, ArrowLeft, ChevronRight, Quote, Palette, Highlighter, Building2, ShieldCheck
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -24,12 +24,15 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' 
     'Student Leader': { bg: 'bg-amber-500', border: 'border-amber-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
     'Graduate': { bg: 'bg-slate-500', border: 'border-slate-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
     'Alumni': { bg: 'bg-slate-400', border: 'border-slate-300/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Staff': { bg: 'bg-slate-600', border: 'border-slate-500/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> }
+    'Staff': { bg: 'bg-slate-600', border: 'border-slate-500/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
+    'Official': { bg: 'bg-indigo-700', border: 'border-indigo-300/50', textColor: 'text-white', icon: <ShieldCheck size={size === 'sm' ? 10 : 12} /> },
+    'Corporate': { bg: 'bg-emerald-700', border: 'border-emerald-300/50', textColor: 'text-white', icon: <Building2 size={size === 'sm' ? 10 : 12} /> }
   };
   const current = config[role] || config['Administrator'];
   const sizeClasses = size === 'sm' ? 'h-4 px-1.5' : 'h-5 px-2';
   return (
     <div className={`inline-flex items-center gap-1 rounded-full ${sizeClasses} ${current.bg} ${current.textColor} border ${current.border} shadow-sm ml-1 select-none`}>
+       {current.icon}
        <span className="text-[7px] font-black uppercase tracking-widest">{role}</span>
     </div>
   );
@@ -383,7 +386,7 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
       const newPost: Post = {
         id: Date.now().toString(), 
         author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar,
-        authorAuthority: (user as any).badges?.includes('Super Admin') ? 'Super Admin' : 'Administrator',
+        authorAuthority: (user as any).badges?.includes('Super Admin') ? 'Super Admin' : (user as any).badges?.includes('Official') ? 'Official' : (user as any).badges?.includes('Corporate') ? 'Corporate' : 'Administrator',
         timestamp: 'Just now', content: content, customFont: font,
         images: image ? [image] : undefined,
         hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], 

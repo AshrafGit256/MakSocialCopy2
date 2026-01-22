@@ -30,88 +30,197 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 
 export const MOCK_POSTS: Post[] = [
   {
-    id: 'creative-1',
-    author: 'Literature Node Alpha',
-    authorId: 'u_lit',
-    authorRole: 'Scholarly Collective',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lit',
-    authorAuthority: 'Lecturer',
+    id: 'inst-1',
+    author: 'MakUnipod',
+    authorId: 'mak_unipod',
+    authorRole: 'Innovation Wing',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Unipod',
+    authorAuthority: 'Official',
     timestamp: 'Just now',
-    content: `<h1>The Renaissance of the Hill</h1>
-<p style="text-align: justify;">In this thesis, we explore the <u>profound transformation</u> of academic discourse through digital synchronization. Note the following observation logs:</p>
-<blockquote style="text-align: center; border: none; font-size: 1.2rem;">"The book is a node in a much larger knowledge network."</blockquote>
-<ul>
-  <li><b>Phase I:</b> Textual Digitization</li>
-  <li><b>Phase II:</b> Collective Commentary</li>
-  <li><b>Phase III:</b> Neural Asset Management</li>
-</ul>
-<p>Visit the <a href="#">Resource Vault</a> for full telemetry.</p>`,
-    customFont: '"Playfair Display"',
-    hashtags: ['#Literature', '#CHUSS', '#Research'],
-    likes: 842,
-    commentsCount: 22,
-    comments: [],
-    views: 12400,
-    flags: [],
-    isOpportunity: false,
-    college: 'CHUSS',
-    aiMetadata: { category: 'Academic', isSafe: true }
-  },
-  {
-    id: 'creative-2',
-    author: 'Ashraf G.',
-    authorId: 'u1',
-    authorRole: 'Protocol Architect',
-    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg',
-    authorAuthority: 'Super Admin',
-    timestamp: '2h ago',
-    content: `<h2>Node Benchmark Results 🚀</h2>
-<p>Current system latency logs for the COCIS Hub Wing:</p>
-<table style="width:100%; border: 1px solid #30363d; margin: 15px 0;">
-  <tr style="background: rgba(99, 102, 241, 0.1);">
-    <th style="padding: 10px; text-align: left;">Segment</th>
-    <th style="padding: 10px; text-align: left;">Latency</th>
+    content: `<h1>Prototyping Grant Signal Activated 🚀</h1>
+<p style="text-align: justify;">We are offering <b>5 PROTOTYPING GRANTS</b> for the semester. If you have an engineering or design node ready for deployment, scan our table below:</p>
+<table style="width:100%; border-collapse: collapse; margin: 1rem 0; border: 1px solid var(--border-color);">
+  <tr style="background-color: rgba(99, 102, 241, 0.1);">
+    <th style="padding: 10px; border: 1px solid var(--border-color);">Batch</th>
+    <th style="padding: 10px; border: 1px solid var(--border-color);">Focus Area</th>
+    <th style="padding: 10px; border: 1px solid var(--border-color);">Grant Amount</th>
   </tr>
   <tr>
-    <td style="padding: 10px;">Primary Uplink</td>
-    <td style="padding: 10px;">12.4ms</td>
+    <td style="padding: 10px; border: 1px solid var(--border-color);">Alpha</td>
+    <td style="padding: 10px; border: 1px solid var(--border-color);">Renewable Energy</td>
+    <td style="padding: 10px; border: 1px solid var(--border-color);">UGX 2,500,000</td>
   </tr>
   <tr>
-    <td style="padding: 10px;">Vault Sync</td>
-    <td style="padding: 10px;">4.8ms</td>
+    <td style="padding: 10px; border: 1px solid var(--border-color);">Beta</td>
+    <td style="padding: 10px; border: 1px solid var(--border-color);">IoT Solutions</td>
+    <td style="padding: 10px; border: 1px solid var(--border-color);">UGX 1,800,000</td>
   </tr>
 </table>
-<p style="text-align: right;"><b>System Status:</b> <span style="background-color: #059669; color: white; padding: 2px 8px; border-radius: 4px;">NOMINAL</span></p>`,
+<blockquote style="border-left: 4px solid #6366f1; padding-left: 10px; font-style: italic;">"Ideas are nodes; prototypes are the uplink."</blockquote>
+<p style="text-align: center;"><span style="color: #6366f1; font-weight: 800; font-size: 1.2rem;">Apply via the Research Vault today!</span></p>`,
     customFont: '"JetBrains Mono"',
-    hashtags: ['#SystemLog', '#COCIS', '#MakSocial'],
-    likes: 1200,
-    commentsCount: 45,
+    hashtags: ['#Innovation', '#MakUnipod', '#CEDAT'],
+    likes: 1540,
+    commentsCount: 89,
     comments: [],
-    views: 89000,
+    views: 45000,
     flags: [],
-    isOpportunity: false,
-    college: 'COCIS',
-    aiMetadata: { category: 'Academic', isSafe: true }
+    isOpportunity: true,
+    college: 'CEDAT'
   },
   {
-    id: 'creative-3',
-    author: 'Social Vibes Node',
-    authorId: 'u_vibes',
-    authorRole: 'Campus Pulse',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vibes',
-    timestamp: '5h ago',
-    content: `<p style="text-align: center;"><span style="background-color: #fef08a; padding: 10px 20px; border-radius: 10px; color: black; font-size: 1.5rem;">OMG GUYS! CHICKEN TONIGHT DEALS ARE WILD! 🍗✨</span></p>
-<p style="text-align: center;">I used <u>Comic Sans</u> because this post is <b>100% vibes</b> and <b>0% stress</b>. Meet us at the food court at 2PM for the synchronization event!</p>`,
-    customFont: '"Comic Sans MS", "Comic Sans", cursive',
-    hashtags: ['#FoodCourt', '#MakerereVibes'],
-    likes: 450,
-    commentsCount: 18,
+    id: 'inst-2',
+    author: 'Mak AI Lab',
+    authorId: 'mak_ailab',
+    authorRole: 'Research Center',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AILab',
+    authorAuthority: 'Official',
+    timestamp: '2h ago',
+    content: `<h2>Neural Logic Internship Program 🧠</h2>
+<p>Seeking <b>Graduate Research Assistants</b> for the <u>NLP and Computer Vision</u> clusters. Candidates must possess the following alphanumeric credentials:</p>
+<ul style="list-style-type: disc; padding-left: 20px;">
+  <li>Proficiency in <span style="background-color: #fef08a; padding: 2px 5px; border-radius: 4px; color: black;">Python & PyTorch</span></li>
+  <li>Experience with Edge Computing</li>
+  <li>Active participation in COCIS Labs</li>
+</ul>
+<p style="background-color: #ef4444; color: white; padding: 10px; border-radius: 6px; text-align: center; font-weight: 800;">DEADLINE: FRIDAY, 5:00 PM EAT</p>
+<p>Visit our node at <a href="#">ai.mak.ac.ug/internships</a> for synchronization.</p>`,
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#AI', '#COCIS', '#Research'],
+    likes: 892,
+    commentsCount: 34,
     comments: [],
-    views: 4500,
+    views: 28000,
+    flags: [],
+    isOpportunity: true,
+    college: 'COCIS'
+  },
+  {
+    id: 'inst-3',
+    author: 'Main Library',
+    authorId: 'mak_library',
+    authorRole: 'Knowledge Hub',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Library',
+    authorAuthority: 'Official',
+    timestamp: '4h ago',
+    content: `<h3>Universal Digital Access Synchronization 📚</h3>
+<p>We are excited to announce full <b>IEEE and JSTOR integration</b> for all verified student nodes. Access scholarly intelligence from anywhere on the hill.</p>
+<p style="font-family: serif; font-size: 1.1rem; line-height: 1.6;">"The library is not just a building; it is a globally distributed knowledge network."</p>
+<p>Reading zones 1 through 4 are now operating on a <b>24/7 UPTIME PROTOCOL</b> for the examination period. Maintain silence logic at all times.</p>`,
+    customFont: '"Playfair Display"',
+    hashtags: ['#Library', '#Research', '#Makerere'],
+    likes: 3200,
+    commentsCount: 120,
+    comments: [],
+    views: 120000,
     flags: [],
     isOpportunity: false,
-    college: 'Global',
-    aiMetadata: { category: 'Social', isSafe: true }
+    college: 'Global'
+  },
+  {
+    id: 'inst-4',
+    author: 'Office of the VC',
+    authorId: 'vc_office',
+    authorRole: 'University Leadership',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
+    authorAuthority: 'Super Admin',
+    timestamp: '6h ago',
+    content: `<h1>Scholarship Stratum Updated 🎓</h1>
+<p style="color: #6366f1; font-weight: 800;">IMPORTANT BROADCAST FOR TOP PERFORMERS</p>
+<p>The University Council has approved a <b>tuition waiver protocol</b> for the top 5% of nodes in each college wing. Eligibility logs are being compiled.</p>
+<blockquote style="border-left: 4px solid #ef4444; padding-left: 10px; italic: true;">"Excellence is the currency of the hill."</blockquote>
+<p>Please ensure your registry details are updated in the <a href="#">Academic Portal</a> by EOD tomorrow.</p>`,
+    customFont: '"Inter"',
+    hashtags: ['#Makerere', '#VCBroadcast', '#Scholarships'],
+    likes: 12400,
+    commentsCount: 450,
+    comments: [],
+    views: 250000,
+    flags: [],
+    isOpportunity: true,
+    college: 'Global'
+  },
+  {
+    id: 'inst-5',
+    author: 'Centenary Bank',
+    authorId: 'centenary_bank',
+    authorRole: 'Financial Partner',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Cente',
+    authorAuthority: 'Corporate',
+    timestamp: '8h ago',
+    content: `<p style="text-align: center;"><span style="font-size: 1.5rem; font-weight: 900; color: #1e3a8a;">CENTE-CONNECT 💳</span></p>
+<p>Open a <b>Student Cente-Account</b> and enjoy <u>Zero Transaction Logic</u> on all campus withdrawals. We are deploying mobile nodes at Freedom Square all week.</p>
+<p style="background-color: #10b981; color: white; padding: 5px; border-radius: 4px; font-weight: 800;">BONUS: First 50 nodes get UGX 10,000 instant sync!</p>`,
+    customFont: '"Plus Jakarta Sans"',
+    hashtags: ['#CenteBank', '#StudentFinance', '#Makerere'],
+    likes: 2100,
+    commentsCount: 67,
+    comments: [],
+    views: 45000,
+    flags: [],
+    isOpportunity: true,
+    college: 'Global'
+  },
+  {
+    id: 'inst-6',
+    author: 'Stanbic Bank',
+    authorId: 'stanbic_bank',
+    authorRole: 'Commercial Partner',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Stanbic',
+    authorAuthority: 'Corporate',
+    timestamp: '10h ago',
+    content: `<h2>Stanbic National Championship 2025 🏆</h2>
+<p>Register your innovation team for the ultimate university battle. Top prize includes a <b>Sync Mission to Silicon Valley</b> and UGX 20M seed capital.</p>
+<table style="width:100%; border: 1px solid #30363d; margin: 10px 0;">
+  <tr>
+    <th style="padding: 8px; text-align: left;">Category</th>
+    <th style="padding: 8px; text-align: left;">Deadline</th>
+  </tr>
+  <tr>
+    <td style="padding: 8px;">Business Idea</td>
+    <td style="padding: 8px;">July 15</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px;">MVP / Prototype</td>
+    <td style="padding: 8px;">August 20</td>
+  </tr>
+</table>
+<p style="text-align: right;"><a href="#" style="color: #3b82f6; font-weight: 800;">Register Team Node &rarr;</a></p>`,
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#StanbicChamps', '#Entrepreneurship', '#MakSocial'],
+    likes: 1800,
+    commentsCount: 45,
+    comments: [],
+    views: 32000,
+    flags: [],
+    isOpportunity: true,
+    college: 'Global'
+  },
+  {
+    id: 'inst-7',
+    author: 'Agro-Chemical Hub',
+    authorId: 'covab_agro',
+    authorRole: 'Research & Science',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Agro',
+    authorAuthority: 'Corporate',
+    timestamp: '12h ago',
+    content: `<h3>Precision Agriculture Workshop @ CoVAB Hub 🚜</h3>
+<p>Learn how to deploy <b>drone telemetry and soil sensor logic</b> for modern crop management. This is a practical synchronization event at the CoVAB Farm Wing.</p>
+<ul style="list-style-type: square; padding-left: 20px;">
+  <li>Satellite imagery decoding</li>
+  <li>Automated irrigation logic</li>
+  <li>Organic pest management protocols</li>
+</ul>
+<p style="color: #059669; font-weight: 800;">Internship opportunities available for CAES finalists!</p>`,
+    customFont: '"Inter"',
+    hashtags: ['#AgroTech', '#CoVAB', '#Makerere'],
+    likes: 940,
+    commentsCount: 28,
+    comments: [],
+    views: 15000,
+    flags: [],
+    isOpportunity: true,
+    college: 'CAES'
   }
 ];
 

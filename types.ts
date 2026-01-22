@@ -5,7 +5,7 @@ export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduat
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 
-export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff';
+export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff' | 'Official' | 'Corporate';
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
@@ -94,12 +94,14 @@ export interface User {
   avatar: string;
   connections: number;
   email?: string;
-  college: College;
+  // FIX: Allow 'Global' as a college value for administrative and corporate accounts
+  college: College | 'Global';
   status: UserStatus;
   subscriptionTier: SubscriptionTier; 
   accountStatus?: 'Active' | 'Inactive' | 'Suspended';
   verified?: boolean;
-  joinedColleges: College[];
+  // FIX: Allow 'Global' in the list of joined colleges
+  joinedColleges: (College | 'Global')[];
   postsCount: number;
   followersCount: number;
   followingCount: number;

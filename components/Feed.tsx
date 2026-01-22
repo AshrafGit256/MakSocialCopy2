@@ -119,7 +119,6 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        // Inserting block image allowing text wrap around it
         const imgHtml = `<p><img src="${base64}" class="post-image" alt="Embedded Asset" /></p><p><br></p>`;
         exec('insertHTML', imgHtml);
       };
@@ -263,7 +262,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
 
        <div className={`flex-1 overflow-y-auto bg-white dark:bg-[#0d1117] ${isFullscreen ? 'p-12' : 'p-6'}`}>
           <div className={`${isFullscreen ? 'max-w-4xl mx-auto' : 'flex gap-4'}`}>
-             {!isFullscreen && <img src={user.avatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white shrink-0 object-cover" />}
+             {!isFullscreen && <img src={user.avatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white shrink-0 object-cover cursor-pointer" />}
              <div className="flex-1 space-y-4">
                <div 
                  ref={editorRef} 
@@ -313,7 +312,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
        <style>{`
          .post-image {
            max-width: 100%;
-           height: auto !important; /* Ensuring long images are displayed in full */
+           height: auto !important;
            display: block;
            margin: 1.5rem 0;
            border-radius: var(--radius-main);
@@ -324,16 +323,25 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
   );
 };
 
-const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isComment?: boolean }> = ({ post, onOpenThread, isComment }) => {
+const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, isComment?: boolean }> = ({ post, onOpenThread, onNavigateToProfile, isComment }) => {
   return (
     <article className="group relative">
       <div className={`absolute left-[1.2rem] top-10 bottom-0 w-px bg-[var(--border-color)] group-last:hidden`}></div>
       <div className="flex gap-3">
-         <img src={post.authorAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover shrink-0 z-10" />
+         <img 
+            src={post.authorAvatar} 
+            onClick={() => onNavigateToProfile(post.authorId)}
+            className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover shrink-0 z-10 cursor-pointer hover:brightness-90 transition-all" 
+         />
          <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center justify-between text-[10px] font-black uppercase">
                <div className="flex items-center gap-1.5 overflow-hidden">
-                  <span className="text-[var(--text-primary)] hover:underline cursor-pointer truncate">{post.author}</span>
+                  <span 
+                    onClick={() => onNavigateToProfile(post.authorId)}
+                    className="text-[var(--text-primary)] hover:underline cursor-pointer truncate"
+                  >
+                    {post.author}
+                  </span>
                   <AuthoritySeal role={post.authorAuthority} size={14} />
                   <span className="text-slate-500 ml-2 truncate">{post.college}</span>
                </div>
@@ -353,7 +361,7 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
       <style>{`
         .rich-content img {
            max-width: 100%;
-           height: auto !important; /* Critical for long flyer display */
+           height: auto !important;
            display: block;
            margin: 1.5rem 0;
            border-radius: var(--radius-main);
@@ -363,7 +371,7 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
   );
 };
 
-const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onBack?: () => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onBack }) => {
+const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -421,7 +429,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                {threadParent && (
                  <div className="space-y-8 animate-in fade-in duration-500">
                    <div className="scale-105 origin-top mb-10">
-                      <PostItem post={threadParent} onOpenThread={() => {}} />
+                      <PostItem post={threadParent} onOpenThread={() => {}} onNavigateToProfile={onNavigateToProfile} />
                    </div>
                    <div className="pl-6 md:pl-12 border-l-2 border-indigo-600/20">
                      <Composer 
@@ -434,7 +442,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                      />
                      <div className="mt-12 space-y-6">
                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-[var(--border-color)] pb-3">Decrypted Signals</h3>
-                        {filteredPosts.map(p => <PostItem key={p.id} post={p} onOpenThread={onOpenThread} />)}
+                        {filteredPosts.map(p => <PostItem key={p.id} post={p} onOpenThread={onOpenThread} onNavigateToProfile={onNavigateToProfile} />)}
                      </div>
                    </div>
                  </div>
@@ -451,7 +459,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       ) : (
          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-0">
             <div className="lg:col-span-8 space-y-10">
-               {/* COMPOSER AS THE FIRST ELEMENT ON THE HOME FEED */}
                <Composer user={user} onPost={(c, f) => handlePost(c, f)} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
                
                <div className="space-y-6">
@@ -462,7 +469,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                         <span className="text-[8px] font-black uppercase tracking-widest">{collegeFilter} Active</span>
                      </div>
                   </div>
-                  {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} />)}
+                  {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} onNavigateToProfile={onNavigateToProfile} />)}
                </div>
             </div>
             <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-24 h-fit">

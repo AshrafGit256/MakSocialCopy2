@@ -115,6 +115,12 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleNavigateToProfile = (userId: string) => {
+    setSelectedUserId(userId);
+    setView('profile');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const renderContent = () => {
     if (isLoggedIn && userRole === 'admin') return <Admin onLogout={handleLogout} />;
 
@@ -122,18 +128,18 @@ const App: React.FC = () => {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed collegeFilter={activeSector} onOpenThread={openThread} />;
-      case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={openThread} onBack={() => setView('home')} />;
-      case 'groups': return <Feed collegeFilter={currentUser?.college} onOpenThread={openThread} />;
+      case 'home': return <Feed collegeFilter={activeSector} onOpenThread={openThread} onNavigateToProfile={handleNavigateToProfile} />;
+      case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={openThread} onBack={() => setView('home')} onNavigateToProfile={handleNavigateToProfile} />;
+      case 'groups': return <Feed collegeFilter={currentUser?.college} onOpenThread={openThread} onNavigateToProfile={handleNavigateToProfile} />;
       case 'messages': return <Chat />;
-      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => setSelectedUserId(null)} />;
+      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={handleNavigateToProfile} />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search onNavigateToProfile={(id) => { setSelectedUserId(id); setView('profile'); }} onNavigateToPost={(id) => openThread(id)} />;
+      case 'search': return <Search onNavigateToProfile={handleNavigateToProfile} onNavigateToPost={(id) => openThread(id)} />;
       case 'resources': return <Resources />;
       case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={handleLogout} />;
-      default: return <Feed collegeFilter={activeSector} onOpenThread={openThread} />;
+      default: return <Feed collegeFilter={activeSector} onOpenThread={openThread} onNavigateToProfile={handleNavigateToProfile} />;
     }
   };
 
@@ -143,11 +149,6 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
       
-      {/* 
-        LAYER 2000: Mobile Sidebar Overlay 
-        Must be above all page content but below the actual sidebar (Level 2001).
-        Added backdrop-blur for better visual separation.
-      */}
       {isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden animate-in fade-in duration-300" 
@@ -155,10 +156,6 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* 
-        LAYER 2001+: Sidebar 
-        Internally managed level in Sidebar.tsx, set to 2001.
-      */}
       <Sidebar 
         activeView={view} 
         setView={handleSetView} 
@@ -169,17 +166,12 @@ const App: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        {/* 
-          LAYER 80: Header 
-          Stays above content but far below overlays.
-        */}
         <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between transition-theme shadow-sm">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full transition-colors active:scale-90 lg:hidden">
               <Menu size={22} />
             </button>
             
-            {/* GLOBAL SECTOR SELECTOR DROPDOWN - Level 500 to sit above common content */}
             <div className="relative">
               <button 
                 onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)}
@@ -197,7 +189,6 @@ const App: React.FC = () => {
 
               {isSectorDropdownOpen && (
                 <>
-                  {/* Backdrop for the dropdown itself - Level 450 */}
                   <div className="fixed inset-0 z-[450]" onClick={() => setIsSectorDropdownOpen(false)}></div>
                   <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
                     <p className="text-[8px] font-black uppercase tracking-[0.3em] text-slate-400 mb-3 ml-2">Switch University Wing</p>
@@ -248,7 +239,6 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
 
-        {/* BOTTOM NAV - Level 85 */}
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] transition-theme lg:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },

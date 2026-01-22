@@ -14,7 +14,8 @@ const YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Finalist', 'Ma
 
 const Resources: React.FC = () => {
   const [currentUser] = useState(db.getUser());
-  const [currentCollege, setCurrentCollege] = useState<College>(currentUser.college);
+  // FIX: Updated currentCollege state to allow 'Global' to match User.college type
+  const [currentCollege, setCurrentCollege] = useState<College | 'Global'>(currentUser.college);
   const [resources, setResources] = useState<Resource[]>(db.getResources());
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,7 +88,7 @@ const Resources: React.FC = () => {
       id: `res-${Date.now()}`,
       title: uploadForm.title,
       category: uploadForm.category,
-      college: currentCollege,
+      college: currentCollege as College, // Manual cast as only specific colleges have vaults
       course: uploadForm.course,
       year: uploadForm.year,
       author: currentUser.name,
@@ -173,7 +174,8 @@ const Resources: React.FC = () => {
                   onChange={(e) => setSelectedCourse(e.target.value)}
                >
                   <option value="All">All Courses in Wing</option>
-                  {COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
+                  {/* FIX: Guarded COURSES_BY_COLLEGE access against 'Global' value */}
+                  {currentCollege !== 'Global' && COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
                </select>
             </div>
 
@@ -383,7 +385,8 @@ const Resources: React.FC = () => {
                   onChange={e => setUploadForm({ ...uploadForm, course: e.target.value })}
                 >
                   <option value="">Select Target Course</option>
-                  {COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
+                  {/* FIX: Guarded COURSES_BY_COLLEGE access against 'Global' value */}
+                  {currentCollege !== 'Global' && COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 

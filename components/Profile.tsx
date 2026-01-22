@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { User, Post, TimelineEvent as TimelineType } from '../types';
+import { User, Post, TimelineEvent as TimelineType, AuthorityRole } from '../types';
+import { AuthoritySeal } from './Feed'; // Import modern tick component
 import { 
   MapPin, Book, Edit3, Heart, MessageCircle, Settings, 
   User as UserIcon, GraduationCap, Briefcase, Camera, Save, 
-  // FIX: Added Activity icon to lucide-react imports
   Plus, X, Clock, Trash2, ArrowLeft, CheckCircle, Activity
 } from 'lucide-react';
 
@@ -52,6 +52,9 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
     { id: 't3', title: 'Profile Initialized', description: 'MakSocial identity node activated.', timestamp: '1 month ago', type: 'achievement', color: 'bg-rose-500' }
   ];
 
+  // Logic for verification tick on profile
+  const authorityRole: AuthorityRole | undefined = user.badges?.includes('Super Admin') ? 'Super Admin' : user.badges?.includes('Official') ? 'Official' : user.badges?.includes('Corporate') ? 'Corporate' : user.verified ? 'Administrator' : undefined;
+
   return (
     <div className="max-w-[1440px] mx-auto py-8 px-4 lg:px-12 pb-32 space-y-8 animate-in fade-in duration-500">
       {onNavigateBack && !isOwnProfile && (
@@ -61,15 +64,22 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: About Me (AdminLTE Style) */}
+        {/* Left Column: About Me */}
         <div className="lg:col-span-4 space-y-6">
           <div className="glass-card bg-[var(--sidebar-bg)] border-t-4 border-indigo-500 rounded-xl shadow-md overflow-hidden transition-theme">
              <div className="p-8 flex flex-col items-center border-b border-[var(--border-color)]">
                 <div className="relative mb-6">
                    <img src={user.avatar} className="w-32 h-32 rounded-full border-4 border-slate-100 dark:border-white/10 object-cover shadow-xl" alt="Profile" />
-                   {user.verified && <CheckCircle size={24} className="absolute bottom-1 right-1 text-emerald-500 fill-white" />}
+                   {authorityRole && (
+                     <div className="absolute bottom-1 right-1 bg-white dark:bg-slate-900 rounded-full p-1 shadow-lg border border-white/20">
+                        <AuthoritySeal role={authorityRole} size={20} />
+                     </div>
+                   )}
                 </div>
-                <h2 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight leading-none mb-1">{user.name}</h2>
+                <div className="flex items-center justify-center gap-1 mb-1">
+                   <h2 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tight leading-none">{user.name}</h2>
+                   <AuthoritySeal role={authorityRole} size={18} />
+                </div>
                 <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4">{user.role}</p>
                 <div className="flex gap-4 text-center w-full">
                    <div className="flex-1">
@@ -129,7 +139,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
           </div>
         </div>
 
-        {/* Right Column: Content Tabs (AdminLTE Style) */}
+        {/* Right Column: Content Tabs */}
         <div className="lg:col-span-8">
            <div className="glass-card bg-[var(--sidebar-bg)] rounded-xl shadow-md border border-[var(--border-color)] transition-theme h-full flex flex-col">
               <div className="flex border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
@@ -158,7 +168,10 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack }) => {
                             <div className="flex items-center gap-3">
                                <img src={user.avatar} className="w-10 h-10 rounded-xl" />
                                <div>
-                                  <h4 className="text-sm font-black uppercase">{user.name}</h4>
+                                  <div className="flex items-center gap-1">
+                                     <h4 className="text-sm font-black uppercase">{user.name}</h4>
+                                     <AuthoritySeal role={authorityRole} size={14} />
+                                  </div>
                                   <p className="text-[9px] text-slate-500 font-bold">{post.timestamp}</p>
                                </div>
                             </div>

@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { User, Post } from '../types';
+import { User, Post, AuthorityRole } from '../types';
+import { AuthoritySeal } from './Feed';
 import { 
   Search as SearchIcon, Users, Hash, Plus, 
   MessageCircle, Heart, Eye, ArrowRight, Sparkles, 
@@ -101,27 +103,35 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
                     <Users size={16} className="text-indigo-600" /> Population Cluster ({filteredUsers.length})
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredUsers.map(u => (
-                      <div 
-                        key={u.id} 
-                        onClick={() => onNavigateToProfile(u.id)}
-                        className="glass-card p-6 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-600/5 transition-all flex items-center justify-between group cursor-pointer"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="relative">
-                            <img src={u.avatar} className="w-16 h-16 rounded-[1.25rem] object-cover border-2 border-[var(--border-color)] group-hover:border-indigo-500 transition-colors" />
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                    {filteredUsers.map(u => {
+                      const authority: AuthorityRole | undefined = u.badges?.includes('Super Admin') ? 'Super Admin' : u.badges?.includes('Official') ? 'Official' : u.badges?.includes('Corporate') ? 'Corporate' : u.verified ? 'Administrator' : undefined;
+                      return (
+                        <div 
+                          key={u.id} 
+                          onClick={() => onNavigateToProfile(u.id)}
+                          className="glass-card p-6 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-600/5 transition-all flex items-center justify-between group cursor-pointer"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="relative">
+                              <img src={u.avatar} className="w-16 h-16 rounded-[1.25rem] object-cover border-2 border-[var(--border-color)] group-hover:border-indigo-500 transition-colors" />
+                              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white dark:bg-slate-900 border-2 border-white dark:border-slate-800 rounded-full flex items-center justify-center">
+                                 <AuthoritySeal role={authority} size={14} />
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1">
+                                 <h4 className="font-extrabold text-[var(--text-primary)] text-lg leading-none">{u.name}</h4>
+                                 <AuthoritySeal role={authority} size={16} />
+                              </div>
+                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{u.college} • {u.role}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-extrabold text-[var(--text-primary)] text-lg leading-none">{u.name}</h4>
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{u.college} • {u.role}</p>
+                          <div className="p-3 bg-indigo-600/5 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                             <ArrowRight size={20}/>
                           </div>
                         </div>
-                        <div className="p-3 bg-indigo-600/5 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                           <ArrowRight size={20}/>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </section>
               )}
@@ -142,7 +152,10 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
                           <div className="flex items-center gap-4">
                             <img src={p.authorAvatar} className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)]" />
                             <div>
-                              <h4 className="font-extrabold text-[var(--text-primary)] uppercase tracking-tight leading-none text-sm">{p.author}</h4>
+                              <div className="flex items-center gap-1">
+                                 <h4 className="font-extrabold text-[var(--text-primary)] uppercase tracking-tight leading-none text-sm">{p.author}</h4>
+                                 <AuthoritySeal role={p.authorAuthority} size={14} />
+                              </div>
                               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{p.timestamp} • {p.college}</p>
                             </div>
                             <div className="ml-auto">

@@ -14,28 +14,28 @@ import {
   Globe, LayoutGrid, Radio, TrendingUp
 } from 'lucide-react';
 
-export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
+export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
   if (!role) return null;
-  const config: Record<AuthorityRole, { bg: string, icon: React.ReactNode, border: string, textColor: string }> = {
-    'Super Admin': { bg: 'bg-rose-600', border: 'border-rose-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Administrator': { bg: 'bg-indigo-600', border: 'border-indigo-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Lecturer': { bg: 'bg-slate-800', border: 'border-slate-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Chairperson': { bg: 'bg-emerald-600', border: 'border-emerald-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'GRC': { bg: 'bg-sky-500', border: 'border-sky-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Student Leader': { bg: 'bg-amber-500', border: 'border-amber-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Graduate': { bg: 'bg-slate-500', border: 'border-slate-400/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Alumni': { bg: 'bg-slate-400', border: 'border-slate-300/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Staff': { bg: 'bg-slate-600', border: 'border-slate-500/50', textColor: 'text-white', icon: <Zap size={size === 'sm' ? 10 : 12} /> },
-    'Official': { bg: 'bg-indigo-700', border: 'border-indigo-300/50', textColor: 'text-white', icon: <ShieldCheck size={size === 'sm' ? 10 : 12} /> },
-    'Corporate': { bg: 'bg-emerald-700', border: 'border-emerald-300/50', textColor: 'text-white', icon: <Building2 size={size === 'sm' ? 10 : 12} /> }
-  };
-  const current = config[role] || config['Administrator'];
-  const sizeClasses = size === 'sm' ? 'h-4 px-1.5' : 'h-5 px-2';
+  
+  // Logic: Institutions/Places get gray, Individuals get blue
+  const isInstitutional = role === 'Official' || role === 'Corporate';
+  const color = isInstitutional ? '#829aab' : '#1d9bf0'; // X-style Gray and Blue
+
   return (
-    <div className={`inline-flex items-center gap-1 rounded-full ${sizeClasses} ${current.bg} ${current.textColor} border ${current.border} shadow-sm ml-1 select-none`}>
-       {current.icon}
-       <span className="text-[7px] font-black uppercase tracking-widest">{role}</span>
-    </div>
+    <svg 
+      viewBox="0 0 24 24" 
+      width={size} 
+      height={size} 
+      aria-label="Verified Account" 
+      className="inline-block ml-1 align-text-bottom flex-shrink-0"
+    >
+      <g>
+        <path 
+          d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.67-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2l-3.53-3.53 1.41-1.41 2.12 2.12 4.96-4.96 1.41 1.41-6.37 6.37z" 
+          fill={color}
+        />
+      </g>
+    </svg>
   );
 };
 
@@ -332,12 +332,12 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
          <img src={post.authorAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover shrink-0 z-10" />
          <div className="flex-1 min-w-0 space-y-2">
             <div className="flex items-center justify-between text-[10px] font-black uppercase">
-               <div className="flex items-center gap-1.5">
-                  <span className="text-[var(--text-primary)] hover:underline cursor-pointer">{post.author}</span>
-                  <span className="text-slate-500">{post.college}</span>
-                  <AuthoritySeal role={post.authorAuthority} size="sm" />
+               <div className="flex items-center gap-1.5 overflow-hidden">
+                  <span className="text-[var(--text-primary)] hover:underline cursor-pointer truncate">{post.author}</span>
+                  <AuthoritySeal role={post.authorAuthority} size={14} />
+                  <span className="text-slate-500 ml-2 truncate">{post.college}</span>
                </div>
-               <span className="text-slate-500 font-mono text-[9px]">{post.timestamp}</span>
+               <span className="text-slate-500 font-mono text-[9px] whitespace-nowrap ml-2">{post.timestamp}</span>
             </div>
             <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[var(--radius-main)] shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
                <div className="p-5 space-y-4" style={{ fontFamily: post.customFont }}>

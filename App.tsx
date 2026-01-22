@@ -15,8 +15,7 @@ import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import { db } from './db';
-// Added Zap icon to the imports
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -27,6 +26,7 @@ const App: React.FC = () => {
   
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [targetPostId, setTargetPostId] = useState<string | null>(null);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -90,53 +90,46 @@ const App: React.FC = () => {
   };
 
   const handleSetView = (newView: AppView) => {
-    if (userRole === 'admin' && newView !== 'admin') {
-      return; 
-    }
-
-    // SUBSCRIPTION PROTECTION: Only Pro users can access 'resources' (The Vault)
+    if (userRole === 'admin' && newView !== 'admin') return;
     if (newView === 'resources' && currentUser?.subscriptionTier === 'Free') {
        alert("PROTOCOL LOCKED: Access to the Academic Vault requires a PRO subscription strata.");
        return;
     }
-
     setView(newView);
     setIsSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const openThread = (postId: string) => {
+    setActiveThreadId(postId);
+    setView('thread');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const renderContent = () => {
-    if (isLoggedIn && userRole === 'admin') {
-      return <Admin onLogout={handleLogout} />;
-    }
+    if (isLoggedIn && userRole === 'admin') return <Admin onLogout={handleLogout} />;
 
     switch (view) {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed targetPostId={targetPostId} onClearTarget={() => setTargetPostId(null)} />;
-      case 'groups': return <Feed collegeFilter={currentUser?.college} />;
+      case 'home': return <Feed onOpenThread={openThread} />;
+      case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={openThread} onBack={() => setView('home')} />;
+      case 'groups': return <Feed collegeFilter={currentUser?.college} onOpenThread={openThread} />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => setSelectedUserId(null)} />;
       case 'explore': return <Explore />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search onNavigateToProfile={(id) => { setSelectedUserId(id); setView('profile'); }} onNavigateToPost={(id) => { setTargetPostId(id); setView('home'); }} />;
+      case 'search': return <Search onNavigateToProfile={(id) => { setSelectedUserId(id); setView('profile'); }} onNavigateToPost={(id) => openThread(id)} />;
       case 'resources': return <Resources />;
       case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={handleLogout} />;
-      default: return <Feed />;
+      default: return <Feed onOpenThread={openThread} />;
     }
   };
 
   const isAuthView = view === 'landing' || view === 'login' || view === 'register';
-
-  if (!isLoggedIn && isAuthView) {
-    return renderContent();
-  }
-
-  if (isLoggedIn && userRole === 'admin') {
-    return <Admin onLogout={handleLogout} />;
-  }
+  if (!isLoggedIn && isAuthView) return renderContent();
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] transition-theme font-sans relative">
@@ -144,14 +137,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden animate-in fade-in duration-300" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      <Sidebar 
-        activeView={view} 
-        setView={handleSetView} 
-        isAdmin={userRole === 'admin'} 
-        onLogout={handleLogout}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={handleLogout} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between transition-theme">

@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -129,7 +129,7 @@ export interface Post {
   authorAuthority?: AuthorityRole;
   timestamp: string;
   content: string;
-  customFont?: string; // NEW: Per-post creative typography
+  customFont?: string; 
   images?: string[];
   video?: string;
   hashtags: string[];
@@ -140,19 +140,21 @@ export interface Post {
   flags: string[]; 
   isOpportunity: boolean;
   college: College | 'Global';
-  isAd?: boolean;
-  isEventBroadcast?: boolean;
-  eventId?: string; 
-  eventFlyer?: string;
-  eventDate?: string;
-  eventTime?: string;
-  eventLocation?: string;
-  eventTitle?: string;
-  eventRegistrationLink?: string;
+  parentId?: string; // NEW: Supports threading/replies
   aiMetadata?: {
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
     isSafe?: boolean;
   };
+  // FIX: Missing properties used for broadcasting events and advertisements to resolve type errors in Admin, Events and Calendar components
+  isEventBroadcast?: boolean;
+  isAd?: boolean;
+  eventTitle?: string;
+  eventDate?: string;
+  eventTime?: string;
+  eventLocation?: string;
+  eventId?: string;
+  eventFlyer?: string;
+  eventRegistrationLink?: string;
 }
 
 export interface CalendarEvent {

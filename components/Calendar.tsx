@@ -170,7 +170,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* RIGHT (Moved to Top on Mobile): Calendar Grid & Quick Control */}
-        <aside className="lg:col-span-4 order-1 lg:order-2 space-y-4 sticky top-20">
+        <aside className="lg:col-span-4 order-1 lg:order-2 space-y-4 lg:sticky lg:top-20">
            <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Registry Grid</h3>

@@ -50,8 +50,8 @@ const Settings: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('maksocial_appearance');
     return saved ? JSON.parse(saved) : {
-      primaryColor: '#6366f1',
-      fontFamily: '"Plus Jakarta Sans"',
+      primaryColor: '#64748b', // Updated to Slate
+      fontFamily: '"JetBrains Mono"', // Updated to JetBrains Mono
       fontSize: 'md',
       contrast: 'normal',
       density: 'comfortable',
@@ -89,8 +89,8 @@ const Settings: React.FC = () => {
 
   const handleReset = () => {
     setSettings({
-      primaryColor: '#6366f1',
-      fontFamily: '"Plus Jakarta Sans"',
+      primaryColor: '#64748b',
+      fontFamily: '"JetBrains Mono"',
       fontSize: 'md',
       contrast: 'normal',
       density: 'comfortable',

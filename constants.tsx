@@ -122,7 +122,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Office of the VC',
     authorId: 'vc_office',
     authorRole: 'University Leadership',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
+    authorAvatar: 'https://businessfocus.co.ug/wp-content/uploads/2019/11/Nawangwe.jpg',
     authorAuthority: 'Super Admin',
     timestamp: '6h ago',
     content: `<h1>Scholarship Stratum Updated 🎓</h1>

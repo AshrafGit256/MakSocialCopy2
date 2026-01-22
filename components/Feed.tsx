@@ -7,10 +7,10 @@ import {
   Image as ImageIcon, Heart, MessageCircle, X, 
   Loader2, Eye, Zap, 
   Maximize2, Minimize2, HelpCircle, 
-  Video, Type as FontIcon, AlignJustify, Minus, Eraser, ChevronDown,
+  Video, Type as FontIcon, ChevronDown,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
-  List, ListOrdered, Table, Link as LinkIcon, Highlighter,
-  Code, Quote, Trash2, Send, Strikethrough, ArrowLeft
+  Table, Link as LinkIcon, Eraser,
+  Send, Strikethrough, ArrowLeft, ChevronRight
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
@@ -45,12 +45,11 @@ interface ComposerProps {
   autoFocus?: boolean;
 }
 
-const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyzing, isFullscreen, setIsFullscreen, autoFocus }) => {
+const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyzing, isFullscreen, setIsFullscreen }) => {
   const [selectedFont, setSelectedFont] = useState('"Plus Jakarta Sans"');
   const [activeDropdown, setActiveDropdown] = useState<'none' | 'style' | 'color' | 'table' | 'font' | 'align'>('none');
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
   const [linkData, setLinkData] = useState({ text: '', url: '' });
   const [videoUrl, setVideoUrl] = useState('');
   const [tableHover, setTableHover] = useState({ r: 0, c: 0 });
@@ -62,20 +61,14 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
 
   const rainbowColors = [
     '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#f3f3f3', '#ffffff',
-    '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff',
-    '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc',
-    '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd',
-    '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0',
-    '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79'
+    '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff'
   ];
 
   const fonts = [
     { name: 'Default', value: '"Plus Jakarta Sans"' },
     { name: 'Comic Sans', value: '"Comic Sans MS", "Comic Sans", cursive' },
     { name: 'Monospace', value: '"JetBrains Mono", monospace' },
-    { name: 'Serif', value: '"Playfair Display", serif' },
-    { name: 'Impact', value: 'Impact, sans-serif' },
-    { name: 'Montserrat', value: '"Montserrat", sans-serif' }
+    { name: 'Serif', value: '"Playfair Display", serif' }
   ];
 
   const saveSelection = () => {
@@ -109,26 +102,9 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
     exec('insertHTML', tableHtml);
   };
 
-  const handleInsertLink = () => {
-    if (!linkData.url) return;
-    const linkHtml = `<a href="${linkData.url}" target="_blank" style="color: #6366f1; text-decoration: underline; font-weight: bold;">${linkData.text || linkData.url}</a>`;
-    exec('insertHTML', linkHtml);
-    setShowLinkModal(false);
-    setLinkData({ text: '', url: '' });
-  };
-
-  const handleInsertVideo = () => {
-    if (!videoUrl) return;
-    let embedUrl = videoUrl;
-    if (videoUrl.includes('youtube.com/watch?v=')) embedUrl = videoUrl.replace('watch?v=', 'embed/');
-    const videoHtml = `<div class="aspect-video my-4"><iframe src="${embedUrl}" class="w-full h-full rounded-md" frameborder="0" allowfullscreen></iframe></div><p><br></p>`;
-    exec('insertHTML', videoHtml);
-    setShowVideoModal(false);
-    setVideoUrl('');
-  };
-
   const submitPost = () => {
     const content = editorRef.current?.innerHTML || '';
+    if (!content.trim() && !selectedImage) return;
     onPost(content, selectedFont, selectedImage);
     if (editorRef.current) editorRef.current.innerHTML = '';
     setSelectedImage(null);
@@ -142,21 +118,9 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
                <Eraser size={14} className="rotate-180" /> <ChevronDown size={10}/>
             </button>
             {activeDropdown === 'style' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-64 p-1 animate-in slide-in-from-top-1">
-                 {[
-                   { n: 'Normal', cmd: 'p', style: 'text-sm' },
-                   { n: 'Blockquote', cmd: 'blockquote', style: 'text-sm italic border-l-4 border-blue-500 pl-4 py-2' },
-                   { n: 'Code', cmd: 'pre', style: 'text-xs font-mono bg-slate-100 p-1 rounded' },
-                   { n: 'Header 1', cmd: 'h1', style: 'text-3xl font-black' },
-                   { n: 'Header 2', cmd: 'h2', style: 'text-2xl font-extrabold' },
-                   { n: 'Header 3', cmd: 'h3', style: 'text-xl font-bold' },
-                   { n: 'Header 4', cmd: 'h4', style: 'text-lg font-bold' },
-                   { n: 'Header 5', cmd: 'h5', style: 'text-base font-bold' },
-                   { n: 'Header 6', cmd: 'h6', style: 'text-sm font-bold uppercase tracking-widest opacity-60' }
-                 ].map((s, i) => (
-                   <button key={i} onClick={() => exec('formatBlock', s.cmd)} className="w-full text-left px-4 py-3 hover:bg-slate-100 dark:hover:bg-white/5 border-b last:border-none border-slate-100 dark:border-white/5">
-                      <span className={s.style}>{s.n}</span>
-                   </button>
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-64 p-1">
+                 {[{ n: 'Normal', cmd: 'p' }, { n: 'Blockquote', cmd: 'blockquote' }, { n: 'Code', cmd: 'pre' }, { n: 'Header 1', cmd: 'h1' }, { n: 'Header 2', cmd: 'h2' }].map((s, i) => (
+                   <button key={i} onClick={() => exec('formatBlock', s.cmd)} className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 text-xs font-bold">{s.n}</button>
                  ))}
               </div>
             )}
@@ -164,21 +128,8 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
 
           <div className="flex items-center gap-0.5 border-r border-[var(--border-color)] pr-1 mr-1">
             <button onClick={() => exec('bold')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Bold size={14}/></button>
-            <button onClick={() => exec('underline')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Underline size={14}/></button>
             <button onClick={() => exec('italic')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Italic size={14}/></button>
-          </div>
-
-          <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
-            <button onClick={() => setActiveDropdown(activeDropdown === 'align' ? 'none' : 'align')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
-               <AlignLeft size={14}/> <ChevronDown size={10}/>
-            </button>
-            {activeDropdown === 'align' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-48 p-1 animate-in slide-in-from-top-1">
-                <button onClick={() => exec('justifyLeft')} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-xs font-bold"><AlignLeft size={14}/> Left</button>
-                <button onClick={() => exec('justifyCenter')} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-xs font-bold"><AlignCenter size={14}/> Center</button>
-                <button onClick={() => exec('justifyRight')} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-xs font-bold"><AlignRight size={14}/> Right</button>
-              </div>
-            )}
+            <button onClick={() => exec('underline')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Underline size={14}/></button>
           </div>
 
           <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
@@ -187,83 +138,32 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
                <div className="h-0.5 w-3 bg-indigo-500 rounded-full"></div>
             </button>
             {activeDropdown === 'color' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-[450px] p-4 flex gap-6 animate-in zoom-in-95 duration-100">
-                 <div className="flex-1">
-                    <p className="text-[10px] font-black uppercase text-center text-slate-500 border-b pb-2">Background</p>
-                    <div className="grid grid-cols-8 gap-0.5 mt-2">
-                       {rainbowColors.map((c, i) => (
-                         <button key={i} onClick={() => exec('hiliteColor', c)} className="w-5 h-5 border border-black/5" style={{ backgroundColor: c }} />
-                       ))}
-                    </div>
-                 </div>
-                 <div className="flex-1">
-                    <p className="text-[10px] font-black uppercase text-center text-slate-500 border-b pb-2">Text Color</p>
-                    <div className="grid grid-cols-8 gap-0.5 mt-2">
-                       {rainbowColors.map((c, i) => (
-                         <button key={i} onClick={() => exec('foreColor', c)} className="w-5 h-5 border border-black/5" style={{ backgroundColor: c }} />
-                       ))}
-                    </div>
-                 </div>
-              </div>
-            )}
-          </div>
-
-          <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
-            <button onClick={() => setActiveDropdown(activeDropdown === 'table' ? 'none' : 'table')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded">
-               <Table size={14}/>
-            </button>
-            {activeDropdown === 'table' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] p-6 animate-in zoom-in-95 duration-100">
-                <div className="grid grid-cols-10 gap-1 mb-4">
-                   {Array.from({length: 10}).map((_, r) => (
-                     Array.from({length: 10}).map((_, c) => (
-                       <div key={`${r}-${c}`} onMouseEnter={() => setTableHover({r: r+1, c: c+1})} onClick={() => handleInsertTable(r+1, c+1)}
-                         className={`w-6 h-6 border transition-colors cursor-pointer ${r < tableHover.r && c < tableHover.c ? 'bg-[#cce5ff] border-[#b8daff]' : 'bg-white border-[#dee2e6]'}`}
-                       />
-                     ))
-                   ))}
-                </div>
-                <p className="text-sm font-black text-center text-indigo-600">{tableHover.r} x {tableHover.c}</p>
-              </div>
-            )}
-          </div>
-
-          <div className="flex border-r border-[var(--border-color)] pr-1 mr-1 gap-0.5">
-            <button onClick={() => { saveSelection(); setShowLinkModal(true); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><LinkIcon size={14}/></button>
-            <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><ImageIcon size={14}/></button>
-            <button onClick={() => setShowVideoModal(true)} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><Video size={14}/></button>
-          </div>
-
-          <div className="relative border-r border-[var(--border-color)] pr-1 mr-1">
-            <button onClick={() => setActiveDropdown(activeDropdown === 'font' ? 'none' : 'font')} className="px-2 py-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              <FontIcon size={14}/> {fonts.find(f => f.value === selectedFont)?.name} <ChevronDown size={10}/>
-            </button>
-            {activeDropdown === 'font' && (
-              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-xl z-[50] w-48 p-1 animate-in slide-in-from-top-1">
-                {fonts.map(f => (
-                  <button key={f.value} onClick={() => { setSelectedFont(f.value); setActiveDropdown('none'); }} className="w-full text-left px-4 py-2 text-[10px] font-bold hover:bg-indigo-600 hover:text-white uppercase" style={{ fontFamily: f.value }}>{f.name}</button>
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-slate-800 border border-[#ced4da] rounded shadow-2xl z-[50] w-[200px] p-2 grid grid-cols-4 gap-1">
+                {rainbowColors.map((c, i) => (
+                   <button key={i} onClick={() => exec('foreColor', c)} className="w-full aspect-square rounded" style={{ backgroundColor: c }} />
                 ))}
               </div>
             )}
           </div>
 
-          <div className="flex gap-0.5">
+          <button onClick={() => setActiveDropdown(activeDropdown === 'table' ? 'none' : 'table')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded border-r border-[var(--border-color)] pr-1 mr-1"><ImageIcon size={14}/></button>
+          
+          <div className="flex gap-0.5 ml-auto">
             <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded">
                {isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}
             </button>
-            <button onClick={() => setShowHelpModal(true)} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><HelpCircle size={14}/></button>
           </div>
        </div>
 
        <div className={`flex-1 overflow-y-auto bg-white dark:bg-[#0d1117] ${isFullscreen ? 'p-12' : 'p-6'}`}>
-          <div className={`${isFullscreen ? 'max-w-5xl mx-auto border border-[var(--border-color)] p-12 bg-white dark:bg-[#161b22] min-h-screen shadow-2xl rounded-sm mb-20' : 'flex gap-4'}`}>
+          <div className={`${isFullscreen ? 'max-w-4xl mx-auto' : 'flex gap-4'}`}>
              {!isFullscreen && <img src={user.avatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white shrink-0" />}
              <div className="flex-1 space-y-4">
-               <div ref={editorRef} contentEditable onBlur={saveSelection} className={`w-full bg-transparent border-none focus:outline-none text-[14px] font-medium text-[var(--text-primary)] leading-relaxed rich-content outline-none ${isFullscreen ? 'min-h-[1000px]' : 'min-h-[150px]'}`} style={{ fontFamily: selectedFont }} data-placeholder={placeholder || "Start crafting your signal..."} />
+               <div ref={editorRef} contentEditable onBlur={saveSelection} className={`w-full bg-transparent border-none focus:outline-none text-[14px] font-medium text-[var(--text-primary)] leading-relaxed rich-content outline-none min-h-[120px]`} style={{ fontFamily: selectedFont }} data-placeholder={placeholder || "Start crafting your signal..."} />
                {selectedImage && (
-                 <div className="relative rounded-[6px] overflow-hidden group border border-[var(--border-color)]">
-                   <img src={selectedImage} className="w-full object-cover max-h-96" />
-                   <button onClick={() => setSelectedImage(null)} className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"><X size={32}/></button>
+                 <div className="relative rounded-[6px] overflow-hidden group border border-[var(--border-color)] max-w-sm">
+                   <img src={selectedImage} className="w-full object-cover" />
+                   <button onClick={() => setSelectedImage(null)} className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full"><X size={14}/></button>
                  </div>
                )}
              </div>
@@ -272,16 +172,12 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
        
        <div className="px-6 py-4 bg-slate-50 dark:bg-white/5 border-t border-[var(--border-color)] flex justify-between items-center z-[30]">
          <div className="flex items-center gap-3">
-            <span className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Signal Node: {user.name}</span>
+            <button onClick={() => fileInputRef.current?.click()} className="text-slate-400 hover:text-indigo-600 transition-colors"><ImageIcon size={18}/></button>
+            <button className="text-slate-400 hover:text-indigo-600 transition-colors"><Video size={18}/></button>
          </div>
-         <div className="flex gap-3">
-           {isFullscreen && (
-             <button onClick={() => setIsFullscreen(false)} className="px-6 py-2.5 bg-slate-200 dark:bg-white/10 rounded-[4px] text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all">Close Editor (ESC)</button>
-           )}
-           <button onClick={submitPost} disabled={isAnalyzing} className="bg-indigo-600 text-white px-10 py-3 rounded-[4px] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md">
-              {isAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Send size={14}/>} Commit Signal
-           </button>
-         </div>
+         <button onClick={submitPost} disabled={isAnalyzing} className="bg-indigo-600 text-white px-8 py-2.5 rounded-[4px] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md">
+            {isAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Send size={14}/>} Commit Signal
+         </button>
        </div>
 
        <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => {
@@ -292,17 +188,6 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
             reader.readAsDataURL(file);
          }
        }} accept="image/*" />
-
-       {showLinkModal && (
-        <div className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
-           <div className="bg-white dark:bg-[#161b22] w-full max-w-md rounded-sm border border-[#ced4da] shadow-2xl p-8 space-y-6 animate-in zoom-in-95">
-              <h3 className="text-lg font-black uppercase italic">Insert Link Signal</h3>
-              <input className="w-full bg-slate-50 border border-[#ced4da] rounded-sm p-3 text-sm outline-none" value={linkData.text} onChange={e => setLinkData({...linkData, text: e.target.value})} placeholder="Display Text" />
-              <input className="w-full bg-slate-50 border border-[#ced4da] rounded-sm p-3 text-sm outline-none" value={linkData.url} onChange={e => setLinkData({...linkData, url: e.target.value})} placeholder="URL (https://...)" />
-              <button onClick={handleInsertLink} className="w-full bg-[#007bff] text-white py-4 rounded-sm font-black text-sm uppercase">Commit Link</button>
-           </div>
-        </div>
-       )}
     </div>
   );
 };
@@ -310,30 +195,26 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
 const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isComment?: boolean }> = ({ post, onOpenThread, isComment }) => {
   return (
     <article className="group relative">
-      <div className={`absolute left-[1.2rem] top-10 bottom-0 w-px bg-[var(--border-color)] group-last:hidden ${isComment ? 'top-0' : ''}`}></div>
+      <div className={`absolute left-[1.2rem] top-10 bottom-0 w-px bg-[var(--border-color)] group-last:hidden`}></div>
       <div className="flex gap-3">
          <img src={post.authorAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover shrink-0 z-10" />
          <div className="flex-1 min-w-0 space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-black tracking-tighter uppercase">
+            <div className="flex items-center justify-between text-[10px] font-black uppercase">
                <div className="flex items-center gap-1.5">
                   <span className="text-[var(--text-primary)] hover:underline cursor-pointer">{post.author}</span>
-                  <span className="text-slate-500 font-bold">/</span>
                   <span className="text-slate-500">{post.college}</span>
                   <AuthoritySeal role={post.authorAuthority} size="sm" />
                </div>
-               <span className="text-slate-500 font-mono text-[9px] lowercase tracking-normal">{post.timestamp}</span>
+               <span className="text-slate-500 font-mono text-[9px]">{post.timestamp}</span>
             </div>
-            <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] shadow-sm overflow-hidden transition-all hover:border-indigo-500/30">
-               <div className="p-6 space-y-4" style={{ fontFamily: post.customFont }}>
+            <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
+               <div className="p-5 space-y-4" style={{ fontFamily: post.customFont }}>
                   <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content text-[14px] leading-relaxed" />
-                  {post.images?.[0] && <img src={post.images[0]} className="w-full object-cover max-h-[500px] rounded-[4px] border border-[var(--border-color)] mt-4" alt="Asset" />}
+                  {post.images?.[0] && <img src={post.images[0]} className="w-full object-cover max-h-[400px] rounded-[4px] border border-[var(--border-color)] mt-2" alt="Asset" />}
                </div>
-               <div className="px-5 py-2.5 bg-slate-50/50 dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                     <button className="flex items-center gap-1.5 text-slate-500 hover:text-rose-500 transition-colors"><Heart size={14} /><span className="text-[10px] font-bold font-mono">{post.likes}</span></button>
-                     <button onClick={() => onOpenThread(post.id)} className="flex items-center gap-1.5 text-slate-500 hover:text-indigo-600 transition-colors"><MessageCircle size={14} /><span className="text-[10px] font-bold font-mono">{post.commentsCount}</span></button>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-400 font-mono text-[9px] uppercase tracking-widest"><Eye size={12}/> {post.views} logs</div>
+               <div className="px-5 py-2 bg-slate-50/50 dark:bg-white/5 border-t border-[var(--border-color)] flex items-center gap-6">
+                  <button className="flex items-center gap-1.5 text-slate-500 hover:text-rose-500 transition-colors"><Heart size={14} /><span className="text-[9px] font-bold">{post.likes}</span></button>
+                  <button onClick={(e) => { e.stopPropagation(); onOpenThread(post.id); }} className="flex items-center gap-1.5 text-slate-500 hover:text-indigo-600 transition-colors"><MessageCircle size={14} /><span className="text-[9px] font-bold">{post.commentsCount}</span></button>
                </div>
             </div>
          </div>
@@ -360,16 +241,14 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
   }, []);
 
   const handlePost = async (content: string, font: string, image: string | null, parentId?: string) => {
-    if (!content.trim() && !image) return;
     setIsAnalyzing(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Verify safety for post. Content: "${content.substring(0, 500)}"`,
+        contents: `Verify safety for university post: "${content.substring(0, 200)}"`,
         config: { responseMimeType: "application/json" }
       });
-      const result = JSON.parse(response.text || '{"isSafe": true}');
       
       const newPost: Post = {
         id: Date.now().toString(), 
@@ -379,11 +258,9 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
         images: image ? [image] : undefined,
         hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], 
         isOpportunity: false, college: activeTab === 'Global' ? 'Global' : activeTab as College,
-        parentId: parentId,
-        aiMetadata: { category: 'Social', isSafe: true }
+        parentId: parentId
       };
       
-      // If replying, increment comment count of parent
       if (parentId) {
          const all = db.getPosts();
          const updated = all.map(p => p.id === parentId ? {...p, commentsCount: p.commentsCount + 1} : p);
@@ -391,9 +268,7 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
       } else {
          db.addPost(newPost);
       }
-      
       setIsAnalyzing(false);
-      setIsFullscreen(false);
     } catch (e) { setIsAnalyzing(false); }
   };
 
@@ -402,65 +277,84 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
     : posts.filter(p => !p.parentId && (activeTab === 'Global' || p.college === activeTab));
 
   const threadParent = threadId ? posts.find(p => p.id === threadId) : null;
+  const ancestorId = threadParent?.parentId;
+  const ancestor = ancestorId ? posts.find(p => p.id === ancestorId) : null;
 
   return (
-    <div className={`max-w-[1440px] mx-auto pb-32 lg:px-12 lg:py-8 ${isFullscreen ? 'fixed inset-0 z-[1000] bg-white dark:bg-[#0d1117] overflow-hidden' : ''}`}>
+    <div className="max-w-[1440px] mx-auto pb-32 lg:px-12 lg:py-8">
       {threadId ? (
-         <div className="space-y-6">
-            <button onClick={onBack} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 transition-all mb-4 px-4 lg:px-0">
-               <ArrowLeft size={16}/> Back to Hub Protocol
-            </button>
-            <div className="px-4 lg:px-0">
+         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="lg:col-span-8 space-y-6 px-4 lg:px-0">
+               <div className="flex items-center gap-4 mb-6">
+                  <button onClick={onBack} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full"><ArrowLeft size={20}/></button>
+                  <h2 className="text-xl font-black uppercase tracking-tighter italic">Signal Terminal</h2>
+               </div>
+
+               {ancestor && (
+                 <div className="opacity-40 hover:opacity-100 transition-opacity mb-2">
+                    <button onClick={() => onOpenThread(ancestor.id)} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                       <ArrowLeft size={12}/> Parent Signal
+                    </button>
+                    <PostItem post={ancestor} onOpenThread={onOpenThread} isComment />
+                 </div>
+               )}
+
                {threadParent && (
-                 <div className="space-y-6">
-                   <PostItem post={threadParent} onOpenThread={() => {}} />
-                   <div className="pl-12">
+                 <div className="space-y-8 animate-in fade-in duration-500">
+                   <div className="scale-105 origin-top mb-10">
+                      <PostItem post={threadParent} onOpenThread={() => {}} />
+                   </div>
+                   <div className="pl-6 md:pl-12 border-l-2 border-indigo-600/20">
                      <Composer 
                        user={user} 
-                       placeholder="Compose a high-fidelity reply..." 
+                       placeholder={`Signal your reply to ${threadParent.author}...`} 
                        onPost={(c, f, i) => handlePost(c, f, i, threadId)} 
                        isAnalyzing={isAnalyzing} 
                        isFullscreen={isFullscreen} 
                        setIsFullscreen={setIsFullscreen} 
-                       autoFocus 
                      />
-                   </div>
-                   <div className="space-y-4 pt-10">
-                      <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b pb-4">Decryption Logs: Replies</h3>
-                      {filteredPosts.map(p => <PostItem key={p.id} post={p} onOpenThread={onOpenThread} isComment />)}
+                     <div className="mt-12 space-y-6">
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-[var(--border-color)] pb-3">Decrypted Replies</h3>
+                        {filteredPosts.map(p => (
+                          <div key={p.id} className="hover:translate-x-1 transition-transform">
+                            <PostItem post={p} onOpenThread={onOpenThread} />
+                          </div>
+                        ))}
+                     </div>
                    </div>
                  </div>
                )}
             </div>
+            <aside className="hidden lg:block lg:col-span-4 sticky top-20 h-fit space-y-6">
+               <div className="bg-indigo-600 rounded-3xl p-8 text-white space-y-4">
+                  <Zap size={32} fill="white"/>
+                  <h4 className="text-xl font-black uppercase italic tracking-tighter leading-none">Context Node</h4>
+                  <p className="text-xs font-medium text-white/80 italic">"You are currently scanning a deep-nested signal. All replies are anchored to this node."</p>
+               </div>
+            </aside>
          </div>
       ) : (
          <>
             {!collegeFilter && (
               <div className="sticky top-0 lg:top-[3.75rem] z-[75] bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border-color)]">
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-3 px-4">
-                  <button onClick={() => setActiveTab('Global')} className={`px-5 py-2 rounded-[6px] text-[10px] font-black uppercase tracking-widest transition-all border ${activeTab === 'Global' ? 'bg-indigo-600 text-white border-transparent' : 'text-slate-500 bg-[var(--bg-secondary)] border-[var(--border-color)]'}`}>Global Hub</button>
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-4 px-4">
+                  <button onClick={() => setActiveTab('Global')} className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'Global' ? 'bg-indigo-600 text-white' : 'text-slate-500 bg-[var(--bg-secondary)]'}`}>Global Hub</button>
                   {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (
-                    <button key={c} onClick={() => setActiveTab(c as College)} className={`flex items-center gap-2 px-5 py-2 rounded-[6px] text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === c ? 'bg-indigo-600 text-white border-transparent' : 'text-slate-500 bg-[var(--bg-secondary)] border-[var(--border-color)]'}`}>{c}</button>
+                    <button key={c} onClick={() => setActiveTab(c as College)} className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === c ? 'bg-indigo-600 text-white' : 'text-slate-500 bg-[var(--bg-secondary)]'}`}>{c}</button>
                   ))}
                 </div>
               </div>
             )}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6 px-4 lg:px-0">
-               <div className="lg:col-span-8 space-y-6">
-                  <Composer 
-                    user={user} 
-                    onPost={handlePost} 
-                    isAnalyzing={isAnalyzing} 
-                    isFullscreen={isFullscreen} 
-                    setIsFullscreen={setIsFullscreen} 
-                  />
-                  <div className="space-y-4">
+               <div className="lg:col-span-8 space-y-8">
+                  <Composer user={user} onPost={handlePost} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
+                  <div className="space-y-6">
                      {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} />)}
                   </div>
                </div>
                <aside className="hidden lg:block lg:col-span-4 space-y-6 sticky top-20 h-fit">
-                  <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-6 shadow-sm">
-                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">Trending Analytics</h3>
+                  <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-2xl p-6 shadow-sm">
+                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6">Trending Analytics</h3>
                      <div className="space-y-4">
                         {['#ResearchWeek', '#Guild89', '#COCISLabs'].map(tag => (
                           <div key={tag} className="group cursor-pointer">
@@ -474,15 +368,6 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
             </div>
          </>
       )}
-
-      <style>{`
-        [contentEditable]:empty:before { content: attr(data-placeholder); color: #8b949e; cursor: text; }
-        .rich-content h1 { font-size: 2.8rem; font-weight: 900; margin: 1.5rem 0; line-height: 1.1; }
-        .rich-content blockquote { border-left: 6px solid #6366f1; padding: 20px 25px; font-style: italic; background: rgba(99,102,241,0.05); color: #64748b; margin: 1.5rem 0; }
-        .rich-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-        .rich-content table td { border: 1px solid #ced4da; padding: 12px; min-width: 50px; }
-        .rich-content a { color: #6366f1; text-decoration: underline; font-weight: bold; pointer-events: auto; }
-      `}</style>
     </div>
   );
 };

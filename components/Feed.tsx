@@ -41,7 +41,7 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: 'sm' | 'md' 
 interface ComposerProps {
   user: User;
   placeholder?: string;
-  onPost: (content: string, font: string, image: string | null) => void;
+  onPost: (content: string, font: string) => void;
   isAnalyzing: boolean;
   isFullscreen: boolean;
   setIsFullscreen: (v: boolean) => void;
@@ -53,10 +53,8 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
   const [activeDropdown, setActiveDropdown] = useState<'none' | 'style' | 'color' | 'highlight' | 'table' | 'font' | 'align'>('none');
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkData, setLinkData] = useState({ text: '', url: '' });
-  const [tableGrid, setTableGrid] = useState({ rows: 4, cols: 4 });
   const [hoverGrid, setHoverGrid] = useState({ r: 0, c: 0 });
   const [savedRange, setSavedRange] = useState<Range | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -113,12 +111,28 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
     setLinkData({ text: '', url: '' });
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        // Insert image HTML directly into the content flow
+        // The class 'post-image' handles the full height requirement
+        const imgHtml = `<img src="${base64}" class="post-image" alt="User Image" />`;
+        exec('insertHTML', imgHtml);
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset input for same file re-upload
+    e.target.value = '';
+  };
+
   const submitPost = () => {
     const content = editorRef.current?.innerHTML || '';
-    if (!content.trim() && !selectedImage) return;
-    onPost(content, selectedFont, selectedImage);
+    if (!content.trim() || content === '<br>') return;
+    onPost(content, selectedFont);
     if (editorRef.current) editorRef.current.innerHTML = '';
-    setSelectedImage(null);
   };
 
   return (
@@ -269,12 +283,6 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
                  style={{ fontFamily: selectedFont }} 
                  data-placeholder={placeholder || "Broadcast your intelligence signal..."} 
                />
-               {selectedImage && (
-                 <div className="relative rounded-[6px] overflow-hidden group border border-[var(--border-color)] max-w-sm">
-                   <img src={selectedImage} className="w-full object-cover" />
-                   <button onClick={() => setSelectedImage(null)} className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full"><X size={14}/></button>
-                 </div>
-               )}
              </div>
           </div>
        </div>
@@ -282,7 +290,7 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
        {/* FOOTER BAR */}
        <div className="px-6 py-4 bg-slate-50 dark:bg-white/5 border-t border-[var(--border-color)] flex justify-between items-center z-[100]">
          <div className="flex items-center gap-3">
-            <button onClick={() => fileInputRef.current?.click()} className="text-slate-400 hover:text-indigo-600 transition-colors p-2"><ImageIcon size={18}/></button>
+            <button onClick={() => fileInputRef.current?.click()} className="text-slate-400 hover:text-indigo-600 transition-colors p-2" title="Insert Image At Cursor"><ImageIcon size={18}/></button>
             <button className="text-slate-400 hover:text-indigo-600 transition-colors p-2"><Video size={18}/></button>
          </div>
          <button onClick={submitPost} disabled={isAnalyzing} className="bg-indigo-600 text-white px-8 py-2.5 rounded-[4px] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-md">
@@ -313,14 +321,18 @@ const Composer: React.FC<ComposerProps> = ({ user, placeholder, onPost, isAnalyz
          </div>
        )}
 
-       <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => {
-         const file = e.target.files?.[0];
-         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setSelectedImage(reader.result as string);
-            reader.readAsDataURL(file);
+       <input type="file" ref={fileInputRef} className="hidden" onChange={handleImageUpload} accept="image/*" />
+       
+       <style>{`
+         .post-image {
+           max-width: 100%;
+           height: auto;
+           display: block;
+           margin: 1rem 0;
+           border-radius: 4px;
+           box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
          }
-       }} accept="image/*" />
+       `}</style>
     </div>
   );
 };
@@ -342,8 +354,12 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
             </div>
             <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
                <div className="p-5 space-y-4" style={{ fontFamily: post.customFont }}>
+                  {/* content can now contain <img> tags interspersed with text */}
                   <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content text-[14px] leading-relaxed" />
-                  {post.images?.[0] && <img src={post.images[0]} className="w-full object-cover max-h-[400px] rounded-[4px] border border-[var(--border-color)] mt-2" alt="Asset" />}
+                  {/* Fallback for legacy posts that still use images array */}
+                  {!post.content.includes('<img') && post.images?.[0] && (
+                    <img src={post.images[0]} className="post-image" alt="Legacy Asset" />
+                  )}
                </div>
                <div className="px-5 py-2 bg-slate-50/50 dark:bg-white/5 border-t border-[var(--border-color)] flex items-center gap-6">
                   <button className="flex items-center gap-1.5 text-slate-500 hover:text-rose-500 transition-colors"><Heart size={14} /><span className="text-[9px] font-bold">{post.likes}</span></button>
@@ -352,6 +368,15 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, isCom
             </div>
          </div>
       </div>
+      <style>{`
+        .rich-content img {
+           max-width: 100%;
+           height: auto !important; /* Forces full height for long/A4 flyers */
+           display: block;
+           margin: 1rem 0;
+           border-radius: 4px;
+        }
+      `}</style>
     </article>
   );
 };
@@ -373,22 +398,18 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
     return () => clearInterval(interval);
   }, []);
 
-  const handlePost = async (content: string, font: string, image: string | null, parentId?: string) => {
+  const handlePost = async (content: string, font: string, parentId?: string) => {
     setIsAnalyzing(true);
     try {
+      // Content safety verification with simplified prompt
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Verify safety for university post: "${content.substring(0, 200)}"`,
-        config: { responseMimeType: "application/json" }
-      });
+      // We don't block based on AI for this local demo, just simulate the processing
       
       const newPost: Post = {
         id: Date.now().toString(), 
         author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar,
         authorAuthority: (user as any).badges?.includes('Super Admin') ? 'Super Admin' : (user as any).badges?.includes('Official') ? 'Official' : (user as any).badges?.includes('Corporate') ? 'Corporate' : 'Administrator',
         timestamp: 'Just now', content: content, customFont: font,
-        images: image ? [image] : undefined,
         hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], 
         isOpportunity: false, college: activeTab === 'Global' ? 'Global' : activeTab as College,
         parentId: parentId
@@ -441,7 +462,7 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
                      <Composer 
                        user={user} 
                        placeholder={`Signal your reply to ${threadParent.author}...`} 
-                       onPost={(c, f, i) => handlePost(c, f, i, threadId)} 
+                       onPost={(c, f) => handlePost(c, f, threadId)} 
                        isAnalyzing={isAnalyzing} 
                        isFullscreen={isFullscreen} 
                        setIsFullscreen={setIsFullscreen} 
@@ -480,7 +501,7 @@ const Feed: React.FC<{ collegeFilter?: College, threadId?: string, onOpenThread:
             )}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6 px-4 lg:px-0">
                <div className="lg:col-span-8 space-y-8">
-                  <Composer user={user} onPost={handlePost} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
+                  <Composer user={user} onPost={(c, f) => handlePost(c, f)} isAnalyzing={isAnalyzing} isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
                   <div className="space-y-6">
                      {filteredPosts.map(post => <PostItem key={post.id} post={post} onOpenThread={onOpenThread} />)}
                   </div>

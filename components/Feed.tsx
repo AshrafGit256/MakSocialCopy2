@@ -8,7 +8,7 @@ import {
   Maximize2, Minimize2, Video, Type as FontIcon, 
   ChevronDown, Bold, Italic, Palette, Send, 
   ArrowLeft, ChevronRight, TrendingUp, Sparkles, Star, Radio,
-  Code, Command, Terminal
+  Terminal, Code, Command
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
@@ -25,7 +25,6 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = 
 const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, isAnalyzing: boolean }> = ({ onPost, isAnalyzing }) => {
   const [content, setContent] = useState('');
   const [activeFont, setActiveFont] = useState('"JetBrains Mono"');
-  const [showToolbar, setShowToolbar] = useState(true);
   const editorRef = useRef<HTMLDivElement>(null);
 
   const exec = (cmd: string, val?: string) => {
@@ -37,24 +36,25 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
     const html = editorRef.current?.innerHTML || '';
     if (html.trim() && html !== '<br>') {
       onPost(html, activeFont);
-      setContent('');
       if (editorRef.current) editorRef.current.innerHTML = '';
+      setContent('');
     }
   };
 
   return (
-    <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-xl shadow-xl overflow-hidden mb-12 animate-in slide-in-from-top-4 duration-500">
+    <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-xl shadow-xl overflow-hidden mb-10 animate-in slide-in-from-top-4 duration-500">
       <div className="px-5 py-3 border-b border-[var(--border-color)] bg-slate-50 dark:bg-white/5 flex items-center justify-between">
         <div className="flex items-center gap-4">
            <Terminal size={14} className="text-indigo-600" />
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Signal.Editor v2.0</span>
+           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Signal.Editor v2.4</span>
         </div>
         <div className="flex items-center gap-1">
-           <button onClick={() => exec('bold')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors"><Bold size={14}/></button>
-           <button onClick={() => exec('italic')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors"><Italic size={14}/></button>
+           <button onClick={() => exec('bold')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors" title="Bold"><Bold size={14}/></button>
+           <button onClick={() => exec('italic')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors" title="Italic"><Italic size={14}/></button>
+           <div className="h-4 w-px bg-[var(--border-color)] mx-2"></div>
            <select 
              onChange={(e) => setActiveFont(e.target.value)}
-             className="bg-transparent text-[9px] font-black uppercase tracking-widest outline-none border-l border-[var(--border-color)] ml-2 pl-2"
+             className="bg-transparent text-[9px] font-black uppercase tracking-widest outline-none cursor-pointer"
            >
               <option value='"JetBrains Mono"'>Tactical Mono</option>
               <option value='"Inter"'>Inter UI</option>
@@ -68,7 +68,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           ref={editorRef}
           contentEditable
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
-          className="min-h-[160px] p-8 text-sm outline-none focus:ring-0 placeholder-empty leading-relaxed"
+          className="min-h-[160px] p-8 text-sm outline-none leading-relaxed"
           style={{ fontFamily: activeFont }}
           data-placeholder="Initialize new signal transmission..."
         />
@@ -86,7 +86,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         </div>
         <button 
           onClick={handlePublish}
-          disabled={isAnalyzing || (!content && content !== '<br>')}
+          disabled={isAnalyzing || !content.trim()}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/30 active:scale-95 disabled:opacity-50 flex items-center gap-2"
         >
           <Send size={14} /> Broadcast Signal
@@ -97,6 +97,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         .rich-content h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; italic; }
         .rich-content h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
         .rich-content p { margin-bottom: 1rem; }
+        .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
       `}</style>
     </div>
   );

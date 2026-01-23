@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppView, User, College, UserStatus } from './types';
+import { AppView, User, College, UserStatus, AppSettings } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -35,16 +35,36 @@ const App: React.FC = () => {
       setCurrentUser(db.getUser());
     }
     
-    const saved = localStorage.getItem('maksocial_appearance');
-    if (saved) {
-      const s = JSON.parse(saved);
-      const root = document.documentElement;
-      root.style.setProperty('--brand-color', s.primaryColor);
-      root.style.setProperty('--font-main', s.fontFamily);
-      const scale = s.fontSize === 'sm' ? '0.9' : s.fontSize === 'lg' ? '1.1' : '1';
-      root.style.setProperty('--text-scale', scale);
-      root.setAttribute('data-contrast', s.contrast);
-    }
+    const applySettings = () => {
+      const saved = localStorage.getItem('maksocial_appearance');
+      if (saved) {
+        const s: AppSettings = JSON.parse(saved);
+        const root = document.documentElement;
+        root.style.setProperty('--brand-color', s.primaryColor);
+        root.style.setProperty('--font-main', s.fontFamily);
+        const scale = s.fontSize === 'sm' ? '0.9' : s.fontSize === 'lg' ? '1.1' : '1';
+        root.style.setProperty('--text-scale', scale);
+        root.setAttribute('data-contrast', s.contrast);
+        root.setAttribute('data-animations', s.animationsEnabled.toString());
+        root.setAttribute('data-glass', s.glassmorphism?.toString() || 'true');
+        root.setAttribute('data-glow', s.glowEffects?.toString() || 'true');
+        root.setAttribute('data-motion', s.motionStrata || 'subtle');
+        
+        if (s.themePreset === 'oled') {
+          root.classList.add('dark');
+          root.style.setProperty('--bg-primary', '#000000');
+          root.style.setProperty('--sidebar-bg', '#000000');
+        } else if (s.themePreset === 'paper') {
+          root.classList.remove('dark');
+          root.style.setProperty('--bg-primary', '#ffffff');
+          root.style.setProperty('--bg-secondary', '#f8f9fa');
+        }
+      }
+    };
+
+    applySettings();
+    window.addEventListener('storage', applySettings);
+    return () => window.removeEventListener('storage', applySettings);
   }, [isLoggedIn, view]);
 
   const toggleTheme = () => {

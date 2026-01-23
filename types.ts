@@ -15,9 +15,15 @@ export interface AppSettings {
   fontSize: 'sm' | 'md' | 'lg' | 'xl';
   contrast: 'normal' | 'high';
   density: 'comfortable' | 'compact' | 'tight';
-  borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  borderRadius: string; // Stored as pixel value
   animationsEnabled: boolean;
+  // Added motionStrata to fix TypeScript error in App.tsx
+  motionStrata: 'subtle' | 'standard' | 'extreme';
   glassmorphism: boolean;
+  glowEffects: boolean;
+  themePreset: 'standard' | 'oled' | 'tactical' | 'paper';
+  showGrid: boolean;
+  accentColor: string;
 }
 
 export interface Ad {

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MakSocial - Let's Connect</title>
+    <title>MakSocial - Intelligence Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -14,42 +14,38 @@
             colors: {
               brand: {
                 dark: '#020617',
-                light: '#f8fafc',
+                light: '#ffffff',
                 accent: 'var(--brand-color)'
               }
             },
             borderRadius: {
               'custom': 'var(--radius-main)',
-              'xl': '0.75rem',
-              '2xl': '1rem',
-              '3xl': '1.5rem',
-              '4xl': '2rem'
             },
             fontFamily: {
+              mono: ['"JetBrains Mono"', 'monospace'],
               sans: ['var(--font-main)', 'Inter', 'sans-serif'],
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Lexend:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;700&family=Space+Grotesk:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-          --bg-primary: #f8fafc;
-          --bg-secondary: #f1f5f9;
-          --text-primary: #0f172a;
-          --text-secondary: #475569;
-          --border-color: #e2e8f0;
+          --bg-primary: #ffffff;
+          --bg-secondary: #f6f8fa;
+          --text-primary: #1f2328;
+          --text-secondary: #656d76;
+          --border-color: #d0d7de;
           --card-bg: #ffffff;
-          --sidebar-bg: #ffffff;
+          --sidebar-bg: #f6f8fa;
           --safe-area-bottom: env(safe-area-inset-bottom);
           
-          /* Updated Defaults: Slate and JetBrains Mono */
-          --brand-color: #64748b;
+          --brand-color: #64748b; /* Default Tactical Gray */
           --font-main: "JetBrains Mono";
           --text-scale: 1;
-          --radius-main: 6px; 
-          --anim-speed: 0.2s;
+          --radius-main: 4px; 
+          --anim-speed: 0.15s;
         }
 
         .dark:root {
@@ -60,129 +56,54 @@
           --border-color: #30363d;
           --card-bg: #0d1117;
           --sidebar-bg: #010409;
-        }
-
-        /* Comic Sans support */
-        @font-face {
-          font-family: 'Comic Sans MS';
-          src: local('Comic Sans MS'), local('Comic Sans');
-        }
-
-        /* Animation Control */
-        [data-animations="false"] * {
-          transition: none !important;
-          animation: none !important;
-        }
-
-        /* High Contrast Overrides */
-        [data-contrast="high"]:root {
-          --text-primary: #000000 !important;
-          --text-secondary: #000000 !important;
-          --border-color: #000000 !important;
-        }
-        .dark[data-contrast="high"]:root {
-          --bg-primary: #000000 !important;
-          --text-primary: #ffffff !important;
-          --text-secondary: #ffffff !important;
-          --border-color: #ffffff !important;
-        }
-
-        /* Glassmorphism Toggles */
-        [data-glass="true"] .glass-card {
-            background: color-mix(in srgb, var(--card-bg) 70%, transparent) !important;
-            backdrop-blur: 12px;
-        }
-
-        html {
-          font-size: calc(16px * var(--text-scale));
+          --brand-color: #94a3b8; /* Lighter Tactical Gray for Dark */
         }
 
         body {
-            font-family: var(--font-main), 'Inter', sans-serif;
+            font-family: var(--font-main), monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            transition: background-color var(--anim-speed) ease, color var(--anim-speed) ease;
+            transition: background-color var(--anim-speed) ease, border-radius var(--anim-speed) ease;
             -webkit-font-smoothing: antialiased;
-            overscroll-behavior-y: none;
         }
 
-        .pb-safe {
-          padding-bottom: calc(4.5rem + var(--safe-area-bottom));
+        /* Fixed working font logic */
+        [style*="font-family"] {
+          font-family: inherit;
         }
 
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #334155;
-        }
-        
         .glass-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-main);
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            transition: all var(--anim-speed) ease;
+        }
+
+        /* Background Grid FX */
+        [data-grid="true"] {
+          background-image: radial-gradient(var(--border-color) 0.5px, transparent 0.5px);
+          background-size: 24px 24px;
+        }
+
+        /* Tactical Glow FX */
+        [data-glow="true"] .active-tab-indicator,
+        [data-glow="true"] .glow-accent {
+            box-shadow: 0 0 15px var(--brand-color);
         }
 
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
 
-        h1, h2, h3, h4 {
-            letter-spacing: -0.025em;
+        .pb-safe {
+          padding-bottom: calc(4.5rem + var(--safe-area-bottom));
         }
 
-        .active-tab {
-            color: var(--brand-color);
-            position: relative;
-        }
-        .active-tab::after {
-            content: '';
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 3px;
-            background: var(--brand-color);
-            border-radius: 0 0 4px 4px;
-        }
-
-        /* Dynamic primary colors */
+        /* Dynamic Tailwind Overrides */
         .text-indigo-600 { color: var(--brand-color) !important; }
         .bg-indigo-600 { background-color: var(--brand-color) !important; }
         .border-indigo-600 { border-color: var(--brand-color) !important; }
-        .shadow-indigo-600\/20 { --tw-shadow-color: var(--brand-color); }
-        .ring-indigo-500\/10 { --tw-ring-color: color-mix(in srgb, var(--brand-color) 10%, transparent); }
-
-        /* Rich Content Styling */
-        .rich-content {
-          font-family: inherit;
-        }
-        .rich-content h1 { font-size: 2rem; font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem; }
-        .rich-content h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; }
-        .rich-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .rich-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; border: 1px solid var(--border-color); }
-        .rich-content table th, .rich-content table td { border: 1px solid var(--border-color); padding: 0.75rem; }
-        .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .rich-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .rich-content a { color: var(--brand-color); text-decoration: underline; }
-        .rich-content blockquote { border-left: 4px solid var(--brand-color); padding-left: 1rem; color: var(--text-secondary); font-style: italic; margin: 1rem 0; }
-        
-        [contentEditable]:empty:before {
-          content: attr(data-placeholder);
-          color: #8b949e;
-          cursor: text;
-        }
+        .ring-indigo-600 { --tw-ring-color: var(--brand-color) !important; }
+        .shadow-indigo-600\/30 { --tw-shadow-color: color-mix(in srgb, var(--brand-color) 30%, transparent) !important; }
     </style>
 <script type="importmap">
 {

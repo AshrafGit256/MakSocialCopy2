@@ -27,7 +27,7 @@ const Resources: React.FC = () => {
   
   const [isAdding, setIsAdding] = useState(false);
   const [previewResource, setPreviewResource] = useState<Resource | null>(null);
-  fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setResources(db.getResources());
@@ -220,7 +220,6 @@ const Resources: React.FC = () => {
               )) : (
                 <tr>
                   <td colSpan={6} className="py-24 text-center space-y-4">
-                    {/* Added FilterX to imports to fix name not found error (Line 223) */}
                     <FilterX size={32} className="mx-auto text-slate-800" />
                     <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Protocol.Silence / Manifest Nullified</p>
                   </td>

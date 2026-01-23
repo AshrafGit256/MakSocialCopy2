@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MakSocial - Let's Connect</title>
+    <title>MakSocial - Intelligence Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -26,13 +26,14 @@
               '4xl': '2rem'
             },
             fontFamily: {
-              sans: ['var(--font-main)', 'Inter', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+              sans: ['"JetBrains Mono"', 'Inter', 'sans-serif'],
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Lexend:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
           --bg-primary: #ffffff;
@@ -44,11 +45,11 @@
           --sidebar-bg: #f6f8fa;
           --safe-area-bottom: env(safe-area-inset-bottom);
           
-          --brand-color: #0969da;
+          --brand-color: #4f46e5; /* Standard Indigo */
           --font-main: "JetBrains Mono";
           --text-scale: 1;
-          --radius-main: 6px; 
-          --anim-speed: 0.2s;
+          --radius-main: 4px; 
+          --anim-speed: 0.15s;
         }
 
         .dark:root {
@@ -59,119 +60,37 @@
           --border-color: #30363d;
           --card-bg: #0d1117;
           --sidebar-bg: #010409;
-          --brand-color: #1d9bf0;
-        }
-
-        @font-face {
-          font-family: 'Comic Sans MS';
-          src: local('Comic Sans MS'), local('Comic Sans');
-        }
-
-        [data-animations="false"] * {
-          transition: none !important;
-          animation: none !important;
-        }
-
-        [data-contrast="high"]:root {
-          --text-primary: #000000 !important;
-          --text-secondary: #000000 !important;
-          --border-color: #000000 !important;
-        }
-        .dark[data-contrast="high"]:root {
-          --bg-primary: #000000 !important;
-          --text-primary: #ffffff !important;
-          --text-secondary: #ffffff !important;
-          --border-color: #ffffff !important;
-        }
-
-        [data-glass="true"] .glass-card {
-            background: color-mix(in srgb, var(--card-bg) 70%, transparent) !important;
-            backdrop-blur: 12px;
-        }
-
-        html {
-          font-size: calc(16px * var(--text-scale));
+          --brand-color: #6366f1; /* Brighter Indigo for dark */
         }
 
         body {
-            font-family: var(--font-main), 'Inter', sans-serif;
+            font-family: var(--font-main), monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            transition: background-color var(--anim-speed) ease, color var(--anim-speed) ease;
+            transition: background-color var(--anim-speed) ease;
             -webkit-font-smoothing: antialiased;
-            overscroll-behavior-y: none;
         }
 
-        .pb-safe {
-          padding-bottom: calc(4.5rem + var(--safe-area-bottom));
-        }
-
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #334155;
-        }
-        
         .glass-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-main);
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            transition: all var(--anim-speed) ease;
         }
 
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
 
-        h1, h2, h3, h4 {
-            letter-spacing: -0.025em;
-        }
-
-        .active-tab {
-            color: var(--brand-color);
-            position: relative;
-        }
-        .active-tab::after {
-            content: '';
+        /* Tactical Active Tab Style */
+        .active-tab-indicator {
             position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 3px;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
             background: var(--brand-color);
-            border-radius: 0 0 4px 4px;
-        }
-
-        /* Dynamic primary colors */
-        .text-indigo-600 { color: var(--brand-color) !important; }
-        .bg-indigo-600 { background-color: var(--brand-color) !important; }
-        .border-indigo-600 { border-color: var(--brand-color) !important; }
-        .shadow-indigo-600\/20 { --tw-shadow-color: var(--brand-color); }
-        .ring-indigo-500\/10 { --tw-ring-color: color-mix(in srgb, var(--brand-color) 10%, transparent); }
-
-        .rich-content img {
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-main);
-            margin: 1.5rem 0;
-            max-width: 100%;
-        }
-
-        [contentEditable]:empty:before {
-          content: attr(data-placeholder);
-          color: var(--text-secondary);
-          opacity: 0.5;
-          cursor: text;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px var(--brand-color);
         }
     </style>
 <script type="importmap">

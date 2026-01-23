@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -44,12 +44,34 @@ const getFutureDate = (days: number) => {
   return d.toISOString().split('T')[0];
 };
 
+const INITIAL_RESOURCES: Resource[] = Array.from({ length: 24 }).map((_, i) => {
+  const colleges: College[] = ['COCIS', 'CEDAT', 'LAW', 'COBAMS', 'CHS', 'CONAS'];
+  // Added ResourceType to fix name not found error (Line 49)
+  const categories: ResourceType[] = ['Past Paper', 'Notes/Books', 'Research', 'Test'];
+  const college = colleges[i % colleges.length];
+  const course = COURSES_BY_COLLEGE[college][i % COURSES_BY_COLLEGE[college].length];
+  
+  return {
+    id: `res-${i}`,
+    title: `${course} Phase ${Math.floor(i/4) + 1} Module`,
+    category: categories[i % categories.length],
+    college: college,
+    course: course,
+    year: `Year ${Math.floor(i/8) + 1}`,
+    author: ['Dr. Opio', 'Prof. Namara', 'Dr. Kasule', 'Mak Library Hub'][i % 4],
+    downloads: Math.floor(Math.random() * 5000),
+    fileType: ['PDF', 'ZIP', 'DOCX'][i % 3] as any,
+    timestamp: getFutureDate(-i),
+    fileData: 'data:application/pdf;base64,JVBERi0xLjcK...'
+  };
+});
+
 const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'e1',
-    title: 'COCIS Annual Hackathon 2025',
-    description: 'A 48-hour sprint for developers and innovators to build the next generation of campus solutions. Prize pool of 5M UGX.',
-    date: getFutureDate(2),
+    title: 'COCIS Alpha Node Assembly',
+    description: 'A 48-hour sprint for developers and innovators to build the next generation of campus solutions.',
+    date: getFutureDate(0),
     time: '09:00',
     location: 'COCIS Block B Labs',
     category: 'Academic',
@@ -60,8 +82,8 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'e2',
     title: 'Freshers Bazaar Finale',
-    description: 'The final night of the Bazaar. Live performances, vendor discounts, and networking nodes for all new arrivals.',
-    date: getFutureDate(5),
+    description: 'The final night of the Bazaar. Live performances, vendor discounts, and networking nodes.',
+    date: getFutureDate(2),
     time: '18:00',
     location: 'Freedom Square',
     category: 'Social',
@@ -72,24 +94,12 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
   {
     id: 'e3',
     title: 'Career & Internship Expo',
-    description: 'Meet industry leaders from MTN, Stanbic, and Google. Secure your internship node for the upcoming semester.',
-    date: getFutureDate(12),
+    description: 'Meet industry leaders from MTN and Stanbic. Secure your internship node.',
+    date: getFutureDate(5),
     time: '10:00',
     location: 'Main Hall',
     category: 'Other',
     image: 'https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?auto=format&fit=crop&w=1200',
-    createdBy: 'super_admin',
-    attendeeIds: []
-  },
-  {
-    id: 'e4',
-    title: 'Law Society Moot Court',
-    description: 'High-stakes legal simulation featuring top finalists and guest judges from the High Court.',
-    date: getFutureDate(15),
-    time: '14:00',
-    location: 'Law Auditorium',
-    category: 'Academic',
-    image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200',
     createdBy: 'super_admin',
     attendeeIds: []
   }
@@ -120,44 +130,6 @@ const INITIAL_USERS: User[] = [
     skills: ['React', 'TypeScript', 'Node.js']
   },
   {
-    id: 'u2',
-    name: 'Sarah K.',
-    role: 'University Student',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-    connections: 110,
-    college: 'LAW',
-    status: 'Year 1',
-    subscriptionTier: 'Free',
-    accountStatus: 'Active',
-    verified: false,
-    joinedColleges: ['LAW'],
-    postsCount: 4,
-    followersCount: 230,
-    followingCount: 150,
-    totalLikesCount: 890,
-    badges: [],
-    appliedTo: []
-  },
-  {
-    id: 'u3',
-    name: 'Kevin M.',
-    role: 'Graduate',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin',
-    connections: 560,
-    college: 'CEDAT',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    accountStatus: 'Active',
-    verified: true,
-    joinedColleges: ['CEDAT', 'COCIS'],
-    postsCount: 25,
-    followersCount: 800,
-    followingCount: 200,
-    totalLikesCount: 2100,
-    badges: ['Alumni'],
-    appliedTo: []
-  },
-  {
     id: 'super_admin',
     name: 'System Admin',
     role: 'Super Admin',
@@ -176,139 +148,6 @@ const INITIAL_USERS: User[] = [
     totalLikesCount: 0,
     badges: ['Super Admin'],
     appliedTo: [],
-  },
-  {
-    id: 'mak_unipod',
-    name: 'MakUnipod',
-    role: 'Innovation Wing',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Unipod',
-    connections: 1200,
-    college: 'CEDAT',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['CEDAT', 'COCIS'],
-    postsCount: 45,
-    followersCount: 3400,
-    followingCount: 10,
-    totalLikesCount: 12000,
-    badges: ['Official'],
-    appliedTo: [],
-    bio: 'The Makerere University Innovation Pod. Transforming student ideas into viable prototypes.'
-  },
-  {
-    id: 'mak_ailab',
-    name: 'Mak AI Lab',
-    role: 'Research Center',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AILab',
-    connections: 800,
-    college: 'COCIS',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['COCIS'],
-    postsCount: 110,
-    followersCount: 5600,
-    followingCount: 5,
-    totalLikesCount: 15000,
-    badges: ['Official'],
-    appliedTo: [],
-    bio: 'Artificial Intelligence & Data Science lab at Makerere University. Leading Africa through neural logic.'
-  },
-  {
-    id: 'mak_library',
-    name: 'Main Library',
-    role: 'Knowledge Hub',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Library',
-    connections: 10000,
-    college: 'CHUSS',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['CHUSS', 'CONAS', 'CEDAT', 'COCIS'],
-    postsCount: 300,
-    followersCount: 45000,
-    followingCount: 2,
-    totalLikesCount: 89000,
-    badges: ['Official'],
-    appliedTo: [],
-    bio: 'The custodian of knowledge at the Hill. 24/7 reading nodes and digital repository access.'
-  },
-  {
-    id: 'vc_office',
-    name: 'Office of the VC',
-    role: 'University Leadership',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
-    connections: 5000,
-    college: 'Global',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['Global'],
-    postsCount: 500,
-    followersCount: 100000,
-    followingCount: 1,
-    totalLikesCount: 250000,
-    badges: ['Super Admin'],
-    appliedTo: [],
-    bio: 'Official node for the Vice Chancellor, Makerere University. Registry and policy updates.'
-  },
-  {
-    id: 'centenary_bank',
-    name: 'Centenary Bank',
-    role: 'Financial Partner',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Cente',
-    connections: 4500,
-    college: 'Global',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['Global'],
-    postsCount: 150,
-    followersCount: 12000,
-    followingCount: 20,
-    totalLikesCount: 34000,
-    badges: ['Corporate'],
-    appliedTo: [],
-    bio: 'The bank that cares for students. Cente-Connect banking nodes across campus.'
-  },
-  {
-    id: 'stanbic_bank',
-    name: 'Stanbic Bank',
-    role: 'Commercial Partner',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Stanbic',
-    connections: 3200,
-    college: 'Global',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['Global'],
-    postsCount: 80,
-    followersCount: 15000,
-    followingCount: 15,
-    totalLikesCount: 21000,
-    badges: ['Corporate'],
-    appliedTo: [],
-    bio: 'Moving forward together. Leading the Stanbic National Schools & University Championship.'
-  },
-  {
-    id: 'covab_agro',
-    name: 'Agro-Chemical Hub',
-    role: 'Research & Science',
-    avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Agro',
-    connections: 900,
-    college: 'CAES',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    verified: true,
-    joinedColleges: ['CAES', 'CONAS'],
-    postsCount: 60,
-    followersCount: 2100,
-    followingCount: 8,
-    totalLikesCount: 7800,
-    badges: ['Corporate'],
-    appliedTo: [],
-    bio: 'Syngenta & Agro-Solutions Collective at CoVAB. Innovation in precision agriculture.'
   }
 ];
 
@@ -353,7 +192,7 @@ export const db = {
   },
   getResources: (): Resource[] => {
     const saved = localStorage.getItem(DB_KEYS.RESOURCES);
-    return saved ? JSON.parse(saved) : [];
+    return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
   },
   saveResources: (resources: Resource[]) => localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(resources)),
   addResource: (res: Resource) => {

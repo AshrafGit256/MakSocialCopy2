@@ -77,7 +77,7 @@ const Resources: React.FC = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Query Manifest..."
-              className="w-full bg-[#0d1117] border border-[#30363d] rounded-md py-2.5 pl-10 pr-4 text-[11px] font-bold text-white outline-none focus:border-indigo-600"
+              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2.5 pl-10 pr-4 text-[11px] font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 shadow-sm"
             />
           </div>
           <button onClick={() => setIsAdding(true)} className="px-4 py-2.5 bg-[#238636] hover:bg-[#2ea043] text-white rounded-md text-[10px] font-bold uppercase flex items-center gap-2 transition-all">
@@ -87,12 +87,12 @@ const Resources: React.FC = () => {
       </header>
 
       {/* 2. FILTER MATRIX */}
-      <div className="bg-[#0d1117] border border-[#30363d] rounded-md mb-8 divide-y divide-[#30363d]">
-        <div className="p-4 flex flex-wrap gap-6 items-center">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md mb-8 divide-y divide-[var(--border-color)] overflow-hidden">
+        <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="flex flex-col gap-1.5">
             <label className="text-[8px] font-bold uppercase text-slate-500">Wing.Sector</label>
             <select 
-              className="bg-[#161b22] border border-[#30363d] rounded-sm px-3 py-1 text-[10px] font-bold uppercase text-slate-300 outline-none"
+              className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm px-3 py-2 text-[10px] font-bold uppercase text-[var(--text-primary)] outline-none"
               value={currentCollege}
               onChange={e => { setCurrentCollege(e.target.value as any); handleScan(); }}
             >
@@ -100,10 +100,10 @@ const Resources: React.FC = () => {
               {Object.keys(COURSES_BY_COLLEGE).map(c => <option key={c} value={c}>{c} Wing</option>)}
             </select>
           </div>
-          <div className="flex flex-col gap-1.5 flex-1 min-w-[150px]">
+          <div className="flex flex-col gap-1.5">
             <label className="text-[8px] font-bold uppercase text-slate-500">Course.Logic</label>
             <select 
-              className="bg-[#161b22] border border-[#30363d] rounded-sm px-3 py-1 text-[10px] font-bold uppercase text-slate-300 outline-none"
+              className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm px-3 py-2 text-[10px] font-bold uppercase text-[var(--text-primary)] outline-none"
               value={selectedCourse}
               onChange={e => { setSelectedCourse(e.target.value); handleScan(); }}
             >
@@ -114,7 +114,7 @@ const Resources: React.FC = () => {
           <div className="flex flex-col gap-1.5">
             <label className="text-[8px] font-bold uppercase text-slate-500">Year.Stratum</label>
             <select 
-              className="bg-[#161b22] border border-[#30363d] rounded-sm px-3 py-1 text-[10px] font-bold uppercase text-slate-300 outline-none"
+              className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm px-3 py-2 text-[10px] font-bold uppercase text-[var(--text-primary)] outline-none"
               value={selectedYear}
               onChange={e => { setSelectedYear(e.target.value); handleScan(); }}
             >
@@ -126,7 +126,7 @@ const Resources: React.FC = () => {
         <div className="p-4 flex flex-wrap gap-2 overflow-x-auto no-scrollbar">
           <button 
             onClick={() => { setSelectedCategory('All'); handleScan(); }}
-            className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === 'All' ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-transparent border-[#30363d] text-slate-500 hover:text-slate-300'}`}
+            className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === 'All' ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-transparent border-[var(--border-color)] text-slate-500 hover:text-[var(--text-primary)]'}`}
           >
             All Signals
           </button>
@@ -134,7 +134,7 @@ const Resources: React.FC = () => {
             <button 
               key={cat} 
               onClick={() => { setSelectedCategory(cat); handleScan(); }}
-              className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === cat ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-transparent border-[#30363d] text-slate-500 hover:text-slate-300'}`}
+              className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === cat ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-transparent border-[var(--border-color)] text-slate-500 hover:text-[var(--text-primary)]'}`}
             >
               {cat}
             </button>
@@ -143,20 +143,21 @@ const Resources: React.FC = () => {
       </div>
 
       {/* 3. REGISTRY STREAM */}
-      <div className="bg-[#0d1117] border border-[#30363d] rounded-md overflow-hidden relative">
+      <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md overflow-hidden relative shadow-sm">
         {isScanning && (
-          <div className="absolute inset-0 z-10 bg-[#0d1117]/50 backdrop-blur-[1px] flex items-center justify-center">
-            <div className="flex items-center gap-3 text-indigo-400">
+          <div className="absolute inset-0 z-10 bg-[var(--bg-primary)]/40 backdrop-blur-[1px] flex items-center justify-center">
+            <div className="flex items-center gap-3 text-indigo-500">
                <Activity size={18} className="animate-pulse" />
                <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Sector Scan Active...</span>
             </div>
           </div>
         )}
 
-        <div className="overflow-x-auto">
+        {/* Desktop View Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#161b22] text-[9px] font-bold text-slate-500 uppercase tracking-widest border-b border-[#30363d]">
+              <tr className="bg-[var(--bg-secondary)] text-[9px] font-bold text-slate-500 uppercase tracking-widest border-b border-[var(--border-color)]">
                 <th className="px-6 py-4">Asset.Identifier</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Node.Source</th>
@@ -165,52 +166,52 @@ const Resources: React.FC = () => {
                 <th className="px-6 py-4 text-right">Uplink</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#30363d]">
+            <tbody className="divide-y divide-[var(--border-color)]">
               {filteredResources.length > 0 ? filteredResources.map(res => (
-                <tr key={res.id} className="group hover:bg-[#161b22]/50 transition-all">
+                <tr key={res.id} className="group hover:bg-[var(--bg-secondary)] transition-all">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
                       <div className={`p-2 rounded-sm border ${
-                        res.category === 'Past Paper' ? 'border-rose-500/30 text-rose-500' :
-                        res.category === 'Research' ? 'border-emerald-500/30 text-emerald-500' :
-                        'border-indigo-500/30 text-indigo-500'
+                        res.category === 'Past Paper' ? 'border-rose-500/30 text-rose-500 bg-rose-500/5' :
+                        res.category === 'Research' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' :
+                        'border-indigo-500/30 text-indigo-500 bg-indigo-500/5'
                       }`}>
                          <FileText size={16} />
                       </div>
                       <div>
-                        <p className="text-[11px] font-bold text-white uppercase tracking-tight group-hover:text-indigo-400 transition-colors">{res.title}</p>
+                        <p className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-tight group-hover:text-indigo-600 transition-colors">{res.title}</p>
                         <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{res.course}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-5">
-                    <span className="text-[8px] font-bold uppercase px-1.5 py-0.5 border border-[#30363d] text-slate-500 rounded-sm">
+                    <span className="text-[8px] font-bold uppercase px-1.5 py-0.5 border border-[var(--border-color)] text-slate-500 rounded-sm">
                       {res.category === 'Test' ? '[EVAL]' : res.category === 'Past Paper' ? '[PATCH]' : '[STABLE]'}
                     </span>
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-2">
-                       <Fingerprint size={12} className="text-slate-600" />
-                       <span className="text-[9px] font-bold text-slate-400">{res.author}</span>
+                       <Fingerprint size={12} className="text-slate-400" />
+                       <span className="text-[9px] font-bold text-slate-500">{res.author}</span>
                     </div>
                   </td>
                   <td className="px-6 py-5">
                     <span className="text-[9px] font-bold text-indigo-500">{res.college}</span>
                   </td>
                   <td className="px-6 py-5">
-                    <span className="text-[9px] font-bold text-slate-500">{res.downloads.toLocaleString()} SCANS</span>
+                    <span className="text-[9px] font-bold text-slate-400">{res.downloads.toLocaleString()} SCANS</span>
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button 
                         onClick={() => setPreviewResource(res)}
-                        className="p-1.5 hover:bg-[#30363d] rounded-md text-slate-500"
+                        className="p-1.5 hover:bg-indigo-500/10 rounded-md text-slate-400 hover:text-indigo-500 transition-colors"
                       >
                         <Eye size={14}/>
                       </button>
                       <button 
                         onClick={() => handleDownload(res)}
-                        className="px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-white text-[9px] font-bold uppercase rounded-md transition-all flex items-center gap-2"
+                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-md transition-all flex items-center gap-2 shadow-sm"
                       >
                         <Download size={12}/> Sync
                       </button>
@@ -220,19 +221,64 @@ const Resources: React.FC = () => {
               )) : (
                 <tr>
                   <td colSpan={6} className="py-24 text-center space-y-4">
-                    <FilterX size={32} className="mx-auto text-slate-800" />
-                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Protocol.Silence / Manifest Nullified</p>
+                    <FilterX size={32} className="mx-auto text-slate-300" />
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Protocol.Silence / Manifest Nullified</p>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card Stack View */}
+        <div className="md:hidden divide-y divide-[var(--border-color)]">
+          {filteredResources.length > 0 ? filteredResources.map(res => (
+            <div key={res.id} className="p-5 space-y-4 hover:bg-[var(--bg-secondary)] transition-all">
+               <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-sm border ${
+                        res.category === 'Past Paper' ? 'border-rose-500/30 text-rose-500 bg-rose-500/5' :
+                        res.category === 'Research' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' :
+                        'border-indigo-500/30 text-indigo-500 bg-indigo-500/5'
+                      }`}>
+                         <FileText size={16} />
+                    </div>
+                    <div>
+                       <p className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-tight">{res.title}</p>
+                       <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{res.course} • {res.college}</p>
+                    </div>
+                  </div>
+                  <span className="text-[8px] font-black uppercase px-1.5 py-0.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-sm shrink-0">
+                    {res.category === 'Past Paper' ? 'PAPER' : 'NOTE'}
+                  </span>
+               </div>
+               
+               <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-4">
+                     <div className="flex items-center gap-1.5 text-slate-500">
+                        <Fingerprint size={10}/>
+                        <span className="text-[8px] font-bold uppercase">{res.author}</span>
+                     </div>
+                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{res.downloads} SCANS</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                     <button onClick={() => setPreviewResource(res)} className="p-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-slate-500"><Eye size={14}/></button>
+                     <button onClick={() => handleDownload(res)} className="px-4 py-2 bg-indigo-600 text-white text-[9px] font-bold uppercase rounded-md flex items-center gap-2 shadow-md"><Download size={12}/> Sync</button>
+                  </div>
+               </div>
+            </div>
+          )) : (
+            <div className="py-20 text-center space-y-4">
+              <FilterX size={32} className="mx-auto text-slate-300" />
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Manifest Nullified</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ADVISORY NODE */}
-      <div className="mt-8 p-4 bg-[#161b22] border border-dashed border-[#30363d] rounded-md flex items-center gap-4">
-        <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-sm border border-indigo-500/20">
+      <div className="mt-8 p-4 bg-[var(--bg-secondary)] border border-dashed border-[var(--border-color)] rounded-md flex items-center gap-4">
+        <div className="p-2 bg-indigo-600/10 text-indigo-600 rounded-sm border border-indigo-600/20">
           <Shield size={16} />
         </div>
         <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
@@ -243,32 +289,32 @@ const Resources: React.FC = () => {
 
       {/* ASSET INITIALIZATION MODAL */}
       {isAdding && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
-           <div className="bg-[#0d1117] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[#30363d]">
-              <div className="flex justify-between items-center border-b border-[#30363d] pb-4">
-                 <h2 className="text-sm font-bold text-white uppercase tracking-widest italic">Asset.Synchronization</h2>
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in">
+           <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[var(--border-color)]">
+              <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-4">
+                 <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest italic">Asset.Synchronization</h2>
                  <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 transition-colors"><X size={20}/></button>
               </div>
               <div className="space-y-4">
                  <div className="space-y-1">
                     <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Asset_Title</label>
-                    <input className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none focus:border-indigo-500 transition-all" placeholder="e.g. COCIS Alpha Node Assembly" />
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all" placeholder="e.g. COCIS Alpha Node Assembly" />
                  </div>
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sector_Wing</label>
-                       <select className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none">
+                       <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none">
                           {Object.keys(COURSES_BY_COLLEGE).map(c => <option key={c}>{c}</option>)}
                        </select>
                     </div>
                     <div className="space-y-1">
                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Stratum</label>
-                       <select className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none">
+                       <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none">
                           {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                        </select>
                     </div>
                  </div>
-                 <button onClick={() => setIsAdding(false)} className="w-full bg-[#238636] py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-md transition-all">Upload to Registry</button>
+                 <button onClick={() => setIsAdding(false)} className="w-full bg-[#238636] py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-md transition-all active:scale-95">Upload to Registry</button>
               </div>
            </div>
         </div>
@@ -276,25 +322,25 @@ const Resources: React.FC = () => {
 
       {/* ASSET PREVIEW MODAL */}
       {previewResource && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
-           <div className="bg-[#0d1117] w-full max-w-4xl h-[80vh] rounded-md shadow-2xl flex flex-col border border-[#30363d]">
-              <div className="px-6 py-4 border-b border-[#30363d] flex justify-between items-center bg-[#161b22]">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in">
+           <div className="bg-[var(--bg-primary)] w-full max-w-4xl h-[80vh] rounded-md shadow-2xl flex flex-col border border-[var(--border-color)]">
+              <div className="px-6 py-4 border-b border-[var(--border-color)] flex flex-col sm:flex-row justify-between items-center bg-[var(--bg-secondary)] gap-4">
                  <div className="flex items-center gap-4">
-                    <FileText size={20} className="text-indigo-400" />
+                    <FileText size={20} className="text-indigo-600" />
                     <div>
-                      <h2 className="text-xs font-bold text-white uppercase tracking-widest">{previewResource.title}</h2>
+                      <h2 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest">{previewResource.title}</h2>
                       <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{previewResource.course} / Uplink_ID: {previewResource.id}</p>
                     </div>
                  </div>
-                 <div className="flex gap-4">
-                   <button onClick={() => handleDownload(previewResource)} className="px-4 py-2 bg-indigo-600 text-white rounded-sm text-[9px] font-bold uppercase tracking-widest flex items-center gap-2"><Download size={12}/> Sync.Asset</button>
-                   <button onClick={() => setPreviewResource(null)} className="text-slate-500 hover:text-rose-500"><X size={20}/></button>
+                 <div className="flex gap-4 w-full sm:w-auto">
+                   <button onClick={() => handleDownload(previewResource)} className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 text-white rounded-sm text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm"><Download size={12}/> Sync.Asset</button>
+                   <button onClick={() => setPreviewResource(null)} className="p-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm text-slate-500 hover:text-rose-500"><X size={20}/></button>
                  </div>
               </div>
-              <div className="flex-1 bg-slate-900 flex items-center justify-center text-slate-700">
-                 <div className="text-center space-y-4">
+              <div className="flex-1 bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-300 dark:text-slate-700">
+                 <div className="text-center space-y-4 p-8">
                     <Lock size={64} className="mx-auto opacity-20" />
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] max-w-xs">Native Decryption Restricted. Initialize Synchronization to view full asset parameters.</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">Native Decryption Restricted. Initialize Synchronization to view full asset parameters.</p>
                  </div>
               </div>
            </div>

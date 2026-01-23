@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -15,9 +15,8 @@ export interface AppSettings {
   fontSize: 'sm' | 'md' | 'lg' | 'xl';
   contrast: 'normal' | 'high';
   density: 'comfortable' | 'compact' | 'tight';
-  borderRadius: string; // Stored as pixel value
+  borderRadius: string; 
   animationsEnabled: boolean;
-  // Added motionStrata to fix TypeScript error in App.tsx
   motionStrata: 'subtle' | 'standard' | 'extreme';
   glassmorphism: boolean;
   glowEffects: boolean;
@@ -147,6 +146,12 @@ export interface Post {
   isOpportunity: boolean;
   college: College | 'Global';
   parentId?: string; 
+  opportunityData?: {
+    type: 'Internship' | 'Grant' | 'Gig' | 'Scholarship' | 'Workshop';
+    deadline?: string;
+    isAIVerified: boolean;
+    detectedBenefit: string;
+  };
   aiMetadata?: {
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
     isSafe?: boolean;

@@ -3,12 +3,13 @@ import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePo
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v15',
-  USERS: 'maksocial_users_v15',
+  POSTS: 'maksocial_posts_v16',
+  USERS: 'maksocial_users_v16',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  RESOURCES: 'maksocial_resources_v5',
-  CALENDAR: 'maksocial_calendar_v7',
-  ADS: 'maksocial_ads_v2'
+  RESOURCES: 'maksocial_resources_v6',
+  CALENDAR: 'maksocial_calendar_v8',
+  ADS: 'maksocial_ads_v3',
+  OPPORTUNITIES: 'maksocial_opps_v1'
 };
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
@@ -26,16 +27,11 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
 const INITIAL_ADS: Ad[] = [
   { id: 'ad-1', clientName: 'Coke Zero', title: 'Campus Refresh Tour', reach: 45000, status: 'Active', budget: 1200000, spent: 450000, clicks: 1200, deadline: '2025-05-30' },
   { id: 'ad-2', clientName: 'MTN Pulse', title: 'Summer Data Blast', reach: 89000, status: 'Active', budget: 2500000, spent: 1800000, clicks: 5600, deadline: '2025-06-15' },
-  { id: 'ad-3', clientName: 'Standard Chartered', title: 'Student Savings Account', reach: 12000, status: 'Pending', budget: 800000, spent: 0, clicks: 0, deadline: '2025-07-01' },
 ];
 
 export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jan', revenue: 4500000, expenses: 2100000, subscribers: 1240, growth: 12 },
   { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560, growth: 25 },
-  { month: 'Mar', revenue: 4800000, expenses: 2200000, subscribers: 1890, growth: 21 },
-  { month: 'Apr', revenue: 6100000, expenses: 2800000, subscribers: 2100, growth: 11 },
-  { month: 'May', revenue: 7800000, expenses: 3100000, subscribers: 2840, growth: 35 },
-  { month: 'Jun', revenue: 8900000, expenses: 3400000, subscribers: 3500, growth: 23 },
 ];
 
 const getFutureDate = (days: number) => {
@@ -44,9 +40,8 @@ const getFutureDate = (days: number) => {
   return d.toISOString().split('T')[0];
 };
 
-const INITIAL_RESOURCES: Resource[] = Array.from({ length: 24 }).map((_, i) => {
+const INITIAL_RESOURCES: Resource[] = Array.from({ length: 12 }).map((_, i) => {
   const colleges: College[] = ['COCIS', 'CEDAT', 'LAW', 'COBAMS', 'CHS', 'CONAS'];
-  // Added ResourceType to fix name not found error (Line 49)
   const categories: ResourceType[] = ['Past Paper', 'Notes/Books', 'Research', 'Test'];
   const college = colleges[i % colleges.length];
   const course = COURSES_BY_COLLEGE[college][i % COURSES_BY_COLLEGE[college].length];
@@ -58,11 +53,10 @@ const INITIAL_RESOURCES: Resource[] = Array.from({ length: 24 }).map((_, i) => {
     college: college,
     course: course,
     year: `Year ${Math.floor(i/8) + 1}`,
-    author: ['Dr. Opio', 'Prof. Namara', 'Dr. Kasule', 'Mak Library Hub'][i % 4],
+    author: ['Dr. Opio', 'Prof. Namara'][i % 2],
     downloads: Math.floor(Math.random() * 5000),
     fileType: ['PDF', 'ZIP', 'DOCX'][i % 3] as any,
     timestamp: getFutureDate(-i),
-    fileData: 'data:application/pdf;base64,JVBERi0xLjcK...'
   };
 });
 
@@ -76,30 +70,6 @@ const INITIAL_CALENDAR_EVENTS: CalendarEvent[] = [
     location: 'COCIS Block B Labs',
     category: 'Academic',
     image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200',
-    createdBy: 'super_admin',
-    attendeeIds: []
-  },
-  {
-    id: 'e2',
-    title: 'Freshers Bazaar Finale',
-    description: 'The final night of the Bazaar. Live performances, vendor discounts, and networking nodes.',
-    date: getFutureDate(2),
-    time: '18:00',
-    location: 'Freedom Square',
-    category: 'Social',
-    image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200',
-    createdBy: 'super_admin',
-    attendeeIds: []
-  },
-  {
-    id: 'e3',
-    title: 'Career & Internship Expo',
-    description: 'Meet industry leaders from MTN and Stanbic. Secure your internship node.',
-    date: getFutureDate(5),
-    time: '10:00',
-    location: 'Main Hall',
-    category: 'Other',
-    image: 'https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?auto=format&fit=crop&w=1200',
     createdBy: 'super_admin',
     attendeeIds: []
   }
@@ -127,7 +97,7 @@ const INITIAL_USERS: User[] = [
     bio: 'Software Engineering student passionate about full-stack development.',
     education: 'B.S. in Software Engineering',
     location: 'Kampala, Uganda',
-    skills: ['React', 'TypeScript', 'Node.js']
+    skills: ['React', 'TypeScript']
   },
   {
     id: 'super_admin',
@@ -179,29 +149,43 @@ export const db = {
   addPost: (post: Post) => {
     const posts = db.getPosts(undefined, true);
     db.savePosts([post, ...posts]);
+    
+    // Auto-sync with Opportunities if marked
+    if (post.isOpportunity && post.opportunityData) {
+      db.addOpportunity(post);
+    }
   },
-  updatePost: (updatedPost: Post) => {
-    const posts = db.getPosts(undefined, true);
-    const updated = posts.map(p => p.id === updatedPost.id ? updatedPost : p);
-    db.savePosts(updated);
+  getOpportunities: (): Post[] => {
+    const saved = localStorage.getItem(DB_KEYS.OPPORTUNITIES);
+    const opps: Post[] = saved ? JSON.parse(saved) : [];
+    
+    // Clean up expired ones
+    const now = new Date();
+    const valid = opps.filter(o => {
+      if (!o.opportunityData?.deadline) return true;
+      const deadline = new Date(o.opportunityData.deadline);
+      return deadline >= now;
+    });
+    
+    if (valid.length !== opps.length) db.saveOpportunities(valid);
+    return valid;
   },
-  deletePost: (postId: string, userId: string) => {
+  saveOpportunities: (opps: Post[]) => localStorage.setItem(DB_KEYS.OPPORTUNITIES, JSON.stringify(opps)),
+  addOpportunity: (post: Post) => {
+    const opps = db.getOpportunities();
+    if (!opps.find(o => o.id === post.id)) {
+      db.saveOpportunities([post, ...opps]);
+    }
+  },
+  deletePost: (postId: string) => {
     const posts = db.getPosts(undefined, true);
-    const updated = posts.filter(p => p.id !== postId);
-    db.savePosts(updated);
+    db.savePosts(posts.filter(p => p.id !== postId));
+    const opps = db.getOpportunities();
+    db.saveOpportunities(opps.filter(o => o.id !== postId));
   },
   getResources: (): Resource[] => {
     const saved = localStorage.getItem(DB_KEYS.RESOURCES);
     return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
-  },
-  saveResources: (resources: Resource[]) => localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(resources)),
-  addResource: (res: Resource) => {
-    const resources = db.getResources();
-    db.saveResources([res, ...resources]);
-  },
-  deleteResource: (id: string) => {
-    const resources = db.getResources();
-    db.saveResources(resources.filter(r => r.id !== id));
   },
   getCalendarEvents: (): CalendarEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.CALENDAR);
@@ -213,10 +197,6 @@ export const db = {
     if (existingIndex !== -1) events[existingIndex] = event;
     else events.push(event);
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events));
-  },
-  deleteCalendarEvent: (id: string) => {
-    const events = db.getCalendarEvents();
-    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(events.filter(e => e.id !== id)));
   },
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();

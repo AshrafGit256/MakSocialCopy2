@@ -18,13 +18,13 @@ const SystemStatus: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-[#0d1117] border border-[#30363d] rounded-md mb-8 font-mono text-[10px]">
+    <div className="flex items-center justify-between px-4 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md mb-8 font-mono text-[10px]">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          <span className="text-emerald-500 font-bold uppercase">System.Live</span>
+          <span className="text-emerald-500 font-black uppercase">System.Live</span>
         </div>
-        <div className="h-4 w-px bg-[#30363d]"></div>
+        <div className="h-4 w-px bg-[var(--border-color)]"></div>
         <div className="flex items-center gap-2 text-slate-400">
           <Server size={12} />
           <span>MAKSOCIAL_CORE_v4.2</span>
@@ -35,7 +35,7 @@ const SystemStatus: React.FC = () => {
           <Clock size={12} />
           <span>{time}</span>
         </div>
-        <div className="flex items-center gap-2 text-indigo-400">
+        <div className="flex items-center gap-2 text-indigo-600">
           <Hash size={12} />
           <span>UPLINK: ACTIVE</span>
         </div>
@@ -91,7 +91,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       const isToday = new Date().toISOString().split('T')[0] === dateStr;
 
       const bgClass = 
-        count === 0 ? 'bg-[#161b22] border-[#30363d]' :
+        count === 0 ? 'bg-[var(--bg-primary)] border-[var(--border-color)]' :
         count === 1 ? 'bg-[#0e4429] border-[#0e4429]' :
         count === 2 ? 'bg-[#006d32] border-[#006d32]' :
         'bg-[#39d353] border-[#39d353]';
@@ -102,11 +102,11 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           onClick={() => setSelectedDate(dateStr)}
           className={`w-7 h-7 rounded-sm border transition-all relative flex items-center justify-center ${bgClass} ${
             isSelected ? 'ring-2 ring-orange-500 z-10 scale-110' : 
-            isToday ? 'ring-1 ring-slate-400' : ''
+            isToday ? 'ring-1 ring-indigo-500' : ''
           }`}
           title={`${count} Protocols on ${dateStr}`}
         >
-          <span className={`text-[8px] font-mono font-bold ${count > 1 || isSelected ? 'text-white' : 'text-slate-500'}`}>{d}</span>
+          <span className={`text-[8px] font-mono font-bold ${count > 0 || isSelected ? 'text-white' : 'text-slate-500'}`}>{d}</span>
         </button>
       );
     }
@@ -128,7 +128,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-32 animate-in fade-in duration-500 font-mono">
+    <div className="max-w-[1440px] mx-auto px-4 lg:px-12 py-6 pb-32 animate-in fade-in duration-500 font-mono text-[var(--text-primary)]">
       
       <SystemStatus />
 
@@ -136,114 +136,114 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         
         {/* LEFT: MATRIX & NAVIGATION */}
         <aside className="lg:col-span-3 space-y-6">
-          <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-6">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Target size={14} className="text-orange-500" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Roadmap.Matrix</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Roadmap.Matrix</span>
               </div>
               <div className="flex gap-1">
-                <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="p-1 hover:bg-[#161b22] border border-[#30363d] rounded-sm"><ChevronLeft size={12}/></button>
-                <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="p-1 hover:bg-[#161b22] border border-[#30363d] rounded-sm"><ChevronRight size={12}/></button>
+                <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="p-1 hover:bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm text-slate-500"><ChevronLeft size={12}/></button>
+                <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="p-1 hover:bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm text-slate-500"><ChevronRight size={12}/></button>
               </div>
             </div>
 
-            <div className="text-[11px] font-bold text-slate-300 uppercase mb-4 px-1 italic">
+            <div className="text-[11px] font-black text-[var(--text-primary)] uppercase mb-4 px-1 italic">
               {currentMonth.toLocaleString('default', { month: 'long' })} {currentMonth.getFullYear()}
             </div>
 
-            <div className="grid grid-cols-7 gap-1 mb-2 text-center text-[7px] font-bold text-slate-500 uppercase">
+            <div className="grid grid-cols-7 gap-1 mb-2 text-center text-[7px] font-black text-slate-500 uppercase">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <div key={d}>{d}</div>)}
             </div>
             <div className="grid grid-cols-7 gap-1">
               {renderMatrix()}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-[#30363d] space-y-4">
+            <div className="mt-8 pt-6 border-t border-[var(--border-color)] space-y-4">
               <div className="flex items-center justify-between text-[10px]">
-                <span className="text-slate-500 uppercase font-bold">Selected Coordinate</span>
-                <span className="text-orange-500 font-bold">{selectedDate}</span>
+                <span className="text-slate-500 uppercase font-black">Coordinate</span>
+                <span className="text-orange-500 font-black">{selectedDate}</span>
               </div>
               <button 
                 onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
-                className="w-full py-2 bg-[#21262d] border border-[#30363d] hover:border-[#8b949e] rounded-md text-[9px] font-bold uppercase text-slate-300 transition-all"
+                className="w-full py-2 bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-indigo-600 rounded-md text-[9px] font-black uppercase text-slate-500 transition-all shadow-sm"
               >
-                Jump to Sys.Today
+                Jump to Today
               </button>
             </div>
           </div>
 
-          <div className="p-5 bg-[#0d1117] border border-[#30363d] rounded-md space-y-4">
-            <h4 className="text-[9px] font-bold uppercase text-indigo-400 tracking-widest flex items-center gap-2">
+          <div className="p-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md space-y-4 shadow-sm">
+            <h4 className="text-[9px] font-black uppercase text-indigo-600 tracking-widest flex items-center gap-2">
               <Shield size={12}/> Protocol Legend
             </h4>
             <div className="space-y-2">
               {[
-                { l: 'Null Signal', c: 'bg-[#161b22]' },
+                { l: 'Null Signal', c: 'bg-[var(--bg-primary)]' },
                 { l: 'Stable Patch', c: 'bg-[#0e4429]' },
                 { l: 'Critical Load', c: 'bg-[#39d353]' }
               ].map(item => (
                 <div key={item.l} className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-sm border border-black/20 ${item.c}`}></div>
-                  <span className="text-[8px] font-bold uppercase text-slate-500">{item.l}</span>
+                  <div className={`w-3 h-3 rounded-sm border border-black/10 ${item.c}`}></div>
+                  <span className="text-[8px] font-black uppercase text-slate-500">{item.l}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {isAdmin && (
-             <button onClick={() => setIsAdding(true)} className="w-full py-3 bg-[#238636] hover:bg-[#2ea043] text-white rounded-md flex items-center justify-center gap-2 transition-all shadow-sm">
+             <button onClick={() => setIsAdding(true)} className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95">
                 <Plus size={14}/>
-                <span className="text-[10px] font-bold uppercase tracking-widest">Init Protocol</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Init Protocol</span>
              </button>
           )}
         </aside>
 
         {/* RIGHT: PROTOCOL STREAM */}
         <main className="lg:col-span-9 space-y-6">
-          <div className="bg-[#0d1117] border border-[#30363d] rounded-md">
-            <div className="px-6 py-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]/50">
+          <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md shadow-sm">
+            <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-secondary)]/50">
               <div className="flex items-center gap-4">
-                <Terminal size={16} className="text-indigo-500" />
-                <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-300">Operational.Log / Sequence_{selectedDate}</h2>
+                <Terminal size={16} className="text-indigo-600" />
+                <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--text-primary)]">Operational.Log / Sequence_{selectedDate}</h2>
               </div>
               <div className="flex items-center gap-3">
-                <button className="p-1.5 hover:bg-[#30363d] rounded-md text-slate-500"><Share2 size={14}/></button>
-                <div className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 rounded-sm text-indigo-400 text-[8px] font-bold">BRANCH: {currentUser.college}</div>
+                <button className="p-1.5 hover:bg-[var(--bg-secondary)] rounded-md text-slate-400"><Share2 size={14}/></button>
+                <div className="px-2 py-0.5 bg-indigo-600/10 border border-indigo-600/20 rounded-sm text-indigo-600 text-[8px] font-black">BRANCH: {currentUser.college}</div>
               </div>
             </div>
 
             <div className="p-0">
               {dailyEvents.length > 0 ? (
-                <div className="divide-y divide-[#30363d]">
+                <div className="divide-y divide-[var(--border-color)]">
                   {dailyEvents.map((event) => {
                     const isRegistered = event.attendeeIds?.includes(currentUser.id);
                     return (
-                      <div key={event.id} className="flex group hover:bg-[#161b22]/30 transition-all">
+                      <div key={event.id} className="flex group hover:bg-[var(--bg-secondary)]/50 transition-all">
                         {/* Time Column */}
-                        <div className="w-24 px-4 py-6 border-r border-[#30363d] flex flex-col items-center justify-start shrink-0">
-                           <span className="text-[10px] font-bold text-slate-300">{event.time || '00:00'}</span>
-                           <div className="mt-2 w-px flex-1 bg-[#30363d]"></div>
-                           <GitCommit size={14} className={`mt-2 ${isRegistered ? 'text-emerald-500' : 'text-slate-600'}`} />
+                        <div className="w-24 px-4 py-6 border-r border-[var(--border-color)] flex flex-col items-center justify-start shrink-0">
+                           <span className="text-[10px] font-black text-[var(--text-primary)]">{event.time || '00:00'}</span>
+                           <div className="mt-2 w-px flex-1 bg-[var(--border-color)]"></div>
+                           <GitCommit size={14} className={`mt-2 ${isRegistered ? 'text-emerald-500' : 'text-slate-300'}`} />
                         </div>
                         
                         {/* Content Column */}
                         <div className="flex-1 p-6 space-y-4">
-                          <div className="flex justify-between items-start">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                              <div className="space-y-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                   <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-sm border ${
-                                      event.category === 'Academic' ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/5' :
-                                      event.category === 'Social' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/5' :
-                                      'border-slate-500/50 text-slate-400 bg-slate-500/5'
+                                   <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-sm border ${
+                                      event.category === 'Academic' ? 'border-indigo-600/50 text-indigo-600 bg-indigo-600/5' :
+                                      event.category === 'Social' ? 'border-emerald-500/50 text-emerald-500 bg-emerald-500/5' :
+                                      'border-slate-400/50 text-slate-500 bg-slate-400/5'
                                    }`}>
                                       {event.category === 'Academic' ? '[STABLE]' : '[PATCH]'}
                                    </span>
-                                   <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                                   <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
                                       <MapPin size={10}/> {event.location}
                                    </span>
                                 </div>
-                                <h4 className="text-sm font-bold text-white uppercase tracking-tight group-hover:text-indigo-400 transition-colors">
+                                <h4 className="text-sm font-black text-[var(--text-primary)] uppercase tracking-tight group-hover:text-indigo-600 transition-colors">
                                   {event.title}
                                 </h4>
                              </div>
@@ -251,8 +251,8 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
                                <button 
                                  onClick={() => !isRegistered && handleRegister(event.id)}
                                  disabled={isRegistered}
-                                 className={`px-4 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-widest transition-all border ${
-                                   isRegistered ? 'bg-transparent border-emerald-500/50 text-emerald-500 cursor-default' : 'bg-[#21262d] border-[#30363d] text-slate-300 hover:border-[#8b949e]'
+                                 className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all border ${
+                                   isRegistered ? 'bg-emerald-600/10 border-emerald-600/50 text-emerald-500 cursor-default' : 'bg-[var(--bg-primary)] border-[var(--border-color)] text-slate-500 hover:border-indigo-600 hover:text-indigo-600 shadow-sm active:scale-95'
                                  }`}
                                >
                                  {isRegistered ? 'Verified_Sync' : 'Initialize_Uplink'}
@@ -260,17 +260,16 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
                              </div>
                           </div>
                           
-                          <p className="text-[11px] text-slate-400 leading-relaxed font-medium font-sans italic opacity-80">
+                          <p className="text-[11px] text-slate-500 leading-relaxed font-medium font-sans italic opacity-80">
                             "{event.description}"
                           </p>
 
                           <div className="flex items-center justify-between pt-2">
-                             <div className="flex items-center gap-4 text-[9px] font-bold text-slate-500 uppercase">
+                             <div className="flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase">
                                 <span className="flex items-center gap-1.5"><Users size={12}/> {event.attendeeIds?.length || 0} Nodes</span>
-                                <span className="flex items-center gap-1.5"><AlertTriangle size={12}/> Low Entropy</span>
                              </div>
-                             <button className="flex items-center gap-1 text-[9px] text-indigo-400 hover:underline">
-                               <LinkIcon size={12}/> View_Source
+                             <button className="flex items-center gap-1 text-[9px] text-indigo-600 hover:underline">
+                               <LinkIcon size={12}/> VIEW_SOURCE
                              </button>
                           </div>
                         </div>
@@ -280,10 +279,10 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
                 </div>
               ) : (
                 <div className="py-40 text-center space-y-4">
-                   <FilterX size={32} className="mx-auto text-slate-700" />
+                   <FilterX size={32} className="mx-auto text-slate-300" />
                    <div className="space-y-1">
-                      <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest">Protocol.Silence</p>
-                      <p className="text-[9px] text-slate-600 uppercase font-mono">No active logs for coordinate {selectedDate}</p>
+                      <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest">Protocol.Silence</p>
+                      <p className="text-[9px] text-slate-400 uppercase font-mono">No active logs for coordinate {selectedDate}</p>
                    </div>
                 </div>
               )}
@@ -291,11 +290,11 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           </div>
 
           {/* SYSTEM ADVISORY */}
-          <div className="p-4 bg-[#161b22] border border-dashed border-[#30363d] rounded-md flex items-center gap-4">
-             <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-md border border-indigo-500/20">
+          <div className="p-4 bg-[var(--bg-secondary)] border border-dashed border-[var(--border-color)] rounded-md flex items-center gap-4">
+             <div className="p-2 bg-indigo-600/10 text-indigo-600 rounded-md border border-indigo-600/20">
                 <AlertTriangle size={16} />
              </div>
-             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
+             <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest leading-loose">
                 Warning: Operational schedules are subject to university protocol shifts. 
                 Always verify coordinates with the central hub before deployment.
              </p>
@@ -303,38 +302,38 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         </main>
       </div>
 
-      {/* MODAL (REDUCED RADIUS) */}
+      {/* MODAL */}
       {isAdding && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
-           <div className="bg-[#0d1117] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[#30363d] max-h-[90vh] overflow-y-auto no-scrollbar">
-              <div className="flex justify-between items-center border-b border-[#30363d] pb-4">
-                 <h2 className="text-lg font-bold text-white uppercase tracking-tighter italic">Initialize.Protocol</h2>
-                 <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 transition-colors"><X size={20}/></button>
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in">
+           <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[var(--border-color)] max-h-[90vh] overflow-y-auto no-scrollbar">
+              <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-4">
+                 <h2 className="text-lg font-black text-[var(--text-primary)] uppercase tracking-tighter italic">Initialize.Protocol</h2>
+                 <button onClick={() => setIsAdding(false)} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={20}/></button>
               </div>
               <div className="space-y-4">
                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Event_Title</label>
-                    <input className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none focus:border-indigo-500 transition-all" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. COCIS Alpha Node Assembly" />
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Event_Title</label>
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-black text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. COCIS Alpha Node Assembly" />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Coordinate_Date</label>
-                       <input type="date" className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Coordinate_Date</label>
+                       <input type="date" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-black text-[var(--text-primary)] outline-none" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
                     </div>
                     <div className="space-y-1">
-                       <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Time_Log</label>
-                       <input type="time" className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
+                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Time_Log</label>
+                       <input type="time" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-black text-[var(--text-primary)] outline-none" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
                     </div>
                  </div>
                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Location_Hub</label>
-                    <input className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none focus:border-indigo-500 transition-all" value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="Main Wing Hall" />
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Location_Hub</label>
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-black text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all" value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="Main Wing Hall" />
                  </div>
                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Mission_Metadata</label>
-                    <textarea className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none h-20 resize-none focus:border-indigo-500 transition-all" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Enter event parameters..." />
+                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Mission_Metadata</label>
+                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-black text-[var(--text-primary)] outline-none h-20 resize-none focus:border-indigo-600 transition-all" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Enter event parameters..." />
                  </div>
-                 <button onClick={handleAddEvent} className="w-full bg-[#238636] py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all">Commit Protocol Log</button>
+                 <button onClick={handleAddEvent} className="w-full bg-indigo-600 py-4 rounded-md text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all">Commit Protocol Log</button>
               </div>
            </div>
         </div>

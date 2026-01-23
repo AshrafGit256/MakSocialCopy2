@@ -1,129 +1,113 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../db';
-import { CalendarEvent, User, College } from '../types';
+import { CalendarEvent, User } from '../types';
 import { 
-  CalendarDays, MapPin, Plus, ChevronLeft, ChevronRight, Zap, X, 
-  CheckCircle2, Image as ImageIcon, Activity, Users, 
-  Bell, Target, Sparkles, Send, Radio, Target as TargetIcon, Clock,
-  Calendar as CalendarIcon
+  Plus, ChevronLeft, ChevronRight, Zap, X, 
+  CheckCircle2, Activity, Radio, Clock,
+  FilterX, Terminal, Hash, Target,
+  Cpu, Share2, Box, GitCommit, Link as LinkIcon,
+  Server, Shield, AlertTriangle, MapPin, Users
 } from 'lucide-react';
 
-const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
-
-const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
-  const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
-
+const SystemStatus: React.FC = () => {
+  const [time, setTime] = useState(new Date().toLocaleTimeString('en-GB'));
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const target = new Date(targetDate).getTime();
-      const diff = target - now;
-      if (diff <= 0) { setTimeLeft(null); clearInterval(timer); return; }
-      setTimeLeft({
-        d: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        h: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        m: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        s: Math.floor((diff % (1000 * 60)) / 1000)
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [targetDate]);
-
-  if (!timeLeft) return <span className="text-rose-500 font-bold uppercase text-[9px] animate-pulse">SIGNAL ACTIVE</span>;
+    const t = setInterval(() => setTime(new Date().toLocaleTimeString('en-GB')), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
-    <div className="flex gap-1">
-      {[{ v: timeLeft.d, l: 'd' }, { v: timeLeft.h, l: 'h' }, { v: timeLeft.m, l: 'm' }].map((item, i) => (
-        <div key={i} className="bg-black/60 backdrop-blur-sm rounded-[4px] px-1.5 py-0.5 text-center border border-white/10">
-           <p className="text-[10px] font-black text-white leading-none">{item.v}{item.l}</p>
+    <div className="flex items-center justify-between px-4 py-2 bg-[#0d1117] border border-[#30363d] rounded-md mb-8 font-mono text-[10px]">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <span className="text-emerald-500 font-bold uppercase">System.Live</span>
         </div>
-      ))}
+        <div className="h-4 w-px bg-[#30363d]"></div>
+        <div className="flex items-center gap-2 text-slate-400">
+          <Server size={12} />
+          <span>MAKSOCIAL_CORE_v4.2</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 text-slate-400">
+          <Clock size={12} />
+          <span>{time}</span>
+        </div>
+        <div className="flex items-center gap-2 text-indigo-400">
+          <Hash size={12} />
+          <span>UPLINK: ACTIVE</span>
+        </div>
+      </div>
     </div>
   );
 };
 
 const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isAdding, setIsAdding] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User>(db.getUser());
-  
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [currentUser] = useState<User>(db.getUser());
+
   const [form, setForm] = useState<Partial<CalendarEvent>>({
-    title: '', description: '', date: '', time: '', location: '', category: 'Social', registrationLink: '', image: ''
+    title: '', description: '', date: '', time: '', location: '', category: 'Social', image: ''
   });
 
   useEffect(() => {
-    const sync = () => {
-      setEvents(db.getCalendarEvents());
-      setCurrentUser(db.getUser());
-    };
+    const sync = () => setEvents(db.getCalendarEvents());
     sync();
-    const interval = setInterval(sync, 4000);
+    const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const handlePrevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
-  const handleNextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+  const dailyEvents = useMemo(() => {
+    return events
+      .filter(e => e.date === selectedDate)
+      .sort((a, b) => (a.time || '00:00').localeCompare(b.time || '00:00'));
+  }, [events, selectedDate]);
 
   const handleRegister = (eventId: string) => {
     db.registerForEvent(eventId, currentUser.id);
     setEvents(db.getCalendarEvents());
   };
 
-  // Logic: Closest upcoming events on top. Expired events at the bottom.
-  const sortedEvents = [...events].sort((a, b) => {
-    const dateA = new Date(`${a.date}T${a.time || '00:00'}`).getTime();
-    const dateB = new Date(`${b.date}T${b.time || '00:00'}`).getTime();
-    const now = Date.now();
-    
-    const isPastA = dateA < now;
-    const isPastB = dateB < now;
-
-    if (isPastA && !isPastB) return 1;
-    if (!isPastA && isPastB) return -1;
-    
-    return isPastA ? dateB - dateA : dateA - dateB;
-  });
-
-  const filteredEvents = sortedEvents.filter(e => {
-    if (selectedDate) return e.date === selectedDate;
-    return true; 
-  });
-
-  const renderCalendar = () => {
+  const renderMatrix = () => {
     const days = [];
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const startDay = new Date(year, month, 1).getDay();
 
     for (let i = 0; i < startDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-10 border border-[var(--border-color)] bg-[var(--bg-secondary)]/30"></div>);
+      days.push(<div key={`empty-${i}`} className="w-7 h-7 rounded-sm bg-transparent border border-transparent"></div>);
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const hasEvents = events.some(e => e.date === dateStr);
-      const isToday = new Date().toISOString().split('T')[0] === dateStr;
+      const count = events.filter(e => e.date === dateStr).length;
       const isSelected = selectedDate === dateStr;
+      const isToday = new Date().toISOString().split('T')[0] === dateStr;
+
+      const bgClass = 
+        count === 0 ? 'bg-[#161b22] border-[#30363d]' :
+        count === 1 ? 'bg-[#0e4429] border-[#0e4429]' :
+        count === 2 ? 'bg-[#006d32] border-[#006d32]' :
+        'bg-[#39d353] border-[#39d353]';
 
       days.push(
-        <div key={d} onClick={() => setSelectedDate(isSelected ? null : dateStr)}
-          className={`h-10 border border-[var(--border-color)] flex flex-col items-center justify-center cursor-pointer transition-all relative ${
-            isSelected ? 'bg-indigo-600 text-white z-10' : 
-            isToday ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600' : 
-            'bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-white/5'
+        <button 
+          key={d} 
+          onClick={() => setSelectedDate(dateStr)}
+          className={`w-7 h-7 rounded-sm border transition-all relative flex items-center justify-center ${bgClass} ${
+            isSelected ? 'ring-2 ring-orange-500 z-10 scale-110' : 
+            isToday ? 'ring-1 ring-slate-400' : ''
           }`}
+          title={`${count} Protocols on ${dateStr}`}
         >
-          <span className={`text-[10px] font-bold ${isSelected ? 'text-white' : ''}`}>{d}</span>
-          {hasEvents && !isSelected && (
-            <div className="absolute bottom-1 w-1 h-1 bg-indigo-500 rounded-full"></div>
-          )}
-        </div>
+          <span className={`text-[8px] font-mono font-bold ${count > 1 || isSelected ? 'text-white' : 'text-slate-500'}`}>{d}</span>
+        </button>
       );
     }
     return days;
@@ -144,210 +128,213 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 space-y-6 pb-40 animate-in fade-in duration-500">
+    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-32 animate-in fade-in duration-500 font-mono">
       
-      {/* Header section with technical styling */}
-      <header className="flex items-center justify-between bg-white dark:bg-[#161b22] border border-[var(--border-color)] p-6 rounded-[6px] shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-600 rounded-[6px] text-white">
-            <Radio size={24} className="animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-xl font-black uppercase tracking-tight italic leading-none text-indigo-600">Campus Registry Hub</h1>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">Synchronization: ACTIVE / Priority Signal Sorting</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {isAdmin && (
-            <button onClick={() => setIsAdding(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-[6px] font-black text-[10px] uppercase tracking-widest hover:bg-indigo-700 transition-all flex items-center gap-2">
-              <Plus size={14}/> Post Signal
-            </button>
-          )}
-        </div>
-      </header>
+      <SystemStatus />
 
-      {/* Main Grid: Mobile - Grid on top, Stream below. Desktop - Stream left, Grid right. */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* RIGHT (Moved to Top on Mobile): Calendar Grid & Quick Control */}
-        <aside className="lg:col-span-4 order-1 lg:order-2 space-y-4 lg:sticky lg:top-20">
-           <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Registry Grid</h3>
-                 <div className="flex gap-1">
-                    <button onClick={handlePrevMonth} className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-[4px] border border-[var(--border-color)]"><ChevronLeft size={14}/></button>
-                    <button onClick={handleNextMonth} className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-[4px] border border-[var(--border-color)]"><ChevronRight size={14}/></button>
-                 </div>
+        {/* LEFT: MATRIX & NAVIGATION */}
+        <aside className="lg:col-span-3 space-y-6">
+          <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Target size={14} className="text-orange-500" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Roadmap.Matrix</span>
               </div>
-              <p className="text-[11px] font-black text-[var(--text-primary)] uppercase mb-3 text-center tracking-tighter italic">
-                {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
-              </p>
-              <div className="grid grid-cols-7 text-center text-[8px] font-black uppercase text-slate-400 mb-2 tracking-widest">
-                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <div key={d}>{d}</div>)}
+              <div className="flex gap-1">
+                <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))} className="p-1 hover:bg-[#161b22] border border-[#30363d] rounded-sm"><ChevronLeft size={12}/></button>
+                <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))} className="p-1 hover:bg-[#161b22] border border-[#30363d] rounded-sm"><ChevronRight size={12}/></button>
               </div>
-              <div className="grid grid-cols-7 border-l border-t border-[var(--border-color)]">
-                {renderCalendar()}
-              </div>
-           </div>
+            </div>
 
-           <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] p-5 space-y-4 hidden lg:block">
-              <div className="flex items-center gap-2 mb-2">
-                 <Bell size={14} className="text-indigo-600" />
-                 <h4 className="text-[9px] font-black uppercase text-slate-500 tracking-widest">Registry Summary</h4>
+            <div className="text-[11px] font-bold text-slate-300 uppercase mb-4 px-1 italic">
+              {currentMonth.toLocaleString('default', { month: 'long' })} {currentMonth.getFullYear()}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 mb-2 text-center text-[7px] font-bold text-slate-500 uppercase">
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <div key={d}>{d}</div>)}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {renderMatrix()}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-[#30363d] space-y-4">
+              <div className="flex items-center justify-between text-[10px]">
+                <span className="text-slate-500 uppercase font-bold">Selected Coordinate</span>
+                <span className="text-orange-500 font-bold">{selectedDate}</span>
               </div>
-              <div className="space-y-3">
-                 <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 border-b border-[var(--border-color)] pb-2">
-                    <span className="uppercase tracking-widest">Global Signals</span>
-                    <span className="text-indigo-600 font-black">{events.length}</span>
-                 </div>
-                 <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 border-b border-[var(--border-color)] pb-2">
-                    <span className="uppercase tracking-widest">Verified Participants</span>
-                    <span className="text-emerald-500 font-black">{events.reduce((acc, ev) => acc + (ev.attendeeIds?.length || 0), 0)}</span>
-                 </div>
-              </div>
-              <button onClick={() => setSelectedDate(null)} className="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-widest rounded-[4px] border border-[var(--border-color)] hover:border-indigo-500/50 hover:text-indigo-600 transition-all">
-                Reset Stream Filter
+              <button 
+                onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
+                className="w-full py-2 bg-[#21262d] border border-[#30363d] hover:border-[#8b949e] rounded-md text-[9px] font-bold uppercase text-slate-300 transition-all"
+              >
+                Jump to Sys.Today
               </button>
-           </div>
+            </div>
+          </div>
+
+          <div className="p-5 bg-[#0d1117] border border-[#30363d] rounded-md space-y-4">
+            <h4 className="text-[9px] font-bold uppercase text-indigo-400 tracking-widest flex items-center gap-2">
+              <Shield size={12}/> Protocol Legend
+            </h4>
+            <div className="space-y-2">
+              {[
+                { l: 'Null Signal', c: 'bg-[#161b22]' },
+                { l: 'Stable Patch', c: 'bg-[#0e4429]' },
+                { l: 'Critical Load', c: 'bg-[#39d353]' }
+              ].map(item => (
+                <div key={item.l} className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-sm border border-black/20 ${item.c}`}></div>
+                  <span className="text-[8px] font-bold uppercase text-slate-500">{item.l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {isAdmin && (
+             <button onClick={() => setIsAdding(true)} className="w-full py-3 bg-[#238636] hover:bg-[#2ea043] text-white rounded-md flex items-center justify-center gap-2 transition-all shadow-sm">
+                <Plus size={14}/>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Init Protocol</span>
+             </button>
+          )}
         </aside>
 
-        {/* LEFT (Moved below Grid on Mobile): Event Poster Stream (The "Main Feed") */}
-        <main className="lg:col-span-8 order-2 lg:order-1 space-y-4">
-           <div className="flex items-center justify-between px-2">
-              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2">
-                 <Activity size={14} className="text-indigo-600" />
-                 Signal Feed: {selectedDate ? `Date Match [${selectedDate}]` : 'Auto-Sorted by Priority'}
-              </h3>
-           </div>
+        {/* RIGHT: PROTOCOL STREAM */}
+        <main className="lg:col-span-9 space-y-6">
+          <div className="bg-[#0d1117] border border-[#30363d] rounded-md">
+            <div className="px-6 py-4 border-b border-[#30363d] flex items-center justify-between bg-[#161b22]/50">
+              <div className="flex items-center gap-4">
+                <Terminal size={16} className="text-indigo-500" />
+                <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-300">Operational.Log / Sequence_{selectedDate}</h2>
+              </div>
+              <div className="flex items-center gap-3">
+                <button className="p-1.5 hover:bg-[#30363d] rounded-md text-slate-500"><Share2 size={14}/></button>
+                <div className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 rounded-sm text-indigo-400 text-[8px] font-bold">BRANCH: {currentUser.college}</div>
+              </div>
+            </div>
 
-           <div ref={scrollRef} className="space-y-4">
-              {filteredEvents.length > 0 ? filteredEvents.map((event) => {
-                const isRegistered = event.attendeeIds?.includes(currentUser.id);
-                const regCount = event.attendeeIds?.length || 0;
-                const isPast = new Date(event.date).getTime() < new Date().setHours(0,0,0,0);
-
-                return (
-                  <div key={event.id} className={`group bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[6px] overflow-hidden transition-all hover:border-indigo-500/50 shadow-sm flex flex-col md:flex-row ${isPast ? 'opacity-60 grayscale' : ''}`}>
-                    {/* Poster section - slightly reduced size */}
-                    <div className="md:w-52 h-36 md:h-auto relative shrink-0 overflow-hidden">
-                       <img 
-                        src={event.image || 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=800'} 
-                        className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" 
-                       />
-                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                       <div className="absolute bottom-3 left-3">
-                          <Countdown targetDate={`${event.date}T${event.time || '00:00'}:00`} />
-                       </div>
-                    </div>
-                    {/* Content section */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
-                       <div className="space-y-3">
+            <div className="p-0">
+              {dailyEvents.length > 0 ? (
+                <div className="divide-y divide-[#30363d]">
+                  {dailyEvents.map((event) => {
+                    const isRegistered = event.attendeeIds?.includes(currentUser.id);
+                    return (
+                      <div key={event.id} className="flex group hover:bg-[#161b22]/30 transition-all">
+                        {/* Time Column */}
+                        <div className="w-24 px-4 py-6 border-r border-[#30363d] flex flex-col items-center justify-start shrink-0">
+                           <span className="text-[10px] font-bold text-slate-300">{event.time || '00:00'}</span>
+                           <div className="mt-2 w-px flex-1 bg-[#30363d]"></div>
+                           <GitCommit size={14} className={`mt-2 ${isRegistered ? 'text-emerald-500' : 'text-slate-600'}`} />
+                        </div>
+                        
+                        {/* Content Column */}
+                        <div className="flex-1 p-6 space-y-4">
                           <div className="flex justify-between items-start">
                              <div className="space-y-1">
-                                <span className="bg-indigo-600/10 text-indigo-600 px-2 py-0.5 rounded-[4px] text-[8px] font-black uppercase border border-indigo-600/20">
-                                   {event.category}
-                                </span>
-                                <h4 className="text-lg font-black uppercase tracking-tight group-hover:text-indigo-600 transition-colors leading-tight pt-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                   <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-sm border ${
+                                      event.category === 'Academic' ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/5' :
+                                      event.category === 'Social' ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/5' :
+                                      'border-slate-500/50 text-slate-400 bg-slate-500/5'
+                                   }`}>
+                                      {event.category === 'Academic' ? '[STABLE]' : '[PATCH]'}
+                                   </span>
+                                   <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                                      <MapPin size={10}/> {event.location}
+                                   </span>
+                                </div>
+                                <h4 className="text-sm font-bold text-white uppercase tracking-tight group-hover:text-indigo-400 transition-colors">
                                   {event.title}
                                 </h4>
                              </div>
-                             <div className="text-right">
-                                <p className="text-sm font-black italic tracking-tighter">{new Date(event.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
-                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{event.time || 'TBD'}</p>
+                             <div className="flex gap-2">
+                               <button 
+                                 onClick={() => !isRegistered && handleRegister(event.id)}
+                                 disabled={isRegistered}
+                                 className={`px-4 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-widest transition-all border ${
+                                   isRegistered ? 'bg-transparent border-emerald-500/50 text-emerald-500 cursor-default' : 'bg-[#21262d] border-[#30363d] text-slate-300 hover:border-[#8b949e]'
+                                 }`}
+                               >
+                                 {isRegistered ? 'Verified_Sync' : 'Initialize_Uplink'}
+                               </button>
                              </div>
                           </div>
                           
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2 border-l-2 border-indigo-600/30 pl-3 italic">
+                          <p className="text-[11px] text-slate-400 leading-relaxed font-medium font-sans italic opacity-80">
                             "{event.description}"
                           </p>
 
-                          <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-widest text-slate-500">
-                             <span className="flex items-center gap-1.5"><MapPin size={12} className="text-indigo-500"/> {event.location}</span>
-                             <span className="flex items-center gap-1.5"><Users size={12} className="text-emerald-500"/> {regCount} Nodes Registered</span>
+                          <div className="flex items-center justify-between pt-2">
+                             <div className="flex items-center gap-4 text-[9px] font-bold text-slate-500 uppercase">
+                                <span className="flex items-center gap-1.5"><Users size={12}/> {event.attendeeIds?.length || 0} Nodes</span>
+                                <span className="flex items-center gap-1.5"><AlertTriangle size={12}/> Low Entropy</span>
+                             </div>
+                             <button className="flex items-center gap-1 text-[9px] text-indigo-400 hover:underline">
+                               <LinkIcon size={12}/> View_Source
+                             </button>
                           </div>
-                       </div>
-                       
-                       <div className="pt-5 flex items-center gap-3">
-                          <button 
-                            onClick={() => !isRegistered && !isPast && handleRegister(event.id)}
-                            disabled={isRegistered || isPast}
-                            className={`flex-1 py-2.5 rounded-[4px] font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 border ${
-                               isRegistered 
-                               ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm' 
-                               : isPast ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700 active:scale-[0.98]'
-                            }`}
-                          >
-                             {isRegistered ? <CheckCircle2 size={14}/> : <Zap size={14}/>}
-                             {isRegistered ? 'Identity Logged' : isPast ? 'Protocol Closed' : 'Confirm Registration'}
-                          </button>
-                          <button className="p-2.5 bg-slate-50 dark:bg-white/5 border border-[var(--border-color)] rounded-[4px] text-slate-500 hover:text-indigo-600 transition-all active:scale-95">
-                             <Send size={16}/>
-                          </button>
-                       </div>
-                    </div>
-                  </div>
-                );
-              }) : (
-                <div className="py-20 text-center border border-dashed border-[var(--border-color)] rounded-[6px] space-y-4">
-                   <CalendarIcon size={32} className="mx-auto text-slate-300" />
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">No signals detected in this range.</p>
-                   <button onClick={() => setSelectedDate(null)} className="text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:underline">Clear Search Logic</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-40 text-center space-y-4">
+                   <FilterX size={32} className="mx-auto text-slate-700" />
+                   <div className="space-y-1">
+                      <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest">Protocol.Silence</p>
+                      <p className="text-[9px] text-slate-600 uppercase font-mono">No active logs for coordinate {selectedDate}</p>
+                   </div>
                 </div>
               )}
-           </div>
-        </main>
+            </div>
+          </div>
 
+          {/* SYSTEM ADVISORY */}
+          <div className="p-4 bg-[#161b22] border border-dashed border-[#30363d] rounded-md flex items-center gap-4">
+             <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-md border border-indigo-500/20">
+                <AlertTriangle size={16} />
+             </div>
+             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
+                Warning: Operational schedules are subject to university protocol shifts. 
+                Always verify coordinates with the central hub before deployment.
+             </p>
+          </div>
+        </main>
       </div>
 
-      {/* Add Modal */}
+      {/* MODAL (REDUCED RADIUS) */}
       {isAdding && (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-sm animate-in zoom-in duration-300">
-           <div className="bg-[var(--sidebar-bg)] w-full max-w-lg p-8 rounded-[6px] shadow-2xl space-y-6 border border-[var(--border-color)] max-h-[90vh] overflow-y-auto no-scrollbar">
-              <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-4">
-                 <h2 className="text-xl font-black text-[var(--text-primary)] uppercase tracking-tighter italic">Initialize Protocol Signal</h2>
-                 <button onClick={() => setIsAdding(false)} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={24}/></button>
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
+           <div className="bg-[#0d1117] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[#30363d] max-h-[90vh] overflow-y-auto no-scrollbar">
+              <div className="flex justify-between items-center border-b border-[#30363d] pb-4">
+                 <h2 className="text-lg font-bold text-white uppercase tracking-tighter italic">Initialize.Protocol</h2>
+                 <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 transition-colors"><X size={20}/></button>
               </div>
               <div className="space-y-4">
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Event Registry Title</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none focus:border-indigo-600 transition-all" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. Research Gala 2025" />
+                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Event_Title</label>
+                    <input className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none focus:border-indigo-500 transition-all" value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="e.g. COCIS Alpha Node Assembly" />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Threshold Date</label>
-                       <input type="date" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+                       <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Coordinate_Date</label>
+                       <input type="date" className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
                     </div>
                     <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Protocol Time</label>
-                       <input type="time" className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
+                       <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Time_Log</label>
+                       <input type="time" className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
                     </div>
                  </div>
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Location Node</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none focus:border-indigo-600 transition-all" value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="Main Hall Auditorium" />
+                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Location_Hub</label>
+                    <input className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none focus:border-indigo-500 transition-all" value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="Main Wing Hall" />
                  </div>
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">High-Fidelity Flyer</label>
-                    <div className="flex gap-2">
-                       <button onClick={() => fileInputRef.current?.click()} className="flex-1 p-4 rounded-[4px] border border-dashed border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5 transition-all flex flex-col items-center justify-center gap-1 group">
-                          {form.image ? <img src={form.image} className="h-16 w-full object-cover rounded-[4px]" /> : <ImageIcon size={20} className="text-slate-400 group-hover:text-indigo-600" />}
-                          <span className="text-[8px] font-black uppercase text-slate-500">Pick Flyer Asset</span>
-                       </button>
-                       <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                             const reader = new FileReader();
-                             reader.onloadend = () => setForm({...form, image: reader.result as string});
-                             reader.readAsDataURL(file);
-                          }
-                       }} />
-                    </div>
+                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Mission_Metadata</label>
+                    <textarea className="w-full bg-[#161b22] border border-[#30363d] rounded-md p-3 text-xs font-bold text-white outline-none h-20 resize-none focus:border-indigo-500 transition-all" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Enter event parameters..." />
                  </div>
-                 <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Mission Log Brief</label>
-                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 text-sm font-bold outline-none h-20 resize-none" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Enter event mission parameters..." />
-                 </div>
-                 <button onClick={handleAddEvent} className="w-full bg-indigo-600 py-4 rounded-[6px] text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-lg shadow-indigo-600/20 active:scale-[0.98] transition-all">Broadcast Protocol Signal</button>
+                 <button onClick={handleAddEvent} className="w-full bg-[#238636] py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-md active:scale-95 transition-all">Commit Protocol Log</button>
               </div>
            </div>
         </div>
@@ -355,8 +342,6 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .animate-spin-slow { animation: spin 3s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
     </div>
   );

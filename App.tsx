@@ -9,13 +9,13 @@ import Feed from './components/Feed';
 import Chat from './components/Chat';
 import Profile from './components/Profile';
 import Admin from './components/Admin';
-import Explore from './components/Explore';
+import Forge from './components/Forge';
 import CalendarView from './components/Calendar';
 import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, GitPullRequest } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -133,7 +133,7 @@ const App: React.FC = () => {
       case 'groups': return <Feed collegeFilter={currentUser?.college} onOpenThread={openThread} onNavigateToProfile={handleNavigateToProfile} />;
       case 'messages': return <Chat />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={handleNavigateToProfile} />;
-      case 'explore': return <Explore />;
+      case 'forge': return <Forge onNavigateToProfile={handleNavigateToProfile} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={handleNavigateToProfile} onNavigateToPost={(id) => openThread(id)} />;
       case 'resources': return <Resources />;
@@ -242,7 +242,7 @@ const App: React.FC = () => {
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] transition-theme lg:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
-            { id: 'explore', icon: <SearchIcon size={22} />, label: 'Explore' },
+            { id: 'forge', icon: <GitPullRequest size={22} />, label: 'Forge' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'messages', icon: <MessageCircle size={22} />, label: 'Chats' },
             { id: 'settings', icon: <Settings size={22} />, label: 'UI' },

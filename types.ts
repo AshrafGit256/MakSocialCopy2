@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'explore' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -94,13 +94,11 @@ export interface User {
   avatar: string;
   connections: number;
   email?: string;
-  // FIX: Allow 'Global' as a college value for administrative and corporate accounts
   college: College | 'Global';
   status: UserStatus;
   subscriptionTier: SubscriptionTier; 
   accountStatus?: 'Active' | 'Inactive' | 'Suspended';
   verified?: boolean;
-  // FIX: Allow 'Global' in the list of joined colleges
   joinedColleges: (College | 'Global')[];
   postsCount: number;
   followersCount: number;
@@ -142,12 +140,11 @@ export interface Post {
   flags: string[]; 
   isOpportunity: boolean;
   college: College | 'Global';
-  parentId?: string; // NEW: Supports threading/replies
+  parentId?: string; 
   aiMetadata?: {
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
     isSafe?: boolean;
   };
-  // FIX: Missing properties used for broadcasting events and advertisements to resolve type errors in Admin, Events and Calendar components
   isEventBroadcast?: boolean;
   isAd?: boolean;
   eventTitle?: string;

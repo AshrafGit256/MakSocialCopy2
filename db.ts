@@ -225,22 +225,38 @@ const INITIAL_OPPORTUNITIES: Post[] = [
   }
 ];
 
+const parseArray = <T>(key: string, fallback: T[]): T[] => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved) return fallback;
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : fallback;
+  } catch (e) {
+    console.error(`Error parsing ${key} from storage:`, e);
+    return fallback;
+  }
+};
+
 export const db = {
-  getUsers: (): User[] => {
-    try {
-      const saved = localStorage.getItem(DB_KEYS.USERS);
-      if (!saved) return [];
-      const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return [];
-    }
-  },
+  getUsers: (): User[] => parseArray<User>(DB_KEYS.USERS, []),
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID);
-    return users.find(u => u.id === currentId) || users[0];
+    const found = users.find(u => u.id === currentId);
+    if (found) return found;
+    return users[0] || {
+      id: 'guest',
+      name: 'Guest Node',
+      role: 'Visitor',
+      avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Guest',
+      connections: 0,
+      college: 'Global',
+      status: 'Year 1',
+      subscriptionTier: 'Free',
+      joinedColleges: ['Global'],
+      postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: []
+    };
   },
   saveUser: (user: User) => {
     const users = db.getUsers();
@@ -250,18 +266,11 @@ export const db = {
     db.saveUsers(users);
   },
   getPosts: (filter?: College | 'Global'): Post[] => {
-    try {
-      const saved = localStorage.getItem(DB_KEYS.POSTS);
-      let posts: Post[] = MOCK_POSTS;
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) posts = parsed;
-      }
-      if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter);
-      return Array.isArray(posts) ? posts : [];
-    } catch (e) {
-      return MOCK_POSTS;
+    let posts = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
+    if (filter && filter !== 'Global') {
+      posts = posts.filter(p => p.college === filter);
     }
+    return posts;
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   addPost: (post: Post) => {
@@ -269,19 +278,7 @@ export const db = {
     db.savePosts([post, ...posts]);
     if (post.isOpportunity) db.addOpportunity(post);
   },
-  getOpportunities: (): Post[] => {
-    try {
-      const saved = localStorage.getItem(DB_KEYS.OPPORTUNITIES);
-      let opps: Post[] = INITIAL_OPPORTUNITIES;
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) opps = parsed;
-      }
-      return Array.isArray(opps) ? opps : [];
-    } catch (e) {
-      return INITIAL_OPPORTUNITIES;
-    }
-  },
+  getOpportunities: (): Post[] => parseArray<Post>(DB_KEYS.OPPORTUNITIES, INITIAL_OPPORTUNITIES),
   saveOpportunities: (opps: Post[]) => localStorage.setItem(DB_KEYS.OPPORTUNITIES, JSON.stringify(opps)),
   addOpportunity: (post: Post) => {
     const opps = db.getOpportunities();
@@ -295,35 +292,12 @@ export const db = {
     const opps = db.getOpportunities();
     db.saveOpportunities(opps.filter(o => o.id !== postId));
   },
-  getResources: (): Resource[] => {
-    try {
-      const saved = localStorage.getItem(DB_KEYS.RESOURCES);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : INITIAL_RESOURCES;
-      }
-      return INITIAL_RESOURCES;
-    } catch (e) {
-      return INITIAL_RESOURCES;
-    }
-  },
+  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, INITIAL_RESOURCES),
   saveResource: (resource: Resource) => {
     const resources = db.getResources();
-    const updated = [resource, ...resources];
-    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(updated));
+    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...resources]));
   },
-  getCalendarEvents: (): CalendarEvent[] => {
-    try {
-      const saved = localStorage.getItem(DB_KEYS.CALENDAR);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
-      }
-      return [];
-    } catch (e) {
-      return [];
-    }
-  },
+  getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, []),
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...events]));
@@ -339,7 +313,7 @@ export const db = {
     });
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
-  getAds: (): Ad[] => [],
-  saveAds: (ads: Ad[]) => {},
+  getAds: (): Ad[] => parseArray<Ad>(DB_KEYS.ADS, []),
+  saveAds: (ads: Ad[]) => localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads)),
   getEvents: () => []
 };

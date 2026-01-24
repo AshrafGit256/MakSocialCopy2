@@ -107,9 +107,9 @@ const App: React.FC = () => {
 
   const unreadNotifs = notifications.filter(n => !n.isRead).length;
 
-  // Handle Admin view exclusively
+  // STRICT ADMIN VIEW ENFORCEMENT
   if (isLoggedIn && userRole === 'admin') {
-    return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
+    return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing'); setIsLoggedIn(false);}} />;
   }
 
   const renderContent = () => {

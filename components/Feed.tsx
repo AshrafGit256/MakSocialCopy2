@@ -130,7 +130,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
     </button>
   );
 
-  // Responsive CSS for dropdowns
+  // Helper classes for responsive dropdowns
   const dropdownBaseClass = "z-[3005] bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md overflow-hidden animate-in fade-in slide-in-from-top-1";
   const mobileCenterClass = "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:absolute md:top-full md:left-0 md:translate-x-0 md:translate-y-0 md:mt-1";
 
@@ -198,7 +198,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Color Picker */}
+        {/* Color Picker with Centered Mobile Strategy */}
         <div className="relative">
           <button 
             onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'colors' ? null : 'colors'); }}
@@ -302,7 +302,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Fullscreen & Help */}
+        {/* Fullscreen & Help with Center Strategy */}
         <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Fullscreen" />
         <div className="relative">
           <ToolbarButton onClick={() => setOpenDropdown(openDropdown === 'help' ? null : 'help')} icon={<HelpCircle size={14}/>} title="Help" />
@@ -337,7 +337,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           ref={editorRef}
           contentEditable
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
-          className="w-full h-full p-3 text-sm outline-none leading-relaxed overflow-y-auto rich-content-editor"
+          className="w-full h-full p-3 text-sm outline-none leading-relaxed overflow-y-auto rich-content-style"
           style={{ fontFamily: activeFont }}
           data-placeholder="Place some text here"
         />
@@ -364,15 +364,19 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
       </div>
 
       <style>{`
-        .rich-content-editor:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
-        .rich-content-editor h1, .rich-content-editor h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
-        .rich-content-editor h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
-        .rich-content-editor p { margin-bottom: 0.5rem; }
-        .rich-content-editor ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
-        .rich-content-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.5rem; }
-        .rich-content-editor table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.5rem; }
-        .rich-content-editor th, .rich-content-editor td { border: 1px solid #ddd; padding: 6px; }
-        .rich-content-editor blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 0.5rem; }
+        .rich-content-style:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
+        .rich-content-style h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .rich-content-style h2 { font-size: 2.0rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .rich-content-style h3 { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .rich-content-style h4 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem; }
+        .rich-content-style h5 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .rich-content-style h6 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem; }
+        .rich-content-style p { margin-bottom: 0.5rem; }
+        .rich-content-style ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .rich-content-style ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .rich-content-style table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.5rem; }
+        .rich-content-style th, .rich-content-style td { border: 1px solid #ddd; padding: 6px; }
+        .rich-content-style blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 0.5rem; }
       `}</style>
     </div>
   );
@@ -396,7 +400,8 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, onNav
             </div>
             <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
                <div className="p-5 space-y-4" style={{ fontFamily: post.customFont }}>
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content text-[14px] leading-relaxed" />
+                  {/* FIXED: Added explicit rich-content-style to ensure all HTML tags (h1-h6, table, etc) are visible after posting */}
+                  <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content-style text-[14px] leading-relaxed" />
                </div>
                <div className="px-5 py-2 bg-slate-50/50 dark:bg-white/5 border-t border-[var(--border-color)] flex items-center gap-6">
                   <button className="flex items-center gap-1.5 text-slate-500 hover:text-rose-500 transition-colors">

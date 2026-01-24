@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppView, User, College, UserStatus, AppSettings } from './types';
+import { AppView, User, College, UserStatus, AppSettings, Notification } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -15,8 +15,9 @@ import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
+import NotificationsView from './components/Notifications';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, GitPullRequest } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -30,24 +31,27 @@ const App: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    if (isLoggedIn) setCurrentUser(db.getUser());
+    if (isLoggedIn) {
+      setCurrentUser(db.getUser());
+      setNotifications(db.getNotifications());
+    }
     const applySettings = () => {
-      const saved = localStorage.getItem('maksocial_appearance_v2');
+      const saved = localStorage.getItem('maksocial_appearance_v3');
       if (saved) {
         const s: AppSettings = JSON.parse(saved);
         const root = document.documentElement;
-        root.style.setProperty('--brand-color', s.primaryColor);
+        root.style.setProperty('--brand-color', s.primaryColor || '#64748b');
         root.style.setProperty('--font-main', s.fontFamily);
         root.setAttribute('data-animations', s.animationsEnabled.toString());
-        root.setAttribute('data-glow', s.glowEffects?.toString() || 'true');
-        root.setAttribute('data-grid', s.showGrid?.toString() || 'true');
         if (s.themePreset === 'oled') {
           root.classList.add('dark');
           root.style.setProperty('--bg-primary', '#000000');
         } else if (s.themePreset === 'paper') {
           root.classList.remove('dark');
+          root.style.setProperty('--bg-primary', '#ffffff');
         }
       }
     };
@@ -55,6 +59,14 @@ const App: React.FC = () => {
     window.addEventListener('storage', applySettings);
     return () => window.removeEventListener('storage', applySettings);
   }, [isLoggedIn, view]);
+
+  useEffect(() => {
+    const sync = () => {
+      if (isLoggedIn) setNotifications(db.getNotifications());
+    };
+    const t = setInterval(sync, 5000);
+    return () => clearInterval(t);
+  }, [isLoggedIn]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -91,6 +103,8 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const unreadNotifs = notifications.filter(n => !n.isRead).length;
+
   const renderContent = () => {
     if (isLoggedIn && userRole === 'admin') return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
     switch (view) {
@@ -100,9 +114,9 @@ const App: React.FC = () => {
       case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'opportunities': return <Opportunities />;
+      case 'notifications': return <NotificationsView />;
       case 'messages': return <Chat initialTargetUserId={activeChatUserId || undefined} />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={(id) => { setActiveChatUserId(id); setView('messages'); }} />;
-      case 'forge': return <Forge onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'resources': return <Resources />;
@@ -118,7 +132,7 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative">
       {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden animate-in fade-in" onClick={() => setIsSidebarOpen(false)} />}
-      <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} unreadNotifications={unreadNotifs} />
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
@@ -142,7 +156,10 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-indigo-600">{isDark ? <Sun size={20} /> : <Moon size={20} />}</button>
-            <button onClick={() => handleSetView('opportunities')} className="p-2.5 text-amber-500 hover:bg-amber-50 rounded-full transition-all"><Zap size={20} fill="currentColor"/></button>
+            <button onClick={() => handleSetView('notifications')} className="p-2.5 text-slate-500 hover:text-indigo-600 relative">
+               <Bell size={20} />
+               {unreadNotifs > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>}
+            </button>
             {currentUser && <button onClick={() => handleSetView('profile')} className="ml-1 active:scale-90 transition-transform"><img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" alt="Profile" /></button>}
           </div>
         </header>
@@ -152,11 +169,16 @@ const App: React.FC = () => {
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
             { id: 'opportunities', icon: <Zap size={22} />, label: 'Bids' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
-            { id: 'messages', icon: <MessageCircle size={22} />, label: 'Chats' },
+            { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
             { id: 'settings', icon: <Settings size={22} />, label: 'UI' },
           ].map((item) => (
             <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${view === item.id ? 'text-indigo-600' : 'text-slate-400'}`}>
-              {item.id === 'opportunities' ? <Zap size={22} className="text-amber-500" fill={view === 'opportunities' ? "currentColor" : "none"} /> : item.icon}
+              <div className="relative">
+                {item.icon}
+                {item.id === 'notifications' && unreadNotifs > 0 && (
+                   <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[7px] font-black px-1 rounded-full">{unreadNotifs}</span>
+                )}
+              </div>
               <span className={`text-[9px] font-black uppercase ${view === item.id ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
             </button>
           ))}

@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -9,8 +9,48 @@ const DB_KEYS = {
   RESOURCES: 'maksocial_resources_v8',
   CALENDAR: 'maksocial_calendar_v9',
   ADS: 'maksocial_ads_v4',
-  OPPORTUNITIES: 'maksocial_opps_v3'
+  OPPORTUNITIES: 'maksocial_opps_v3',
+  NOTIFICATIONS: 'maksocial_notifications_v1'
 };
+
+const INITIAL_NOTIFS: Notification[] = [
+  {
+    id: 'n1',
+    type: 'skill_match',
+    title: 'AI Node Sync: Skill Detected',
+    description: 'A new Research Grant in COCIS matches your credentials in [Python, AI Research].',
+    timestamp: '10m ago',
+    isRead: false,
+    meta: { reason: 'AI SCAN', hash: '8f2a11' }
+  },
+  {
+    id: 'n2',
+    type: 'event',
+    title: 'Protocol Reminder: Guild Assembly',
+    description: 'The Emergency Guild Assembly at Freedom Square initiates tomorrow @ 10:00 AM.',
+    timestamp: '2h ago',
+    isRead: false,
+    meta: { reason: 'CALENDAR', hash: 'e992bc' }
+  },
+  {
+    id: 'n3',
+    type: 'follow',
+    title: 'New Node Uplink',
+    description: 'Sarah CEDAT initiated a follow sequence with your node profile.',
+    timestamp: '5h ago',
+    isRead: true,
+    meta: { nodeId: 'sarah_cedat', reason: 'NETWORK', hash: '411a0d' }
+  },
+  {
+    id: 'n4',
+    type: 'engagement',
+    title: 'Signal Upvoted',
+    description: 'Admin Registry and 12 others upvoted your latest Broadcast Signal.',
+    timestamp: '1d ago',
+    isRead: true,
+    meta: { reason: 'ENGAGEMENT', hash: 'd9b1c2' }
+  }
+];
 
 const getFutureDate = (days: number) => {
   const d = new Date();
@@ -33,196 +73,6 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
 export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jan', revenue: 4500000, expenses: 2100000, subscribers: 1240, growth: 12 },
   { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560, growth: 25 },
-];
-
-const INITIAL_RESOURCES: Resource[] = [
-  {
-    id: 'res-1',
-    title: 'Operating Systems - 2024 Past Paper',
-    category: 'Past Paper',
-    college: 'COCIS',
-    course: 'Computer Science',
-    year: 'Year 2',
-    author: 'Admin_Registry',
-    downloads: 1240,
-    fileType: 'PDF',
-    timestamp: '2 days ago'
-  },
-  {
-    id: 'res-2',
-    title: 'Structural Analysis III Notes',
-    category: 'Notes/Books',
-    college: 'CEDAT',
-    course: 'Civil Engineering',
-    year: 'Year 3',
-    author: 'Lecturer_Sync',
-    downloads: 890,
-    fileType: 'PDF',
-    timestamp: '5 days ago'
-  },
-  {
-    id: 'res-3',
-    title: 'Constitutional Law - Case Summaries',
-    category: 'Notes/Books',
-    college: 'LAW',
-    course: 'Bachelor of Laws',
-    year: 'Year 1',
-    author: 'Guild_Vault',
-    downloads: 3200,
-    fileType: 'DOCX',
-    timestamp: '1 week ago'
-  }
-];
-
-const INITIAL_OPPORTUNITIES: Post[] = [
-  {
-    id: 'opp-featured',
-    author: 'Google Africa',
-    authorId: 'google_africa',
-    authorRole: 'Corporate Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Google',
-    timestamp: '1h ago',
-    content: 'The Google Developer Student Club (GDSC) lead applications for 2025/26 are now open. Influence the tech pulse on campus.',
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Tech', '#Leadership'],
-    likes: 2450,
-    commentsCount: 156,
-    comments: [],
-    views: 89000,
-    flags: [],
-    isOpportunity: true,
-    college: 'Global',
-    images: ['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200'],
-    opportunityData: {
-      type: 'Workshop',
-      deadline: getFutureDate(14),
-      isAIVerified: true,
-      detectedBenefit: 'Global Network'
-    }
-  },
-  {
-    id: 'opp-1',
-    author: 'Mak AI Lab',
-    authorId: 'mak_ailab',
-    authorRole: 'Research Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AILab',
-    timestamp: '2h ago',
-    content: 'Urgent: Seeking 5 Student Developers for a 48-hour NLP data labeling gig. Payment: 150k UGX per node.',
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Gig', '#AI'],
-    likes: 420,
-    commentsCount: 12,
-    comments: [],
-    views: 1200,
-    flags: [],
-    isOpportunity: true,
-    college: 'COCIS',
-    opportunityData: {
-      type: 'Gig',
-      deadline: getFutureDate(1), 
-      isAIVerified: true,
-      detectedBenefit: 'Immediate Payment'
-    }
-  },
-  {
-    id: 'opp-cedat-grant',
-    author: 'MakUnipod',
-    authorId: 'mak_unipod',
-    authorRole: 'Innovation Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Unipod',
-    timestamp: '5h ago',
-    content: 'Innovation Grant: Alpha Cohort for Sustainable Energy Prototypes. We are funding up to 5 projects this semester.',
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Grant', '#Engineering'],
-    likes: 890,
-    commentsCount: 45,
-    comments: [],
-    views: 15000,
-    flags: [],
-    isOpportunity: true,
-    college: 'CEDAT',
-    images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200'],
-    opportunityData: {
-      type: 'Grant',
-      deadline: getFutureDate(30),
-      isAIVerified: true,
-      detectedBenefit: 'UGX 2.5M Fund'
-    }
-  },
-  {
-    id: 'opp-law-intern',
-    author: 'Kats & Co.',
-    authorId: 'kats_law',
-    authorRole: 'Corporate Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=LawFirm',
-    timestamp: '1d ago',
-    content: 'Summer Clerkship Program: Open for 3rd and 4th Year Law students. High-intensity litigation exposure.',
-    customFont: '"Plus Jakarta Sans"',
-    hashtags: ['#Internship', '#Law'],
-    likes: 120,
-    commentsCount: 8,
-    comments: [],
-    views: 4500,
-    flags: [],
-    isOpportunity: true,
-    college: 'LAW',
-    opportunityData: {
-      type: 'Internship',
-      deadline: getFutureDate(7),
-      isAIVerified: true,
-      detectedBenefit: 'Professional Mentorship'
-    }
-  },
-  {
-    id: 'opp-chs-research',
-    author: 'WHO Research Unit',
-    authorId: 'who_unit',
-    authorRole: 'Official Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=WHO',
-    timestamp: '3d ago',
-    content: 'Seeking Medical Students for Community Health Survey in Mulago. Research nodes needed for 2 weeks.',
-    customFont: '"Inter"',
-    hashtags: ['#Research', '#Medicine'],
-    likes: 340,
-    commentsCount: 22,
-    comments: [],
-    views: 8900,
-    flags: [],
-    isOpportunity: true,
-    college: 'CHS',
-    images: ['https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200'],
-    opportunityData: {
-      type: 'Research' as any,
-      deadline: getFutureDate(5),
-      isAIVerified: true,
-      detectedBenefit: 'Research Credentials'
-    }
-  },
-  {
-    id: 'opp-cobams-scholar',
-    author: 'Stanbic Bank',
-    authorId: 'stanbic_mak',
-    authorRole: 'Corporate Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Stanbic',
-    timestamp: '4d ago',
-    content: 'FinTech Scholarship: Full tuition coverage for top 10 Economics/Statistics students with a focus on Digital Banking.',
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Scholarship', '#Finance'],
-    likes: 5600,
-    commentsCount: 890,
-    comments: [],
-    views: 120000,
-    flags: [],
-    isOpportunity: true,
-    college: 'COBAMS',
-    images: ['https://www.intelligentcio.com/africa/wp-content/uploads/sites/5/2023/08/STANBIC-BANK_1000X450.jpg'],
-    opportunityData: {
-      type: 'Scholarship',
-      deadline: getFutureDate(21),
-      isAIVerified: true,
-      detectedBenefit: 'Full Tuition'
-    }
-  }
 ];
 
 const parseArray = <T>(key: string, fallback: T[]): T[] => {
@@ -278,7 +128,7 @@ export const db = {
     db.savePosts([post, ...posts]);
     if (post.isOpportunity) db.addOpportunity(post);
   },
-  getOpportunities: (): Post[] => parseArray<Post>(DB_KEYS.OPPORTUNITIES, INITIAL_OPPORTUNITIES),
+  getOpportunities: (): Post[] => parseArray<Post>(DB_KEYS.OPPORTUNITIES, []),
   saveOpportunities: (opps: Post[]) => localStorage.setItem(DB_KEYS.OPPORTUNITIES, JSON.stringify(opps)),
   addOpportunity: (post: Post) => {
     const opps = db.getOpportunities();
@@ -292,7 +142,7 @@ export const db = {
     const opps = db.getOpportunities();
     db.saveOpportunities(opps.filter(o => o.id !== postId));
   },
-  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, INITIAL_RESOURCES),
+  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
   saveResource: (resource: Resource) => {
     const resources = db.getResources();
     localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...resources]));
@@ -315,5 +165,11 @@ export const db = {
   },
   getAds: (): Ad[] => parseArray<Ad>(DB_KEYS.ADS, []),
   saveAds: (ads: Ad[]) => localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads)),
+  getNotifications: (): Notification[] => parseArray<Notification>(DB_KEYS.NOTIFICATIONS, INITIAL_NOTIFS),
+  saveNotifications: (notifs: Notification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifs)),
+  addNotification: (notif: Notification) => {
+    const notifs = db.getNotifications();
+    db.saveNotifications([notif, ...notifs]);
+  },
   getEvents: () => []
 };

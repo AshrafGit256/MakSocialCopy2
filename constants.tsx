@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { 
-  Home, Search, Compass, MessageCircle, LayoutGrid, User, Calendar, BookOpen, Newspaper, GitPullRequest
+  Home, Search, MessageCircle, User, Calendar, BookOpen, Bell, Award
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
@@ -10,9 +10,8 @@ export const NAV_ITEMS = [
   { id: 'search', label: 'Search', icon: <Search size={22} /> },
   { id: 'calendar', label: 'Schedule', icon: <Calendar size={22} /> },
   { id: 'resources', label: 'The Vault', icon: <BookOpen size={22} /> },
-  { id: 'forge', label: 'The Forge', icon: <GitPullRequest size={22} /> },
+  { id: 'notifications', label: 'Signals', icon: <Bell size={22} /> },
   { id: 'messages', label: 'Direct', icon: <MessageCircle size={22} /> },
-  { id: 'groups', label: 'Wing Hubs', icon: <LayoutGrid size={22} /> },
   { id: 'profile', label: 'Terminal', icon: <User size={22} /> },
 ];
 

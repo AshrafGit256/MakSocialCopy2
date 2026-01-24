@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star, Bell } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -12,9 +12,10 @@ interface SidebarProps {
   onLogout: () => void;
   isOpen?: boolean;
   onClose?: () => void;
+  unreadNotifications?: number;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onClose, unreadNotifications = 0 }) => {
   const [currentUser, setCurrentUser] = useState<User>(db.getUser());
 
   useEffect(() => {
@@ -44,9 +45,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
         </div>
 
         <nav className="space-y-1.5">
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Main Signal Clusters</p>
+          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Registry Control</p>
           {NAV_ITEMS.map((item) => {
             const isLocked = item.id === 'resources' && currentUser.subscriptionTier === 'Free';
+            const isNotifications = item.id === 'notifications';
+            
             return (
               <button
                 key={item.id}
@@ -58,10 +61,20 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                 } ${isLocked ? 'opacity-60 cursor-not-allowed' : ''}`}
               >
                 <div className="flex items-center space-x-4">
-                  <span className="transition-transform duration-300 group-hover:scale-110">{item.icon}</span>
+                  <div className="relative">
+                     <span className="transition-transform duration-300 group-hover:scale-110 block">{item.icon}</span>
+                     {isNotifications && unreadNotifications > 0 && (
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[var(--sidebar-bg)]"></span>
+                     )}
+                  </div>
                   <span className="text-[11px] tracking-widest font-black uppercase">{item.label}</span>
                 </div>
                 {isLocked && <Lock size={14} className="text-slate-400" />}
+                {isNotifications && unreadNotifications > 0 && (
+                   <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${activeView === 'notifications' ? 'bg-white text-indigo-600' : 'bg-rose-500 text-white'}`}>
+                      {unreadNotifications}
+                   </span>
+                )}
               </button>
             );
           })}

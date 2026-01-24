@@ -112,8 +112,14 @@ const INITIAL_OPPORTUNITIES: Post[] = [
 
 export const db = {
   getUsers: (): User[] => {
-    const saved = localStorage.getItem(DB_KEYS.USERS);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(DB_KEYS.USERS);
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
   },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
   getUser: (id?: string): User => {
@@ -129,10 +135,18 @@ export const db = {
     db.saveUsers(users);
   },
   getPosts: (filter?: College | 'Global'): Post[] => {
-    const saved = localStorage.getItem(DB_KEYS.POSTS);
-    let posts: Post[] = saved ? JSON.parse(saved) : MOCK_POSTS;
-    if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter);
-    return posts;
+    try {
+      const saved = localStorage.getItem(DB_KEYS.POSTS);
+      let posts: Post[] = MOCK_POSTS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) posts = parsed;
+      }
+      if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter);
+      return posts;
+    } catch (e) {
+      return MOCK_POSTS;
+    }
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   addPost: (post: Post) => {
@@ -141,20 +155,28 @@ export const db = {
     if (post.isOpportunity) db.addOpportunity(post);
   },
   getOpportunities: (): Post[] => {
-    const saved = localStorage.getItem(DB_KEYS.OPPORTUNITIES);
-    const opps: Post[] = saved ? JSON.parse(saved) : INITIAL_OPPORTUNITIES;
-    
-    const now = new Date().getTime();
-    return opps
-      .filter(o => {
-        if (!o.opportunityData?.deadline) return true;
-        return new Date(o.opportunityData.deadline).getTime() >= now;
-      })
-      .sort((a, b) => {
-        const da = a.opportunityData?.deadline ? new Date(a.opportunityData.deadline).getTime() : Infinity;
-        const dbVal = b.opportunityData?.deadline ? new Date(b.opportunityData.deadline).getTime() : Infinity;
-        return da - dbVal;
-      });
+    try {
+      const saved = localStorage.getItem(DB_KEYS.OPPORTUNITIES);
+      let opps: Post[] = INITIAL_OPPORTUNITIES;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) opps = parsed;
+      }
+      
+      const now = new Date().getTime();
+      return opps
+        .filter(o => {
+          if (!o.opportunityData?.deadline) return true;
+          return new Date(o.opportunityData.deadline).getTime() >= now;
+        })
+        .sort((a, b) => {
+          const da = a.opportunityData?.deadline ? new Date(a.opportunityData.deadline).getTime() : Infinity;
+          const dbVal = b.opportunityData?.deadline ? new Date(b.opportunityData.deadline).getTime() : Infinity;
+          return da - dbVal;
+        });
+    } catch (e) {
+      return INITIAL_OPPORTUNITIES;
+    }
   },
   saveOpportunities: (opps: Post[]) => localStorage.setItem(DB_KEYS.OPPORTUNITIES, JSON.stringify(opps)),
   addOpportunity: (post: Post) => {

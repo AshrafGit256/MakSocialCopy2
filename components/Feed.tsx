@@ -6,9 +6,10 @@ import { GoogleGenAI } from "@google/genai";
 import { 
   Heart, MessageCircle, X, Loader2, Eye, Zap, 
   Maximize2, Minimize2, Video, Type as LucideType, 
-  ChevronDown, Bold, Italic, Palette, Send, 
-  ArrowLeft, ChevronRight, TrendingUp, Sparkles, Star, Radio,
-  Terminal, Code, Command
+  Bold, Italic, Palette, Send, Underline, Eraser,
+  List, ListOrdered, AlignLeft, Table, Link as LinkIcon,
+  ImageIcon, Code, HelpCircle, ChevronRight, TrendingUp, 
+  Radio, Terminal, Sparkles, Star
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
@@ -25,6 +26,8 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = 
 const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, isAnalyzing: boolean }> = ({ onPost, isAnalyzing }) => {
   const [content, setContent] = useState('');
   const [activeFont, setActiveFont] = useState('"JetBrains Mono"');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isCodeView, setIsCodeView] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
   const exec = (cmd: string, val?: string) => {
@@ -34,74 +37,148 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
     }
   };
 
+  const insertLink = () => {
+    const url = window.prompt("Enter destination URL:");
+    if (url) exec('createLink', url);
+  };
+
+  const insertImage = () => {
+    const url = window.prompt("Enter image URL:");
+    if (url) exec('insertImage', url);
+  };
+
   const handlePublish = () => {
-    const html = editorRef.current ? editorRef.current.innerHTML : '';
+    const html = isCodeView ? content : (editorRef.current ? editorRef.current.innerHTML : '');
     if (html.trim() && html !== '<br>') {
       onPost(html, activeFont);
-      if (editorRef.current) {
-        editorRef.current.innerHTML = '';
-      }
+      if (editorRef.current) editorRef.current.innerHTML = '';
       setContent('');
+      setIsCodeView(false);
     }
   };
 
+  const ToolbarButton: React.FC<{ onClick: () => void, icon: React.ReactNode, title?: string }> = ({ onClick, icon, title }) => (
+    <button 
+      onClick={(e) => { e.preventDefault(); onClick(); }} 
+      className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors text-slate-700 dark:text-slate-300"
+      title={title}
+    >
+      {icon}
+    </button>
+  );
+
   return (
-    <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-xl shadow-xl overflow-hidden mb-10 animate-in slide-in-from-top-4 duration-500">
-      <div className="px-5 py-3 border-b border-[var(--border-color)] bg-slate-50 dark:bg-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-           <Terminal size={14} className="text-indigo-600" />
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Signal.Editor v2.4</span>
+    <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-xl overflow-hidden mb-10 transition-all ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none' : 'relative animate-in slide-in-from-top-4 duration-500'}`}>
+      {/* SOPHISTICATED TOOLBAR (SUMMERNOTE STYLE) */}
+      <div className="px-2 py-1.5 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-1 gap-y-1">
+        
+        {/* Group: AI Magic */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <ToolbarButton onClick={() => exec('italic')} icon={<Sparkles size={14}/>} title="Magic Auto-Format" />
         </div>
+
+        {/* Group: Text Style */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <ToolbarButton onClick={() => exec('bold')} icon={<Bold size={14}/>} title="Bold" />
+          <ToolbarButton onClick={() => exec('underline')} icon={<Underline size={14}/>} title="Underline" />
+          <ToolbarButton onClick={() => exec('removeFormat')} icon={<Eraser size={14}/>} title="Clear Formatting" />
+        </div>
+
+        {/* Group: Font Selection */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <select 
+            onChange={(e) => setActiveFont(e.target.value)}
+            className="bg-transparent text-[10px] px-1 h-7 border border-slate-300 dark:border-white/20 rounded outline-none cursor-pointer"
+            value={activeFont}
+          >
+            <option value='"JetBrains Mono"'>JetBrains Mono</option>
+            <option value='"Inter"'>Inter UI</option>
+            <option value='"Playfair Display"'>Scholar Serif</option>
+            <option value='sans-serif'>System Sans</option>
+          </select>
+        </div>
+
+        {/* Group: Color/Highlight */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <ToolbarButton onClick={() => exec('backColor', '#ffff00')} icon={<div className="flex flex-col items-center"><span className="text-[10px] leading-none font-black underline decoration-yellow-400">A</span></div>} title="Highlight Text" />
+        </div>
+
+        {/* Group: Lists & Paragraphs */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={14}/>} title="Bullet List" />
+          <ToolbarButton onClick={() => exec('insertOrderedList')} icon={<ListOrdered size={14}/>} title="Numbered List" />
+          <ToolbarButton onClick={() => exec('justifyLeft')} icon={<AlignLeft size={14}/>} title="Alignment" />
+        </div>
+
+        {/* Group: Tables */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <ToolbarButton onClick={() => {}} icon={<Table size={14}/>} title="Insert Table" />
+        </div>
+
+        {/* Group: Links & Media */}
+        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+          <ToolbarButton onClick={insertLink} icon={<LinkIcon size={14}/>} title="Add Link" />
+          <ToolbarButton onClick={insertImage} icon={<ImageIcon size={14}/>} title="Add Image" />
+          <ToolbarButton onClick={() => {}} icon={<Video size={14}/>} title="Embed Video" />
+        </div>
+
+        {/* Group: System Tools */}
         <div className="flex items-center gap-1">
-           <button onClick={() => exec('bold')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors" title="Bold"><Bold size={14}/></button>
-           <button onClick={() => exec('italic')} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors" title="Italic"><Italic size={14}/></button>
-           <div className="h-4 w-px bg-[var(--border-color)] mx-2"></div>
-           <select 
-             onChange={(e) => setActiveFont(e.target.value)}
-             className="bg-transparent text-[9px] font-black uppercase tracking-widest outline-none cursor-pointer"
-           >
-              <option value='"JetBrains Mono"'>Tactical Mono</option>
-              <option value='"Inter"'>Inter UI</option>
-              <option value='"Playfair Display"'>Scholar Serif</option>
-           </select>
+          <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Toggle Fullscreen" />
+          <ToolbarButton onClick={() => setIsCodeView(!isCodeView)} icon={<Code size={14}/>} title="Code View" />
+          <ToolbarButton onClick={() => {}} icon={<HelpCircle size={14}/>} title="Help" />
         </div>
       </div>
 
-      <div className="relative">
-        <div 
-          ref={editorRef}
-          contentEditable
-          onInput={(e) => setContent(e.currentTarget.innerHTML)}
-          className="min-h-[160px] p-8 text-sm outline-none leading-relaxed"
-          style={{ fontFamily: activeFont }}
-          data-placeholder="Initialize new signal transmission..."
-        />
-        {!content && <div className="absolute top-8 left-8 text-slate-400 pointer-events-none text-xs italic opacity-50 font-mono">_awaiting_input...</div>}
+      {/* EDITOR AREA */}
+      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-140px)]' : 'min-h-[160px]'}`}>
+        {isCodeView ? (
+          <textarea 
+            className="w-full h-full p-8 font-mono text-xs bg-slate-900 text-emerald-400 outline-none resize-none"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+        ) : (
+          <div 
+            ref={editorRef}
+            contentEditable
+            onInput={(e) => setContent(e.currentTarget.innerHTML)}
+            className="w-full h-full p-8 text-sm outline-none leading-relaxed overflow-y-auto rich-content-editor"
+            style={{ fontFamily: activeFont }}
+            data-placeholder="Place some text here"
+          />
+        )}
+        {!content && !isCodeView && <div className="absolute top-8 left-8 text-slate-400 pointer-events-none text-sm font-sans opacity-70">Place some text here</div>}
       </div>
 
-      <div className="px-5 py-4 bg-slate-50 dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
+      {/* FOOTER BAR */}
+      <div className="px-5 py-3 bg-[#f8f9fa] dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
         <div className="flex items-center gap-3">
+           <div className="h-2 w-10 bg-slate-300 dark:bg-white/10 rounded-full"></div>
            {isAnalyzing && (
              <div className="flex items-center gap-2 px-3 py-1 bg-indigo-600/10 rounded-full text-indigo-600">
-               <Loader2 size={12} className="animate-spin" />
-               <span className="text-[8px] font-black uppercase tracking-widest">AI Categorization Active</span>
+               <Loader2 size={10} className="animate-spin" />
+               <span className="text-[8px] font-black uppercase tracking-widest">AI Intelligence Sync Active</span>
              </div>
            )}
         </div>
         <button 
           onClick={handlePublish}
           disabled={isAnalyzing || !content.trim()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/30 active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-md font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
         >
           <Send size={14} /> Broadcast Signal
         </button>
       </div>
+
       <style>{`
-        [contenteditable]:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
-        .rich-content h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; font-style: italic; }
-        .rich-content h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
-        .rich-content p { margin-bottom: 1rem; }
-        .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .rich-content-editor:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
+        .rich-content-editor h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .rich-content-editor p { margin-bottom: 1rem; }
+        .rich-content-editor ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .rich-content-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .rich-content-editor table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; }
+        .rich-content-editor th, .rich-content-editor td { border: 1px solid #ddd; padding: 8px; }
       `}</style>
     </div>
   );
@@ -123,7 +200,7 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, onNav
                </div>
                <span className="text-slate-500 font-mono text-[9px] whitespace-nowrap ml-2">{post.timestamp}</span>
             </div>
-            <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-[var(--radius-main)] shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
+            <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
                <div className="p-5 space-y-4" style={{ fontFamily: post.customFont }}>
                   <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content text-[14px] leading-relaxed" />
                </div>

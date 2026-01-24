@@ -9,6 +9,25 @@ export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC'
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
+export interface AuditLog {
+  id: string;
+  action: string;
+  admin: string;
+  target: string;
+  timestamp: string;
+  severity: 'info' | 'warning' | 'danger';
+}
+
+export interface FlaggedContent {
+  id: string;
+  contentType: 'post' | 'comment' | 'user';
+  reason: string;
+  reportedBy: string;
+  contentPreview: string;
+  timestamp: string;
+  status: 'pending' | 'resolved' | 'dismissed';
+}
+
 export interface Notification {
   id: string;
   type: 'skill_match' | 'engagement' | 'follow' | 'event' | 'system';

@@ -105,6 +105,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
       reader.onload = (event) => {
         const base64 = event.target?.result as string;
         restoreSelection();
+        // Updated: The class responsive-doc-image now handles the "squeeze"
         const html = `<div class="content-image-wrapper"><img src="${base64}" class="responsive-doc-image" alt="User Document" /></div><br>`;
         document.execCommand('insertHTML', false, html);
       };
@@ -332,15 +333,15 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         </div>
       </div>
 
-      {/* COMPACT TYPING AREA */}
-      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'min-h-[60px] max-h-[250px]'}`}>
+      {/* COMPACT TYPING AREA - Fixed Height disturbance by allowing expansion and containment */}
+      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'min-h-[100px] max-h-[600px] overflow-y-auto'}`}>
         <div 
           ref={editorRef}
           contentEditable
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
           onFocus={saveSelection}
           onBlur={saveSelection}
-          className="w-full h-full p-3 text-sm outline-none leading-tight overflow-y-auto rich-content-style"
+          className="w-full h-auto min-h-[100px] p-3 text-sm outline-none leading-tight rich-content-style"
           style={{ fontFamily: activeFont }}
           data-placeholder="Start typing your signal..."
         />
@@ -373,7 +374,18 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         .rich-content-style h4 { font-size: 1.1rem; font-weight: 700; margin: 0.3rem 0; display: block; }
         .rich-content-style p { margin-bottom: 0.25rem; }
         .content-image-wrapper { margin: 8px 0; text-align: center; width: 100%; display: flex; justify-content: center; }
-        .responsive-doc-image { max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: block; border: 1px solid #ddd; }
+        
+        /* Fixed image squeezing: ensure images stay manageable in editor */
+        .responsive-doc-image { 
+          max-width: 100%; 
+          max-height: 350px; 
+          object-fit: contain; 
+          border-radius: 4px; 
+          box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
+          display: block; 
+          border: 1px solid #ddd; 
+        }
+        
         .rich-content-style table { border-collapse: collapse; width: 100% !important; border: 1px solid #ddd !important; margin: 10px 0 !important; table-layout: fixed; }
         .rich-content-style th, .rich-content-style td { border: 1px solid #ddd !important; padding: 6px !important; word-wrap: break-word; }
         .rich-content-style blockquote { border-left: 3px solid #4f46e5; padding-left: 0.75rem; font-style: italic; color: #64748b; margin-bottom: 0.25rem; }

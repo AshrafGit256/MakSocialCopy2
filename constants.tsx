@@ -110,7 +110,7 @@ export const ANALYTICS: AnalyticsData[] = [
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
-    user: { name: 'Guru A.', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Ashraf.jpeg'},
+    user: { name: 'Guru A.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ashraf'},
     lastMessage: 'The research notes are in the Vault.',
     unreadCount: 2,
     messages: [
@@ -131,7 +131,7 @@ export const MOCK_CHATS: ChatConversation[] = [
   },
   {
     id: 'c3',
-    user: { name: 'Admin Registry', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png'},
+    user: { name: 'Admin Registry', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Admin'},
     lastMessage: 'Protocol updated for semester 2.',
     unreadCount: 1,
     messages: [
@@ -147,6 +147,25 @@ export const MOCK_CHATS: ChatConversation[] = [
     messages: [
       { id: 'm8', text: 'Handshake: Discussing Article 45 compliance.', timestamp: '2 days ago', isMe: true },
       { id: 'm9', text: 'Legal brief finalized. Forwarding to CHS node.', timestamp: '2 days ago', isMe: false },
+    ]
+  },
+  {
+    id: 'c5',
+    user: { name: 'Proffesor X', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ProfX'},
+    lastMessage: 'Class scheduled at 2PM in Block B.',
+    unreadCount: 0,
+    messages: [
+      { id: 'm10', text: 'Assignment uplink received.', timestamp: '3 hours ago', isMe: false },
+      { id: 'm11', text: 'Thank you Professor.', timestamp: '2 hours ago', isMe: true },
+    ]
+  },
+  {
+    id: 'c6',
+    user: { name: 'Makerere Guild', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Guild'},
+    lastMessage: 'Bursary applications are open.',
+    unreadCount: 5,
+    messages: [
+      { id: 'm12', text: 'Emergency Guild assembly at Freedom Square.', timestamp: '1 hour ago', isMe: false },
     ]
   }
 ];

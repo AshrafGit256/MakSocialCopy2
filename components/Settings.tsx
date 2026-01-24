@@ -8,7 +8,8 @@ import {
   Maximize2, Grid3X3, Layers, Fingerprint,
   ChevronRight, Laptop, Moon, Sun, Ghost,
   MousePointer2, Square, Circle, Info, Eye,
-  FileText, MessageCircle, Heart, Share2
+  FileText, MessageCircle, Heart, Share2,
+  Plus, Minus, Hash, Command, Globe
 } from 'lucide-react';
 
 const COLORS = [
@@ -29,7 +30,7 @@ const FONTS = [
 ];
 
 const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'visuals' | 'geometry' | 'behavior'>('visuals');
+  const [activeTab, setActiveTab] = useState<'visuals' | 'geometry' | 'behavior' | 'system'>('visuals');
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('maksocial_appearance_v2');
     return saved ? JSON.parse(saved) : {
@@ -40,7 +41,6 @@ const Settings: React.FC = () => {
       density: 'comfortable',
       borderRadius: '4px',
       animationsEnabled: true,
-      // Added motionStrata default
       motionStrata: 'subtle',
       glassmorphism: true,
       glowEffects: true,
@@ -50,6 +50,8 @@ const Settings: React.FC = () => {
     };
   });
 
+  const [fontSizeNumeric, setFontSizeNumeric] = useState(14);
+
   useEffect(() => {
     localStorage.setItem('maksocial_appearance_v2', JSON.stringify(settings));
     
@@ -58,29 +60,46 @@ const Settings: React.FC = () => {
     root.style.setProperty('--brand-color', settings.primaryColor);
     root.style.setProperty('--font-main', settings.fontFamily);
     root.style.setProperty('--radius-main', settings.borderRadius);
+    root.style.setProperty('--base-font-size', `${fontSizeNumeric}px`);
     
     // Applying Data Attributes
     root.setAttribute('data-animations', settings.animationsEnabled.toString());
     root.setAttribute('data-glow', settings.glowEffects.toString());
     root.setAttribute('data-grid', settings.showGrid.toString());
     
-    // Applying Theme Presets
+    // Applying Theme Presets - FIXED THEME BUG
     if (settings.themePreset === 'oled') {
       root.classList.add('dark');
       root.style.setProperty('--bg-primary', '#000000');
+      root.style.setProperty('--bg-secondary', '#0a0a0a');
       root.style.setProperty('--sidebar-bg', '#000000');
       root.style.setProperty('--border-color', '#1a1a1a');
+      root.style.setProperty('--text-primary', '#ffffff');
+      root.style.setProperty('--text-secondary', '#777777');
     } else if (settings.themePreset === 'paper') {
       root.classList.remove('dark');
       root.style.setProperty('--bg-primary', '#ffffff');
-      root.style.setProperty('--bg-secondary', '#f8f9fa');
+      root.style.setProperty('--bg-secondary', '#f9fafb');
+      root.style.setProperty('--sidebar-bg', '#ffffff');
+      root.style.setProperty('--border-color', '#e5e7eb');
+      root.style.setProperty('--text-primary', '#111827');
+      root.style.setProperty('--text-secondary', '#4b5563');
     } else if (settings.themePreset === 'tactical') {
       root.classList.add('dark');
       root.style.setProperty('--bg-primary', '#0d1117');
       root.style.setProperty('--bg-secondary', '#161b22');
+      root.style.setProperty('--sidebar-bg', '#010409');
       root.style.setProperty('--border-color', '#30363d');
+      root.style.setProperty('--text-primary', '#c9d1d9');
+      root.style.setProperty('--text-secondary', '#8b949e');
+    } else {
+      // Standard Slate
+      root.classList.add('dark');
+      root.style.setProperty('--bg-primary', '#1e293b');
+      root.style.setProperty('--bg-secondary', '#334155');
+      root.style.setProperty('--border-color', '#475569');
     }
-  }, [settings]);
+  }, [settings, fontSizeNumeric]);
 
   const handleReset = () => {
     setSettings({
@@ -91,7 +110,6 @@ const Settings: React.FC = () => {
       density: 'comfortable',
       borderRadius: '4px',
       animationsEnabled: true,
-      // Added motionStrata reset
       motionStrata: 'subtle',
       glassmorphism: true,
       glowEffects: true,
@@ -99,47 +117,51 @@ const Settings: React.FC = () => {
       showGrid: true,
       accentColor: '#4f46e5'
     });
+    setFontSizeNumeric(14);
+  };
+
+  const adjustFontSize = (delta: number) => {
+    setFontSizeNumeric(prev => Math.min(Math.max(prev + delta, 10), 24));
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10 pb-40 font-mono text-[var(--text-primary)]">
+    <div className="max-w-7xl mx-auto px-4 lg:px-12 py-10 pb-40 font-mono text-[var(--text-primary)]">
       
       {/* 1. TACTICAL HEADER */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-16">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-12">
         <div className="flex items-center gap-6">
-           <div className="p-5 bg-indigo-600 rounded-xl shadow-2xl shadow-indigo-600/20 text-white">
-              <Cpu size={40} />
+           <div className="p-4 bg-indigo-600 rounded-xl shadow-2xl shadow-indigo-600/20 text-white">
+              <Cpu size={36} />
            </div>
            <div>
-              <h1 className="text-5xl font-black uppercase tracking-tighter italic leading-none">OS.Customizer</h1>
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 mt-2">Registry Configuration / Node v4.2.0</p>
+              <h1 className="text-4xl font-black uppercase tracking-tighter italic leading-none">OS_Registry_Config</h1>
+              <p className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-500 mt-2 flex items-center gap-2">
+                 <Activity size={10} className="text-emerald-500" /> SYSTEM.NOMINAL / NODE_v4.2
+              </p>
            </div>
         </div>
-        <div className="flex gap-3">
-           <button onClick={handleReset} className="px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-rose-500 hover:border-rose-500/30 transition-all flex items-center gap-2">
-              <RefreshCcw size={14} /> Factory.Reset
+        <div className="flex gap-2">
+           <button onClick={handleReset} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[8px] font-black uppercase tracking-widest hover:text-rose-500 hover:border-rose-500/30 transition-all flex items-center gap-2">
+              <RefreshCcw size={12} /> Factory_Purge
            </button>
-           <div className="px-5 py-2.5 bg-indigo-600/10 border border-indigo-600/20 rounded-md text-indigo-600 text-[9px] font-black uppercase flex items-center gap-2">
-              <Radio size={12} className="animate-pulse" /> Uplink.Ready
-           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         {/* 2. LEFT: PREVIEW NODE */}
-        <aside className="lg:col-span-4 space-y-8">
-           <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-8 sticky top-24 shadow-sm space-y-8">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-3">
-                 <Monitor size={16} /> Live.Signal_Preview
+        <aside className="lg:col-span-4 space-y-6">
+           <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-6 sticky top-24 shadow-sm space-y-6 overflow-hidden">
+              <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-3">
+                 <Monitor size={14} /> Global_Signal_Preview
               </h3>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                  {/* MOCK POST COMPONENT */}
-                 <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 space-y-4 shadow-sm" style={{ fontFamily: settings.fontFamily, borderRadius: settings.borderRadius }}>
+                 <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] p-5 space-y-3 shadow-sm transition-all duration-300" style={{ fontFamily: settings.fontFamily, borderRadius: settings.borderRadius }}>
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
                              <Fingerprint size={20} />
                           </div>
                           <div>
@@ -147,53 +169,57 @@ const Settings: React.FC = () => {
                              <div className="h-1.5 w-16 bg-slate-300 dark:bg-white/10 rounded-full"></div>
                           </div>
                        </div>
-                       <Share2 size={14} className="text-slate-400" />
+                       <Command size={14} className="text-slate-400" />
                     </div>
-                    <p className="text-[11px] font-medium leading-relaxed italic">
-                       "Initializing deep signal preview. The university registry is now synchronized with your custom UI strata."
+                    <p className="font-medium leading-relaxed italic" style={{ fontSize: `${fontSizeNumeric}px` }}>
+                       "Registry strata initialized. Visual telemetry is now synced with local node configurations."
                     </p>
-                    <div className="flex gap-4 pt-2">
-                       <div className="flex items-center gap-1.5 text-rose-500"><Heart size={14} /><span className="text-[9px] font-black">4.2k</span></div>
-                       <div className="flex items-center gap-1.5 text-indigo-600"><MessageCircle size={14} /><span className="text-[9px] font-black">89</span></div>
+                    <div className="flex gap-4 pt-1 opacity-60">
+                       <div className="flex items-center gap-1.5 text-rose-500"><Heart size={12} /><span className="text-[8px] font-black uppercase">Sync</span></div>
+                       <div className="flex items-center gap-1.5 text-indigo-600"><Share2 size={12} /><span className="text-[8px] font-black uppercase">Fork</span></div>
                     </div>
                  </div>
 
                  {/* MOCK UI ELEMENTS */}
-                 <div className="grid grid-cols-2 gap-3">
-                    <button className="bg-indigo-600 text-white p-3 flex flex-col items-center justify-center gap-2 shadow-lg" style={{ borderRadius: settings.borderRadius }}>
-                       <Zap size={16} className={settings.glowEffects ? 'animate-pulse' : ''}/>
-                       <span className="text-[8px] font-black uppercase">Active.Node</span>
-                    </button>
-                    <button className="bg-[var(--bg-primary)] border border-[var(--border-color)] p-3 flex flex-col items-center justify-center gap-2" style={{ borderRadius: settings.borderRadius }}>
-                       <Database size={16} className="text-slate-400" />
-                       <span className="text-[8px] font-black uppercase text-slate-500">Registry</span>
-                    </button>
+                 <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-indigo-600 text-white p-3 flex flex-col items-center justify-center gap-1 shadow-lg" style={{ borderRadius: settings.borderRadius }}>
+                       <Zap size={14} className={settings.glowEffects ? 'animate-pulse' : ''}/>
+                       <span className="text-[7px] font-black uppercase tracking-widest">Active_Uplink</span>
+                    </div>
+                    <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] p-3 flex flex-col items-center justify-center gap-1" style={{ borderRadius: settings.borderRadius }}>
+                       <Database size={14} className="text-slate-400" />
+                       <span className="text-[7px] font-black uppercase tracking-widest text-slate-500">Registry_Log</span>
+                    </div>
                  </div>
               </div>
 
-              <div className="pt-6 border-t border-[var(--border-color)] flex items-center gap-4 text-slate-500">
-                 <Info size={16} />
-                 <p className="text-[8px] font-black uppercase tracking-widest leading-loose">
-                    Preview uses localized variable injection. Actual signal transmission may vary based on terminal constraints.
-                 </p>
+              <div className="pt-4 border-t border-[var(--border-color)] space-y-2">
+                 <div className="flex justify-between items-center text-[8px] font-black uppercase text-slate-500">
+                    <span>Signal_Strength</span>
+                    <span className="text-emerald-500">98% Stable</span>
+                 </div>
+                 <div className="h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-indigo-600 w-[98%] shadow-[0_0_8px_var(--brand-color)]"></div>
+                 </div>
               </div>
            </div>
         </aside>
 
         {/* 3. RIGHT: CONTROL MATRIX */}
-        <main className="lg:col-span-8 space-y-12 pb-32">
+        <main className="lg:col-span-8 space-y-10">
            
            {/* TAB SWITCHER */}
-           <div className="flex gap-2 p-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] w-fit">
+           <div className="flex overflow-x-auto no-scrollbar gap-2 p-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] w-full sm:w-fit">
               {[
-                { id: 'visuals', label: 'OS Visuals', icon: <Palette size={14}/> },
-                { id: 'geometry', label: 'Geometry', icon: <Box size={14}/> },
-                { id: 'behavior', label: 'Behaviors', icon: <Sliders size={14}/> }
+                { id: 'visuals', label: 'Visual_Strata', icon: <Palette size={14}/> },
+                { id: 'geometry', label: 'Geometry_Logic', icon: <Box size={14}/> },
+                { id: 'behavior', label: 'Behaviors', icon: <Sliders size={14}/> },
+                { id: 'system', label: 'System_Info', icon: <Info size={14}/> }
               ].map(tab => (
                  <button
                    key={tab.id}
                    onClick={() => setActiveTab(tab.id as any)}
-                   className={`px-6 py-2 rounded-sm text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}
+                   className={`px-4 py-2 rounded-sm text-[9px] font-black uppercase tracking-widest flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}
                  >
                     {tab.icon} {tab.label}
                  </button>
@@ -203,71 +229,69 @@ const Settings: React.FC = () => {
            {activeTab === 'visuals' && (
               <section className="space-y-10 animate-in fade-in slide-in-from-right-2 duration-300">
                  {/* Environment Presets */}
-                 <div className="space-y-6">
-                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 block ml-1">Environment_Presets</label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500 block ml-1 flex items-center gap-2">
+                       <Globe size={12}/> Environment_Parameters
+                    </label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                        {[
-                         { id: 'tactical', label: 'Tactical Dark', icon: <Laptop size={18}/>, desc: 'Classic Registry' },
-                         { id: 'oled', label: 'Pure OLED', icon: <Ghost size={18}/>, desc: 'Maximum Stealth' },
-                         { id: 'paper', label: 'Paper White', icon: <FileText size={18}/>, desc: 'Light Mode' },
-                         { id: 'standard', label: 'Slate Hybrid', icon: <Activity size={18}/>, desc: 'Medium Contrast' }
+                         { id: 'tactical', label: 'Tactical_Dark', icon: <Laptop size={16}/>, desc: 'Night Ops' },
+                         { id: 'oled', label: 'Pure_OLED', icon: <Ghost size={16}/>, desc: 'Stealth' },
+                         { id: 'paper', label: 'Light_Paper', icon: <FileText size={16}/>, desc: 'Day Ops' },
+                         { id: 'standard', label: 'Hybrid_Blue', icon: <Activity size={16}/>, desc: 'Balanced' }
                        ].map(t => (
                           <button 
                             key={t.id}
                             onClick={() => setSettings({...settings, themePreset: t.id as any})}
-                            className={`p-5 rounded-md border text-left transition-all group ${settings.themePreset === t.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600/50'}`}
+                            className={`p-4 rounded-md border text-left transition-all group ${settings.themePreset === t.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600/50'}`}
                           >
-                             <div className="flex justify-between items-start mb-4">
+                             <div className="flex justify-between items-start mb-3">
                                 {t.icon}
-                                {settings.themePreset === t.id && <Check size={14} />}
+                                {settings.themePreset === t.id && <Check size={12} />}
                              </div>
-                             <p className="text-[9px] font-black uppercase tracking-widest">{t.label}</p>
-                             <p className={`text-[7px] font-bold uppercase mt-1 opacity-50 ${settings.themePreset === t.id ? 'text-white' : 'text-slate-400'}`}>{t.desc}</p>
+                             <p className="text-[8px] font-black uppercase tracking-widest">{t.label}</p>
+                             <p className={`text-[6px] font-bold uppercase mt-1 opacity-50 ${settings.themePreset === t.id ? 'text-white' : 'text-slate-400'}`}>{t.desc}</p>
                           </button>
                        ))}
                     </div>
                  </div>
 
-                 {/* Signal Frequencies (Primary Colors) */}
-                 <div className="space-y-6">
-                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 block ml-1">Frequency_Spectrum (Accent)</label>
-                    <div className="flex flex-wrap gap-4">
+                 {/* Frequencies */}
+                 <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500 block ml-1 flex items-center gap-2">
+                       <Hash size={12}/> Frequency_Accent (Color)
+                    </label>
+                    <div className="flex flex-wrap gap-4 p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)]">
                        {COLORS.map(c => (
                           <button 
                             key={c.hex}
                             onClick={() => setSettings({...settings, primaryColor: c.hex})}
-                            className={`group relative flex flex-col items-center gap-3 transition-transform hover:scale-105`}
+                            className={`group relative flex flex-col items-center gap-2 transition-transform hover:scale-105`}
                           >
                              <div 
-                               className={`w-14 h-14 rounded-md border-4 transition-all flex items-center justify-center ${settings.primaryColor === c.hex ? 'border-white shadow-2xl scale-110' : 'border-transparent opacity-60 hover:opacity-100'}`} 
+                               className={`w-12 h-12 rounded-md border-2 transition-all flex items-center justify-center ${settings.primaryColor === c.hex ? 'border-white shadow-2xl scale-110' : 'border-transparent opacity-60 hover:opacity-100'}`} 
                                style={{ backgroundColor: c.hex }}
                              >
-                                {settings.primaryColor === c.hex && <Check size={20} className="text-white" />}
+                                {settings.primaryColor === c.hex && <Check size={18} className="text-white" />}
                              </div>
-                             <span className={`text-[7px] font-black uppercase tracking-widest ${settings.primaryColor === c.hex ? 'text-indigo-600' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>{c.name}</span>
+                             <span className={`text-[6px] font-black uppercase tracking-widest ${settings.primaryColor === c.hex ? 'text-indigo-600' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>{c.name}</span>
                           </button>
                        ))}
                     </div>
                  </div>
 
-                 {/* Typography Engines */}
-                 <div className="space-y-6">
-                    <label className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 block ml-1">Typeface_Engine</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       {FONTS.map(f => (
-                          <button 
-                            key={f.name}
-                            onClick={() => setSettings({...settings, fontFamily: f.value})}
-                            className={`p-6 border rounded-md text-left transition-all ${settings.fontFamily === f.value ? 'bg-indigo-600 text-white border-transparent shadow-lg' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600/30 text-slate-500'}`}
-                            style={{ fontFamily: f.value }}
-                          >
-                             <div className="flex justify-between items-center">
-                                <span className="text-xs font-black uppercase tracking-widest">{f.name}</span>
-                                {settings.fontFamily === f.value && <Eye size={14}/>}
-                             </div>
-                             <p className="text-[8px] mt-2 opacity-60">"The quick brown fox jumps over the lazy student."</p>
-                          </button>
-                       ))}
+                 {/* Font Numeric Control */}
+                 <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500 block ml-1 flex items-center gap-2">
+                       <Maximize2 size={12}/> Typography_Scale
+                    </label>
+                    <div className="flex items-center gap-6 p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)]">
+                       <button onClick={() => adjustFontSize(-1)} className="p-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md hover:text-indigo-600 transition-colors"><Minus size={16}/></button>
+                       <div className="flex-1 flex flex-col items-center gap-1">
+                          <span className="text-2xl font-black italic tracking-tighter">{fontSizeNumeric}px</span>
+                          <span className="text-[7px] font-black uppercase text-slate-400 tracking-[0.2em]">Scale_Resolution</span>
+                       </div>
+                       <button onClick={() => adjustFontSize(1)} className="p-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md hover:text-indigo-600 transition-colors"><Plus size={16}/></button>
                     </div>
                  </div>
               </section>
@@ -275,12 +299,12 @@ const Settings: React.FC = () => {
 
            {activeTab === 'geometry' && (
               <section className="space-y-10 animate-in fade-in slide-in-from-right-2 duration-300">
-                 <div className="p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] space-y-10">
+                 <div className="p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] space-y-8">
                     {/* Radius Slider */}
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                        <div className="flex justify-between items-center">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
-                             <Square size={14}/> Component_Geometry (Radius)
+                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
+                             <Square size={14}/> Radius_Geometry
                           </label>
                           <span className="text-indigo-600 text-[10px] font-black uppercase">{settings.borderRadius}</span>
                        </div>
@@ -290,26 +314,26 @@ const Settings: React.FC = () => {
                          onChange={(e) => setSettings({...settings, borderRadius: `${e.target.value}px`})}
                          className="w-full h-1 bg-[var(--bg-primary)] rounded-full appearance-none cursor-pointer accent-indigo-600"
                        />
-                       <div className="flex justify-between text-[7px] font-black text-slate-400 uppercase tracking-widest">
-                          <span>Hard_Industrial (0px)</span>
+                       <div className="flex justify-between text-[6px] font-black text-slate-400 uppercase tracking-widest">
+                          <span>Hard_Indus (0px)</span>
                           <span>Soft_Minimal (12px)</span>
                           <span>Fluid_Modern (24px)</span>
                        </div>
                     </div>
 
-                    <div className="h-px bg-[var(--border-color)]" />
+                    <div className="h-px bg-[var(--border-color)] opacity-40" />
 
                     {/* UI Density */}
-                    <div className="space-y-6">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
-                          <Layers size={14}/> Interface_Density
+                    <div className="space-y-4">
+                       <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-3">
+                          <Layers size={14}/> Interface_Density_Stack
                        </label>
-                       <div className="grid grid-cols-3 gap-4">
+                       <div className="grid grid-cols-3 gap-3">
                           {(['comfortable', 'compact', 'tight'] as const).map(d => (
                              <button
                                key={d}
                                onClick={() => setSettings({...settings, density: d})}
-                               className={`py-4 rounded-md border text-[9px] font-black uppercase tracking-widest transition-all ${settings.density === d ? 'bg-indigo-600 text-white border-transparent' : 'bg-[var(--bg-primary)] border-[var(--border-color)] text-slate-400'}`}
+                               className={`py-3 rounded-md border text-[8px] font-black uppercase tracking-widest transition-all ${settings.density === d ? 'bg-indigo-600 text-white border-transparent shadow-lg' : 'bg-[var(--bg-primary)] border-[var(--border-color)] text-slate-400'}`}
                              >
                                 {d}
                              </button>
@@ -322,43 +346,55 @@ const Settings: React.FC = () => {
 
            {activeTab === 'behavior' && (
               <section className="space-y-10 animate-in fade-in slide-in-from-right-2 duration-300">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Toggles */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
-                      { id: 'animationsEnabled', label: 'Motion_Strata', icon: <Activity size={18}/>, desc: 'Enable fluid UI transitions' },
-                      { id: 'glowEffects', label: 'Signal_Glow', icon: <Zap size={18}/>, desc: 'Neon active-state highlights' },
-                      { id: 'showGrid', label: 'Tactical_Grid', icon: <Grid3X3 size={18}/>, desc: 'Background telemetry lines' },
-                      { id: 'glassmorphism', label: 'Glass_Transparency', icon: <Layers size={18}/>, desc: 'Blur-based depth effects' }
+                      { id: 'animationsEnabled', label: 'Motion_Flux', icon: <Activity size={18}/>, desc: 'Enable UI transitions' },
+                      { id: 'glowEffects', label: 'Signal_Glow', icon: <Zap size={18}/>, desc: 'Neon accent pulses' },
+                      { id: 'showGrid', label: 'Telemetry_Grid', icon: <Grid3X3 size={18}/>, desc: 'System background grid' },
+                      { id: 'glassmorphism', label: 'Blur_Optics', icon: <Layers size={18}/>, desc: 'Z-axis transparency' }
                     ].map(toggle => (
                        <button
                          key={toggle.id}
                          onClick={() => setSettings({...settings, [toggle.id]: !settings[toggle.id as keyof AppSettings]})}
-                         className={`p-6 rounded-md border text-left flex items-start gap-4 transition-all ${settings[toggle.id as keyof AppSettings] ? 'bg-indigo-600/5 border-indigo-600' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] opacity-60'}`}
+                         className={`p-5 rounded-md border text-left flex items-start gap-4 transition-all ${settings[toggle.id as keyof AppSettings] ? 'bg-indigo-600/5 border-indigo-600' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] opacity-60'}`}
                        >
                           <div className={`p-2 rounded-lg ${settings[toggle.id as keyof AppSettings] ? 'bg-indigo-600 text-white' : 'bg-[var(--bg-primary)] text-slate-400'}`}>
                              {toggle.icon}
                           </div>
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-0">
                              <div className="flex justify-between items-center mb-1">
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${settings[toggle.id as keyof AppSettings] ? 'text-indigo-600' : 'text-slate-500'}`}>{toggle.label}</span>
+                                <span className={`text-[9px] font-black uppercase tracking-widest ${settings[toggle.id as keyof AppSettings] ? 'text-indigo-600' : 'text-slate-500'}`}>{toggle.label}</span>
                                 <div className={`w-8 h-4 rounded-full relative transition-colors ${settings[toggle.id as keyof AppSettings] ? 'bg-indigo-600' : 'bg-slate-300'}`}>
                                    <div className={`absolute top-1 w-2 h-2 rounded-full bg-white transition-all ${settings[toggle.id as keyof AppSettings] ? 'left-5' : 'left-1'}`} />
                                 </div>
                              </div>
-                             <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">{toggle.desc}</p>
+                             <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest truncate">{toggle.desc}</p>
                           </div>
                        </button>
                     ))}
                  </div>
+              </section>
+           )}
 
-                 <div className="p-10 border border-dashed border-indigo-600/30 rounded-[var(--radius-main)] bg-indigo-600/5 flex flex-col items-center text-center space-y-6">
-                    <ShieldCheck size={48} className="text-indigo-600 opacity-40" />
-                    <div className="space-y-2">
-                       <h4 className="text-xl font-black uppercase tracking-tighter italic">Integrity Shield Active</h4>
-                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] max-md leading-relaxed">
-                          All customization variables are locally persistent and verified against the university registry. 
-                          Changes do not affect main signal protocols.
+           {activeTab === 'system' && (
+              <section className="space-y-6 animate-in fade-in duration-300">
+                 <div className="p-8 border border-dashed border-indigo-600/30 rounded-[var(--radius-main)] bg-indigo-600/5 space-y-6">
+                    <ShieldCheck size={32} className="text-indigo-600" />
+                    <div className="space-y-4">
+                       <h4 className="text-xl font-black uppercase tracking-tighter italic">Integrity_Shield: Active</h4>
+                       <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest leading-relaxed">
+                          All local environment variables are verified against the central Hill Registry. Personal stratification changes do not affect main signal integrity. Current session verified until next academic cycle reset.
                        </p>
+                       <div className="grid grid-cols-2 gap-4 text-[8px] font-black uppercase tracking-[0.2em]">
+                          <div className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md flex flex-col gap-1">
+                             <span className="text-slate-400">Node_ID</span>
+                             <span className="text-indigo-600 truncate">MD5_{Math.random().toString(36).substring(7).toUpperCase()}</span>
+                          </div>
+                          <div className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md flex flex-col gap-1">
+                             <span className="text-slate-400">Sync_Strata</span>
+                             <span className="text-emerald-500">LEVEL_4_AUTH</span>
+                          </div>
+                       </div>
                     </div>
                  </div>
               </section>

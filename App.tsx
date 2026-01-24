@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppView, User, College, UserStatus, AppSettings, Notification } from './types';
 import Landing from './components/Landing';
@@ -15,8 +16,10 @@ import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
+import Market from './components/Market';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X } from 'lucide-react';
+// Added ShoppingBag to the lucide-react imports
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -121,6 +124,8 @@ const App: React.FC = () => {
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'resources': return <Resources />;
+      case 'market': return <Market />;
+      case 'forge': return <Forge onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
       default: return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
@@ -188,7 +193,7 @@ const App: React.FC = () => {
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
-            { id: 'opportunities', icon: <Zap size={22} />, label: 'Bids' },
+            { id: 'market', icon: <ShoppingBag size={22} />, label: 'Bazaar' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
             { id: 'settings', icon: <Settings size={22} />, label: 'UI' },

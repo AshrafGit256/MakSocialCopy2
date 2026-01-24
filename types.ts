@@ -1,4 +1,3 @@
-
 export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
@@ -8,6 +7,21 @@ export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff' | 'Official' | 'Corporate';
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
+
+export interface MarketService {
+  id: string;
+  providerId: string;
+  providerName: string;
+  providerAvatar: string;
+  title: string;
+  description: string;
+  price: string;
+  category: 'Coding' | 'Design' | 'Tutoring' | 'Writing' | 'Laundry/Errand' | 'Other';
+  college: College;
+  rating: number;
+  reviewsCount: number;
+  isPromoted: boolean;
+}
 
 export interface Notification {
   id: string;

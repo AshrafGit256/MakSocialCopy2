@@ -1,18 +1,12 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { db } from '../db';
 import { ChatConversation, User, College } from '../types';
 import { 
   Send, Paperclip, Smile, Search, Edit3, 
-  Terminal, ShieldCheck, Cpu, Box, Hash, 
-  Filter, MoreVertical, Paperclip as FileIcon, 
-  ExternalLink, ChevronRight, MessageSquare, 
+  Terminal, ShieldCheck, Box, MoreVertical,
+  FileText, Code, CheckCircle2, Lock, 
   Database, Activity, Zap, Info, X, Globe,
-  FileText, Code, CheckCircle2, Lock, Star, 
-  Github, GitPullRequest, Laptop, Radio, 
-  Layers, HardDrive, Cpu as CpuIcon, Shield,
-  Command, Coffee, FlaskConical, Target,
-  ArrowLeft, Palette
+  ArrowLeft, MessageSquare, Target, Command
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -23,17 +17,13 @@ interface ChatProps {
 
 const ASSET_PALETTE = [
   { icon: <Zap size={14}/>, label: 'Pulse' },
-  { icon: <Shield size={14}/>, label: 'Secure' },
+  { icon: <ShieldCheck size={14}/>, label: 'Secure' },
   { icon: <Activity size={14}/>, label: 'Sync' },
   { icon: <Terminal size={14}/>, label: 'Log' },
   { icon: <Database size={14}/>, label: 'Asset' },
   { icon: <Code size={14}/>, label: 'Logic' },
-  { icon: <Coffee size={14}/>, label: 'Idle' },
-  { icon: <Target size={14}/>, label: 'Node' },
-  { icon: <FlaskConical size={14}/>, label: 'Research' },
-  { icon: <Command size={14}/>, label: 'Commit' },
   { icon: <Globe size={14}/>, label: 'Wing' },
-  { icon: <Box size={14}/>, label: 'Pack' },
+  { icon: <Target size={14}/>, label: 'Node' },
 ];
 
 const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
@@ -41,7 +31,6 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [search, setSearch] = useState('');
-  const [wingFilter, setWingFilter] = useState<College | 'Global'>('Global');
   const [showPalette, setShowPalette] = useState(false);
   const [currentUser] = useState(db.getUser());
   const [mobileMode, setMobileMode] = useState<'list' | 'chat'>('list');
@@ -64,7 +53,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
             setMobileMode('chat');
           } else {
             // New interaction start
-            console.log("Initializing new signal sequence...");
+            console.log("Initializing direct protocol with node...");
           }
         } else if (m.MOCK_CHATS.length > 0 && !activeChatId && window.innerWidth > 768) {
           setActiveChatId(m.MOCK_CHATS[0].id);
@@ -112,7 +101,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && activeChatId) {
-      handleSend(`Commit Asset Uplink: [FILE: ${file.name}] (${(file.size / 1024).toFixed(1)} KB)`);
+      handleSend(`Commit_Asset: [FILE: ${file.name}] (${(file.size / 1024).toFixed(1)} KB)`);
     }
   };
 
@@ -133,27 +122,14 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               <Edit3 size={16} />
             </button>
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={14} />
             <input 
-              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[4px] py-2 pl-9 pr-4 text-[10px] font-bold uppercase outline-none focus:border-indigo-600 transition-all"
+              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2 pl-9 pr-4 text-[10px] font-bold uppercase outline-none focus:border-indigo-600 transition-all"
               placeholder="Filter manifests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
-          <div className="flex gap-1 overflow-x-auto no-scrollbar pb-1">
-             {['Global', 'COCIS', 'CEDAT', 'LAW', 'CHS'].map(w => (
-               <button 
-                 key={w}
-                 onClick={() => setWingFilter(w as any)}
-                 className={`px-3 py-1 rounded-full text-[8px] font-black uppercase whitespace-nowrap border transition-all ${
-                   wingFilter === w ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white dark:bg-white/5 border-[var(--border-color)] text-slate-400 hover:text-indigo-600'
-                 }`}
-               >
-                 {w}
-               </button>
-             ))}
           </div>
         </div>
 
@@ -176,7 +152,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                   <h4 className="text-[11px] font-black uppercase tracking-tight text-[var(--text-primary)] truncate">{chat.user.name}</h4>
-                  <span className="text-[8px] font-mono text-slate-400">{SHA_GEN()}</span>
+                  <span className="text-[8px] font-mono text-slate-400 opacity-60">ID_{SHA_GEN()}</span>
                 </div>
                 <p className="text-[10px] text-slate-500 truncate italic font-medium">
                   {chat.lastMessage}
@@ -186,7 +162,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
           )) : (
             <div className="p-10 text-center space-y-4 opacity-30">
                <Terminal size={32} className="mx-auto" />
-               <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">No Active Links Found</p>
+               <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">No active links found</p>
             </div>
           )}
         </div>
@@ -212,23 +188,18 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
                   <span className="text-[var(--text-primary)] truncate">{activeChat.user.name.toLowerCase()}-sync</span>
                 </div>
                 <div className="px-2 py-0.5 border border-emerald-500/30 bg-emerald-500/5 text-emerald-500 text-[8px] font-black uppercase rounded-full flex items-center gap-1.5 whitespace-nowrap">
-                   <Activity size={10} className="animate-pulse" /> Stable_Handshake
+                   <Activity size={10} className="animate-pulse" /> Stable_Link
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="hidden lg:flex items-center gap-6 text-[10px] font-mono text-slate-400">
-                  <div className="flex items-center gap-1.5 hover:text-indigo-600 cursor-pointer"><Zap size={12}/> 4.2k cycles</div>
-                </div>
-                <button className="p-2 text-slate-400 hover:text-[var(--text-primary)] transition-colors"><MoreVertical size={18} /></button>
-              </div>
+              <button className="p-2 text-slate-400 hover:text-[var(--text-primary)] transition-colors"><MoreVertical size={18} /></button>
             </div>
 
             {/* Message Stream */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 no-scrollbar bg-[var(--bg-primary)]" style={{ backgroundImage: 'radial-gradient(var(--border-color) 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}>
               <div className="py-10 text-center space-y-2 border-b border-dashed border-[var(--border-color)] mb-10 opacity-60">
                  <Lock size={18} className="mx-auto text-slate-400" />
-                 <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Encrypted Registry Uplink Initialized</h5>
-                 <p className="text-[7px] text-slate-400 font-mono italic">Protocol Version 4.2 Stable</p>
+                 <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Registry Uplink Encrypted</h5>
+                 <p className="text-[7px] text-slate-400 font-mono italic">Handshake successful @ {new Date().toLocaleDateString()}</p>
               </div>
 
               {activeChat.messages.map(msg => (
@@ -264,22 +235,20 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               ))}
             </div>
 
-            {/* Input Terminal - Extended Flush to Bottom */}
+            {/* Input Terminal - Flush to Bottom */}
             <div className="border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-[#0d1117] relative shrink-0">
-              
               {showPalette && (
                 <div className="absolute bottom-[calc(100%+12px)] left-4 right-4 md:left-6 md:right-auto mb-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[4px] shadow-2xl p-4 w-auto md:w-72 animate-in slide-in-from-bottom-2 z-[60]">
                    <div className="flex justify-between items-center mb-3 border-b border-[var(--border-color)] pb-2">
-                      <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400">Technical.Asset_Registry</h3>
+                      <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400">Asset_Registry</h3>
                       <button onClick={() => setShowPalette(false)}><X size={12} className="text-slate-400 hover:text-rose-500"/></button>
                    </div>
                    <div className="grid grid-cols-4 gap-2">
                       {ASSET_PALETTE.map((asset, i) => (
                         <button 
                           key={i}
-                          onClick={() => handleSend(`Signal Asset Decrypted: [${asset.label}]`)}
+                          onClick={() => handleSend(`Signal_Asset: [${asset.label}]`)}
                           className="flex flex-col items-center justify-center p-2 rounded border border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5 transition-all group"
-                          title={asset.label}
                         >
                            <span className="text-slate-500 group-hover:text-indigo-600">{asset.icon}</span>
                            <span className="text-[6px] font-black uppercase text-slate-400 mt-1">{asset.label}</span>
@@ -292,18 +261,18 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               <div className="flex flex-col h-full">
                 <div className="px-4 py-2 border-b border-[var(--border-color)] bg-slate-50/30 dark:bg-white/5 flex items-center justify-between">
                    <div className="flex items-center gap-4">
-                      <button onClick={() => fileRef.current?.click()} className="p-1 text-slate-400 hover:text-indigo-600 transition-colors" title="Attach Asset"><Paperclip size={14}/></button>
-                      <button className="hidden sm:block p-1 text-slate-400 hover:text-indigo-600 transition-colors" title="Code Block"><Code size={14}/></button>
-                      <button onClick={() => setShowPalette(!showPalette)} className={`p-1 transition-colors ${showPalette ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-600'}`} title="Asset Palette"><Smile size={14}/></button>
-                   </div>
-                   <div className="text-[8px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
-                      <Activity size={10} className="text-emerald-500"/> I/O Stream Active
+                      <button onClick={() => fileRef.current?.click()} className="p-1 text-slate-400 hover:text-indigo-600 transition-colors"><Paperclip size={14}/></button>
+                      <button onClick={() => setShowPalette(!showPalette)} className={`p-1 transition-colors ${showPalette ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-600'}`}><Smile size={14}/></button>
+                      <div className="h-4 w-px bg-[var(--border-color)] mx-1"></div>
+                      <div className="text-[8px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+                        <Activity size={10} className="text-emerald-500"/> Stream Active
+                     </div>
                    </div>
                 </div>
-                <div className="flex items-end gap-3 p-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-6">
+                <div className="flex items-end gap-3 p-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pb-4">
                   <textarea 
                     className="flex-1 bg-transparent border-none focus:outline-none text-xs px-2 py-1 resize-none h-10 no-scrollbar text-[var(--text-primary)] font-medium placeholder:text-slate-400 placeholder:italic"
-                    placeholder="Enter commit signal..."
+                    placeholder="Enter commit message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyDown={(e) => {
@@ -333,7 +302,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
              <div className="space-y-3">
                 <h3 className="text-2xl font-black uppercase tracking-tighter italic text-[var(--text-primary)]">Select a Network Node</h3>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] max-w-xs leading-loose mx-auto">
-                   Establish a secure downlink with university peers. Select a channel from the manifest to begin synchronization.
+                   Establish a secure protocol with university peers. Select a channel to begin synchronization.
                 </p>
              </div>
              <button 

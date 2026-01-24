@@ -118,5 +118,35 @@ export const MOCK_CHATS: ChatConversation[] = [
       { id: 'm2', text: 'Yes, just synced with that node.', timestamp: '10:05 AM', isMe: true },
       { id: 'm3', text: 'The research notes are in the Vault.', timestamp: '10:10 AM', isMe: false },
     ]
+  },
+  {
+    id: 'c2',
+    user: { name: 'Sarah CEDAT', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'},
+    lastMessage: 'Circuit schematic verified.',
+    unreadCount: 0,
+    messages: [
+      { id: 'm4', text: 'Sarah, is the Alpha-7 node ready?', timestamp: '09:00 AM', isMe: true },
+      { id: 'm5', text: 'Circuit schematic verified. Ready for uplink.', timestamp: '09:15 AM', isMe: false },
+    ]
+  },
+  {
+    id: 'c3',
+    user: { name: 'Admin Registry', avatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png'},
+    lastMessage: 'Protocol updated for semester 2.',
+    unreadCount: 1,
+    messages: [
+      { id: 'm6', text: 'Query: When is the next vault sync?', timestamp: 'Yesterday', isMe: true },
+      { id: 'm7', text: 'Protocol updated for semester 2. Check the Forge.', timestamp: 'Yesterday', isMe: false },
+    ]
+  },
+  {
+    id: 'c4',
+    user: { name: 'Justice LAW', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Justice'},
+    lastMessage: 'Legal brief finalized.',
+    unreadCount: 0,
+    messages: [
+      { id: 'm8', text: 'Handshake: Discussing Article 45 compliance.', timestamp: '2 days ago', isMe: true },
+      { id: 'm9', text: 'Legal brief finalized. Forwarding to CHS node.', timestamp: '2 days ago', isMe: false },
+    ]
   }
 ];

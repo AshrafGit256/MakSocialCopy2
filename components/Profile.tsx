@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Post, TimelineEvent as TimelineType, AuthorityRole } from '../types';
 import { AuthoritySeal } from './Feed'; 
-// Added Users to lucide-react imports to fix 'Cannot find name Users' error
 import { 
   MapPin, Book, Edit3, Heart, MessageCircle, Settings, 
   User as UserIcon, GraduationCap, Briefcase, Camera, Save, 
@@ -14,12 +13,12 @@ import {
 
 interface ProfileProps {
   userId?: string;
-  // Fix: onNavigateBack should be a function type () => void, not just void to be assignable and testable for truthiness.
   onNavigateBack?: () => void;
   onNavigateToProfile?: (id: string) => void;
+  onMessageUser?: (id: string) => void;
 }
 
-const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack, onNavigateToProfile }) => {
+const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack, onNavigateToProfile, onMessageUser }) => {
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState<'broadcasts' | 'registry' | 'intelligence' | 'settings'>('broadcasts');
@@ -127,7 +126,12 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack, onNavigateToP
              ) : (
                <>
                  <button className="px-8 py-2.5 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">Follow Signal</button>
-                 <button className="p-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--border-color)] transition-all"><MessageCircle size={18}/></button>
+                 <button 
+                  onClick={() => onMessageUser && onMessageUser(user.id)}
+                  className="px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[var(--border-color)] transition-all flex items-center gap-2"
+                 >
+                    <MessageCircle size={18}/> Message
+                 </button>
                  <button className="p-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--border-color)] transition-all"><MoreHorizontal size={18}/></button>
                </>
              )}

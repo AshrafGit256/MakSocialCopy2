@@ -29,6 +29,7 @@ const App: React.FC = () => {
   const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoggedIn) setCurrentUser(db.getUser());
@@ -85,6 +86,7 @@ const App: React.FC = () => {
        alert("PROTOCOL LOCKED: Access to the Academic Vault requires a PRO subscription strata.");
        return;
     }
+    if (newView !== 'messages') setActiveChatUserId(null);
     setView(newView); setIsSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -98,8 +100,8 @@ const App: React.FC = () => {
       case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'opportunities': return <Opportunities />;
-      case 'messages': return <Chat />;
-      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} />;
+      case 'messages': return <Chat initialTargetUserId={activeChatUserId || undefined} />;
+      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={(id) => { setActiveChatUserId(id); setView('messages'); }} />;
       case 'forge': return <Forge onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;

@@ -8,31 +8,67 @@ import {
   Filter, MoreVertical, Paperclip as FileIcon, 
   ExternalLink, ChevronRight, MessageSquare, 
   Database, Activity, Zap, Info, X, Globe,
-  FileText, Code, CheckCircle2, Lock
+  FileText, Code, CheckCircle2, Lock, Star, 
+  Github, GitPullRequest, Laptop, Radio, 
+  Layers, HardDrive, Cpu as CpuIcon, Shield,
+  Command, Coffee, FlaskConical, Target
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
-const Chat: React.FC = () => {
+interface ChatProps {
+  initialTargetUserId?: string;
+}
+
+const ASSET_PALETTE = [
+  { icon: <Zap size={14}/>, label: 'Pulse' },
+  { icon: <Shield size={14}/>, label: 'Secure' },
+  { icon: <Activity size={14}/>, label: 'Sync' },
+  { icon: <Terminal size={14}/>, label: 'Log' },
+  { icon: <Database size={14}/>, label: 'Asset' },
+  { icon: <Code size={14}/>, label: 'Logic' },
+  { icon: <Coffee size={14}/>, label: 'Idle' },
+  { icon: <Target size={14}/>, label: 'Node' },
+  { icon: <FlaskConical size={14}/>, label: 'Research' },
+  { icon: <Command size={14}/>, label: 'Commit' },
+  { icon: <Globe size={14}/>, label: 'Wing' },
+  { icon: <Box size={14}/>, label: 'Pack' },
+];
+
+const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [search, setSearch] = useState('');
   const [wingFilter, setWingFilter] = useState<College | 'Global'>('Global');
   const [isInitializing, setIsInitializing] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
   const [currentUser] = useState(db.getUser());
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // In a real app, we'd fetch from db. Here we use constants or local state
-    // For now, let's pull the mock ones
-    import('../constants').then(m => {
-      setConversations(m.MOCK_CHATS);
-      if (m.MOCK_CHATS.length > 0) setActiveChatId(m.MOCK_CHATS[0].id);
-    });
-  }, []);
+    const sync = () => {
+      import('../constants').then(m => {
+        setConversations(m.MOCK_CHATS);
+        
+        // Handle navigation from profile
+        if (initialTargetUserId) {
+          const existingChat = m.MOCK_CHATS.find(c => c.user.name.toLowerCase().includes(initialTargetUserId.toLowerCase()) || c.id === initialTargetUserId);
+          if (existingChat) {
+            setActiveChatId(existingChat.id);
+          } else {
+            // New handshake logic
+            setIsInitializing(true);
+          }
+        } else if (m.MOCK_CHATS.length > 0 && !activeChatId) {
+          setActiveChatId(m.MOCK_CHATS[0].id);
+        }
+      });
+    };
+    sync();
+  }, [initialTargetUserId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -42,12 +78,13 @@ const Chat: React.FC = () => {
 
   const activeChat = conversations.find(c => c.id === activeChatId);
 
-  const handleSend = () => {
-    if (!message.trim() || !activeChatId) return;
+  const handleSend = (overrideText?: string) => {
+    const textToSend = overrideText || message;
+    if (!textToSend.trim() || !activeChatId) return;
     
     const newMessage = {
       id: `m-${Date.now()}`,
-      text: message,
+      text: textToSend,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isMe: true
     };
@@ -56,7 +93,7 @@ const Chat: React.FC = () => {
       if (c.id === activeChatId) {
         return {
           ...c,
-          lastMessage: message,
+          lastMessage: textToSend.length > 30 ? textToSend.slice(0, 30) + '...' : textToSend,
           messages: [...c.messages, newMessage]
         };
       }
@@ -64,7 +101,15 @@ const Chat: React.FC = () => {
     });
 
     setConversations(updated);
-    setMessage('');
+    if (!overrideText) setMessage('');
+    setShowPalette(false);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && activeChatId) {
+      handleSend(`Commit Asset Uplink: [FILE: ${file.name}] (${(file.size / 1024).toFixed(1)} KB)`);
+    }
   };
 
   return (
@@ -110,7 +155,7 @@ const Chat: React.FC = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          {conversations.length > 0 ? conversations.map(chat => (
+          {conversations.length > 0 ? conversations.filter(c => c.user.name.toLowerCase().includes(search.toLowerCase())).map(chat => (
             <button 
               key={chat.id}
               onClick={() => setActiveChatId(chat.id)}
@@ -131,7 +176,7 @@ const Chat: React.FC = () => {
                   {chat.lastMessage}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
-                   <span className="text-[7px] font-black uppercase px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-600/10 text-indigo-600 rounded">COCIS Wing</span>
+                   <span className="text-[7px] font-black uppercase px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-600/10 text-indigo-600 rounded">Wing Source</span>
                    {chat.unreadCount > 0 && (
                      <span className="w-2 h-2 bg-orange-500 rounded-full shadow-[0_0_8px_#f97316]"></span>
                    )}
@@ -193,9 +238,19 @@ const Chat: React.FC = () => {
                       ? 'bg-indigo-600 border-indigo-600 text-white rounded-[4px] rounded-tr-none' 
                       : 'bg-white dark:bg-[#161b22] border-[var(--border-color)] text-[var(--text-primary)] rounded-[4px] rounded-tl-none'
                     }`}>
-                      <p className="text-xs leading-relaxed font-medium">
-                         {msg.text}
-                      </p>
+                      {msg.text.includes('[FILE:') ? (
+                        <div className="flex items-center gap-3">
+                           <FileText size={20} className="text-white/70" />
+                           <div className="flex flex-col">
+                              <span className="text-[11px] font-black uppercase truncate">{msg.text.split('[FILE: ')[1].split(']')[0]}</span>
+                              <span className="text-[8px] opacity-70">Asset Upload Complete</span>
+                           </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs leading-relaxed font-medium">
+                           {msg.text}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -203,15 +258,36 @@ const Chat: React.FC = () => {
             </div>
 
             {/* Terminal Input */}
-            <div className="p-6 border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-white/5">
+            <div className="p-6 border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-white/5 relative">
+              
+              {/* ASSET PALETTE POPOVER */}
+              {showPalette && (
+                <div className="absolute bottom-full left-6 mb-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[4px] shadow-2xl p-4 w-72 animate-in slide-in-from-bottom-2">
+                   <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3 border-b pb-2">Technical.Asset_Registry</h3>
+                   <div className="grid grid-cols-4 gap-2">
+                      {ASSET_PALETTE.map((asset, i) => (
+                        <button 
+                          key={i}
+                          onClick={() => handleSend(`Signal Asset Logged: [${asset.label}]`)}
+                          className="flex flex-col items-center justify-center p-2 rounded border border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5 transition-all group"
+                          title={asset.label}
+                        >
+                           <span className="text-slate-500 group-hover:text-indigo-600">{asset.icon}</span>
+                           <span className="text-[6px] font-black uppercase text-slate-400 mt-1">{asset.label}</span>
+                        </button>
+                      ))}
+                   </div>
+                </div>
+              )}
+
               <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[4px] focus-within:border-indigo-600 focus-within:ring-4 focus-within:ring-indigo-600/5 transition-all">
                 <div className="px-4 py-2 border-b border-[var(--border-color)] bg-slate-50/30 dark:bg-white/5 flex items-center justify-between">
                    <div className="flex items-center gap-3">
                       <button onClick={() => fileRef.current?.click()} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors" title="Attach Asset"><Paperclip size={14}/></button>
-                      <button className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors"><Code size={14}/></button>
-                      <button className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors"><Smile size={14}/></button>
+                      <button className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors" title="Code Block"><Code size={14}/></button>
+                      <button onClick={() => setShowPalette(!showPalette)} className={`p-1.5 transition-colors ${showPalette ? 'text-indigo-600' : 'text-slate-400 hover:text-indigo-600'}`} title="Asset Palette"><Smile size={14}/></button>
                    </div>
-                   <div className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Markdown Enabled</div>
+                   <div className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Terminal Active</div>
                 </div>
                 <div className="flex items-end gap-3 p-3">
                   <textarea 
@@ -227,7 +303,7 @@ const Chat: React.FC = () => {
                     }}
                   />
                   <button 
-                    onClick={handleSend}
+                    onClick={() => handleSend()}
                     disabled={!message.trim()}
                     className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white p-3 rounded-[4px] transition-all shadow-lg active:scale-95 shrink-0"
                   >
@@ -235,7 +311,7 @@ const Chat: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <input type="file" ref={fileRef} className="hidden" />
+              <input type="file" ref={fileRef} className="hidden" onChange={handleFileUpload} />
               <div className="mt-3 flex items-center gap-4">
                  <div className="flex items-center gap-1.5 text-[8px] font-black uppercase text-slate-400">
                     <CheckCircle2 size={10} className="text-emerald-500" /> Auto-sync active
@@ -291,7 +367,7 @@ const Chat: React.FC = () => {
                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Target Node (User ID/Name)</label>
                        <div className="relative">
                           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                          <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 pl-10 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all" placeholder="Search global registry..." />
+                          <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-3 pl-10 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 transition-all" placeholder="Search global registry..." defaultValue={initialTargetUserId || ''} />
                        </div>
                     </div>
 

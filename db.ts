@@ -76,6 +76,31 @@ const INITIAL_RESOURCES: Resource[] = [
 
 const INITIAL_OPPORTUNITIES: Post[] = [
   {
+    id: 'opp-featured',
+    author: 'Google Africa',
+    authorId: 'google_africa',
+    authorRole: 'Corporate Partner',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Google',
+    timestamp: '1h ago',
+    content: 'The Google Developer Student Club (GDSC) lead applications for 2025/26 are now open. Influence the tech pulse on campus.',
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#Tech', '#Leadership'],
+    likes: 2450,
+    commentsCount: 156,
+    comments: [],
+    views: 89000,
+    flags: [],
+    isOpportunity: true,
+    college: 'Global',
+    images: ['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200'],
+    opportunityData: {
+      type: 'Workshop',
+      deadline: getFutureDate(14),
+      isAIVerified: true,
+      detectedBenefit: 'Global Network'
+    }
+  },
+  {
     id: 'opp-1',
     author: 'Mak AI Lab',
     authorId: 'mak_ailab',
@@ -85,7 +110,7 @@ const INITIAL_OPPORTUNITIES: Post[] = [
     content: 'Urgent: Seeking 5 Student Developers for a 48-hour NLP data labeling gig. Payment: 150k UGX per node.',
     customFont: '"JetBrains Mono"',
     hashtags: ['#Gig', '#AI'],
-    likes: 42,
+    likes: 420,
     commentsCount: 12,
     comments: [],
     views: 1200,
@@ -97,6 +122,105 @@ const INITIAL_OPPORTUNITIES: Post[] = [
       deadline: getFutureDate(1), 
       isAIVerified: true,
       detectedBenefit: 'Immediate Payment'
+    }
+  },
+  {
+    id: 'opp-cedat-grant',
+    author: 'MakUnipod',
+    authorId: 'mak_unipod',
+    authorRole: 'Innovation Hub',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Unipod',
+    timestamp: '5h ago',
+    content: 'Innovation Grant: Alpha Cohort for Sustainable Energy Prototypes. We are funding up to 5 projects this semester.',
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#Grant', '#Engineering'],
+    likes: 890,
+    commentsCount: 45,
+    comments: [],
+    views: 15000,
+    flags: [],
+    isOpportunity: true,
+    college: 'CEDAT',
+    images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200'],
+    opportunityData: {
+      type: 'Grant',
+      deadline: getFutureDate(30),
+      isAIVerified: true,
+      detectedBenefit: 'UGX 2.5M Fund'
+    }
+  },
+  {
+    id: 'opp-law-intern',
+    author: 'Kats & Co.',
+    authorId: 'kats_law',
+    authorRole: 'Corporate Node',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=LawFirm',
+    timestamp: '1d ago',
+    content: 'Summer Clerkship Program: Open for 3rd and 4th Year Law students. High-intensity litigation exposure.',
+    customFont: '"Plus Jakarta Sans"',
+    hashtags: ['#Internship', '#Law'],
+    likes: 120,
+    commentsCount: 8,
+    comments: [],
+    views: 4500,
+    flags: [],
+    isOpportunity: true,
+    college: 'LAW',
+    opportunityData: {
+      type: 'Internship',
+      deadline: getFutureDate(7),
+      isAIVerified: true,
+      detectedBenefit: 'Professional Mentorship'
+    }
+  },
+  {
+    id: 'opp-chs-research',
+    author: 'WHO Research Unit',
+    authorId: 'who_unit',
+    authorRole: 'Official Node',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=WHO',
+    timestamp: '3d ago',
+    content: 'Seeking Medical Students for Community Health Survey in Mulago. Research nodes needed for 2 weeks.',
+    customFont: '"Inter"',
+    hashtags: ['#Research', '#Medicine'],
+    likes: 340,
+    commentsCount: 22,
+    comments: [],
+    views: 8900,
+    flags: [],
+    isOpportunity: true,
+    college: 'CHS',
+    images: ['https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200'],
+    opportunityData: {
+      type: 'Research' as any,
+      deadline: getFutureDate(5),
+      isAIVerified: true,
+      detectedBenefit: 'Research Credentials'
+    }
+  },
+  {
+    id: 'opp-cobams-scholar',
+    author: 'Stanbic Bank',
+    authorId: 'stanbic_mak',
+    authorRole: 'Corporate Partner',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Stanbic',
+    timestamp: '4d ago',
+    content: 'FinTech Scholarship: Full tuition coverage for top 10 Economics/Statistics students with a focus on Digital Banking.',
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#Scholarship', '#Finance'],
+    likes: 5600,
+    commentsCount: 890,
+    comments: [],
+    views: 120000,
+    flags: [],
+    isOpportunity: true,
+    college: 'COBAMS',
+    images: ['https://www.intelligentcio.com/africa/wp-content/uploads/sites/5/2023/08/STANBIC-BANK_1000X450.jpg'],
+    opportunityData: {
+      type: 'Scholarship',
+      deadline: getFutureDate(21),
+      isAIVerified: true,
+      detectedBenefit: 'Full Tuition'
     }
   }
 ];

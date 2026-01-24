@@ -38,6 +38,8 @@ const OpportunityCard: React.FC<{
     'Workshop': 'text-cyan-500 bg-cyan-500/5'
   };
 
+  const hasImage = opp.images && opp.images.length > 0;
+
   return (
     <div className={`group relative bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[4px] hover:border-indigo-500/50 transition-all flex flex-col shadow-sm hover:shadow-xl ${isLarge ? 'md:col-span-2 md:row-span-2' : ''}`}>
       {/* 1. Repository Header */}
@@ -57,6 +59,15 @@ const OpportunityCard: React.FC<{
       </div>
 
       {/* 2. Intelligence Body */}
+      {hasImage && (
+        <div className={`relative overflow-hidden border-b border-[var(--border-color)] ${isLarge ? 'h-64' : 'h-40'}`}>
+          <img src={opp.images![0]} alt="Flyer" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+             <span className="text-[8px] font-black text-white uppercase tracking-widest bg-indigo-600 px-2 py-1 rounded">Visual_Manifest_Attached</span>
+          </div>
+        </div>
+      )}
+      
       <div className="p-6 flex-1 space-y-4">
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
@@ -112,7 +123,7 @@ const OpportunityCard: React.FC<{
       </div>
 
       {/* Masonry-style abstract background for large tiles */}
-      {isLarge && (
+      {isLarge && !hasImage && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] text-[60px] font-black select-none">
           {type.toUpperCase()}
         </div>

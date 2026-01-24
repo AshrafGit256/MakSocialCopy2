@@ -105,7 +105,6 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
       reader.onload = (event) => {
         const base64 = event.target?.result as string;
         restoreSelection();
-        // Updated: The class responsive-doc-image now handles the "squeeze"
         const html = `<div class="content-image-wrapper"><img src="${base64}" class="responsive-doc-image" alt="User Document" /></div><br>`;
         document.execCommand('insertHTML', false, html);
       };
@@ -450,61 +449,110 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   }, []);
 
   const handlePost = async (content: string, font: string) => {
-    // HARMFUL CONTENT DETECTION (MOCK AI SCANNER FOR REQUESTED CATEGORIES)
-    const plainText = content.replace(/<[^>]*>/g, '').toLowerCase();
-    const harmfulKeywords = ['sex', 'porn', 'abuse', 'kill', 'attack', 'harrass', 'idiot', 'stupid', 'naked', 'explicit'];
-    const isHarmful = harmfulKeywords.some(keyword => plainText.includes(keyword));
-
-    if (isHarmful) {
-      triggerSafetyError("The content you want to upload is harmful for public consumption. Signals containing harassment, sexually explicit material, violence, or abusive language are prohibited.");
-      return;
-    }
-
     setIsAnalyzing(true);
-    let opportunityData: Post['opportunityData'] | undefined = undefined;
+
+    // 1. EXTRACT DATA FOR NEURAL SCAN
+    const plainText = content.replace(/<[^>]*>/g, '').trim();
+    const images: { data: string, mimeType: string }[] = [];
+    
+    // Parse the HTML content to find images
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const imgTags = tempDiv.querySelectorAll('img');
+    imgTags.forEach(img => {
+      const src = img.getAttribute('src') || '';
+      if (src.startsWith('data:')) {
+        const [meta, data] = src.split(',');
+        const mimeType = meta.split(':')[1].split(';')[0];
+        images.push({ data, mimeType });
+      }
+    });
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      
+      // 2. MULTIMODAL SAFETY & OPPORTUNITY SCAN
+      // We send both text and images to Gemini for verification
+      const prompt = `Analyze this signal for public consumption. 
+      Rules:
+      - Flag "unsafe" if it contains sexually explicit content (even partial), harassment, abuse, extreme violence, or indecent material.
+      - Determine if it's an "opportunity" (internship, gig, grant, etc.).
+      - Provide a "reason" for unsafe flagging.
+      
+      Return JSON: { 
+        "isSafe": boolean, 
+        "unsafeReason": "string|null", 
+        "isOpportunity": boolean, 
+        "oppType": "Internship|Gig|Grant|Workshop|null", 
+        "benefit": "string(3 words)|null" 
+      }
+      
+      Text Content: "${plainText}"`;
+
+      const contents: any[] = [{ text: prompt }];
+      images.forEach(img => {
+        contents.push({
+          inlineData: {
+            data: img.data,
+            mimeType: img.mimeType
+          }
+        });
+      });
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Determine if this post is a student opportunity. If yes, return JSON: { "isOpportunity": true, "type": "Gig|Internship|Grant|Scholarship|Workshop", "detectedBenefit": "string(3words)", "deadline": "YYYY-MM-DD|null" }. Post: "${content.replace(/<[^>]*>/g, '')}"`,
+        contents: { parts: contents },
         config: { responseMimeType: "application/json" }
       });
-      const text = response.text || '{}';
-      const analysis = JSON.parse(text);
+
+      const analysis = JSON.parse(response.text || '{}');
+
+      // 3. BLOCK HARMFUL CONTENT
+      if (analysis.isSafe === false) {
+        setIsAnalyzing(false);
+        triggerSafetyError(`The content you want to upload is harmful for public consumption. ${analysis.unsafeReason || "Signals containing harassment, sexually explicit images, or abusive language are prohibited."}`);
+        return;
+      }
+
+      // 4. PROCESS VALID POST
+      let opportunityData: Post['opportunityData'] | undefined = undefined;
       if (analysis.isOpportunity) {
         opportunityData = {
-          type: analysis.type,
-          deadline: analysis.deadline,
+          type: analysis.oppType || 'Gig',
           isAIVerified: true,
-          detectedBenefit: analysis.detectedBenefit
+          detectedBenefit: analysis.benefit || 'Detected Benefit'
         };
       }
-    } catch (e) { 
-      console.warn("AI Sync Refused"); 
-    }
 
-    const newPost: Post = {
-      id: Date.now().toString(),
-      author: user.name,
-      authorId: user.id,
-      authorRole: user.role,
-      authorAvatar: user.avatar,
-      timestamp: 'Just now',
-      content: content,
-      customFont: font,
-      hashtags: [],
-      likes: 0,
-      commentsCount: 0,
-      comments: [],
-      views: 1,
-      flags: [], 
-      isOpportunity: !!opportunityData,
-      opportunityData: opportunityData,
-      college: collegeFilter as College | 'Global'
-    };
-    db.addPost(newPost);
-    setIsAnalyzing(false);
+      const newPost: Post = {
+        id: Date.now().toString(),
+        author: user.name,
+        authorId: user.id,
+        authorRole: user.role,
+        authorAvatar: user.avatar,
+        timestamp: 'Just now',
+        content: content,
+        customFont: font,
+        hashtags: [],
+        likes: 0,
+        commentsCount: 0,
+        comments: [],
+        views: 1,
+        flags: [], 
+        isOpportunity: !!opportunityData,
+        opportunityData: opportunityData,
+        college: collegeFilter as College | 'Global'
+      };
+      
+      db.addPost(newPost);
+      setIsAnalyzing(false);
+
+    } catch (e) { 
+      console.warn("Safety Uplink Refused or Interrupted", e); 
+      setIsAnalyzing(false);
+      // Fallback for extreme cases: block if API fails during potential safety scan
+      // For now, we proceed to prevent app breakage, but we've added the neural scan.
+    }
   };
 
   const filteredPosts = (posts || []).filter((p) => {

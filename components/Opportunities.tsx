@@ -1,71 +1,122 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { Post, User } from '../types';
+import { Post, User, College } from '../types';
 import { 
   Zap, Clock, Sparkles, Trash2, ArrowUpRight, 
   Radio, Cpu, Search, ShieldCheck, Star, 
   Filter, Calendar, ChevronRight, Info, Award,
-  Terminal, ExternalLink
+  Terminal, ExternalLink, GitFork, Eye, 
+  Hash, Layers, LayoutGrid, Box, Activity,
+  Globe, Database, Command
 } from 'lucide-react';
 
-const OpportunityNode: React.FC<{ opp: Post, onDelete: (id: string) => void, isAdmin: boolean }> = ({ opp, onDelete, isAdmin }) => {
-  const getDaysLeft = (deadline?: string) => {
-    if (!deadline) return null;
-    const diff = new Date(deadline).getTime() - new Date().getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+const SignalLabel: React.FC<{ type: string; color: string }> = ({ type, color }) => (
+  <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border border-current ${color}`}>
+    {type}
+  </span>
+);
+
+const OpportunityCard: React.FC<{ 
+  opp: Post; 
+  onDelete: (id: string) => void; 
+  isAdmin: boolean;
+  isLarge?: boolean;
+}> = ({ opp, onDelete, isAdmin, isLarge }) => {
+  const daysLeft = opp.opportunityData?.deadline ? 
+    Math.floor((new Date(opp.opportunityData.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
+    null;
+  
+  const isUrgent = daysLeft !== null && daysLeft <= 2;
+  const type = opp.opportunityData?.type || 'Gig';
+
+  const typeColors: Record<string, string> = {
+    'Gig': 'text-amber-500 bg-amber-500/5',
+    'Internship': 'text-indigo-500 bg-indigo-500/5',
+    'Grant': 'text-emerald-500 bg-emerald-500/5',
+    'Scholarship': 'text-rose-500 bg-rose-500/5',
+    'Workshop': 'text-cyan-500 bg-cyan-500/5'
   };
 
-  const daysLeft = getDaysLeft(opp.opportunityData?.deadline);
-  const isUrgent = daysLeft !== null && daysLeft <= 2;
-
   return (
-    <div className={`bg-white dark:bg-[#0d1117] border ${isUrgent ? 'border-amber-500 shadow-lg shadow-amber-500/10' : 'border-[var(--border-color)]'} rounded-xl p-6 flex flex-col lg:flex-row items-start lg:items-center gap-6 transition-all hover:border-indigo-500/50 group`}>
-      {/* Identity Node */}
-      <div className="flex items-center gap-4 shrink-0 lg:w-48">
-        <img src={opp.authorAvatar} alt={opp.author} className="w-12 h-12 rounded-xl border border-[var(--border-color)] bg-slate-50 grayscale group-hover:grayscale-0 transition-all" />
-        <div className="min-w-0">
-          <div className="flex items-center gap-1">
-            <span className="text-[10px] font-black uppercase text-[var(--text-primary)] truncate">{opp.author}</span>
-            <Star size={10} className="text-amber-500 fill-amber-500 shrink-0" />
+    <div className={`group relative bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[4px] hover:border-indigo-500/50 transition-all flex flex-col shadow-sm hover:shadow-xl ${isLarge ? 'md:col-span-2 md:row-span-2' : ''}`}>
+      {/* 1. Repository Header */}
+      <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-white/20">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <Box size={14} className="text-slate-400 shrink-0" />
+          <div className="flex items-center text-[11px] font-bold truncate">
+            <span className="text-indigo-600 hover:underline cursor-pointer">{opp.author}</span>
+            <span className="mx-1 text-slate-400">/</span>
+            <span className="text-[var(--text-primary)] truncate">{opp.opportunityData?.detectedBenefit || 'Signal'}</span>
           </div>
-          <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{opp.college} Hub</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {opp.isOpportunity && <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>}
+          <div className="text-[8px] font-black uppercase text-slate-400 font-mono">v1.0</div>
         </div>
       </div>
 
-      {/* Benefit Manifest */}
-      <div className="flex-1 min-w-0 space-y-1">
-        <h3 className="text-xl font-black uppercase italic tracking-tighter leading-none text-indigo-600 group-hover:underline">
-          {opp.opportunityData?.detectedBenefit || 'High-Value Signal'}
-        </h3>
-        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest line-clamp-1 opacity-70 italic">
-          "{opp.content.replace(/<[^>]*>/g, '')}"
-        </p>
+      {/* 2. Intelligence Body */}
+      <div className="p-6 flex-1 space-y-4">
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            <SignalLabel type={type} color={typeColors[type] || 'text-slate-500'} />
+            <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 border border-[var(--border-color)] text-slate-400">
+               {opp.college} Hub
+            </span>
+          </div>
+          <p className={`text-[var(--text-primary)] leading-relaxed italic ${isLarge ? 'text-lg font-black' : 'text-xs font-medium'}`}>
+            "{opp.content.replace(/<[^>]*>/g, '').slice(0, isLarge ? 200 : 120)}{opp.content.length > 120 ? '...' : ''}"
+          </p>
+        </div>
+
+        {/* Technical Data Points */}
+        <div className="grid grid-cols-2 gap-4 py-2">
+          <div className="space-y-0.5">
+            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Signal_Intensity</p>
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className={`h-1 flex-1 rounded-full ${i < (opp.likes > 100 ? 5 : 3) ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-white/5'}`}></div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-0.5 text-right">
+            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Time_To_Live</p>
+            <p className={`text-[10px] font-mono font-bold ${isUrgent ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>
+              {daysLeft !== null ? `${daysLeft}D_REMAINING` : 'PERMANENT'}
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Meta Labels (GitHub Style) */}
-      <div className="flex flex-wrap gap-2 lg:w-64">
-        <span className="px-2 py-0.5 bg-slate-100 dark:bg-white/5 border border-[var(--border-color)] text-[8px] font-black uppercase tracking-widest rounded text-slate-500">
-           {opp.opportunityData ? opp.opportunityData.type : 'Gig'}
-        </span>
-        {daysLeft !== null && (
-          <span className={`px-2 py-0.5 border text-[8px] font-black uppercase tracking-widest rounded flex items-center gap-1 ${isUrgent ? 'border-amber-500 text-amber-500 animate-pulse' : 'border-[var(--border-color)] text-slate-500'}`}>
-            <Clock size={8}/> TTL: {daysLeft}d
-          </span>
-        )}
-      </div>
-
-      {/* Action Uplink */}
-      <div className="flex items-center gap-3 shrink-0 ml-auto">
-        {isAdmin && (
-           <button onClick={() => onDelete(opp.id)} className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all">
-              <Trash2 size={16}/>
+      {/* 3. Terminal Footer */}
+      <div className="px-4 py-3 bg-slate-50/30 dark:bg-black/20 border-t border-[var(--border-color)] flex items-center justify-between">
+        <div className="flex items-center gap-4 text-[10px] font-mono text-slate-500">
+          <div className="flex items-center gap-1.5 hover:text-indigo-500 cursor-pointer transition-colors">
+            <Star size={12} /> {opp.likes}
+          </div>
+          <div className="flex items-center gap-1.5 hover:text-emerald-500 cursor-pointer transition-colors">
+            <GitFork size={12} /> {opp.commentsCount}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+           {isAdmin && (
+             <button onClick={() => onDelete(opp.id)} className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors">
+                <Trash2 size={14}/>
+             </button>
+           )}
+           <button className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-[4px] text-[9px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-sm">
+             Commit <ArrowUpRight size={12}/>
            </button>
-        )}
-        <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/30 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2">
-          Connect <ArrowUpRight size={14}/>
-        </button>
+        </div>
       </div>
+
+      {/* Masonry-style abstract background for large tiles */}
+      {isLarge && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] text-[60px] font-black select-none">
+          {type.toUpperCase()}
+        </div>
+      )}
     </div>
   );
 };
@@ -73,8 +124,9 @@ const OpportunityNode: React.FC<{ opp: Post, onDelete: (id: string) => void, isA
 const Opportunities: React.FC = () => {
   const [opps, setOpps] = useState<Post[]>([]);
   const [search, setSearch] = useState('');
-  const [currentUser] = useState<User>(db.getUser());
-  const isAdmin = currentUser && currentUser.role === 'Super Admin';
+  const [activeType, setActiveType] = useState<string>('All');
+  const [currentUser] = useState(db.getUser());
+  const isAdmin = currentUser?.badges?.includes('Super Admin');
 
   useEffect(() => {
     const sync = () => {
@@ -87,96 +139,141 @@ const Opportunities: React.FC = () => {
   }, []);
 
   const filtered = (opps || []).filter((o) => {
-    const contentText = o.content.toLowerCase();
-    const benefitText = o.opportunityData ? o.opportunityData.detectedBenefit.toLowerCase() : '';
-    const query = search.toLowerCase();
-    return contentText.includes(query) || benefitText.includes(query);
+    const matchesSearch = o.content.toLowerCase().includes(search.toLowerCase()) || 
+                         (o.opportunityData?.detectedBenefit || '').toLowerCase().includes(search.toLowerCase());
+    const matchesType = activeType === 'All' || o.opportunityData?.type === activeType;
+    return matchesSearch && matchesType;
   });
 
   const handleDelete = (id: string) => {
     if (confirm("Log: Confirm protocol removal of this opportunity signal?")) {
       db.deletePost(id);
-      const o = db.getOpportunities();
-      setOpps(Array.isArray(o) ? o : []);
+      setOpps(db.getOpportunities());
     }
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 pb-40 animate-in fade-in duration-500 font-mono text-[var(--text-primary)]">
+    <div className="max-w-[1600px] mx-auto px-4 lg:px-12 py-8 pb-40 animate-in fade-in duration-700 font-sans">
       
-      {/* 1. REFINED HEADER */}
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 mb-16">
-        <div className="space-y-4">
-           <div className="flex items-center gap-5">
-              <div className="p-4 bg-indigo-600 rounded-xl shadow-2xl shadow-indigo-600/20 text-white">
-                 <Zap size={32} fill="white"/>
+      {/* 1. REFINED COMMAND HEADER */}
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-12">
+        <div className="space-y-6">
+           <div className="flex items-center gap-4">
+              <div className="p-4 bg-indigo-600 rounded-[var(--radius-main)] shadow-2xl shadow-indigo-600/30 text-white">
+                 <Terminal size={32} />
               </div>
               <div>
-                 <h1 className="text-4xl font-black uppercase tracking-tighter italic leading-none">Signal.Registry</h1>
-                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mt-2">Intelligence Stream / Automated Filtering Node</p>
+                 <h1 className="text-5xl font-black uppercase tracking-tighter italic leading-none text-[var(--text-primary)]">
+                    Intelligence.<span className="text-indigo-600">Registry</span>
+                 </h1>
+                 <div className="flex items-center gap-3 mt-3">
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[8px] font-black uppercase tracking-widest">
+                       <Activity size={10} className="animate-pulse" /> Network.Stable
+                    </div>
+                    <p className="text-[9px] font-bold uppercase text-slate-500 tracking-[0.4em]">Sector: Opportunities / Wing: Global</p>
+                 </div>
               </div>
            </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-           <div className="relative flex-1 lg:w-96">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+        <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+           <div className="relative flex-1 lg:w-[450px] group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
               <input 
-                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl py-4 pl-12 pr-4 text-[11px] font-black uppercase tracking-widest outline-none focus:border-indigo-600 transition-all placeholder:text-slate-500"
-                placeholder="Query signal manifest..."
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] py-4 pl-12 pr-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all"
+                placeholder="Query alphanumeric signal manifest..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-           </div>
-           <div className="px-6 py-4 bg-indigo-600/10 border border-indigo-600/20 rounded-xl text-indigo-600 text-[10px] font-black uppercase flex items-center gap-3">
-              <Radio size={16} className="animate-pulse" /> {(opps || []).length} Active Nodes
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-30 group-focus-within:opacity-100 transition-opacity">
+                 <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-white/10 rounded text-[9px] font-mono">/</span>
+                 <Command size={12}/>
+              </div>
            </div>
         </div>
       </header>
 
-      {/* 2. REGISTRY MANIFEST (GitHub Style) */}
-      <div className="space-y-4">
-         <div className="hidden lg:grid grid-cols-12 px-8 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-            <div className="col-span-2">Source Wing</div>
-            <div className="col-span-6">Benefit Signal / Context</div>
-            <div className="col-span-2">Classification</div>
-            <div className="col-span-2 text-right">Uplink Status</div>
-         </div>
-
-         {filtered.length > 0 ? filtered.map((opp) => (
-            <OpportunityNode 
-               key={opp.id} 
-               opp={opp} 
-               onDelete={handleDelete} 
-               isAdmin={isAdmin} 
-            />
-         )) : (
-            <div className="py-40 text-center space-y-6 bg-[var(--sidebar-bg)] border border-dashed border-[var(--border-color)] rounded-[3rem]">
-               <Terminal size={64} className="mx-auto text-slate-200 animate-pulse" />
-               <div className="space-y-1">
-                  <h3 className="text-2xl font-black text-slate-300 uppercase italic tracking-tighter leading-none">Registry.Null_Signal</h3>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">No active signals identified in this sector.</p>
-               </div>
+      {/* 2. REGISTRY TELEMETRY (Mini dashboard) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        {[
+          { label: 'Active_Nodes', val: opps.length, icon: <LayoutGrid size={16}/>, color: 'text-indigo-600' },
+          { label: 'Global_Liquidity', val: 'UGX 42.5M', icon: <Database size={16}/>, color: 'text-emerald-500' },
+          { label: 'Uplink_Intensity', val: '98.2%', icon: <Activity size={16}/>, color: 'text-rose-500' },
+          { label: 'Verified_Assets', val: opps.filter(o => o.opportunityData?.isAIVerified).length, icon: <ShieldCheck size={16}/>, color: 'text-amber-500' },
+        ].map((stat, i) => (
+          <div key={i} className="p-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] flex items-center gap-4 transition-transform hover:-translate-y-1 cursor-default group">
+            <div className={`p-3 bg-white dark:bg-black/20 rounded shadow-sm ${stat.color} group-hover:scale-110 transition-transform`}>{stat.icon}</div>
+            <div>
+              <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{stat.label}</p>
+              <p className="text-lg font-black tracking-tighter text-[var(--text-primary)]">{stat.val}</p>
             </div>
-         )}
+          </div>
+        ))}
       </div>
 
-      {/* 3. ADVISORY PANEL */}
-      <div className="mt-20 p-10 border border-dashed border-[var(--border-color)] rounded-[2.5rem] bg-indigo-600/5 flex flex-col lg:flex-row items-center justify-between gap-8">
-         <div className="flex items-center gap-8 text-center lg:text-left">
-            <div className="p-5 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-[var(--border-color)]">
-               <Info size={40} className="text-indigo-600" />
-            </div>
-            <div className="space-y-1">
-               <h4 className="text-2xl font-black uppercase tracking-tight italic">Protocol Advisory</h4>
-               <p className="text-xs text-slate-500 font-medium italic max-w-xl leading-relaxed">
-                  "Registry nodes are AI-extracted for high academic utility. Critical path signals (expiring &lt; 48h) are prioritized. Verify all coordinate links before connection."
-               </p>
-            </div>
+      {/* 3. FILTER TABS (GitHub style) */}
+      <div className="flex items-center gap-2 mb-8 border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
+        {['All', 'Gig', 'Internship', 'Grant', 'Scholarship', 'Workshop'].map(type => (
+          <button
+            key={type}
+            onClick={() => setActiveType(type)}
+            className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 whitespace-nowrap ${
+              activeType === type ? 'border-orange-500 text-[var(--text-primary)] bg-indigo-50/50 dark:bg-indigo-600/5' : 'border-transparent text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {type} {activeType === type && `(${filtered.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* 4. THE DISCOVERY GRID (Instagram Explore Layout) */}
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
+          {filtered.map((opp, index) => (
+            <OpportunityCard 
+              key={opp.id} 
+              opp={opp} 
+              onDelete={handleDelete} 
+              isAdmin={isAdmin}
+              isLarge={index === 0 || (index > 0 && index % 7 === 0)} 
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="py-40 text-center space-y-8 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">
+           <div className="w-24 h-24 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full flex items-center justify-center mx-auto shadow-inner relative group">
+              <div className="absolute inset-0 bg-indigo-600 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-10"></div>
+              <Terminal size={40} className="text-slate-300 group-hover:text-indigo-600 transition-colors duration-500" />
+           </div>
+           <div className="space-y-2">
+             <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic leading-none">Manifest.Nullified</h3>
+             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">No alphanumeric signals match your current query.</p>
+           </div>
+           <button onClick={() => {setSearch(''); setActiveType('All');}} className="px-8 py-3 bg-indigo-600 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Reset Sync</button>
+        </div>
+      )}
+
+      {/* 5. AUDIT FOOTER */}
+      <div className="mt-20 p-10 border border-indigo-600/20 rounded-[4px] bg-indigo-600/5 relative overflow-hidden group">
+         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Globe size={120} />
          </div>
-         <div className="flex gap-4">
-            <button className="px-10 py-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all shadow-sm">Audit Trail</button>
-            <button className="px-10 py-4 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20">Sync Registry</button>
+         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+            <div className="flex items-center gap-6 text-center md:text-left">
+               <div className="p-4 bg-white dark:bg-slate-900 border border-[var(--border-color)] rounded shadow-xl">
+                  <ShieldCheck size={48} className="text-emerald-500" />
+               </div>
+               <div className="space-y-1">
+                  <h4 className="text-2xl font-black uppercase tracking-tight italic">Protocol.Verification_Matrix</h4>
+                  <p className="text-xs text-slate-500 font-medium italic max-w-xl leading-relaxed">
+                    "All synchronized signals are parsed via neural assessment to ensure academic integrity. Nodes failing verification are pruned automatically from the global registry."
+                  </p>
+               </div>
+            </div>
+            <div className="flex gap-4">
+               <button className="px-10 py-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all shadow-sm">View_Policy</button>
+               <button className="px-10 py-4 bg-indigo-600 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-95 transition-all">Sync.Force</button>
+            </div>
          </div>
       </div>
     </div>

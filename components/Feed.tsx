@@ -7,9 +7,9 @@ import {
   Heart, MessageCircle, X, Loader2, Eye, Zap, 
   Maximize2, Minimize2, Video, Type as LucideType, 
   Bold, Italic, Palette, Send, Underline, Eraser,
-  List, ListOrdered, AlignLeft, Table, Link as LinkIcon,
-  ImageIcon, Code, HelpCircle, ChevronRight, TrendingUp, 
-  Radio, Terminal, Sparkles, Star
+  List, ListOrdered, AlignLeft, Table as TableIcon, Link as LinkIcon,
+  ImageIcon, HelpCircle, ChevronRight, TrendingUp, 
+  Radio, Terminal, Sparkles, Star, ChevronDown, Type, Quote
 } from 'lucide-react';
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
@@ -27,40 +27,82 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   const [content, setContent] = useState('');
   const [activeFont, setActiveFont] = useState('"JetBrains Mono"');
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isCodeView, setIsCodeView] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<'headers' | 'fonts' | 'table' | 'colors' | 'help' | 'link' | null>(null);
+  const [tableHover, setTableHover] = useState({ r: 0, c: 0 });
+  
+  // Link State
+  const [linkText, setLinkText] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+
   const editorRef = useRef<HTMLDivElement>(null);
+
+  const FONTS = [
+    { name: 'JetBrains Mono', value: '"JetBrains Mono", monospace' },
+    { name: 'Inter UI', value: '"Inter", sans-serif' },
+    { name: 'Comic Sans', value: '"Comic Sans MS", "Comic Sans", cursive' },
+    { name: 'Scholar Serif', value: '"Playfair Display", serif' },
+    { name: 'Arial', value: 'Arial, sans-serif' },
+    { name: 'Times New Roman', value: '"Times New Roman", serif' },
+    { name: 'Courier New', value: '"Courier New", monospace' },
+    { name: 'Verdana', value: 'Verdana, sans-serif' },
+    { name: 'Plus Jakarta', value: '"Plus Jakarta Sans", sans-serif' },
+    { name: 'Space Grotesk', value: '"Space Grotesk", sans-serif' },
+    { name: 'Georgia', value: 'Georgia, serif' },
+  ];
+
+  const COLOR_PALETTE = [
+    ['#000000', '#424242', '#636363', '#919191', '#bdbdbd', '#e0e0e0', '#eeeeee', '#ffffff'],
+    ['#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff'],
+    ['#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc'],
+    ['#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd'],
+    ['#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0'],
+    ['#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79'],
+    ['#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47'],
+    ['#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']
+  ];
 
   const exec = (cmd: string, val?: string) => {
     document.execCommand(cmd, false, val);
-    if (editorRef.current) {
-      editorRef.current.focus();
+    setOpenDropdown(null);
+    if (editorRef.current) editorRef.current.focus();
+  };
+
+  const handleInsertLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (linkUrl) {
+      const html = `<a href="${linkUrl}" target="_blank" style="color: #4f46e5; text-decoration: underline;">${linkText || linkUrl}</a> `;
+      exec('insertHTML', html);
+      setLinkText('');
+      setLinkUrl('');
     }
   };
 
-  const insertLink = () => {
-    const url = window.prompt("Enter destination URL:");
-    if (url) exec('createLink', url);
-  };
-
-  const insertImage = () => {
-    const url = window.prompt("Enter image URL:");
-    if (url) exec('insertImage', url);
+  const insertTable = (rows: number, cols: number) => {
+    let html = '<table style="width:100%; border-collapse: collapse; border: 1px solid #ddd; margin: 10px 0;">';
+    for (let i = 0; i < rows; i++) {
+      html += '<tr>';
+      for (let j = 0; j < cols; j++) {
+        html += '<td style="border: 1px solid #ddd; padding: 8px; min-width: 20px;">&nbsp;</td>';
+      }
+      html += '</tr>';
+    }
+    html += '</table>';
+    exec('insertHTML', html);
   };
 
   const handlePublish = () => {
-    const html = isCodeView ? content : (editorRef.current ? editorRef.current.innerHTML : '');
+    const html = editorRef.current ? editorRef.current.innerHTML : '';
     if (html.trim() && html !== '<br>') {
       onPost(html, activeFont);
       if (editorRef.current) editorRef.current.innerHTML = '';
       setContent('');
-      setIsCodeView(false);
     }
   };
 
-  const ToolbarButton: React.FC<{ onClick: () => void, icon: React.ReactNode, title?: string }> = ({ onClick, icon, title }) => (
+  const ToolbarButton: React.FC<{ onClick: () => void, icon: React.ReactNode, title?: string, active?: boolean }> = ({ onClick, icon, title, active }) => (
     <button 
-      onClick={(e) => { e.preventDefault(); onClick(); }} 
-      className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors text-slate-700 dark:text-slate-300"
+      onMouseDown={(e) => { e.preventDefault(); onClick(); }} 
+      className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors text-slate-700 dark:text-slate-300 ${active ? 'bg-indigo-100 dark:bg-indigo-900/30' : ''}`}
       title={title}
     >
       {icon}
@@ -68,117 +110,301 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   );
 
   return (
-    <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-xl overflow-hidden mb-10 transition-all ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none' : 'relative animate-in slide-in-from-top-4 duration-500'}`}>
-      {/* SOPHISTICATED TOOLBAR (SUMMERNOTE STYLE) */}
-      <div className="px-2 py-1.5 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-1 gap-y-1">
+    <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-xl overflow-visible mb-10 transition-all ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none' : 'relative animate-in slide-in-from-top-4 duration-500'}`}>
+      {/* SOPHISTICATED TOOLBAR */}
+      <div className="px-2 py-1 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-1 gap-y-1 relative z-50">
         
-        {/* Group: AI Magic */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
-          <ToolbarButton onClick={() => exec('italic')} icon={<Sparkles size={14}/>} title="Magic Auto-Format" />
+        {/* Headers Dropdown */}
+        <div className="relative">
+          <button 
+            onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'headers' ? null : 'headers'); }}
+            className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[10px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10"
+          >
+            Normal <ChevronDown size={10} />
+          </button>
+          {openDropdown === 'headers' && (
+            <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md overflow-hidden py-1">
+              {[1,2,3,4,5,6].map(i => (
+                <button 
+                  key={i} 
+                  onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', `H${i}`); }}
+                  className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors"
+                >
+                  <span style={{ fontSize: `${2.0 - (i*0.15)}rem` }} className="font-bold leading-none">Header {i}</span>
+                </button>
+              ))}
+              <div className="h-px bg-[var(--border-color)] my-1"></div>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'blockquote'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2">
+                 <Quote size={12}/> <span className="text-xs italic font-medium">Blockquote</span>
+              </button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'p'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white text-xs font-medium">Paragraph</button>
+            </div>
+          )}
         </div>
 
-        {/* Group: Text Style */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* Style Cluster */}
+        <div className="flex items-center gap-0.5">
           <ToolbarButton onClick={() => exec('bold')} icon={<Bold size={14}/>} title="Bold" />
           <ToolbarButton onClick={() => exec('underline')} icon={<Underline size={14}/>} title="Underline" />
           <ToolbarButton onClick={() => exec('removeFormat')} icon={<Eraser size={14}/>} title="Clear Formatting" />
         </div>
 
-        {/* Group: Font Selection */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
-          <select 
-            onChange={(e) => setActiveFont(e.target.value)}
-            className="bg-transparent text-[10px] px-1 h-7 border border-slate-300 dark:border-white/20 rounded outline-none cursor-pointer"
-            value={activeFont}
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* Fonts Dropdown */}
+        <div className="relative">
+          <button 
+            onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'fonts' ? null : 'fonts'); }}
+            className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[10px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10 min-w-[100px] justify-between"
           >
-            <option value='"JetBrains Mono"'>JetBrains Mono</option>
-            <option value='"Inter"'>Inter UI</option>
-            <option value='"Playfair Display"'>Scholar Serif</option>
-            <option value='sans-serif'>System Sans</option>
-          </select>
+            {FONTS.find(f => f.value === activeFont)?.name || 'Font'} <ChevronDown size={10} />
+          </button>
+          {openDropdown === 'fonts' && (
+            <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md overflow-y-auto max-h-64 py-1">
+              {FONTS.map(f => (
+                <button 
+                  key={f.name} 
+                  onMouseDown={(e) => { e.preventDefault(); setActiveFont(f.value); setOpenDropdown(null); }}
+                  className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors"
+                  style={{ fontFamily: f.value }}
+                >
+                  {f.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Group: Color/Highlight */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
-          <ToolbarButton onClick={() => exec('backColor', '#ffff00')} icon={<div className="flex flex-col items-center"><span className="text-[10px] leading-none font-black underline decoration-yellow-400">A</span></div>} title="Highlight Text" />
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* Color Dropdown (Advanced Tabs Mode) */}
+        <div className="relative">
+          <button 
+            onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'colors' ? null : 'colors'); }}
+            className="px-2 py-1 flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded border border-slate-300 dark:border-white/10"
+            title="Color Picker"
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-[14px] leading-none font-black underline decoration-indigo-500 decoration-2">A</span>
+            </div>
+            <ChevronDown size={10} className="text-slate-400"/>
+          </button>
+          {openDropdown === 'colors' && (
+            <div className="absolute top-full left-0 mt-1 p-4 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md min-w-[340px] flex gap-6 md:flex-row flex-col max-h-[80vh] overflow-y-auto">
+              {/* Background Color Column */}
+              <div className="flex-1 space-y-3">
+                <p className="text-[10px] font-black uppercase text-slate-500 text-center border-b pb-1 tracking-widest">Background Color</p>
+                <button 
+                  onMouseDown={(e) => { e.preventDefault(); exec('hiliteColor', 'transparent'); }}
+                  className="w-full py-1.5 border border-slate-300 dark:border-white/10 text-[9px] font-bold uppercase rounded hover:bg-slate-50 transition-colors"
+                >
+                  Transparent
+                </button>
+                <div className="grid grid-cols-8 gap-0.5">
+                  {COLOR_PALETTE.map((row, rid) => row.map((c, cid) => (
+                    <button key={`${rid}-${cid}`} onMouseDown={(e) => { e.preventDefault(); exec('hiliteColor', c); }} className="w-4 h-4 hover:scale-110 transition-transform" style={{ backgroundColor: c }} />
+                  )))}
+                </div>
+              </div>
+
+              <div className="w-px bg-[var(--border-color)] md:block hidden"></div>
+
+              {/* Text Color Column */}
+              <div className="flex-1 space-y-3">
+                <p className="text-[10px] font-black uppercase text-slate-500 text-center border-b pb-1 tracking-widest">Text Color</p>
+                <button 
+                  onMouseDown={(e) => { e.preventDefault(); exec('foreColor', '#1f2328'); }}
+                  className="w-full py-1.5 border border-slate-300 dark:border-white/10 text-[9px] font-bold uppercase rounded hover:bg-slate-50 transition-colors"
+                >
+                  Reset to default
+                </button>
+                <div className="grid grid-cols-8 gap-0.5">
+                  {COLOR_PALETTE.map((row, rid) => row.map((c, cid) => (
+                    <button key={`t-${rid}-${cid}`} onMouseDown={(e) => { e.preventDefault(); exec('foreColor', c); }} className="w-4 h-4 hover:scale-110 transition-transform" style={{ backgroundColor: c }} />
+                  )))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Group: Lists & Paragraphs */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
-          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={14}/>} title="Bullet List" />
-          <ToolbarButton onClick={() => exec('insertOrderedList')} icon={<ListOrdered size={14}/>} title="Numbered List" />
-          <ToolbarButton onClick={() => exec('justifyLeft')} icon={<AlignLeft size={14}/>} title="Alignment" />
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* List Cluster */}
+        <div className="flex items-center gap-0.5">
+          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={14}/>} title="Unordered List" />
+          <ToolbarButton onClick={() => exec('insertOrderedList')} icon={<ListOrdered size={14}/>} title="Ordered List" />
         </div>
 
-        {/* Group: Tables */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
-          <ToolbarButton onClick={() => {}} icon={<Table size={14}/>} title="Insert Table" />
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* Table Dropdown */}
+        <div className="relative">
+          <button 
+            onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'table' ? null : 'table'); }}
+            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1"
+            title="Insert Table"
+          >
+            <TableIcon size={14}/>
+            <ChevronDown size={10} className="text-slate-400"/>
+          </button>
+          {openDropdown === 'table' && (
+            <div className="absolute top-full left-0 mt-1 p-3 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md">
+              <p className="text-[8px] font-black uppercase text-slate-400 mb-3 text-center tracking-widest">{tableHover.r} x {tableHover.c} Table</p>
+              <div className="grid grid-cols-5 gap-1">
+                {[1,2,3,4,5].map(r => (
+                  [1,2,3,4,5].map(c => (
+                    <div 
+                      key={`${r}-${c}`}
+                      onMouseEnter={() => setTableHover({r, c})}
+                      onMouseDown={(e) => { e.preventDefault(); insertTable(r, c); }}
+                      className={`w-4 h-4 border cursor-pointer transition-colors ${r <= tableHover.r && c <= tableHover.c ? 'bg-indigo-600 border-indigo-600' : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10'}`}
+                    />
+                  ))
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Group: Links & Media */}
-        <div className="flex items-center gap-1 border-r border-[var(--border-color)] pr-1 mr-1">
-          <ToolbarButton onClick={insertLink} icon={<LinkIcon size={14}/>} title="Add Link" />
-          <ToolbarButton onClick={insertImage} icon={<ImageIcon size={14}/>} title="Add Image" />
-          <ToolbarButton onClick={() => {}} icon={<Video size={14}/>} title="Embed Video" />
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* Link Pop-up */}
+        <div className="relative">
+          <ToolbarButton onClick={() => setOpenDropdown(openDropdown === 'link' ? null : 'link')} icon={<LinkIcon size={14}/>} title="Add Link" />
+          {openDropdown === 'link' && (
+            <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md p-4 space-y-4">
+              <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b pb-2">Create Signal Link</h5>
+              <div className="space-y-3">
+                <input 
+                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs outline-none" 
+                  placeholder="Text to display..."
+                  value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
+                />
+                <input 
+                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs outline-none" 
+                  placeholder="Link URL (https://...)"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                />
+                <div className="flex gap-2 pt-2">
+                  <button onMouseDown={handleInsertLink} className="flex-1 bg-indigo-600 text-white text-[9px] font-black uppercase py-2 rounded shadow-lg">Insert</button>
+                  <button onMouseDown={() => setOpenDropdown(null)} className="px-3 bg-slate-100 text-slate-500 text-[9px] font-black uppercase py-2 rounded">Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Group: System Tools */}
-        <div className="flex items-center gap-1">
-          <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Toggle Fullscreen" />
-          <ToolbarButton onClick={() => setIsCodeView(!isCodeView)} icon={<Code size={14}/>} title="Code View" />
-          <ToolbarButton onClick={() => {}} icon={<HelpCircle size={14}/>} title="Help" />
+        {/* Media Cluster */}
+        <div className="flex items-center gap-0.5">
+          <ToolbarButton onClick={() => { const url = window.prompt("Enter image URL:"); if(url) exec('insertImage', url); }} icon={<ImageIcon size={14}/>} title="Image" />
+          <ToolbarButton onClick={() => exec('insertHorizontalRule')} icon={<div className="w-4 h-px bg-slate-400" />} title="Horizontal Line" />
+        </div>
+
+        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+
+        {/* System Cluster */}
+        <div className="flex items-center gap-0.5">
+          <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Fullscreen" />
+          
+          <div className="relative">
+            <ToolbarButton onClick={() => setOpenDropdown(openDropdown === 'help' ? null : 'help')} icon={<HelpCircle size={14}/>} title="Help" />
+            {openDropdown === 'help' && (
+              <div className="absolute top-full right-0 mt-1 w-80 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md p-4 overflow-y-auto max-h-96">
+                <h4 className="text-[10px] font-black uppercase text-indigo-600 mb-4 tracking-widest border-b border-indigo-600/20 pb-2">Keyboard Protocols</h4>
+                <div className="space-y-1.5 text-[9px] font-mono">
+                  {[
+                    ['ESC', 'Escape'],
+                    ['ENTER', 'Insert Paragraph'],
+                    ['CTRL+Z', 'Undo last command'],
+                    ['CTRL+Y', 'Redo last command'],
+                    ['TAB', 'Tab'],
+                    ['SHIFT+TAB', 'Untab'],
+                    ['CTRL+B', 'Set bold style'],
+                    ['CTRL+I', 'Set italic style'],
+                    ['CTRL+U', 'Set underline style'],
+                    ['CTRL+SHIFT+S', 'Set strikethrough style'],
+                    ['CTRL+\\', 'Clean a style'],
+                    ['CTRL+SHIFT+L', 'Set left align'],
+                    ['CTRL+SHIFT+E', 'Set center align'],
+                    ['CTRL+SHIFT+R', 'Set right align'],
+                    ['CTRL+SHIFT+J', 'Set full align'],
+                    ['CTRL+SHIFT+NUM7', 'Toggle unordered list'],
+                    ['CTRL+SHIFT+NUM8', 'Toggle ordered list'],
+                    ['CTRL+[', 'Outdent on current paragraph'],
+                    ['CTRL+]', 'Indent on current paragraph'],
+                    ['CTRL+NUM0', 'Format as Paragraph'],
+                    ['CTRL+NUM1', 'Format as H1'],
+                    ['CTRL+NUM2', 'Format as H2'],
+                    ['CTRL+NUM3', 'Format as H3'],
+                    ['CTRL+NUM4', 'Format as H4'],
+                    ['CTRL+NUM5', 'Format as H5'],
+                    ['CTRL+NUM6', 'Format as H6'],
+                    ['CTRL+ENTER', 'Insert horizontal rule'],
+                    ['CTRL+K', 'Show Link Dialog']
+                  ].map(([k, d]) => (
+                    <div key={k} className="flex justify-between items-center gap-4 py-0.5 border-b border-slate-50 dark:border-white/5 last:border-0">
+                      <span className="bg-slate-100 dark:bg-white/5 px-1 rounded border border-slate-300 dark:border-white/10 text-indigo-600 font-bold whitespace-nowrap">{k}</span>
+                      <span className="text-slate-500 text-right uppercase font-bold text-[8px]">{d}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* EDITOR AREA */}
-      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-140px)]' : 'min-h-[160px]'}`}>
-        {isCodeView ? (
-          <textarea 
-            className="w-full h-full p-8 font-mono text-xs bg-slate-900 text-emerald-400 outline-none resize-none"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-        ) : (
-          <div 
-            ref={editorRef}
-            contentEditable
-            onInput={(e) => setContent(e.currentTarget.innerHTML)}
-            className="w-full h-full p-8 text-sm outline-none leading-relaxed overflow-y-auto rich-content-editor"
-            style={{ fontFamily: activeFont }}
-            data-placeholder="Place some text here"
-          />
-        )}
-        {!content && !isCodeView && <div className="absolute top-8 left-8 text-slate-400 pointer-events-none text-sm font-sans opacity-70">Place some text here</div>}
+      {/* EDITOR AREA - MINIMIZED HEIGHT */}
+      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-140px)]' : 'min-h-[80px]'}`}>
+        <div 
+          ref={editorRef}
+          contentEditable
+          onInput={(e) => setContent(e.currentTarget.innerHTML)}
+          className="w-full h-full p-4 text-sm outline-none leading-relaxed overflow-y-auto rich-content-editor"
+          style={{ fontFamily: activeFont }}
+          data-placeholder="Place some text here"
+        />
+        {!content && <div className="absolute top-4 left-4 text-slate-400 pointer-events-none text-sm font-sans opacity-70">Place some text here</div>}
       </div>
 
       {/* FOOTER BAR */}
-      <div className="px-5 py-3 bg-[#f8f9fa] dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
+      <div className="px-4 py-2 bg-[#f8f9fa] dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
         <div className="flex items-center gap-3">
-           <div className="h-2 w-10 bg-slate-300 dark:bg-white/10 rounded-full"></div>
            {isAnalyzing && (
-             <div className="flex items-center gap-2 px-3 py-1 bg-indigo-600/10 rounded-full text-indigo-600">
+             <div className="flex items-center gap-2 px-2 py-0.5 bg-indigo-600/10 rounded-full text-indigo-600">
                <Loader2 size={10} className="animate-spin" />
-               <span className="text-[8px] font-black uppercase tracking-widest">AI Intelligence Sync Active</span>
+               <span className="text-[7px] font-black uppercase tracking-widest">AI Matrix Syncing...</span>
              </div>
            )}
         </div>
         <button 
           onClick={handlePublish}
           disabled={isAnalyzing || !content.trim()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-md font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-black text-[9px] uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
         >
-          <Send size={14} /> Broadcast Signal
+          <Send size={12} /> Broadcast
         </button>
       </div>
 
       <style>{`
         .rich-content-editor:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
-        .rich-content-editor h1 { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .rich-content-editor h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .rich-content-editor h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
+        .rich-content-editor h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .rich-content-editor h4 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem; }
+        .rich-content-editor h5 { font-size: 1.0rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .rich-content-editor h6 { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.2rem; }
         .rich-content-editor p { margin-bottom: 1rem; }
         .rich-content-editor ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
         .rich-content-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
         .rich-content-editor table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; }
         .rich-content-editor th, .rich-content-editor td { border: 1px solid #ddd; padding: 8px; }
+        .rich-content-editor blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 1rem; }
       `}</style>
     </div>
   );

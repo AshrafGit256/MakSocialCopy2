@@ -37,7 +37,7 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
     const q = query.toLowerCase();
     
     setFilteredUsers(
-      allUsers.filter(u => 
+      (allUsers || []).filter(u => 
         u.name.toLowerCase().includes(q) || 
         u.role.toLowerCase().includes(q) || 
         u.college.toLowerCase().includes(q)
@@ -45,10 +45,10 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
     );
 
     setFilteredPosts(
-      allPosts.filter(p => 
+      (allPosts || []).filter(p => 
         p.content.toLowerCase().includes(q) || 
         p.author.toLowerCase().includes(q) || 
-        p.hashtags.some(h => h.toLowerCase().includes(q))
+        (p.hashtags || []).some(h => h.toLowerCase().includes(q))
       )
     );
   }, [query, allUsers, allPosts]);

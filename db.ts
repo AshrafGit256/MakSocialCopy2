@@ -134,7 +134,7 @@ export const db = {
         if (Array.isArray(parsed)) posts = parsed;
       }
       if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter);
-      return posts;
+      return Array.isArray(posts) ? posts : [];
     } catch (e) {
       return MOCK_POSTS;
     }
@@ -153,7 +153,7 @@ export const db = {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) opps = parsed;
       }
-      return opps;
+      return Array.isArray(opps) ? opps : [];
     } catch (e) {
       return INITIAL_OPPORTUNITIES;
     }
@@ -174,7 +174,10 @@ export const db = {
   getResources: (): Resource[] => {
     try {
       const saved = localStorage.getItem(DB_KEYS.RESOURCES);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : INITIAL_RESOURCES;
+      }
       return INITIAL_RESOURCES;
     } catch (e) {
       return INITIAL_RESOURCES;
@@ -188,7 +191,11 @@ export const db = {
   getCalendarEvents: (): CalendarEvent[] => {
     try {
       const saved = localStorage.getItem(DB_KEYS.CALENDAR);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+      return [];
     } catch (e) {
       return [];
     }

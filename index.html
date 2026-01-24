@@ -40,7 +40,7 @@
           --sidebar-bg: #f6f8fa;
           --safe-area-bottom: env(safe-area-inset-bottom);
           
-          --brand-color: #4f46e5;
+          --brand-color: #64748b; /* Tactical Gray Default */
           --font-main: "Inter";
           --base-font-size: 14px;
           --radius-main: 6px; 
@@ -55,7 +55,7 @@
           --border-color: #30363d;
           --card-bg: #0d1117;
           --sidebar-bg: #010409;
-          --brand-color: #6366f1;
+          --brand-color: #94a3b8; /* Lighter gray for dark mode accessibility */
         }
 
         html {
@@ -78,11 +78,10 @@
           padding-bottom: calc(4.5rem + var(--safe-area-bottom));
         }
 
-        /* Dynamic Tailwind Overrides */
+        /* Tactical Overrides */
         .text-indigo-600 { color: var(--brand-color) !important; }
         .bg-indigo-600 { background-color: var(--brand-color) !important; }
         .border-indigo-600 { border-color: var(--brand-color) !important; }
-        .ring-indigo-600 { --tw-ring-color: var(--brand-color) !important; }
     </style>
 <script type="importmap">
 {

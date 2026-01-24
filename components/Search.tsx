@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { User, Post, AuthorityRole } from '../types';
+import { User, Post, AuthorityRole, College } from '../types';
 import { AuthoritySeal } from './Feed';
 import { 
-  Search as SearchIcon, Users, Hash, Plus, 
-  MessageCircle, Heart, Eye, ArrowRight, Sparkles, 
-  Zap, Command, FileText, ImageIcon 
+  Search as SearchIcon, Users, Hash, 
+  MessageCircle, Heart, Star, GitFork, 
+  Book, FileCode, Clock, Filter, 
+  ChevronDown, Terminal, Database,
+  ArrowUpRight, Layout, Info, Share2
 } from 'lucide-react';
 
 interface SearchProps {
@@ -20,7 +21,8 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
-  const [activeTab, setActiveTab] = useState<'all' | 'people' | 'posts'>('all');
+  const [activeType, setActiveType] = useState<'Repositories' | 'Users'>('Repositories');
+  const [selectedWing, setSelectedWing] = useState<College | 'All'>('All');
 
   useEffect(() => {
     setAllUsers(db.getUsers());
@@ -28,183 +30,197 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
   }, []);
 
   useEffect(() => {
-    if (!query.trim()) {
-      setFilteredUsers([]);
-      setFilteredPosts([]);
-      return;
-    }
-
     const q = query.toLowerCase();
     
-    setFilteredUsers(
-      (allUsers || []).filter(u => 
-        u.name.toLowerCase().includes(q) || 
-        u.role.toLowerCase().includes(q) || 
-        u.college.toLowerCase().includes(q)
-      )
+    const userMatches = (allUsers || []).filter(u => 
+      u.name.toLowerCase().includes(q) || 
+      u.role.toLowerCase().includes(q) || 
+      u.college.toLowerCase().includes(q)
     );
 
-    setFilteredPosts(
-      (allPosts || []).filter(p => 
-        p.content.toLowerCase().includes(q) || 
-        p.author.toLowerCase().includes(q) || 
-        (p.hashtags || []).some(h => h.toLowerCase().includes(q))
-      )
-    );
-  }, [query, allUsers, allPosts]);
+    const postMatches = (allPosts || []).filter(p => {
+      const textMatch = p.content.toLowerCase().includes(q) || p.author.toLowerCase().includes(q);
+      const wingMatch = selectedWing === 'All' || p.college === selectedWing;
+      return textMatch && wingMatch;
+    });
 
-  const isArticle = (p: Post) => p.content.length > 150 && !p.images?.length;
+    setFilteredUsers(userMatches);
+    setFilteredPosts(postMatches);
+  }, [query, allUsers, allPosts, selectedWing]);
+
+  const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 space-y-12 pb-32">
-      <div className="relative group max-w-4xl mx-auto">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-4 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-full px-6 py-4 focus-within:border-indigo-500 transition-colors">
-            
-            <SearchIcon size={20} className="text-slate-400" />
-
-            <input
-              className="flex-1 bg-transparent text-base font-medium text-[var(--text-primary)] outline-none placeholder:text-slate-500"
-              placeholder="Search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              autoFocus
-            />
+    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-mono">
+      {/* 1. TOP SEARCH BAR - GitHub Vibe */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mb-8">
+        <div className="relative flex-1 w-full group">
+          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+          <input
+            className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2.5 pl-12 pr-4 text-sm font-bold outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all shadow-sm"
+            placeholder="Search Registry for nodes, signals, or academic assets..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none opacity-30">
+            <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-white/10 rounded text-[9px] font-bold">/</span>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+           <div className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase rounded-md flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div> Registry_Online
+           </div>
         </div>
       </div>
 
-      {query.trim() ? (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-500">
-          <div className="flex items-center gap-2 bg-[var(--bg-secondary)] p-1.5 rounded-[1.5rem] border border-[var(--border-color)] w-fit">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* 2. SIDEBAR FILTERS */}
+        <aside className="lg:col-span-3 space-y-8">
+          <div className="space-y-1">
+            <h3 className="px-3 text-[11px] font-bold uppercase text-slate-500 tracking-widest mb-3">Filter by Type</h3>
             {[
-              { id: 'all', label: 'Universal' },
-              { id: 'people', label: 'People' },
-              { id: 'posts', label: 'Broadcasts' }
-            ].map(tab => (
-              <button 
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                  activeTab === tab.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'text-slate-500 hover:text-[var(--text-primary)]'
+              { id: 'Repositories', label: 'Broadcast Signals', count: filteredPosts.length },
+              { id: 'Users', label: 'Network Nodes', count: filteredUsers.length }
+            ].map(type => (
+              <button
+                key={type.id}
+                onClick={() => setActiveType(type.id as any)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-bold transition-all ${
+                  activeType === type.id ? 'bg-[var(--bg-secondary)] border-l-4 border-orange-500 text-[var(--text-primary)]' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'
                 }`}
               >
-                {tab.label}
+                <span>{type.label}</span>
+                <span className="bg-slate-200 dark:bg-white/5 px-1.5 py-0.5 rounded-full text-[9px]">{type.count}</span>
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {/* Left Result Panel */}
-            <div className="lg:col-span-12 space-y-12">
-              {(activeTab === 'all' || activeTab === 'people') && filteredUsers.length > 0 && (
-                <section className="space-y-6">
-                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
-                    <Users size={16} className="text-indigo-600" /> Population Cluster ({filteredUsers.length})
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredUsers.map(u => {
-                      const authority: AuthorityRole | undefined = u.badges?.includes('Super Admin') ? 'Super Admin' : u.badges?.includes('Official') ? 'Official' : u.badges?.includes('Corporate') ? 'Corporate' : u.verified ? 'Administrator' : undefined;
-                      return (
-                        <div 
-                          key={u.id} 
-                          onClick={() => onNavigateToProfile(u.id)}
-                          className="glass-card p-6 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-600/5 transition-all flex items-center justify-between group cursor-pointer"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="relative">
-                              <img src={u.avatar} className="w-16 h-16 rounded-[1.25rem] object-cover border-2 border-[var(--border-color)] group-hover:border-indigo-500 transition-colors" />
-                              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white dark:bg-slate-900 border-2 border-white dark:border-slate-800 rounded-full flex items-center justify-center">
-                                 <AuthoritySeal role={authority} size={14} />
-                              </div>
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-1">
-                                 <h4 className="font-extrabold text-[var(--text-primary)] text-lg leading-none">{u.name}</h4>
-                                 <AuthoritySeal role={authority} size={16} />
-                              </div>
-                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{u.college} • {u.role}</p>
-                            </div>
-                          </div>
-                          <div className="p-3 bg-indigo-600/5 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                             <ArrowRight size={20}/>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
+          <div className="pt-6 border-t border-[var(--border-color)]">
+            <h3 className="px-3 text-[11px] font-bold uppercase text-slate-500 tracking-widest mb-3">Languages (Hubs)</h3>
+            {['All', 'COCIS', 'CEDAT', 'LAW', 'CHS', 'COBAMS'].map(wing => (
+              <button
+                key={wing}
+                onClick={() => setSelectedWing(wing as any)}
+                className={`w-full flex items-center px-3 py-2 rounded-md text-[10px] font-black uppercase transition-all ${
+                  selectedWing === wing ? 'text-indigo-600 bg-indigo-50/50 dark:bg-indigo-600/5' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full mr-3 ${
+                  wing === 'COCIS' ? 'bg-indigo-500' : 
+                  wing === 'CEDAT' ? 'bg-orange-500' : 
+                  wing === 'LAW' ? 'bg-rose-500' : 'bg-emerald-500'
+                }`}></div>
+                {wing}
+              </button>
+            ))}
+          </div>
+        </aside>
 
-              {(activeTab === 'all' || activeTab === 'posts') && filteredPosts.length > 0 && (
-                <section className="space-y-6">
-                  <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
-                    <Hash size={16} className="text-indigo-600" /> Active Signal Stream ({filteredPosts.length})
-                  </h3>
-                  <div className="grid grid-cols-1 gap-6">
-                    {filteredPosts.map(p => (
-                      <div 
-                        key={p.id} 
-                        onClick={() => onNavigateToPost(p.id)}
-                        className="glass-card p-8 border-[var(--border-color)] bg-[var(--card-bg)] hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-600/5 transition-all cursor-pointer group flex flex-col md:flex-row gap-8"
-                      >
-                        <div className="flex-1 space-y-4">
-                          <div className="flex items-center gap-4">
-                            <img src={p.authorAvatar} className="w-10 h-10 rounded-xl object-cover border border-[var(--border-color)]" />
-                            <div>
-                              <div className="flex items-center gap-1">
-                                 <h4 className="font-extrabold text-[var(--text-primary)] uppercase tracking-tight leading-none text-sm">{p.author}</h4>
-                                 <AuthoritySeal role={p.authorAuthority} size={14} />
-                              </div>
-                              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{p.timestamp} • {p.college}</p>
-                            </div>
-                            <div className="ml-auto">
-                              {isArticle(p) ? (
-                                <div className="flex items-center gap-2 text-[8px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded uppercase tracking-widest">
-                                  <FileText size={10}/> Long Form
-                                </div>
-                              ) : p.images?.length ? (
-                                <div className="flex items-center gap-2 text-[8px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded uppercase tracking-widest">
-                                  <ImageIcon size={10}/> Visual Asset
-                                </div>
-                              ) : null}
-                            </div>
-                          </div>
-                          <p className={`text-[var(--text-primary)] ${isArticle(p) ? 'text-lg font-serif italic' : 'text-base font-medium'} leading-relaxed line-clamp-3`}>
-                            "{p.content}"
-                          </p>
-                          <div className="flex items-center gap-8 pt-4 border-t border-[var(--border-color)]">
-                            <span className="flex items-center gap-2 text-rose-500 text-[10px] font-black"><Heart size={16}/> {p.likes.toLocaleString()}</span>
-                            <span className="flex items-center gap-2 text-indigo-600 text-[10px] font-black"><MessageCircle size={16}/> {p.commentsCount}</span>
-                            <span className="flex items-center gap-2 text-slate-400 text-[10px] font-black"><Eye size={16}/> {p.views.toLocaleString()}</span>
-                          </div>
-                        </div>
-                        
-                        {p.images?.[0] && (
-                          <div className="w-full md:w-64 aspect-video md:aspect-square rounded-2xl overflow-hidden border border-[var(--border-color)] shrink-0">
-                            <img src={p.images[0]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
+        {/* 3. RESULTS LIST - GitHub Repo List Style */}
+        <main className="lg:col-span-9 space-y-6">
+          <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-4">
+            <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">
+              {activeType === 'Repositories' 
+                ? `${filteredPosts.length} signal results found` 
+                : `${filteredUsers.length} network node results found`
+              }
+            </h2>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+               Sort: <span className="text-[var(--text-primary)] flex items-center gap-1 cursor-pointer">Best match <ChevronDown size={14}/></span>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="py-40 text-center space-y-8 animate-in fade-in zoom-in duration-700">
-           <div className="w-32 h-32 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto shadow-inner relative group">
-              <div className="absolute inset-0 bg-indigo-600 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-10"></div>
-              <SearchIcon size={56} className="text-slate-300 group-hover:text-indigo-600 transition-colors duration-500" />
-           </div>
-           <div className="space-y-2">
-             <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic">Deep Scan Initialization Required</h3>
-             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">Awaiting alphanumeric signal input...</p>
-           </div>
-        </div>
-      )}
+
+          <div className="divide-y divide-[var(--border-color)]">
+            {activeType === 'Repositories' ? (
+              filteredPosts.map(post => (
+                <div key={post.id} className="py-6 space-y-4 group">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                       <Book size={16} className="text-slate-400" />
+                       <h4 onClick={() => onNavigateToPost(post.id)} className="text-base font-black text-indigo-600 hover:underline cursor-pointer tracking-tight">
+                         {post.author.toLowerCase()} / signal_{post.id.slice(-4)}
+                       </h4>
+                       <span className="px-2 py-0.5 border border-[var(--border-color)] rounded-full text-[9px] text-slate-500 font-bold uppercase">Public</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <div className="flex-1 space-y-3">
+                      <p className="text-xs text-slate-500 leading-relaxed font-sans line-clamp-2 italic">
+                        "{post.content.replace(/<[^>]*>/g, '')}"
+                      </p>
+                      
+                      <div className="flex flex-wrap items-center gap-4 text-[10px] font-bold text-slate-400">
+                        <div className="flex items-center gap-1.5">
+                           <div className={`w-2.5 h-2.5 rounded-full ${post.college === 'COCIS' ? 'bg-indigo-500' : 'bg-emerald-500'}`}></div>
+                           <span className="uppercase">{post.college} Hub</span>
+                        </div>
+                        <div className="flex items-center gap-1 hover:text-indigo-600 transition-colors cursor-pointer">
+                           <Star size={14}/> {post.likes}
+                        </div>
+                        <div className="flex items-center gap-1 hover:text-emerald-500 transition-colors cursor-pointer">
+                           <GitFork size={14}/> {post.commentsCount}
+                        </div>
+                        <div className="flex items-center gap-1">
+                           Updated {post.timestamp}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Technical Metadata Box */}
+                    <div className="hidden md:block w-48 p-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md space-y-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                       <div className="flex justify-between text-[8px] font-black uppercase text-slate-500">
+                          <span>SHA_SUM</span>
+                          <span>{SHA_GEN()}</span>
+                       </div>
+                       <div className="h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-indigo-600 w-3/4"></div>
+                       </div>
+                       <p className="text-[7px] font-bold text-slate-400 leading-none">INTEGRITY: VERIFIED</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              filteredUsers.map(user => (
+                <div key={user.id} className="py-6 flex items-center justify-between group">
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                       <img src={user.avatar} className="w-12 h-12 rounded-[4px] border border-[var(--border-color)] bg-white object-cover" />
+                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[var(--bg-primary)] rounded-full"></div>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 onClick={() => onNavigateToProfile(user.id)} className="text-sm font-black text-[var(--text-primary)] hover:text-indigo-600 transition-colors cursor-pointer uppercase">{user.name}</h4>
+                        <AuthoritySeal role={user.badges?.includes('Official') ? 'Official' : undefined} size={14} />
+                      </div>
+                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">{user.role} • {user.college} HUB</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="hidden sm:block text-right">
+                       <p className="text-[9px] font-black text-slate-400 uppercase">Commits</p>
+                       <p className="text-sm font-black text-indigo-600">{user.postsCount}</p>
+                    </div>
+                    <button onClick={() => onNavigateToProfile(user.id)} className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-indigo-600 rounded-md text-[9px] font-black uppercase tracking-widest transition-all">View Node</button>
+                  </div>
+                </div>
+              ))
+            )}
+
+            {(filteredPosts.length === 0 && filteredUsers.length === 0) && (
+              <div className="py-40 text-center space-y-6">
+                <Terminal size={48} className="mx-auto text-slate-300" />
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black uppercase tracking-tighter italic">Registry Error: 404</h3>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">No alphanumeric signals detected for current query parameters.</p>
+                </div>
+                <button onClick={() => setQuery('')} className="px-8 py-3 bg-indigo-600 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Clear Protocol</button>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

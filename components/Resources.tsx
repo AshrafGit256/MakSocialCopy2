@@ -27,10 +27,15 @@ const Resources: React.FC = () => {
   
   const [isAdding, setIsAdding] = useState(false);
   const [previewResource, setPreviewResource] = useState<Resource | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [addForm, setAddForm] = useState({ title: '', course: '', year: 'Year 1', category: 'Notes/Books' as ResourceType });
 
   useEffect(() => {
-    setResources(db.getResources());
+    const sync = () => {
+      setResources(db.getResources());
+    };
+    sync();
+    const interval = setInterval(sync, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const filteredResources = useMemo(() => {
@@ -48,6 +53,26 @@ const Resources: React.FC = () => {
     alert(`Initiating decryption for ${res.title}. [Status: Verified]`);
     const updated = resources.map(r => r.id === res.id ? {...r, downloads: r.downloads + 1} : r);
     setResources(updated);
+  };
+
+  const handleAddResource = () => {
+    if (!addForm.title) return;
+    const newRes: Resource = {
+      id: Date.now().toString(),
+      title: addForm.title,
+      category: addForm.category,
+      college: currentCollege === 'Global' ? currentUser.college : currentCollege as College,
+      course: addForm.course || 'General',
+      year: addForm.year,
+      author: currentUser.name,
+      downloads: 0,
+      fileType: 'PDF',
+      timestamp: 'Just now'
+    };
+    db.saveResource(newRes);
+    setResources(db.getResources());
+    setIsAdding(false);
+    setAddForm({ title: '', course: '', year: 'Year 1', category: 'Notes/Books' });
   };
 
   const handleScan = () => {
@@ -108,7 +133,7 @@ const Resources: React.FC = () => {
               onChange={e => { setSelectedCourse(e.target.value); handleScan(); }}
             >
               <option value="All">Full Manifest</option>
-              {currentCollege !== 'Global' && COURSES_BY_COLLEGE[currentCollege].map(c => <option key={c} value={c}>{c}</option>)}
+              {currentCollege !== 'Global' && COURSES_BY_COLLEGE[currentCollege as College].map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -153,7 +178,6 @@ const Resources: React.FC = () => {
           </div>
         )}
 
-        {/* Desktop View Table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -230,7 +254,6 @@ const Resources: React.FC = () => {
           </table>
         </div>
 
-        {/* Mobile Card Stack View */}
         <div className="md:hidden divide-y divide-[var(--border-color)]">
           {filteredResources.length > 0 ? filteredResources.map(res => (
             <div key={res.id} className="p-5 space-y-4 hover:bg-[var(--bg-secondary)] transition-all">
@@ -248,11 +271,7 @@ const Resources: React.FC = () => {
                        <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{res.course} • {res.college}</p>
                     </div>
                   </div>
-                  <span className="text-[8px] font-black uppercase px-1.5 py-0.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-sm shrink-0">
-                    {res.category === 'Past Paper' ? 'PAPER' : 'NOTE'}
-                  </span>
                </div>
-               
                <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-4">
                      <div className="flex items-center gap-1.5 text-slate-500">
@@ -276,18 +295,6 @@ const Resources: React.FC = () => {
         </div>
       </div>
 
-      {/* ADVISORY NODE */}
-      <div className="mt-8 p-4 bg-[var(--bg-secondary)] border border-dashed border-[var(--border-color)] rounded-md flex items-center gap-4">
-        <div className="p-2 bg-indigo-600/10 text-indigo-600 rounded-sm border border-indigo-600/20">
-          <Shield size={16} />
-        </div>
-        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
-          Secure Uplink Active: All documents in this registry are verified academic assets. 
-          Unauthorized redistribution is logged as a protocol violation.
-        </p>
-      </div>
-
-      {/* ASSET INITIALIZATION MODAL */}
       {isAdding && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in">
            <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[var(--border-color)]">
@@ -298,29 +305,26 @@ const Resources: React.FC = () => {
               <div className="space-y-4">
                  <div className="space-y-1">
                     <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Asset_Title</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all" placeholder="e.g. COCIS Alpha Node Assembly" />
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all" value={addForm.title} onChange={e => setAddForm({...addForm, title: e.target.value})} placeholder="e.g. Year 2 Networks Paper" />
                  </div>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sector_Wing</label>
-                       <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none">
-                          {Object.keys(COURSES_BY_COLLEGE).map(c => <option key={c}>{c}</option>)}
-                       </select>
+                       <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Course_Logic</label>
+                       <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all" value={addForm.course} onChange={e => setAddForm({...addForm, course: e.target.value})} placeholder="Software Eng." />
                     </div>
                     <div className="space-y-1">
                        <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Stratum</label>
-                       <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none">
-                          {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                       <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none" value={addForm.category} onChange={e => setAddForm({...addForm, category: e.target.value as ResourceType})}>
+                          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                        </select>
                     </div>
                  </div>
-                 <button onClick={() => setIsAdding(false)} className="w-full bg-[#238636] py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-md transition-all active:scale-95">Upload to Registry</button>
+                 <button onClick={handleAddResource} className="w-full bg-[#238636] py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.2em] shadow-md transition-all active:scale-95">Commit to Registry</button>
               </div>
            </div>
         </div>
       )}
 
-      {/* ASSET PREVIEW MODAL */}
       {previewResource && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in">
            <div className="bg-[var(--bg-primary)] w-full max-w-4xl h-[80vh] rounded-md shadow-2xl flex flex-col border border-[var(--border-color)]">
@@ -346,10 +350,6 @@ const Resources: React.FC = () => {
            </div>
         </div>
       )}
-
-      <style>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-      `}</style>
     </div>
   );
 };

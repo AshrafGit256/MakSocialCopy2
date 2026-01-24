@@ -106,7 +106,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
       reader.onload = (event) => {
         const base64 = event.target?.result as string;
         restoreSelection();
-        const html = `<div class="content-image-wrapper"><img src="${base64}" class="responsive-doc-image" alt="User Image" /></div><br>`;
+        const html = `<div class="content-image-wrapper"><img src="${base64}" class="responsive-doc-image" alt="User Document" /></div><br>`;
         document.execCommand('insertHTML', false, html);
       };
       reader.readAsDataURL(file);
@@ -166,8 +166,9 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           </button>
           {openDropdown === 'headers' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} w-48 py-1`}>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H2'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-base">Header</button>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H3'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-sm">Sub-header</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H2'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white font-bold text-base">Header</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H3'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white font-bold text-sm">Sub-header</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H4'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white font-bold text-xs">Small-header</button>
               <div className="h-px bg-[var(--border-color)] my-1"></div>
               <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'blockquote'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2">
                  <Quote size={12}/> <span className="text-xs italic font-medium">Blockquote</span>
@@ -332,8 +333,8 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         </div>
       </div>
 
-      {/* COMPACT EDITOR AREA */}
-      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'min-h-[40px] max-h-[300px]'}`}>
+      {/* COMPACT TYPING AREA */}
+      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'min-h-[60px] max-h-[250px]'}`}>
         <div 
           ref={editorRef}
           contentEditable
@@ -342,9 +343,9 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           onBlur={saveSelection}
           className="w-full h-full p-3 text-sm outline-none leading-tight overflow-y-auto rich-content-style"
           style={{ fontFamily: activeFont }}
-          data-placeholder="Start typing..."
+          data-placeholder="Start typing your signal..."
         />
-        {!content && <div className="absolute top-3 left-3 text-slate-400 pointer-events-none text-sm font-sans opacity-60">Start typing...</div>}
+        {!content && <div className="absolute top-3 left-3 text-slate-400 pointer-events-none text-sm font-sans opacity-60">Start typing your signal...</div>}
       </div>
 
       {/* COMPACT BROADCAST BAR */}
@@ -368,13 +369,14 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
 
       <style>{`
         .rich-content-style:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
-        .rich-content-style h2 { font-size: 1.5rem; font-weight: 900; margin: 0.25rem 0; text-transform: uppercase; line-height: 1; }
-        .rich-content-style h3 { font-size: 1.25rem; font-weight: 800; margin: 0.2rem 0; }
+        .rich-content-style h2 { font-size: 1.5rem; font-weight: 900; margin: 0.5rem 0; text-transform: uppercase; line-height: 1; display: block; }
+        .rich-content-style h3 { font-size: 1.25rem; font-weight: 800; margin: 0.4rem 0; display: block; }
+        .rich-content-style h4 { font-size: 1.1rem; font-weight: 700; margin: 0.3rem 0; display: block; }
         .rich-content-style p { margin-bottom: 0.25rem; }
         .content-image-wrapper { margin: 8px 0; text-align: center; width: 100%; display: flex; justify-content: center; }
-        .responsive-doc-image { max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: block; border: 1px solid #ddd; }
-        .rich-content-style table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.25rem; table-layout: fixed; }
-        .rich-content-style th, .rich-content-style td { border: 1px solid #ddd; padding: 4px; word-wrap: break-word; overflow-wrap: break-word; }
+        .responsive-doc-image { max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: block; border: 1px solid #ddd; }
+        .rich-content-style table { border-collapse: collapse; width: 100% !important; border: 1px solid #ddd !important; margin: 10px 0 !important; table-layout: fixed; }
+        .rich-content-style th, .rich-content-style td { border: 1px solid #ddd !important; padding: 6px !important; word-wrap: break-word; }
         .rich-content-style blockquote { border-left: 3px solid #4f46e5; padding-left: 0.75rem; font-style: italic; color: #64748b; margin-bottom: 0.25rem; }
         .rich-content-style a { color: #4f46e5; text-decoration: underline; }
       `}</style>
@@ -400,6 +402,7 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, onNav
             </div>
             <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-sm overflow-hidden transition-all hover:border-indigo-500/30 ${isComment ? 'cursor-default' : 'cursor-pointer'}`}>
                <div className="p-5 space-y-4" style={{ fontFamily: post.customFont }}>
+                  {/* RE-APPLIED RICH STYLE TO POSTS TO FIX DESIGN LOSS */}
                   <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content-style text-[14px] leading-relaxed" />
                </div>
                <div className="px-5 py-2 bg-slate-50/50 dark:bg-white/5 border-t border-[var(--border-color)] flex items-center gap-6">

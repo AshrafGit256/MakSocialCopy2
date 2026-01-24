@@ -6,7 +6,7 @@ const DB_KEYS = {
   POSTS: 'maksocial_posts_v17',
   USERS: 'maksocial_users_v17',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  RESOURCES: 'maksocial_resources_v7',
+  RESOURCES: 'maksocial_resources_v8',
   CALENDAR: 'maksocial_calendar_v9',
   ADS: 'maksocial_ads_v4',
   OPPORTUNITIES: 'maksocial_opps_v3'
@@ -35,6 +35,45 @@ export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560, growth: 25 },
 ];
 
+const INITIAL_RESOURCES: Resource[] = [
+  {
+    id: 'res-1',
+    title: 'Operating Systems - 2024 Past Paper',
+    category: 'Past Paper',
+    college: 'COCIS',
+    course: 'Computer Science',
+    year: 'Year 2',
+    author: 'Admin_Registry',
+    downloads: 1240,
+    fileType: 'PDF',
+    timestamp: '2 days ago'
+  },
+  {
+    id: 'res-2',
+    title: 'Structural Analysis III Notes',
+    category: 'Notes/Books',
+    college: 'CEDAT',
+    course: 'Civil Engineering',
+    year: 'Year 3',
+    author: 'Lecturer_Sync',
+    downloads: 890,
+    fileType: 'PDF',
+    timestamp: '5 days ago'
+  },
+  {
+    id: 'res-3',
+    title: 'Constitutional Law - Case Summaries',
+    category: 'Notes/Books',
+    college: 'LAW',
+    course: 'Bachelor of Laws',
+    year: 'Year 1',
+    author: 'Guild_Vault',
+    downloads: 3200,
+    fileType: 'DOCX',
+    timestamp: '1 week ago'
+  }
+];
+
 const INITIAL_OPPORTUNITIES: Post[] = [
   {
     id: 'opp-1',
@@ -55,57 +94,9 @@ const INITIAL_OPPORTUNITIES: Post[] = [
     college: 'COCIS',
     opportunityData: {
       type: 'Gig',
-      deadline: getFutureDate(1), // EXPIRING TOMORROW
+      deadline: getFutureDate(1), 
       isAIVerified: true,
       detectedBenefit: 'Immediate Payment'
-    }
-  },
-  {
-    id: 'opp-2',
-    author: 'Google DSC Mak',
-    authorId: 'gdsc_mak',
-    authorRole: 'Tech Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=GDSC',
-    timestamp: '5h ago',
-    content: 'The 2025 Core Team selection is open. Looking for leads in Web, Cloud, and AI wings.',
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Leadership', '#Tech'],
-    likes: 89,
-    commentsCount: 24,
-    comments: [],
-    views: 3400,
-    flags: [],
-    isOpportunity: true,
-    college: 'Global',
-    opportunityData: {
-      type: 'Workshop',
-      deadline: getFutureDate(3), // EXPIRING SOON
-      isAIVerified: true,
-      detectedBenefit: 'Core Team Roles'
-    }
-  },
-  {
-    id: 'opp-3',
-    author: 'Mastercard Foundation',
-    authorId: 'mcf_mak',
-    authorRole: 'Sponsor Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=MCF',
-    timestamp: '1d ago',
-    content: 'Full Scholarship Call for CHS and CEDAT finalists. Must have a CGPA of 4.0 and above.',
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Scholarship', '#Grant'],
-    likes: 450,
-    commentsCount: 110,
-    comments: [],
-    views: 15000,
-    flags: [],
-    isOpportunity: true,
-    college: 'Global',
-    opportunityData: {
-      type: 'Scholarship',
-      deadline: getFutureDate(14),
-      isAIVerified: true,
-      detectedBenefit: 'Full Tuition Cover'
     }
   }
 ];
@@ -162,18 +153,7 @@ export const db = {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) opps = parsed;
       }
-      
-      const now = new Date().getTime();
-      return opps
-        .filter(o => {
-          if (!o.opportunityData?.deadline) return true;
-          return new Date(o.opportunityData.deadline).getTime() >= now;
-        })
-        .sort((a, b) => {
-          const da = a.opportunityData?.deadline ? new Date(a.opportunityData.deadline).getTime() : Infinity;
-          const dbVal = b.opportunityData?.deadline ? new Date(b.opportunityData.deadline).getTime() : Infinity;
-          return da - dbVal;
-        });
+      return opps;
     } catch (e) {
       return INITIAL_OPPORTUNITIES;
     }
@@ -191,10 +171,43 @@ export const db = {
     const opps = db.getOpportunities();
     db.saveOpportunities(opps.filter(o => o.id !== postId));
   },
-  getResources: (): Resource[] => [],
-  getCalendarEvents: (): CalendarEvent[] => [],
-  saveCalendarEvent: (event: CalendarEvent) => {},
-  registerForEvent: (eventId: string, userId: string) => {},
+  getResources: (): Resource[] => {
+    try {
+      const saved = localStorage.getItem(DB_KEYS.RESOURCES);
+      if (saved) return JSON.parse(saved);
+      return INITIAL_RESOURCES;
+    } catch (e) {
+      return INITIAL_RESOURCES;
+    }
+  },
+  saveResource: (resource: Resource) => {
+    const resources = db.getResources();
+    const updated = [resource, ...resources];
+    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(updated));
+  },
+  getCalendarEvents: (): CalendarEvent[] => {
+    try {
+      const saved = localStorage.getItem(DB_KEYS.CALENDAR);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  },
+  saveCalendarEvent: (event: CalendarEvent) => {
+    const events = db.getCalendarEvents();
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...events]));
+  },
+  registerForEvent: (eventId: string, userId: string) => {
+    const events = db.getCalendarEvents();
+    const updated = events.map(ev => {
+      if (ev.id === eventId) {
+        const attendees = ev.attendeeIds || [];
+        if (!attendees.includes(userId)) return { ...ev, attendeeIds: [...attendees, userId] };
+      }
+      return ev;
+    });
+    localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+  },
   getAds: (): Ad[] => [],
   saveAds: (ads: Ad[]) => {},
   getEvents: () => []

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Post, User, College, AuthorityRole } from '../types';
 import { db } from '../db';
@@ -422,7 +421,7 @@ const PostItem: React.FC<{ post: Post, onOpenThread: (id: string) => void, onNav
   );
 };
 
-const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack }) => {
+const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -439,6 +438,16 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   }, []);
 
   const handlePost = async (content: string, font: string) => {
+    // HARMFUL CONTENT DETECTION (MOCK AI SCANNER FOR REQUESTED CATEGORIES)
+    const plainText = content.replace(/<[^>]*>/g, '').toLowerCase();
+    const harmfulKeywords = ['sex', 'porn', 'abuse', 'kill', 'attack', 'harrass', 'idiot', 'stupid', 'naked', 'explicit'];
+    const isHarmful = harmfulKeywords.some(keyword => plainText.includes(keyword));
+
+    if (isHarmful) {
+      triggerSafetyError("The content you want to upload is harmful for public consumption. Signals containing harassment, sexually explicit material, violence, or abusive language are prohibited.");
+      return;
+    }
+
     setIsAnalyzing(true);
     let opportunityData: Post['opportunityData'] | undefined = undefined;
 

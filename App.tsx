@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { AppView, User, College, UserStatus, AppSettings, Notification } from './types';
 import Landing from './components/Landing';
@@ -17,7 +16,7 @@ import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -32,6 +31,9 @@ const App: React.FC = () => {
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  
+  // Safety Notification State
+  const [safetyError, setSafetyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -61,12 +63,11 @@ const App: React.FC = () => {
   }, [isLoggedIn, view]);
 
   useEffect(() => {
-    const sync = () => {
-      if (isLoggedIn) setNotifications(db.getNotifications());
-    };
-    const t = setInterval(sync, 5000);
-    return () => clearInterval(t);
-  }, [isLoggedIn]);
+    if (safetyError) {
+      const timer = setTimeout(() => setSafetyError(null), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [safetyError]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -111,8 +112,8 @@ const App: React.FC = () => {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
-      case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
+      case 'home': return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
+      case 'thread': return <Feed threadId={activeThreadId || undefined} triggerSafetyError={setSafetyError} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
       case 'messages': return <Chat initialTargetUserId={activeChatUserId || undefined} />;
@@ -122,7 +123,7 @@ const App: React.FC = () => {
       case 'resources': return <Resources />;
       case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
-      default: return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
+      default: return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
     }
   };
 
@@ -131,6 +132,26 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative">
+      
+      {/* ADMINLTE V3 STYLE ERROR MESSAGE */}
+      {safetyError && (
+        <div className="fixed top-20 right-6 z-[9999] animate-in slide-in-from-right-4 duration-300">
+           <div className="bg-white border border-[#dee2e6] rounded shadow-lg p-3 pr-8 flex items-start gap-4 max-w-sm relative">
+              <div className="shrink-0 pt-0.5">
+                 <XCircle className="text-[#dc3545]" size={36} />
+              </div>
+              <div className="flex flex-col gap-1">
+                 <p className="text-[#495057] text-sm font-bold leading-tight">
+                    {safetyError}
+                 </p>
+              </div>
+              <button onClick={() => setSafetyError(null)} className="absolute top-2 right-2 text-[#adb5bd] hover:text-[#495057]">
+                <X size={14} />
+              </button>
+           </div>
+        </div>
+      )}
+
       {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden animate-in fade-in" onClick={() => setIsSidebarOpen(false)} />}
       <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} unreadNotifications={unreadNotifs} />
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">

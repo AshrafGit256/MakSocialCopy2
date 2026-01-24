@@ -111,7 +111,6 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
       };
       reader.readAsDataURL(file);
     }
-    // Reset file input value to allow the same file to be selected again
     e.target.value = '';
   };
 
@@ -140,7 +139,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   const ToolbarButton: React.FC<{ onClick: () => void, icon: React.ReactNode, title?: string, active?: boolean }> = ({ onClick, icon, title, active }) => (
     <button 
       onMouseDown={(e) => { e.preventDefault(); saveSelection(); onClick(); }} 
-      className={`p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors text-slate-700 dark:text-slate-300 ${active ? 'bg-indigo-100 dark:bg-indigo-900/30' : ''}`}
+      className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors text-slate-700 dark:text-slate-300 ${active ? 'bg-indigo-100 dark:bg-indigo-900/30' : ''}`}
       title={title}
     >
       {icon}
@@ -153,30 +152,22 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   return (
     <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-xl overflow-visible mb-10 transition-all ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none' : 'relative animate-in slide-in-from-top-4 duration-500'}`}>
       
-      {/* HIDDEN FILE INPUT */}
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleImageUpload} 
-        accept="image/*" 
-        className="hidden" 
-      />
+      <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
 
-      {/* PROFESSIONAL TOOLBAR */}
-      <div className="px-2 py-1 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-1 gap-y-1 relative z-[60]">
+      {/* COMPACT TOOLBAR */}
+      <div className="px-1.5 py-0.5 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-0.5 gap-y-0.5 relative z-[60]">
         
-        {/* Headers Dropdown */}
         <div className="relative">
           <button 
             onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'headers' ? null : 'headers'); }}
-            className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[10px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10"
+            className="flex items-center gap-1 px-1.5 py-0.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[9px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10"
           >
-            Type <ChevronDown size={10} />
+            Type <ChevronDown size={8} />
           </button>
           {openDropdown === 'headers' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} w-48 py-1`}>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H2'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-lg">Header</button>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H3'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-base">Sub-header</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H2'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-base">Header</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H3'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-sm">Sub-header</button>
               <div className="h-px bg-[var(--border-color)] my-1"></div>
               <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'blockquote'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2">
                  <Quote size={12}/> <span className="text-xs italic font-medium">Blockquote</span>
@@ -186,24 +177,22 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+        <div className="h-3 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Style Tools */}
         <div className="flex items-center gap-0.5">
-          <ToolbarButton onClick={() => exec('bold')} icon={<Bold size={14}/>} title="Bold" />
-          <ToolbarButton onClick={() => exec('underline')} icon={<Underline size={14}/>} title="Underline" />
-          <ToolbarButton onClick={() => exec('removeFormat')} icon={<Eraser size={14}/>} title="Clean Style" />
+          <ToolbarButton onClick={() => exec('bold')} icon={<Bold size={12}/>} title="Bold" />
+          <ToolbarButton onClick={() => exec('underline')} icon={<Underline size={12}/>} title="Underline" />
+          <ToolbarButton onClick={() => exec('removeFormat')} icon={<Eraser size={12}/>} title="Clean Style" />
         </div>
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+        <div className="h-3 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Fonts */}
         <div className="relative">
           <button 
             onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'fonts' ? null : 'fonts'); }}
-            className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[10px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10 min-w-[100px] justify-between"
+            className="flex items-center gap-1 px-1.5 py-0.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[9px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10 min-w-[80px] justify-between"
           >
-            {FONTS.find(f => f.value === activeFont)?.name || 'Font'} <ChevronDown size={10} />
+            <span className="truncate">{FONTS.find(f => f.value === activeFont)?.name || 'Font'}</span> <ChevronDown size={8} />
           </button>
           {openDropdown === 'fonts' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} w-56 max-h-64 overflow-y-auto py-1`}>
@@ -221,16 +210,15 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+        <div className="h-3 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Color Matrix */}
         <div className="relative">
           <button 
             onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'colors' ? null : 'colors'); }}
-            className="px-2 py-1 flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded border border-slate-300 dark:border-white/10"
+            className="px-1.5 py-0.5 flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded border border-slate-300 dark:border-white/10"
           >
-            <span className="text-[14px] leading-none font-black underline decoration-indigo-500 decoration-2">A</span>
-            <ChevronDown size={10} className="text-slate-400"/>
+            <span className="text-[12px] leading-none font-black underline decoration-indigo-500 decoration-1">A</span>
+            <ChevronDown size={8} className="text-slate-400"/>
           </button>
           {openDropdown === 'colors' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} p-4 min-w-[340px] flex gap-6 md:flex-row flex-col max-h-[90vh] overflow-y-auto`}>
@@ -257,16 +245,15 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+        <div className="h-3 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Alignment */}
         <div className="relative">
           <button 
             onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'align' ? null : 'align'); }}
-            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1"
+            className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1"
           >
-            <AlignLeft size={14}/>
-            <ChevronDown size={10} className="text-slate-400"/>
+            <AlignLeft size={12}/>
+            <ChevronDown size={8} className="text-slate-400"/>
           </button>
           {openDropdown === 'align' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} w-32 py-1`}>
@@ -278,19 +265,17 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        {/* Lists */}
         <div className="flex items-center gap-0.5">
-          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={14}/>} title="Bullet List" />
-          <ToolbarButton onClick={() => exec('insertOrderedList')} icon={<ListOrdered size={14}/>} title="Ordered List" />
+          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={12}/>} title="Bullet List" />
+          <ToolbarButton onClick={() => exec('insertOrderedList')} icon={<ListOrdered size={12}/>} title="Ordered List" />
         </div>
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+        <div className="h-3 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Table Generator */}
         <div className="relative">
-          <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'table' ? null : 'table'); }} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
-            <TableIcon size={14}/>
-            <ChevronDown size={10} className="text-slate-400"/>
+          <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'table' ? null : 'table'); }} className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
+            <TableIcon size={12}/>
+            <ChevronDown size={8} className="text-slate-400"/>
           </button>
           {openDropdown === 'table' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} p-3`}>
@@ -304,12 +289,11 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        {/* Link Protocol */}
         <div className="relative">
-          <ToolbarButton onClick={() => { saveSelection(); setOpenDropdown(openDropdown === 'link' ? null : 'link'); }} icon={<LinkIcon size={14}/>} title="Add Link" />
+          <ToolbarButton onClick={() => { saveSelection(); setOpenDropdown(openDropdown === 'link' ? null : 'link'); }} icon={<LinkIcon size={12}/>} title="Add Link" />
           {openDropdown === 'link' && (
             <div className={`${dropdownBaseClass} ${mobileCenterClass} w-64 p-4 space-y-4`}>
-              <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b pb-2">Inject Signal Link</h5>
+              <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b pb-2">Inject Link</h5>
               <div className="space-y-3">
                 <input className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs outline-none" placeholder="Text to display..." value={linkText} onChange={(e) => setLinkText(e.target.value)} />
                 <input className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs outline-none" placeholder="https://..." value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
@@ -322,24 +306,20 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        {/* Image Hub (Device Selection) */}
-        <ToolbarButton onClick={() => fileInputRef.current?.click()} icon={<ImageIcon size={14}/>} title="Upload Image" />
-        <ToolbarButton onClick={() => exec('insertHorizontalRule')} icon={<div className="w-4 h-px bg-slate-400" />} title="Separator" />
+        <ToolbarButton onClick={() => fileInputRef.current?.click()} icon={<ImageIcon size={12}/>} title="Upload Image" />
+        <ToolbarButton onClick={() => exec('insertHorizontalRule')} icon={<div className="w-3 h-px bg-slate-400" />} title="Separator" />
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
+        <div className="h-3 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Systems */}
-        <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Fullscreen" />
+        <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={12}/> : <Maximize2 size={12}/>} title="Fullscreen" />
         <div className="relative">
-          <ToolbarButton onClick={() => { saveSelection(); setOpenDropdown(openDropdown === 'help' ? null : 'help'); }} icon={<HelpCircle size={14}/>} title="Help" />
+          <ToolbarButton onClick={() => { saveSelection(); setOpenDropdown(openDropdown === 'help' ? null : 'help'); }} icon={<HelpCircle size={12}/>} title="Help" />
           {openDropdown === 'help' && (
             <div className={`${dropdownBaseClass} fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:absolute md:top-full md:right-0 md:left-auto md:translate-x-0 md:translate-y-0 w-80 p-4 max-h-[80vh] overflow-y-auto`}>
-              <h4 className="text-[10px] font-black uppercase text-indigo-600 mb-4 tracking-widest border-b pb-2">Terminal Protocols</h4>
+              <h4 className="text-[10px] font-black uppercase text-indigo-600 mb-4 tracking-widest border-b pb-2">Shortcuts</h4>
               <div className="space-y-1.5 text-[9px] font-mono">
                 {[
-                  ['ESC', 'Escape'], ['ENTER', 'Paragraph'], ['CTRL+Z', 'Undo'], ['CTRL+Y', 'Redo'],
-                  ['CTRL+B', 'Bold'], ['CTRL+I', 'Italic'], ['CTRL+U', 'Underline'], ['CTRL+K', 'Link Dialog'],
-                  ['CTRL+SHIFT+L', 'Left'], ['CTRL+SHIFT+E', 'Center'], ['CTRL+SHIFT+R', 'Right']
+                  ['ESC', 'Escape'], ['ENTER', 'Paragraph'], ['CTRL+Z', 'Undo'], ['CTRL+B', 'Bold'], ['CTRL+K', 'Link']
                 ].map(([k, d]) => (
                   <div key={k} className="flex justify-between items-center py-1 border-b border-slate-50 dark:border-white/5 last:border-0">
                     <span className="bg-slate-100 dark:bg-white/5 px-1 rounded text-indigo-600 font-bold">{k}</span>
@@ -352,55 +332,51 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         </div>
       </div>
 
-      {/* ELASTIC EDITOR AREA */}
-      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-140px)]' : 'min-h-[40px]'}`}>
+      {/* COMPACT EDITOR AREA */}
+      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-120px)]' : 'min-h-[40px] max-h-[300px]'}`}>
         <div 
           ref={editorRef}
           contentEditable
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
           onFocus={saveSelection}
           onBlur={saveSelection}
-          className="w-full h-full p-4 text-sm outline-none leading-relaxed overflow-y-auto rich-content-style"
+          className="w-full h-full p-3 text-sm outline-none leading-tight overflow-y-auto rich-content-style"
           style={{ fontFamily: activeFont }}
-          data-placeholder="Start typing your signal..."
+          data-placeholder="Start typing..."
         />
-        {!content && <div className="absolute top-4 left-4 text-slate-400 pointer-events-none text-sm font-sans opacity-70">Start typing your signal...</div>}
+        {!content && <div className="absolute top-3 left-3 text-slate-400 pointer-events-none text-sm font-sans opacity-60">Start typing...</div>}
       </div>
 
-      {/* BROADCAST BAR */}
-      <div className="px-4 py-2 bg-[#f8f9fa] dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* COMPACT BROADCAST BAR */}
+      <div className="px-3 py-1.5 bg-[#f8f9fa] dark:bg-white/5 border-t border-[var(--border-color)] flex items-center justify-between">
+        <div className="flex items-center gap-2">
            {isAnalyzing && (
-             <div className="flex items-center gap-2 px-2 py-0.5 bg-indigo-600/10 rounded-full text-indigo-600">
-               <Loader2 size={10} className="animate-spin" />
-               <span className="text-[7px] font-black uppercase tracking-widest">AI Sync Active</span>
+             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-indigo-600/10 rounded-full text-indigo-600">
+               <Loader2 size={8} className="animate-spin" />
+               <span className="text-[6px] font-black uppercase tracking-widest">AI Scanning</span>
              </div>
            )}
         </div>
         <button 
           onClick={handlePublish}
           disabled={isAnalyzing || !content.trim()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-black text-[9px] uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-md font-black text-[8px] uppercase tracking-[0.1em] transition-all shadow-md active:scale-95 disabled:opacity-50 flex items-center gap-1.5"
         >
-          <Send size={12} /> Broadcast Signal
+          <Send size={10} /> Broadcast
         </button>
       </div>
 
       <style>{`
         .rich-content-style:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
-        .rich-content-style h2 { font-size: 2.0rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; line-height: 1; }
-        .rich-content-style h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.4rem; }
-        .rich-content-style p { margin-bottom: 0.5rem; }
-        .content-image-wrapper { margin: 15px 0; text-align: center; width: 100%; display: flex; justify-content: center; }
-        .responsive-doc-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; border: 1px solid #ddd; }
-        .rich-content-style table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.5rem; table-layout: fixed; }
-        .rich-content-style th, .rich-content-style td { border: 1px solid #ddd; padding: 6px; word-wrap: break-word; overflow-wrap: break-word; }
-        .rich-content-style blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 0.5rem; }
+        .rich-content-style h2 { font-size: 1.5rem; font-weight: 900; margin: 0.25rem 0; text-transform: uppercase; line-height: 1; }
+        .rich-content-style h3 { font-size: 1.25rem; font-weight: 800; margin: 0.2rem 0; }
+        .rich-content-style p { margin-bottom: 0.25rem; }
+        .content-image-wrapper { margin: 8px 0; text-align: center; width: 100%; display: flex; justify-content: center; }
+        .responsive-doc-image { max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: block; border: 1px solid #ddd; }
+        .rich-content-style table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.25rem; table-layout: fixed; }
+        .rich-content-style th, .rich-content-style td { border: 1px solid #ddd; padding: 4px; word-wrap: break-word; overflow-wrap: break-word; }
+        .rich-content-style blockquote { border-left: 3px solid #4f46e5; padding-left: 0.75rem; font-style: italic; color: #64748b; margin-bottom: 0.25rem; }
         .rich-content-style a { color: #4f46e5; text-decoration: underline; }
-        /* A4 document simulation for readability on small screens */
-        @media (max-width: 768px) {
-          .responsive-doc-image { width: 100%; object-fit: contain; }
-        }
       `}</style>
     </div>
   );

@@ -36,6 +36,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   const [linkUrl, setLinkUrl] = useState('');
 
   const editorRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const FONTS = [
     { name: 'JetBrains Mono', value: '"JetBrains Mono", monospace' },
@@ -98,13 +99,20 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
     }
   };
 
-  const handleInsertImage = () => {
-    const url = window.prompt("Enter image URL:");
-    if (url) {
-      restoreSelection();
-      const html = `<div style="margin: 15px 0; text-align: center;"><img src="${url}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="Uploaded Image" /></div><br>`;
-      document.execCommand('insertHTML', false, html);
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        restoreSelection();
+        const html = `<div class="content-image-wrapper"><img src="${base64}" class="responsive-doc-image" alt="User Image" /></div><br>`;
+        document.execCommand('insertHTML', false, html);
+      };
+      reader.readAsDataURL(file);
     }
+    // Reset file input value to allow the same file to be selected again
+    e.target.value = '';
   };
 
   const insertTable = (rows: number, cols: number) => {
@@ -145,6 +153,15 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   return (
     <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-xl overflow-visible mb-10 transition-all ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none' : 'relative animate-in slide-in-from-top-4 duration-500'}`}>
       
+      {/* HIDDEN FILE INPUT */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleImageUpload} 
+        accept="image/*" 
+        className="hidden" 
+      />
+
       {/* PROFESSIONAL TOOLBAR */}
       <div className="px-2 py-1 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-1 gap-y-1 relative z-[60]">
         
@@ -305,8 +322,8 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        {/* Image Hub */}
-        <ToolbarButton onClick={handleInsertImage} icon={<ImageIcon size={14}/>} title="Image" />
+        {/* Image Hub (Device Selection) */}
+        <ToolbarButton onClick={() => fileInputRef.current?.click()} icon={<ImageIcon size={14}/>} title="Upload Image" />
         <ToolbarButton onClick={() => exec('insertHorizontalRule')} icon={<div className="w-4 h-px bg-slate-400" />} title="Separator" />
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
@@ -374,11 +391,16 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         .rich-content-style h2 { font-size: 2.0rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; line-height: 1; }
         .rich-content-style h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.4rem; }
         .rich-content-style p { margin-bottom: 0.5rem; }
-        .rich-content-style img { max-width: 100%; height: auto; display: block; margin: 10px auto; border-radius: 6px; }
+        .content-image-wrapper { margin: 15px 0; text-align: center; width: 100%; display: flex; justify-content: center; }
+        .responsive-doc-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: block; border: 1px solid #ddd; }
         .rich-content-style table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.5rem; table-layout: fixed; }
         .rich-content-style th, .rich-content-style td { border: 1px solid #ddd; padding: 6px; word-wrap: break-word; overflow-wrap: break-word; }
         .rich-content-style blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 0.5rem; }
         .rich-content-style a { color: #4f46e5; text-decoration: underline; }
+        /* A4 document simulation for readability on small screens */
+        @media (max-width: 768px) {
+          .responsive-doc-image { width: 100%; object-fit: contain; }
+        }
       `}</style>
     </div>
   );

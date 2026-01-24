@@ -14,13 +14,15 @@ const Explore: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchingMap, setIsSearchingMap] = useState(false);
   const [mapResponse, setMapResponse] = useState<string | null>(null);
-  const [userCoords, setUserCoords] = useState<{lat: number, lng: number} | null>(null);
+  // Fixed state to use latitude/longitude property names as required by the GenAI Maps tool
+  const [userCoords, setUserCoords] = useState<{latitude: number, longitude: number} | null>(null);
   const [estimationMode, setEstimationMode] = useState<'walking' | 'driving'>('walking');
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        // Corrected property names to match the expected schema for latLng grounding in retrievalConfig
+        (pos) => setUserCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
         (err) => console.debug("Location blocked", err)
       );
     }
@@ -44,19 +46,23 @@ const Explore: React.FC = () => {
     if (!searchQuery.trim()) return;
     setIsSearchingMap(true);
     try {
+      // Re-initialize GenAI client right before the call to ensure fresh key access
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-lite-latest",
+        // Updated to the correct full model name alias for Gemini Flash Lite 2.5 series
+        model: "gemini-flash-lite-latest",
         contents: `Provide information about ${searchQuery} at Makerere University. Give me navigation tips and significance.`,
         config: {
           tools: [{ googleMaps: {} }],
           toolConfig: {
             retrievalConfig: {
+              // Ensure coordinates match the expected latitude/longitude schema for grounding
               latLng: userCoords || { latitude: 0.3348, longitude: 32.5684 }
             }
           }
         }
       });
+      // Correctly accessing .text property on the response as per guidelines
       setMapResponse(response.text || "Scanning complete. Location identified.");
     } catch (e) {
       console.error(e);

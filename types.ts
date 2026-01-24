@@ -197,3 +197,19 @@ export interface CalendarEvent {
   registrationLink?: string;
   isPromoted?: boolean;
 }
+
+// Market service interface for Bazaar marketplace transactional nodes
+export interface MarketService {
+  id: string;
+  providerId: string;
+  providerName: string;
+  providerAvatar: string;
+  title: string;
+  description: string;
+  price: string;
+  category: string;
+  college: College;
+  rating: number;
+  reviewsCount: number;
+  isPromoted: boolean;
+}

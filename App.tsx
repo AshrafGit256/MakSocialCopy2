@@ -109,7 +109,7 @@ const App: React.FC = () => {
 
   // STRICT ADMIN VIEW ENFORCEMENT
   if (isLoggedIn && userRole === 'admin') {
-    return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing'); setIsLoggedIn(false);}} />;
+    return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
   }
 
   const renderContent = () => {

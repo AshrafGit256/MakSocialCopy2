@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star, Bell, ShoppingBag, GitPullRequest } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star, Bell } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -78,24 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             );
           })}
 
-          <div className="h-px bg-[var(--border-color)] my-4 opacity-50 mx-4"></div>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Economic Strata</p>
-
-          <button
-            onClick={() => setView('market')}
-            className={`w-full flex items-center justify-between px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
-              activeView === 'market' 
-              ? 'bg-emerald-600 text-white shadow-lg' 
-              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-emerald-600'
-            }`}
-          >
-            <div className="flex items-center space-x-4">
-              <ShoppingBag size={22} />
-              <span className="text-[11px] tracking-widest font-black uppercase">The Bazaar</span>
-            </div>
-            <span className="bg-rose-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full animate-pulse">NEW</span>
-          </button>
-
           <button
             onClick={() => setView('opportunities')}
             className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
@@ -107,21 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             <Award size={22} className={activeView === 'opportunities' ? 'text-white' : ''} />
             <span className="text-[11px] tracking-widest font-black uppercase">Opportunities</span>
           </button>
-
-          <button
-            onClick={() => setView('forge')}
-            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
-              activeView === 'forge' 
-              ? 'bg-indigo-900 text-white shadow-lg' 
-              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-900'
-            }`}
-          >
-            <GitPullRequest size={22} />
-            <span className="text-[11px] tracking-widest font-black uppercase">The Forge</span>
-          </button>
           
-          <div className="h-px bg-[var(--border-color)] my-4 opacity-50 mx-4"></div>
-
           <button
             onClick={() => setView('settings')}
             className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${

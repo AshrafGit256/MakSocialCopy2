@@ -7,7 +7,8 @@ import {
   Heart, MessageCircle, X, Loader2, Eye, Zap, 
   Maximize2, Minimize2, Video, Type as LucideType, 
   Bold, Italic, Palette, Send, Underline, Eraser,
-  List, ListOrdered, AlignLeft, Table as TableIcon, Link as LinkIcon,
+  List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  Table as TableIcon, Link as LinkIcon,
   ImageIcon, HelpCircle, ChevronRight, TrendingUp, 
   Radio, Terminal, Sparkles, Star, ChevronDown, Type, Quote
 } from 'lucide-react';
@@ -27,10 +28,10 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   const [content, setContent] = useState('');
   const [activeFont, setActiveFont] = useState('"JetBrains Mono"');
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<'headers' | 'fonts' | 'table' | 'colors' | 'help' | 'link' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'headers' | 'fonts' | 'table' | 'colors' | 'help' | 'link' | 'align' | null>(null);
   const [tableHover, setTableHover] = useState({ r: 0, c: 0 });
+  const [savedRange, setSavedRange] = useState<Range | null>(null);
   
-  // Link State
   const [linkText, setLinkText] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
 
@@ -61,6 +62,24 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
     ['#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']
   ];
 
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      setSavedRange(sel.getRangeAt(0));
+    }
+  };
+
+  const restoreSelection = () => {
+    if (savedRange) {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+      }
+    }
+    if (editorRef.current) editorRef.current.focus();
+  };
+
   const exec = (cmd: string, val?: string) => {
     document.execCommand(cmd, false, val);
     setOpenDropdown(null);
@@ -70,10 +89,12 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
   const handleInsertLink = (e: React.FormEvent) => {
     e.preventDefault();
     if (linkUrl) {
-      const html = `<a href="${linkUrl}" target="_blank" style="color: #4f46e5; text-decoration: underline;">${linkText || linkUrl}</a> `;
-      exec('insertHTML', html);
+      restoreSelection();
+      const html = `<a href="${linkUrl}" target="_blank" style="color: #4f46e5; text-decoration: underline;">${linkText || linkUrl}</a>&nbsp;`;
+      document.execCommand('insertHTML', false, html);
       setLinkText('');
       setLinkUrl('');
+      setOpenDropdown(null);
     }
   };
 
@@ -109,8 +130,13 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
     </button>
   );
 
+  // Responsive CSS for dropdowns
+  const dropdownBaseClass = "z-[3005] bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md overflow-hidden animate-in fade-in slide-in-from-top-1";
+  const mobileCenterClass = "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:absolute md:top-full md:left-0 md:translate-x-0 md:translate-y-0 md:mt-1";
+
   return (
     <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-xl overflow-visible mb-10 transition-all ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none' : 'relative animate-in slide-in-from-top-4 duration-500'}`}>
+      
       {/* SOPHISTICATED TOOLBAR */}
       <div className="px-2 py-1 border-b border-[var(--border-color)] bg-[#f8f9fa] dark:bg-white/5 flex flex-wrap items-center gap-x-1 gap-y-1 relative z-50">
         
@@ -120,19 +146,12 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
             onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'headers' ? null : 'headers'); }}
             className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-[10px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-white/10"
           >
-            Normal <ChevronDown size={10} />
+            Headers <ChevronDown size={10} />
           </button>
           {openDropdown === 'headers' && (
-            <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md overflow-hidden py-1">
-              {[1,2,3,4,5,6].map(i => (
-                <button 
-                  key={i} 
-                  onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', `H${i}`); }}
-                  className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors"
-                >
-                  <span style={{ fontSize: `${2.0 - (i*0.15)}rem` }} className="font-bold leading-none">Header {i}</span>
-                </button>
-              ))}
+            <div className={`${dropdownBaseClass} ${mobileCenterClass} w-48 py-1`}>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H2'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-lg">Header</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'H3'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white transition-colors font-bold text-base">Sub-header</button>
               <div className="h-px bg-[var(--border-color)] my-1"></div>
               <button onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', 'blockquote'); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2">
                  <Quote size={12}/> <span className="text-xs italic font-medium">Blockquote</span>
@@ -148,7 +167,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
         <div className="flex items-center gap-0.5">
           <ToolbarButton onClick={() => exec('bold')} icon={<Bold size={14}/>} title="Bold" />
           <ToolbarButton onClick={() => exec('underline')} icon={<Underline size={14}/>} title="Underline" />
-          <ToolbarButton onClick={() => exec('removeFormat')} icon={<Eraser size={14}/>} title="Clear Formatting" />
+          <ToolbarButton onClick={() => exec('removeFormat')} icon={<Eraser size={14}/>} title="Clear Style" />
         </div>
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
@@ -162,7 +181,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
             {FONTS.find(f => f.value === activeFont)?.name || 'Font'} <ChevronDown size={10} />
           </button>
           {openDropdown === 'fonts' && (
-            <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md overflow-y-auto max-h-64 py-1">
+            <div className={`${dropdownBaseClass} ${mobileCenterClass} w-56 max-h-64 overflow-y-auto py-1`}>
               {FONTS.map(f => (
                 <button 
                   key={f.name} 
@@ -179,50 +198,33 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* Color Dropdown (Advanced Tabs Mode) */}
+        {/* Color Picker */}
         <div className="relative">
           <button 
             onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'colors' ? null : 'colors'); }}
             className="px-2 py-1 flex items-center gap-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded border border-slate-300 dark:border-white/10"
-            title="Color Picker"
           >
-            <div className="flex flex-col items-center">
-              <span className="text-[14px] leading-none font-black underline decoration-indigo-500 decoration-2">A</span>
-            </div>
+            <span className="text-[14px] leading-none font-black underline decoration-indigo-500 decoration-2">A</span>
             <ChevronDown size={10} className="text-slate-400"/>
           </button>
           {openDropdown === 'colors' && (
-            <div className="absolute top-full left-0 mt-1 p-4 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md min-w-[340px] flex gap-6 md:flex-row flex-col max-h-[80vh] overflow-y-auto">
-              {/* Background Color Column */}
+            <div className={`${dropdownBaseClass} ${mobileCenterClass} p-4 min-w-[340px] flex gap-6 md:flex-row flex-col`}>
               <div className="flex-1 space-y-3">
                 <p className="text-[10px] font-black uppercase text-slate-500 text-center border-b pb-1 tracking-widest">Background Color</p>
-                <button 
-                  onMouseDown={(e) => { e.preventDefault(); exec('hiliteColor', 'transparent'); }}
-                  className="w-full py-1.5 border border-slate-300 dark:border-white/10 text-[9px] font-bold uppercase rounded hover:bg-slate-50 transition-colors"
-                >
-                  Transparent
-                </button>
+                <button onMouseDown={(e) => { e.preventDefault(); exec('hiliteColor', 'transparent'); }} className="w-full py-1.5 border border-slate-300 dark:border-white/10 text-[9px] font-bold uppercase rounded">Transparent</button>
                 <div className="grid grid-cols-8 gap-0.5">
                   {COLOR_PALETTE.map((row, rid) => row.map((c, cid) => (
-                    <button key={`${rid}-${cid}`} onMouseDown={(e) => { e.preventDefault(); exec('hiliteColor', c); }} className="w-4 h-4 hover:scale-110 transition-transform" style={{ backgroundColor: c }} />
+                    <button key={`bg-${rid}-${cid}`} onMouseDown={(e) => { e.preventDefault(); exec('hiliteColor', c); }} className="w-4 h-4 hover:scale-110" style={{ backgroundColor: c }} />
                   )))}
                 </div>
               </div>
-
-              <div className="w-px bg-[var(--border-color)] md:block hidden"></div>
-
-              {/* Text Color Column */}
+              <div className="w-px bg-[var(--border-color)] hidden md:block"></div>
               <div className="flex-1 space-y-3">
                 <p className="text-[10px] font-black uppercase text-slate-500 text-center border-b pb-1 tracking-widest">Text Color</p>
-                <button 
-                  onMouseDown={(e) => { e.preventDefault(); exec('foreColor', '#1f2328'); }}
-                  className="w-full py-1.5 border border-slate-300 dark:border-white/10 text-[9px] font-bold uppercase rounded hover:bg-slate-50 transition-colors"
-                >
-                  Reset to default
-                </button>
+                <button onMouseDown={(e) => { e.preventDefault(); exec('foreColor', '#1f2328'); }} className="w-full py-1.5 border border-slate-300 dark:border-white/10 text-[9px] font-bold uppercase rounded">Reset Default</button>
                 <div className="grid grid-cols-8 gap-0.5">
                   {COLOR_PALETTE.map((row, rid) => row.map((c, cid) => (
-                    <button key={`t-${rid}-${cid}`} onMouseDown={(e) => { e.preventDefault(); exec('foreColor', c); }} className="w-4 h-4 hover:scale-110 transition-transform" style={{ backgroundColor: c }} />
+                    <button key={`txt-${rid}-${cid}`} onMouseDown={(e) => { e.preventDefault(); exec('foreColor', c); }} className="w-4 h-4 hover:scale-110" style={{ backgroundColor: c }} />
                   )))}
                 </div>
               </div>
@@ -232,9 +234,28 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
 
+        {/* Alignment Dropdown */}
+        <div className="relative">
+          <button 
+            onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'align' ? null : 'align'); }}
+            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1"
+          >
+            <AlignLeft size={14}/>
+            <ChevronDown size={10} className="text-slate-400"/>
+          </button>
+          {openDropdown === 'align' && (
+            <div className={`${dropdownBaseClass} ${mobileCenterClass} w-32 py-1`}>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyLeft'); }} className="w-full px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-[10px] font-bold uppercase"><AlignLeft size={14}/> Left</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyCenter'); }} className="w-full px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-[10px] font-bold uppercase"><AlignCenter size={14}/> Center</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyRight'); }} className="w-full px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-[10px] font-bold uppercase"><AlignRight size={14}/> Right</button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyFull'); }} className="w-full px-4 py-2 hover:bg-indigo-600 hover:text-white flex items-center gap-2 text-[10px] font-bold uppercase"><AlignJustify size={14}/> Justify</button>
+            </div>
+          )}
+        </div>
+
         {/* List Cluster */}
         <div className="flex items-center gap-0.5">
-          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={14}/>} title="Unordered List" />
+          <ToolbarButton onClick={() => exec('insertUnorderedList')} icon={<List size={14}/>} title="Bullet List" />
           <ToolbarButton onClick={() => exec('insertOrderedList')} icon={<ListOrdered size={14}/>} title="Ordered List" />
         </div>
 
@@ -242,56 +263,33 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
 
         {/* Table Dropdown */}
         <div className="relative">
-          <button 
-            onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'table' ? null : 'table'); }}
-            className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1"
-            title="Insert Table"
-          >
+          <button onMouseDown={(e) => { e.preventDefault(); setOpenDropdown(openDropdown === 'table' ? null : 'table'); }} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded flex items-center gap-1">
             <TableIcon size={14}/>
             <ChevronDown size={10} className="text-slate-400"/>
           </button>
           {openDropdown === 'table' && (
-            <div className="absolute top-full left-0 mt-1 p-3 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md">
+            <div className={`${dropdownBaseClass} ${mobileCenterClass} p-3`}>
               <p className="text-[8px] font-black uppercase text-slate-400 mb-3 text-center tracking-widest">{tableHover.r} x {tableHover.c} Table</p>
               <div className="grid grid-cols-5 gap-1">
-                {[1,2,3,4,5].map(r => (
-                  [1,2,3,4,5].map(c => (
-                    <div 
-                      key={`${r}-${c}`}
-                      onMouseEnter={() => setTableHover({r, c})}
-                      onMouseDown={(e) => { e.preventDefault(); insertTable(r, c); }}
-                      className={`w-4 h-4 border cursor-pointer transition-colors ${r <= tableHover.r && c <= tableHover.c ? 'bg-indigo-600 border-indigo-600' : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10'}`}
-                    />
-                  ))
-                ))}
+                {[1,2,3,4,5].map(r => [1,2,3,4,5].map(c => (
+                  <div key={`${r}-${c}`} onMouseEnter={() => setTableHover({r, c})} onMouseDown={(e) => { e.preventDefault(); insertTable(r, c); }} className={`w-4 h-4 border cursor-pointer ${r <= tableHover.r && c <= tableHover.c ? 'bg-indigo-600 border-indigo-600' : 'bg-slate-100 dark:bg-white/5 border-slate-300 dark:border-white/10'}`} />
+                )))}
               </div>
             </div>
           )}
         </div>
 
-        <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
-
-        {/* Link Pop-up */}
+        {/* Link Pop-up with Selection Memory */}
         <div className="relative">
-          <ToolbarButton onClick={() => setOpenDropdown(openDropdown === 'link' ? null : 'link')} icon={<LinkIcon size={14}/>} title="Add Link" />
+          <ToolbarButton onClick={() => { saveSelection(); setOpenDropdown(openDropdown === 'link' ? null : 'link'); }} icon={<LinkIcon size={14}/>} title="Add Link" />
           {openDropdown === 'link' && (
-            <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md p-4 space-y-4">
-              <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b pb-2">Create Signal Link</h5>
+            <div className={`${dropdownBaseClass} ${mobileCenterClass} w-64 p-4 space-y-4`}>
+              <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-500 border-b pb-2">Inject Signal Link</h5>
               <div className="space-y-3">
-                <input 
-                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs outline-none" 
-                  placeholder="Text to display..."
-                  value={linkText}
-                  onChange={(e) => setLinkText(e.target.value)}
-                />
-                <input 
-                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs outline-none" 
-                  placeholder="Link URL (https://...)"
-                  value={linkUrl}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                />
-                <div className="flex gap-2 pt-2">
-                  <button onMouseDown={handleInsertLink} className="flex-1 bg-indigo-600 text-white text-[9px] font-black uppercase py-2 rounded shadow-lg">Insert</button>
+                <input className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs" placeholder="Text to display..." value={linkText} onChange={(e) => setLinkText(e.target.value)} />
+                <input className="w-full bg-slate-50 dark:bg-black/20 border border-slate-300 dark:border-white/10 rounded p-2 text-xs" placeholder="https://..." value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
+                <div className="flex gap-2">
+                  <button onMouseDown={handleInsertLink} className="flex-1 bg-indigo-600 text-white text-[9px] font-black uppercase py-2 rounded">Insert</button>
                   <button onMouseDown={() => setOpenDropdown(null)} className="px-3 bg-slate-100 text-slate-500 text-[9px] font-black uppercase py-2 rounded">Cancel</button>
                 </div>
               </div>
@@ -299,77 +297,51 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           )}
         </div>
 
-        {/* Media Cluster */}
-        <div className="flex items-center gap-0.5">
-          <ToolbarButton onClick={() => { const url = window.prompt("Enter image URL:"); if(url) exec('insertImage', url); }} icon={<ImageIcon size={14}/>} title="Image" />
-          <ToolbarButton onClick={() => exec('insertHorizontalRule')} icon={<div className="w-4 h-px bg-slate-400" />} title="Horizontal Line" />
-        </div>
+        <ToolbarButton onClick={() => { const url = window.prompt("Enter image URL:"); if(url) exec('insertImage', url); }} icon={<ImageIcon size={14}/>} title="Image" />
+        <ToolbarButton onClick={() => exec('insertHorizontalRule')} icon={<div className="w-4 h-px bg-slate-400" />} title="Separator" />
 
         <div className="h-4 w-px bg-[var(--border-color)] mx-0.5"></div>
 
-        {/* System Cluster */}
-        <div className="flex items-center gap-0.5">
-          <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Fullscreen" />
-          
-          <div className="relative">
-            <ToolbarButton onClick={() => setOpenDropdown(openDropdown === 'help' ? null : 'help')} icon={<HelpCircle size={14}/>} title="Help" />
-            {openDropdown === 'help' && (
-              <div className="absolute top-full right-0 mt-1 w-80 bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded-md p-4 overflow-y-auto max-h-96">
-                <h4 className="text-[10px] font-black uppercase text-indigo-600 mb-4 tracking-widest border-b border-indigo-600/20 pb-2">Keyboard Protocols</h4>
-                <div className="space-y-1.5 text-[9px] font-mono">
-                  {[
-                    ['ESC', 'Escape'],
-                    ['ENTER', 'Insert Paragraph'],
-                    ['CTRL+Z', 'Undo last command'],
-                    ['CTRL+Y', 'Redo last command'],
-                    ['TAB', 'Tab'],
-                    ['SHIFT+TAB', 'Untab'],
-                    ['CTRL+B', 'Set bold style'],
-                    ['CTRL+I', 'Set italic style'],
-                    ['CTRL+U', 'Set underline style'],
-                    ['CTRL+SHIFT+S', 'Set strikethrough style'],
-                    ['CTRL+\\', 'Clean a style'],
-                    ['CTRL+SHIFT+L', 'Set left align'],
-                    ['CTRL+SHIFT+E', 'Set center align'],
-                    ['CTRL+SHIFT+R', 'Set right align'],
-                    ['CTRL+SHIFT+J', 'Set full align'],
-                    ['CTRL+SHIFT+NUM7', 'Toggle unordered list'],
-                    ['CTRL+SHIFT+NUM8', 'Toggle ordered list'],
-                    ['CTRL+[', 'Outdent on current paragraph'],
-                    ['CTRL+]', 'Indent on current paragraph'],
-                    ['CTRL+NUM0', 'Format as Paragraph'],
-                    ['CTRL+NUM1', 'Format as H1'],
-                    ['CTRL+NUM2', 'Format as H2'],
-                    ['CTRL+NUM3', 'Format as H3'],
-                    ['CTRL+NUM4', 'Format as H4'],
-                    ['CTRL+NUM5', 'Format as H5'],
-                    ['CTRL+NUM6', 'Format as H6'],
-                    ['CTRL+ENTER', 'Insert horizontal rule'],
-                    ['CTRL+K', 'Show Link Dialog']
-                  ].map(([k, d]) => (
-                    <div key={k} className="flex justify-between items-center gap-4 py-0.5 border-b border-slate-50 dark:border-white/5 last:border-0">
-                      <span className="bg-slate-100 dark:bg-white/5 px-1 rounded border border-slate-300 dark:border-white/10 text-indigo-600 font-bold whitespace-nowrap">{k}</span>
-                      <span className="text-slate-500 text-right uppercase font-bold text-[8px]">{d}</span>
-                    </div>
-                  ))}
-                </div>
+        {/* Fullscreen & Help */}
+        <ToolbarButton onClick={() => setIsFullscreen(!isFullscreen)} icon={isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>} title="Fullscreen" />
+        <div className="relative">
+          <ToolbarButton onClick={() => setOpenDropdown(openDropdown === 'help' ? null : 'help')} icon={<HelpCircle size={14}/>} title="Help" />
+          {openDropdown === 'help' && (
+            <div className={`${dropdownBaseClass} fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:absolute md:top-full md:right-0 md:left-auto md:translate-x-0 md:translate-y-0 w-80 p-4 max-h-[80vh] overflow-y-auto`}>
+              <h4 className="text-[10px] font-black uppercase text-indigo-600 mb-4 tracking-widest border-b pb-2">Keyboard Protocols</h4>
+              <div className="space-y-1.5 text-[9px] font-mono">
+                {[
+                  ['ESC', 'Escape'], ['ENTER', 'Insert Paragraph'], ['CTRL+Z', 'Undo'], ['CTRL+Y', 'Redo'],
+                  ['TAB', 'Tab'], ['SHIFT+TAB', 'Untab'], ['CTRL+B', 'Bold Style'], ['CTRL+I', 'Italic Style'],
+                  ['CTRL+U', 'Underline Style'], ['CTRL+SHIFT+S', 'Strikethrough'], ['CTRL+\\', 'Clean Style'],
+                  ['CTRL+SHIFT+L', 'Left Align'], ['CTRL+SHIFT+E', 'Center Align'], ['CTRL+SHIFT+R', 'Right Align'],
+                  ['CTRL+SHIFT+J', 'Full Align'], ['CTRL+SHIFT+NUM7', 'Unordered List'], ['CTRL+SHIFT+NUM8', 'Ordered List'],
+                  ['CTRL+[', 'Outdent'], ['CTRL+]', 'Indent'], ['CTRL+NUM0', 'Paragraph'], ['CTRL+NUM1', 'H1'],
+                  ['CTRL+NUM2', 'H2'], ['CTRL+NUM3', 'H3'], ['CTRL+NUM4', 'H4'], ['CTRL+NUM5', 'H5'],
+                  ['CTRL+NUM6', 'H6'], ['CTRL+ENTER', 'Horizontal Rule'], ['CTRL+K', 'Link Dialog']
+                ].map(([k, d]) => (
+                  <div key={k} className="flex justify-between items-center py-0.5 border-b border-slate-50 dark:border-white/5 last:border-0">
+                    <span className="bg-slate-100 dark:bg-white/5 px-1 rounded text-indigo-600 font-bold whitespace-nowrap">{k}</span>
+                    <span className="text-slate-500 uppercase font-bold text-[8px]">{d}</span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* EDITOR AREA - MINIMIZED HEIGHT */}
-      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-140px)]' : 'min-h-[80px]'}`}>
+      {/* EDITOR AREA - ELASTIC HEIGHT */}
+      <div className={`relative bg-white dark:bg-black/20 ${isFullscreen ? 'h-[calc(100vh-140px)]' : 'min-h-[40px]'}`}>
         <div 
           ref={editorRef}
           contentEditable
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
-          className="w-full h-full p-4 text-sm outline-none leading-relaxed overflow-y-auto rich-content-editor"
+          className="w-full h-full p-3 text-sm outline-none leading-relaxed overflow-y-auto rich-content-editor"
           style={{ fontFamily: activeFont }}
           data-placeholder="Place some text here"
         />
-        {!content && <div className="absolute top-4 left-4 text-slate-400 pointer-events-none text-sm font-sans opacity-70">Place some text here</div>}
+        {!content && <div className="absolute top-3 left-3 text-slate-400 pointer-events-none text-sm font-sans opacity-70">Place some text here</div>}
       </div>
 
       {/* FOOTER BAR */}
@@ -378,7 +350,7 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
            {isAnalyzing && (
              <div className="flex items-center gap-2 px-2 py-0.5 bg-indigo-600/10 rounded-full text-indigo-600">
                <Loader2 size={10} className="animate-spin" />
-               <span className="text-[7px] font-black uppercase tracking-widest">AI Matrix Syncing...</span>
+               <span className="text-[7px] font-black uppercase tracking-widest">AI Context Analyzing...</span>
              </div>
            )}
         </div>
@@ -387,24 +359,20 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string) => void, i
           disabled={isAnalyzing || !content.trim()}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-black text-[9px] uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
         >
-          <Send size={12} /> Broadcast
+          <Send size={12} /> Broadcast Signal
         </button>
       </div>
 
       <style>{`
         .rich-content-editor:empty:before { content: attr(data-placeholder); color: #64748b; opacity: 0.5; }
-        .rich-content-editor h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
-        .rich-content-editor h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; }
-        .rich-content-editor h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
-        .rich-content-editor h4 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem; }
-        .rich-content-editor h5 { font-size: 1.0rem; font-weight: 700; margin-bottom: 0.3rem; }
-        .rich-content-editor h6 { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.2rem; }
-        .rich-content-editor p { margin-bottom: 1rem; }
-        .rich-content-editor ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .rich-content-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .rich-content-editor table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; }
-        .rich-content-editor th, .rich-content-editor td { border: 1px solid #ddd; padding: 8px; }
-        .rich-content-editor blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 1rem; }
+        .rich-content-editor h1, .rich-content-editor h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .rich-content-editor h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .rich-content-editor p { margin-bottom: 0.5rem; }
+        .rich-content-editor ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .rich-content-editor ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.5rem; }
+        .rich-content-editor table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; margin-bottom: 0.5rem; }
+        .rich-content-editor th, .rich-content-editor td { border: 1px solid #ddd; padding: 6px; }
+        .rich-content-editor blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; font-style: italic; color: #64748b; margin-bottom: 0.5rem; }
       `}</style>
     </div>
   );

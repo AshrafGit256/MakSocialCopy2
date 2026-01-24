@@ -1,10 +1,11 @@
 import React from "react";
 import { 
   ArrowRight, Zap, Globe, Users, ShieldCheck, 
-  Sparkles, GraduationCap, Radio, Search, 
-  MessageSquare, BookOpen, Terminal, Code,
-  GitBranch, Activity, Database, Box, Cpu,
-  Star, Command, ExternalLink, ChevronRight, Check
+  Radio, Search, BookOpen, Terminal, Code,
+  Activity, Database, Box, Cpu, Star, 
+  ExternalLink, ChevronRight, Check, Hash,
+  FileText, Download, TrendingUp, GitBranch,
+  Lock, MessageSquare, Briefcase, GraduationCap
 } from "lucide-react";
 
 interface LandingProps {
@@ -13,28 +14,26 @@ interface LandingProps {
 
 const Landing: React.FC<LandingProps> = ({ onStart }) => {
   return (
-    <div className="bg-[#0d1117] text-[#c9d1d9] min-h-screen overflow-x-hidden selection:bg-[#64748b]/30 font-sans">
+    <div className="bg-[#0d1117] text-[#c9d1d9] min-h-screen font-sans selection:bg-[#64748b]/30">
       
-      {/* 1. PRODUCT NAVIGATION */}
-      <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-[#30363d] bg-[#0d1117]/90 backdrop-blur-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-            <div className="p-1.5 bg-[#161b22] border border-[#30363d] rounded group-hover:border-[#64748b] transition-all">
-              <Terminal size={18} className="text-[#64748b]" />
-            </div>
-            <span className="text-xl font-black tracking-tighter uppercase text-white">MakSocial</span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-10">
-            <a href="#features" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e] hover:text-white transition-colors">Infrastructure</a>
-            <a href="#vault" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e] hover:text-white transition-colors">The Vault</a>
-            <a href="#impact" className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8b949e] hover:text-white transition-colors">Network Stats</a>
-          </div>
-
+      {/* 1. MINIMALIST NAV - PROMPTS.CHAT STYLE */}
+      <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-[#30363d] bg-[#0d1117]/95 backdrop-blur-sm">
+        <div className="max-w-[1440px] mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
+            <div className="p-1.5 bg-[#161b22] border border-[#30363d] rounded text-[#64748b]">
+              <Terminal size={20} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tighter uppercase text-white leading-none">MakSocial</span>
+              <span className="text-[8px] font-black uppercase text-[#64748b] tracking-[0.4em]">Registry Protocol</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+             <button onClick={onStart} className="hidden md:block text-[10px] font-black uppercase tracking-widest text-[#8b949e] hover:text-white transition-colors">Documentation</button>
              <button
                onClick={onStart}
-               className="bg-white text-black px-6 py-2 rounded font-black text-[10px] uppercase tracking-widest hover:bg-[#c9d1d9] transition-all active:scale-95 shadow-lg"
+               className="bg-white text-black px-6 py-2.5 rounded font-black text-[10px] uppercase tracking-[0.2em] hover:bg-[#c9d1d9] transition-all active:scale-95 shadow-xl"
              >
                Initialize Node
              </button>
@@ -42,230 +41,257 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         </div>
       </nav>
 
-      {/* 2. HERO: CLARITY & POWER */}
-      <section className="relative pt-48 pb-32 px-6 bg-grid-pattern overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0d1117] to-[#0d1117]"></div>
+      {/* 2. HERO: THE PITCH */}
+      <header className="pt-40 pb-20 px-6 border-b border-[#30363d] bg-grid-pattern relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0d1117]"></div>
+        <div className="max-w-[1200px] mx-auto text-center relative z-10 space-y-8">
+          <div className="inline-flex items-center gap-3 px-4 py-1 bg-[#161b22] border border-[#30363d] rounded-full">
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#8b949e]">Uplink: Live Connection to 50k+ Student Nodes</span>
+          </div>
+          <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase text-white leading-[0.85]">
+            Everything inside <br />
+            <span className="text-[#64748b]">The Registry.</span>
+          </h1>
+          <p className="text-lg md:text-xl text-[#8b949e] font-bold max-w-2xl mx-auto leading-relaxed uppercase tracking-tight">
+            The Definitive Resource Hub, Signal Feed, and Opportunity Matrix for the University strata.
+          </p>
+          <div className="flex justify-center gap-4 pt-4">
+             <button onClick={onStart} className="px-12 py-5 bg-[#64748b] text-white rounded font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:bg-[#475569] active:scale-95 transition-all">Start Synchronization</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-[1440px] mx-auto px-6 py-20 space-y-32 pb-40">
         
-        {/* Abstract Background Element */}
-        <div className="absolute top-40 -right-20 w-[500px] h-[500px] bg-[#64748b]/10 blur-[100px] rounded-full"></div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-10 animate-in fade-in slide-in-from-left-8 duration-1000">
-              <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-indigo-600/10 border border-indigo-600/20 rounded-full">
-                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>
-                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-indigo-400">Registry v4.2 Stable Release</span>
-              </div>
-
-              <h1 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter uppercase text-white">
-                The Central <span className="text-[#64748b]">Hub</span> For Campus <br /> Intelligence.
-              </h1>
-
-              <p className="text-lg md:text-xl text-[#8b949e] font-bold max-w-xl leading-relaxed">
-                Connect with verified student nodes across all university wings. Broadcast academic signals, collaborate in secure forges, and access the scholarly vault.
-              </p>
-
-              <div className="flex flex-wrap gap-4 pt-4">
-                <button
-                  onClick={onStart}
-                  className="bg-[#64748b] text-white px-10 py-5 rounded font-black text-xs uppercase tracking-[0.2em] hover:bg-[#475569] transition-all shadow-2xl flex items-center justify-center gap-3 active:scale-95 group"
-                >
-                  Start Your Registry <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-                <div className="flex items-center gap-6 pl-4 border-l border-[#30363d]">
-                   <div className="flex -space-x-3">
-                      {[1,2,3,4].map(i => (
-                        <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}99`} className="w-10 h-10 rounded-full border-2 border-[#0d1117] bg-[#161b22]" />
-                      ))}
-                   </div>
-                   <div className="space-y-0.5">
-                      <p className="text-white text-sm font-black">50,000+ Nodes</p>
-                      <p className="text-[#8b949e] text-[9px] font-bold uppercase tracking-widest">Active Synchronizations</p>
-                   </div>
-                </div>
-              </div>
+        {/* SECTION A: THE SIGNAL PULSE (LATEST POSTS) */}
+        <section className="space-y-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-l-4 border-[#64748b] pl-8">
+            <div className="space-y-2">
+              <h2 className="text-[10px] font-black text-[#64748b] uppercase tracking-[0.5em]">Module_01</h2>
+              <h3 className="text-4xl font-black text-white uppercase tracking-tighter">The Signal Pulse</h3>
+              <p className="text-[#8b949e] font-bold uppercase text-xs tracking-widest">Real-time student broadcasts and research signals</p>
             </div>
-
-            <div className="relative group animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
-               <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500/20 to-emerald-500/20 rounded-[2rem] blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
-               <div className="relative rounded-[1.5rem] border border-[#30363d] bg-[#161b22] p-2 overflow-hidden shadow-2xl">
-                  <img 
-                    src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200" 
-                    className="w-full rounded-[1rem] object-cover h-[500px] grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700" 
-                    alt="Collaboration Image"
-                  />
-                  <div className="absolute bottom-10 left-10 p-6 bg-[#0d1117]/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl max-w-xs">
-                     <p className="text-[9px] font-black uppercase text-[#64748b] tracking-widest mb-2">Live Node Activity</p>
-                     <p className="text-xs font-bold text-white leading-relaxed">
-                        "Node 4A91 synchronized with the Academic Vault in the COCIS Wing."
-                     </p>
-                  </div>
-               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. PRODUCT TOUR: HOW IT WORKS */}
-      <section id="features" className="py-32 px-6 border-t border-[#30363d]">
-        <div className="max-w-7xl mx-auto space-y-24">
-          
-          {/* Feature 1: The Registry */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-             <div className="order-2 lg:order-1 relative rounded-[2rem] overflow-hidden border border-[#30363d] h-[450px]">
-                <img 
-                  src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200" 
-                  className="w-full h-full object-cover grayscale brightness-50"
-                  alt="Students Networking"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                   <div className="p-8 bg-[#0d1117] border border-[#30363d] rounded-2xl shadow-2xl space-y-4 max-w-xs">
-                      <Users size={40} className="text-indigo-500" />
-                      <h4 className="text-xl font-black uppercase text-white tracking-tighter">Unified Registry</h4>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">Every student is a node. Find peers by skill, hub, or project intent.</p>
-                   </div>
-                </div>
-             </div>
-             <div className="order-1 lg:order-2 space-y-8">
-                <h2 className="text-[10px] font-black text-[#64748b] uppercase tracking-[0.5em]">Module_01</h2>
-                <h3 className="text-5xl font-black tracking-tighter uppercase text-white leading-[1]">Identity <br />Synchronization.</h3>
-                <p className="text-lg text-[#8b949e] font-bold leading-relaxed">
-                   Stop working in silos. The Registry connects you to the entire Makerere intelligence network. Browse student profiles verified by their academic wing.
-                </p>
-                <ul className="space-y-4">
-                   {[
-                     'Direct Node Messaging (Encrypted)',
-                     'Wing-Specific Identity Badges',
-                     'Skill Strata Verification'
-                   ].map(item => (
-                     <li key={item} className="flex items-center gap-3 text-sm font-black uppercase text-white tracking-widest">
-                        <Check size={18} className="text-emerald-500" /> {item}
-                     </li>
-                   ))}
-                </ul>
-             </div>
+            <button onClick={onStart} className="text-[10px] font-black text-white uppercase tracking-widest bg-[#161b22] border border-[#30363d] px-6 py-2 rounded hover:border-[#64748b] transition-all">View Global Feed</button>
           </div>
 
-          {/* Feature 2: The Vault */}
-          <div id="vault" className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-             <div className="space-y-8">
-                <h2 className="text-[10px] font-black text-[#64748b] uppercase tracking-[0.5em]">Module_02</h2>
-                <h3 className="text-5xl font-black tracking-tighter uppercase text-white leading-[1]">The Academic <br />Resource Vault.</h3>
-                <p className="text-lg text-[#8b949e] font-bold leading-relaxed">
-                   Access over 100,000 decrypted academic assets. Share, sync, and download past papers, research theses, and technical briefs curated by the community.
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                   <div className="p-6 bg-[#161b22] border border-[#30363d] rounded-xl space-y-2">
-                      <p className="text-2xl font-black text-white">100k+</p>
-                      <p className="text-[9px] font-black uppercase text-[#64748b] tracking-widest">Logged Assets</p>
-                   </div>
-                   <div className="p-6 bg-[#161b22] border border-[#30363d] rounded-xl space-y-2">
-                      <p className="text-2xl font-black text-white">UGX 0</p>
-                      <p className="text-[9px] font-black uppercase text-[#64748b] tracking-widest">Access Fee</p>
-                   </div>
-                </div>
-             </div>
-             <div className="relative group">
-                <div className="absolute inset-0 bg-indigo-600/10 blur-[100px] rounded-full"></div>
-                <div className="relative rounded-[2rem] overflow-hidden border border-[#30363d] h-[550px] shadow-2xl">
-                   <img 
-                    src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1200" 
-                    className="w-full h-full object-cover grayscale brightness-50 group-hover:scale-105 transition-transform duration-1000"
-                    alt="Library Assets"
-                   />
-                   <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-transparent to-transparent"></div>
-                   <div className="absolute bottom-10 left-10 right-10 grid grid-cols-1 gap-2">
-                      {[1,2,3].map(i => (
-                        <div key={i} className="p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-lg flex items-center justify-between">
-                           <div className="flex items-center gap-3">
-                              <BookOpen size={16} className="text-[#64748b]" />
-                              <span className="text-[10px] font-black uppercase text-white tracking-widest">Asset_Log_{i}284.PDF</span>
-                           </div>
-                           <span className="text-[8px] font-bold text-[#64748b] uppercase">Verified</span>
-                        </div>
-                      ))}
-                   </div>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. STATISTICS STRIP */}
-      <section id="impact" className="bg-white py-24">
-        <div className="max-w-7xl mx-auto px-6">
-           <div className="text-center mb-16 space-y-4">
-              <h2 className="text-[10px] font-black text-[#64748b] uppercase tracking-[0.5em]">Real-Time Metrics</h2>
-              <h3 className="text-4xl font-black tracking-tighter uppercase text-black italic">Network Velocity.</h3>
-           </div>
-           <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { label: 'Verified Student Nodes', val: '50,000+', icon: <Users size={24}/> },
-              { label: 'Signals Transmitted', val: '1.2M+', icon: <Radio size={24}/> },
-              { label: 'Repository Assets', val: '108,492', icon: <Database size={24}/> },
-              { label: 'Uptime Protocol', val: '99.99%', icon: <ShieldCheck size={24}/> },
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center text-center space-y-3 text-black group">
-                 <div className="p-4 bg-black/5 rounded-2xl group-hover:scale-110 transition-transform text-[#64748b]">
-                    {item.icon}
-                 </div>
-                 <h3 className="text-5xl font-black tracking-tighter uppercase leading-none">{item.val}</h3>
-                 <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40">{item.label}</p>
+              { author: 'MakUnipod', role: 'Innovation Wing', content: 'Prototyping Grant Alpha is now open. We are funding 5 hardware nodes this semester. CEDAT students apply now.', likes: '1.2k', tags: ['#Innovation', '#CEDAT'] },
+              { author: 'Sarah C.', role: 'Computer Science', content: 'Seeking 2 nodes with React/Node.js credentials for a Fintech project. High intensity build starting Monday.', likes: '458', tags: ['#Dev', '#COCIS'] },
+              { author: 'Guild89', role: 'Official', content: 'Official Protocol: General Assembly at Freedom Square tomorrow @ 10:00. Mandatory sync for all student nodes.', likes: '5.6k', tags: ['#Assembly', '#Official'] },
+            ].map((post, i) => (
+              <div key={i} className="bg-[#161b22] border border-[#30363d] rounded p-6 space-y-6 hover:border-[#64748b] transition-all shadow-xl group">
+                <div className="flex items-center gap-3">
+                  <img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${post.author}`} className="w-8 h-8 rounded bg-white border border-[#30363d]" />
+                  <div>
+                    <h4 className="text-[10px] font-black text-white uppercase tracking-widest">{post.author}</h4>
+                    <p className="text-[8px] font-black text-[#64748b] uppercase tracking-widest">{post.role}</p>
+                  </div>
+                  <span className="ml-auto text-[8px] font-mono text-[#8b949e]">SHA_{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
+                </div>
+                <p className="text-sm font-bold text-[#c9d1d9] leading-relaxed uppercase tracking-tight line-clamp-3">
+                  "{post.content}"
+                </p>
+                <div className="flex items-center gap-4 pt-4 border-t border-[#30363d]">
+                   <div className="flex items-center gap-1.5 text-[#8b949e]">
+                      <Star size={12} className="group-hover:text-amber-500 transition-colors" />
+                      <span className="text-[10px] font-black">{post.likes}</span>
+                   </div>
+                   {post.tags.map(tag => (
+                     <span key={tag} className="text-[8px] font-black text-[#64748b] uppercase tracking-widest">{tag}</span>
+                   ))}
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 5. CALL TO ACTION */}
-      <section className="py-48 px-6 relative overflow-hidden bg-[#0d1117]">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-        <div className="max-w-4xl mx-auto text-center space-y-12 relative z-10">
-           <div className="inline-block p-4 bg-[#64748b] rounded-2xl shadow-2xl mb-6">
-              <Terminal size={48} className="text-white" />
-           </div>
-           <h2 className="text-7xl md:text-9xl font-black text-white tracking-tighter uppercase leading-[0.8] animate-in slide-in-from-bottom-10">
-             Uplink <br />
-             Confirmed.
-           </h2>
-           <p className="text-xl text-[#8b949e] font-bold max-w-2xl mx-auto leading-relaxed uppercase tracking-tight">
-             Join the definitive intelligence network for university excellence. Register your node to begin synchronization.
-           </p>
-           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-10">
-              <button
-                onClick={onStart}
-                className="bg-white text-black px-16 py-7 rounded font-black text-sm uppercase tracking-[0.3em] hover:bg-[#c9d1d9] transition-all shadow-2xl active:scale-95 flex items-center gap-4"
-              >
-                Create Account <Zap size={20} fill="currentColor" />
-              </button>
-              <button className="text-[11px] font-black uppercase tracking-widest text-[#8b949e] hover:text-white flex items-center gap-2 group transition-all">
-                Registry Docs <ExternalLink size={14} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-           </div>
-        </div>
-      </section>
-
-      {/* 6. FOOTER */}
-      <footer className="py-20 px-6 border-t border-[#30363d] bg-[#010409]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
-          <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-[#161b22] border border-[#30363d] rounded text-[#64748b]">
-              <Terminal size={18} />
+        {/* SECTION B: BIDS & OPPORTUNITIES (SCREENSHOT SHOWCASE) */}
+        <section className="space-y-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-l-4 border-amber-600 pl-8">
+            <div className="space-y-2">
+              <h2 className="text-[10px] font-black text-amber-600 uppercase tracking-[0.5em]">Module_02</h2>
+              <h3 className="text-4xl font-black text-white uppercase tracking-tighter">Bids & Opportunities</h3>
+              <p className="text-[#8b949e] font-bold uppercase text-xs tracking-widest">Gigs, Internships, and Research Grants</p>
             </div>
-            <span className="text-xl font-black tracking-tighter uppercase text-white">MakSocial</span>
-          </div>
-          
-          <div className="flex gap-10">
-             <a href="#" className="text-[9px] font-black uppercase text-[#8b949e] hover:text-white transition-colors">Repository</a>
-             <a href="#" className="text-[9px] font-black uppercase text-[#8b949e] hover:text-white transition-colors">Protocol Status</a>
-             <a href="#" className="text-[9px] font-black uppercase text-[#8b949e] hover:text-white transition-colors">Audit Log</a>
+            <button onClick={onStart} className="text-[10px] font-black text-white uppercase tracking-widest bg-[#161b22] border border-[#30363d] px-6 py-2 rounded hover:border-amber-600 transition-all">Search Manifest</button>
           </div>
 
-          <p className="text-[9px] font-black text-[#484f58] uppercase tracking-[0.3em]">
-            © 2026 MakSocial Registry. Initialized via Open Protocol.
-          </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+             {/* Styled Screenshot 1 */}
+             <div className="relative group overflow-hidden rounded border border-[#30363d] bg-[#161b22] shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200" 
+                  className="w-full h-[400px] object-cover grayscale brightness-50 group-hover:scale-105 transition-all duration-1000" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-transparent to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-10 space-y-4">
+                   <div className="flex gap-2">
+                      <span className="bg-amber-600 text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest">High Intensity Gig</span>
+                      <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest border border-white/20">COCIS Hub</span>
+                   </div>
+                   <h4 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">AI Training Node Recruitment</h4>
+                   <p className="text-sm font-bold text-[#8b949e] uppercase tracking-tight">Requirement: Python Strata 4+ / Computer Vision Logic</p>
+                   <div className="flex items-center gap-6 pt-4 border-t border-white/10">
+                      <div className="space-y-1">
+                         <p className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Compensation</p>
+                         <p className="text-lg font-black text-white uppercase tracking-tight">UGX 1.2M / Project</p>
+                      </div>
+                      <div className="space-y-1">
+                         <p className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Deadline</p>
+                         <p className="text-lg font-black text-white uppercase tracking-tight">24H_REMAINING</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+
+             {/* Styled Screenshot 2 */}
+             <div className="relative group overflow-hidden rounded border border-[#30363d] bg-[#161b22] shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200" 
+                  className="w-full h-[400px] object-cover grayscale brightness-50 group-hover:scale-105 transition-all duration-1000" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-transparent to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-10 space-y-4">
+                   <div className="flex gap-2">
+                      <span className="bg-indigo-600 text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest">Official Internship</span>
+                      <span className="bg-white/10 backdrop-blur-md text-white px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest border border-white/20">CEDAT Wing</span>
+                   </div>
+                   <h4 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">Smart Grid Research Lead</h4>
+                   <p className="text-sm font-bold text-[#8b949e] uppercase tracking-tight">In collaboration with the innovation center alpha node.</p>
+                   <div className="flex items-center gap-6 pt-4 border-t border-white/10">
+                      <div className="space-y-1">
+                         <p className="text-[8px] font-black text-indigo-600 uppercase tracking-widest">Certification</p>
+                         <p className="text-lg font-black text-white uppercase tracking-tight">Protocol Verified</p>
+                      </div>
+                      <div className="space-y-1">
+                         <p className="text-[8px] font-black text-indigo-600 uppercase tracking-widest">Vacancies</p>
+                         <p className="text-lg font-black text-white uppercase tracking-tight">04 NODES</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </section>
+
+        {/* SECTION C: THE ACADEMIC VAULT (FILE LOGS) */}
+        <section className="space-y-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-l-4 border-emerald-600 pl-8">
+            <div className="space-y-2">
+              <h2 className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.5em]">Module_03</h2>
+              <h3 className="text-4xl font-black text-white uppercase tracking-tighter">The Vault Manifest</h3>
+              <p className="text-[#8b949e] font-bold uppercase text-xs tracking-widest">Decrypted academic assets and research repository</p>
+            </div>
+            <button onClick={onStart} className="text-[10px] font-black text-white uppercase tracking-widest bg-[#161b22] border border-[#30363d] px-6 py-2 rounded hover:border-emerald-600 transition-all">Explore Archives</button>
+          </div>
+
+          <div className="bg-[#161b22] border border-[#30363d] rounded overflow-hidden shadow-2xl">
+             <div className="px-6 py-4 bg-[#0d1117] border-b border-[#30363d] flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <Database size={16} className="text-[#64748b]" />
+                   <span className="text-[10px] font-black text-white uppercase tracking-widest">Current_Upload_Sequence</span>
+                </div>
+                <div className="flex gap-4">
+                   <div className="w-2 h-2 rounded-full bg-rose-500/50"></div>
+                   <div className="w-2 h-2 rounded-full bg-amber-500/50"></div>
+                   <div className="w-2 h-2 rounded-full bg-emerald-500/50"></div>
+                </div>
+             </div>
+             <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                   <thead className="bg-[#0d1117] border-b border-[#30363d] text-[9px] font-black text-[#8b949e] uppercase tracking-widest">
+                      <tr>
+                         <th className="px-8 py-4">Asset.Identifier</th>
+                         <th className="px-8 py-4">Strata.Sector</th>
+                         <th className="px-8 py-4">Node.Source</th>
+                         <th className="px-8 py-4 text-right">Decryption</th>
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-[#30363d]">
+                      {[
+                        { name: 'Distributed_Systems_P4.pdf', hub: 'COCIS', author: 'Dr. John', type: 'Past Paper' },
+                        { name: 'Blockchain_Logic_v2.docx', hub: 'CEDAT', author: 'Asset Hub', type: 'Research' },
+                        { name: 'Guild_Constitution_Revised.pdf', hub: 'LAW', author: 'Registry', type: 'Official' },
+                        { name: 'Neural_Network_Basics.pptx', hub: 'COCIS', author: 'Sarah M.', type: 'Notes' },
+                      ].map((asset, i) => (
+                        <tr key={i} className="hover:bg-white/5 transition-colors group">
+                           <td className="px-8 py-5 flex items-center gap-4">
+                              <FileText size={18} className="text-[#64748b] group-hover:text-emerald-500 transition-colors" />
+                              <span className="text-xs font-black text-white uppercase tracking-tight">{asset.name}</span>
+                           </td>
+                           <td className="px-8 py-5">
+                              <span className="px-2 py-0.5 border border-[#30363d] rounded text-[8px] font-black text-[#8b949e] uppercase tracking-widest">{asset.hub} HUB</span>
+                           </td>
+                           <td className="px-8 py-5">
+                              <span className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">{asset.author}</span>
+                           </td>
+                           <td className="px-8 py-5 text-right">
+                              <button className="text-[10px] font-black text-emerald-500 uppercase tracking-widest hover:underline">Download_Uplink</button>
+                           </td>
+                        </tr>
+                      ))}
+                   </tbody>
+                </table>
+             </div>
+             <div className="p-8 bg-[#0d1117] border-t border-[#30363d] text-center">
+                <p className="text-[10px] font-black text-[#8b949e] uppercase tracking-[0.4em]">Decrypted 108,492 scholarly assets successfully</p>
+             </div>
+          </div>
+        </section>
+
+        {/* SECTION D: INTERACTIVE ELEMENTS */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+           <div className="p-10 bg-[#161b22] border border-[#30363d] rounded space-y-6 group hover:border-[#64748b] transition-all">
+              <div className="w-12 h-12 bg-[#64748b]/10 rounded flex items-center justify-center text-[#64748b] group-hover:scale-110 transition-transform">
+                 <MessageSquare size={24} />
+              </div>
+              <h4 className="text-2xl font-black text-white uppercase tracking-tighter">Direct Node Sync</h4>
+              <p className="text-sm font-bold text-[#8b949e] leading-relaxed uppercase tracking-tight">Encrypted messaging for high-intensity research collaboration.</p>
+              <span className="text-[9px] font-black text-[#64748b] uppercase tracking-widest">Protocol.V2_STABLE</span>
+           </div>
+
+           <div className="p-10 bg-[#161b22] border border-[#30363d] rounded space-y-6 group hover:border-emerald-500 transition-all">
+              <div className="w-12 h-12 bg-emerald-500/10 rounded flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+                 <Zap size={24} />
+              </div>
+              <h4 className="text-2xl font-black text-white uppercase tracking-tighter">AI Node Scan</h4>
+              <p className="text-sm font-bold text-[#8b949e] leading-relaxed uppercase tracking-tight">Automated opportunity matching based on your node's skill strata.</p>
+              <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Intelligence.ONLINE</span>
+           </div>
+
+           <div className="p-10 bg-[#161b22] border border-[#30363d] rounded space-y-6 group hover:border-indigo-500 transition-all">
+              <div className="w-12 h-12 bg-indigo-500/10 rounded flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform">
+                 <Globe size={24} />
+              </div>
+              <h4 className="text-2xl font-black text-white uppercase tracking-tighter">Wing Hubs</h4>
+              <p className="text-sm font-bold text-[#8b949e] leading-relaxed uppercase tracking-tight">Dedicated infrastructure for all 9 university wings on the hill.</p>
+              <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">STRATA.GLOBAL</span>
+           </div>
+        </section>
+
+      </main>
+
+      {/* 3. TACTICAL FOOTER */}
+      <footer className="py-32 px-6 border-t border-[#30363d] bg-[#010409]">
+        <div className="max-w-[1440px] mx-auto text-center space-y-16">
+           <div className="space-y-6">
+              <h2 className="text-6xl md:text-9xl font-black text-white uppercase tracking-tighter leading-none animate-pulse">Confirm <br /> Uplink?</h2>
+              <p className="text-xl text-[#8b949e] font-black uppercase tracking-tight max-w-2xl mx-auto">Join the campus intelligence network today.</p>
+           </div>
+           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <button onClick={onStart} className="px-16 py-6 bg-white text-black rounded font-black text-sm uppercase tracking-[0.4em] shadow-2xl hover:bg-[#c9d1d9] active:scale-95 transition-all">Create Node Identity</button>
+           </div>
+           <div className="pt-20 flex flex-col md:flex-row justify-between items-center gap-10 border-t border-[#30363d]/30">
+              <div className="flex items-center gap-3">
+                 <Terminal size={18} className="text-[#64748b]" />
+                 <span className="text-lg font-black tracking-tighter uppercase text-white">MakSocial</span>
+              </div>
+              <p className="text-[9px] font-black text-[#484f58] uppercase tracking-[0.4em]">© 2026 Registry Protocol. Verified Hill Infrastructure.</p>
+           </div>
         </div>
       </footer>
+
     </div>
   );
 };

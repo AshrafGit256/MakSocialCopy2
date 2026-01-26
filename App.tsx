@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppView, User, College, UserStatus, AppSettings, Notification } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
@@ -18,29 +18,62 @@ import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Market from './components/Market';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Command, CheckCircle2 } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Command, CheckCircle2, Info } from 'lucide-react';
 
-const WhaleAlert: React.FC<{ message: string; onDismiss: () => void }> = ({ message, onDismiss }) => (
-  <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-lg animate-in slide-in-from-top-4 duration-500">
-    <div className="bg-white dark:bg-[#0f172a] border border-[var(--border-color)] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-4 flex items-center gap-4 relative overflow-hidden group">
-      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand-accent group-hover:w-2 transition-all"></div>
-      <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
-        <CheckCircle2 className="text-emerald-500" size={24} />
+const WhaleAlert: React.FC<{ message: string; onDismiss: () => void }> = ({ message, onDismiss }) => {
+  const [progress, setProgress] = useState(100);
+  const duration = 6000; // 6 seconds
+
+  useEffect(() => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
+      setProgress(remaining);
+      if (remaining === 0) {
+        clearInterval(interval);
+        onDismiss();
+      }
+    }, 10);
+    return () => clearInterval(interval);
+  }, [onDismiss]);
+
+  return (
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[95%] max-w-lg animate-in slide-in-from-top-10 duration-500 ease-out">
+      <div className="bg-white/90 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-[var(--border-color)] rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] p-5 flex items-center gap-5 relative overflow-hidden group">
+        {/* Background Glow */}
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-600/10 blur-3xl rounded-full group-hover:bg-indigo-600/20 transition-all"></div>
+        
+        {/* Verification Icon - High Fidelity */}
+        <div className="relative shrink-0">
+          <div className="w-12 h-12 rounded-full bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center">
+            <CheckCircle2 className="text-brand-accent" size={26} />
+          </div>
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-accent rounded-full border-2 border-white dark:border-[#0f172a] animate-pulse"></div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[9px] font-black uppercase text-brand-accent tracking-[0.3em]">Protocol_Broadcast</span>
+            <div className="h-px flex-1 bg-brand-accent/10"></div>
+          </div>
+          <p className="text-sm font-bold text-[var(--text-primary)] leading-tight italic line-clamp-2">
+            "{message}"
+          </p>
+        </div>
+
+        {/* Close */}
+        <button onClick={onDismiss} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-rose-500">
+          <X size={18} />
+        </button>
+
+        {/* Progress Bar - GitHub/AdminLTE inspired timer */}
+        <div className="absolute bottom-0 left-0 h-1 bg-brand-accent/30 transition-none" style={{ width: `${progress}%` }}></div>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-black uppercase text-brand-accent tracking-[0.2em] mb-0.5 flex items-center gap-2">
-          <Zap size={10} fill="currentColor"/> Whale_Alert_Broadcast
-        </p>
-        <p className="text-sm font-bold text-[var(--text-primary)] leading-tight italic truncate">
-          {message}
-        </p>
-      </div>
-      <button onClick={onDismiss} className="p-2 text-slate-400 hover:text-rose-500 transition-colors">
-        <X size={16} />
-      </button>
     </div>
-  </div>
-);
+  );
+};
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -62,13 +95,13 @@ const App: React.FC = () => {
       setCurrentUser(db.getUser());
       setNotifications(db.getNotifications());
       
-      // Verification Example for Whale Alert
+      // Auto-trigger example alert on successful login
       const timer = setTimeout(() => {
         setActiveAlert("Prof. Barnabas shared a new 'Final Exam' asset in CHS Wing.");
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, view]);
+  }, [isLoggedIn]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;

@@ -4,9 +4,6 @@ import { Post, User, College, AuthorityRole, PollData, PollOption } from '../typ
 import { db } from '../db';
 import { GoogleGenAI } from "@google/genai";
 import { 
-  AreaChart, Area, ResponsiveContainer, YAxis, XAxis, Tooltip
-} from 'recharts';
-import { 
   Heart, MessageCircle, X, Loader2, Eye, Zap, 
   Maximize2, Minimize2, Video, Type as LucideType, 
   Bold, Italic, Palette, Send, Underline, Eraser,
@@ -16,143 +13,13 @@ import {
   Radio, Terminal, Sparkles, Star, ChevronDown, Type, Quote,
   BarChart2, PlusCircle, MinusCircle, CheckCircle, Image as LucideImage,
   Calendar, Trash2, Settings2, Activity, Info, Clock,
-  Code, MoreHorizontal, FileText, LayoutGrid, Layers, Globe, ArrowUpRight, Cpu,
-  TrendingDown, Gauge, MousePointer2, Command
+  Code, MoreHorizontal, FileText, LayoutGrid, Layers, Globe
 } from 'lucide-react';
-
-const NetworkIntensityIndex: React.FC<{ posts: Post[] }> = ({ posts }) => {
-  const [sentiment, setSentiment] = useState<{ heat: number; label: string; brief: string }>({ heat: 50, label: 'STABLE', brief: 'Initializing telemetry...' });
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Sparkline data mimicking price action
-  const sparkData = [
-    { v: 40 }, { v: 45 }, { v: 38 }, { v: 52 }, { v: 60 }, { v: 55 }, { v: 72 }, { v: 85 }, { v: 78 }, { v: 92 }
-  ];
-
-  useEffect(() => {
-    const analyzeSentiment = async () => {
-      if (posts.length === 0) return;
-      setIsLoading(true);
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const contentSample = posts.slice(0, 8).map(p => p.content.replace(/<[^>]*>/g, '')).join('\n');
-        const response = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
-          contents: `Analyze student network heat. Return JSON: { "heat": number(0-100), "label": "BULLISH|BEARISH|STABLE", "summary": "1 sentence" }. Data: ${contentSample}`,
-          config: { responseMimeType: "application/json" }
-        });
-        const res = JSON.parse(response.text || '{}');
-        setSentiment({ heat: res.heat || 50, label: res.label || 'STABLE', brief: res.summary || 'Signals synchronized.' });
-      } catch (e) {
-        setSentiment({ heat: 72, label: 'BULLISH', brief: 'High signal velocity detected in research wings.' });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    analyzeSentiment();
-  }, [posts]);
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-      {/* 1. Main Sentiment Gauge */}
-      <div className="lg:col-span-2 bg-[#020617] border border-[#1e293b] rounded-md p-6 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-2 opacity-5"><Gauge size={140} /></div>
-        <div className="relative z-10 flex flex-col h-full justify-between">
-           <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Network_Intensity_Index</h4>
-                 <div className="flex items-center gap-3">
-                    <span className={`text-4xl font-black italic tracking-tighter ${sentiment.label === 'BEARISH' ? 'text-rose-500' : 'text-emerald-500'}`}>
-                      {sentiment.heat.toFixed(1)}
-                    </span>
-                    <div className="flex flex-col">
-                       <span className={`text-[10px] font-black uppercase ${sentiment.label === 'BEARISH' ? 'text-rose-500' : 'text-emerald-500'}`}>{sentiment.label}</span>
-                       <span className="text-[8px] font-bold text-slate-500 uppercase">Vol: 1.2M SIGNALS</span>
-                    </div>
-                 </div>
-              </div>
-              <div className="w-24 h-12">
-                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={sparkData}>
-                       <Area type="monotone" dataKey="v" stroke={sentiment.label === 'BEARISH' ? '#f43f5e' : '#10b981'} fill={sentiment.label === 'BEARISH' ? '#f43f5e22' : '#10b98122'} strokeWidth={2} />
-                    </AreaChart>
-                 </ResponsiveContainer>
-              </div>
-           </div>
-           <p className="mt-4 text-[11px] text-slate-400 font-medium italic border-l border-slate-700 pl-4 leading-relaxed">
-             "{sentiment.brief}"
-           </p>
-        </div>
-      </div>
-
-      {/* 2. Top Movers (Tags as Assets) */}
-      <div className="bg-[#020617] border border-[#1e293b] rounded-md p-5 flex flex-col justify-between">
-         <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4">Signal_Watchlist</h4>
-         <div className="space-y-3">
-            {[
-              { t: '#COCIS', v: '+12.4%', c: 'text-emerald-500' },
-              { t: '#CEDAT', v: '-2.1%', c: 'text-rose-500' },
-              { t: '#GUILD', v: '+45.8%', c: 'text-emerald-500' }
-            ].map((item, i) => (
-              <div key={i} className="flex justify-between items-center group cursor-pointer hover:bg-white/5 p-1 rounded transition-all">
-                 <span className="text-[11px] font-black text-slate-300 group-hover:text-indigo-400">{item.t}</span>
-                 <span className={`text-[10px] font-mono font-bold ${item.c}`}>{item.v}</span>
-              </div>
-            ))}
-         </div>
-         <button className="mt-4 w-full py-2 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 text-[8px] font-black uppercase tracking-widest border border-indigo-600/20 rounded transition-all">View All Assets</button>
-      </div>
-
-      {/* 3. Global Liquidity (Opportunities Heat) */}
-      <div className="bg-[#020617] border border-[#1e293b] rounded-md p-5 flex flex-col justify-between relative overflow-hidden">
-         <div className="absolute -bottom-4 -right-4 opacity-5 rotate-12"><Zap size={100} fill="white" /></div>
-         <div className="relative z-10">
-            <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Global_Liquidity</h4>
-            <p className="text-2xl font-black text-white italic tracking-tighter mt-1">UGX 8.2M</p>
-            <p className="text-[8px] font-bold text-emerald-500 uppercase mt-1 flex items-center gap-1"><ArrowUpRight size={10}/> 2.4% vs Last Session</p>
-         </div>
-         <div className="pt-4 space-y-1">
-            <div className="flex justify-between text-[7px] font-black uppercase text-slate-500">
-               <span>Registry_Fill</span>
-               <span>84%</span>
-            </div>
-            <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-               <div className="h-full bg-indigo-500 w-[84%] animate-pulse"></div>
-            </div>
-         </div>
-      </div>
-    </div>
-  );
-};
-
-const VelocityTicker: React.FC = () => {
-  const trends = ['#COCISLabs', '#CEDATHack', '#GuildElection', '#MakerereAI', '#ResearchGrant', '#Hackathon', '#FinalistProjects'];
-  return (
-    <div className="w-full bg-[#020617] text-indigo-400 py-1.5 overflow-hidden whitespace-nowrap border-y border-[#1e293b] font-mono text-[9px] font-black uppercase tracking-[0.2em] relative">
-      <div className="flex animate-marquee gap-10">
-        {[...trends, ...trends].map((t, i) => (
-          <span key={i} className="flex items-center gap-2">
-            <Activity size={10} className="text-emerald-500"/> {t} <span className="text-slate-600 text-[8px]">@ 0.33481</span> <span className="text-emerald-500 font-bold">▲</span>
-          </span>
-        ))}
-      </div>
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 40s linear infinite;
-        }
-      `}</style>
-    </div>
-  );
-};
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
   if (!role) return null;
   const isInstitutional = role === 'Official' || role === 'Corporate' || role === 'Academic Council';
-  const color = isInstitutional ? '#94a3b8' : '#6366f1';
+  const color = isInstitutional ? '#829aab' : '#0969da';
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} className="inline-block ml-1 align-text-bottom flex-shrink-0">
       <g><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.67-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34-2.19s2.67-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2l-3.53-3.53 1.41-1.41 2.12 2.12 4.96-4.96 1.41 1.41-6.37 6.37z" fill={color}/></g>
@@ -239,123 +106,241 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string, poll?: Pol
     }
   };
 
+  const handlePollOptionImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && currentPollOptionIdx !== null) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        const newOpts = [...pollOptions];
+        newOpts[currentPollOptionIdx].imageUrl = base64;
+        setPollOptions(newOpts);
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+    setCurrentPollOptionIdx(null);
+  };
+
   return (
-    <div className={`bg-[#020617] border border-[#1e293b] rounded-md shadow-2xl transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none overflow-y-auto' : 'relative mb-10'}`}>
+    <div className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-sm transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-[3000] m-0 rounded-none overflow-y-auto' : 'relative mb-10'}`}>
       
-      <input type="file" ref={fileInputRef} className="hidden" />
-      <input type="file" ref={pollOptionFileRef} className="hidden" />
+      <input type="file" ref={fileInputRef} onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const base64 = event.target?.result as string;
+            restoreSelection();
+            document.execCommand('insertHTML', false, `<div class="content-image-wrapper"><img src="${base64}" class="responsive-doc-image" /></div><br>`);
+          };
+          reader.readAsDataURL(file);
+        }
+        e.target.value = '';
+      }} accept="image/*" className="hidden" />
 
-      {/* TERMINAL HEADER */}
-      <div className="px-4 py-3 border-b border-[#1e293b] flex items-center justify-between bg-[#0a0f1e]">
-         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-               <div className="w-2.5 h-2.5 rounded-full bg-rose-500/20 border border-rose-500/40"></div>
-               <div className="w-2.5 h-2.5 rounded-full bg-amber-500/20 border border-amber-500/40"></div>
-               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/20 border border-emerald-500/40"></div>
+      <input type="file" ref={pollOptionFileRef} onChange={handlePollOptionImage} accept="image/*" className="hidden" />
+
+      {/* SUMMERNOTE-STYLE TOOLBAR */}
+      <div className="px-2 py-2 border-b border-[var(--border-color)] bg-[#f6f8fa] dark:bg-[#161b22] flex flex-wrap items-center gap-1 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-0.5">
+          <button onMouseDown={(e) => { e.preventDefault(); exec('bold'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400 transition-all"><Bold size={14}/></button>
+          <button onMouseDown={(e) => { e.preventDefault(); exec('italic'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400 transition-all"><Italic size={14}/></button>
+          <button onMouseDown={(e) => { e.preventDefault(); exec('underline'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400 transition-all"><Underline size={14}/></button>
+        </div>
+
+        <div className="h-6 w-px bg-[var(--border-color)] mx-1"></div>
+
+        <div className="flex items-center gap-0.5">
+          <button onMouseDown={(e) => { e.preventDefault(); exec('insertUnorderedList'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400"><List size={14}/></button>
+          <button onMouseDown={(e) => { e.preventDefault(); exec('insertOrderedList'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400"><ListOrdered size={14}/></button>
+        </div>
+
+        <div className="h-6 w-px bg-[var(--border-color)] mx-1 hidden sm:block"></div>
+
+        <div className="relative group/align">
+          <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'align' ? null : 'align'); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400 transition-all flex items-center gap-1">
+            <AlignLeft size={14}/> <ChevronDown size={10}/>
+          </button>
+          {openDropdown === 'align' && (
+            <div className="absolute top-full left-0 mt-1 z-[3010] bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-xl rounded p-1 flex gap-1 animate-in fade-in zoom-in-95">
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyLeft'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignLeft size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyCenter'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignCenter size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyRight'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignRight size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyFull'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignJustify size={14}/></button>
             </div>
-            <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em]">Broadcast_Terminal / ID: {Math.random().toString(16).slice(2, 8).toUpperCase()}</span>
-         </div>
-         <div className="flex items-center gap-1 opacity-40 hover:opacity-100 transition-opacity">
-            <button className="p-1 hover:bg-white/5 rounded text-slate-400"><MinusCircle size={14}/></button>
-            <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-1 hover:bg-white/5 rounded text-slate-400"><Maximize2 size={14}/></button>
-            <button className="p-1 hover:bg-rose-500/10 rounded text-rose-500"><X size={14}/></button>
-         </div>
-      </div>
+          )}
+        </div>
 
-      <div className="px-2 py-2 border-b border-[#1e293b] bg-[#020617] flex flex-wrap items-center gap-1 overflow-x-auto no-scrollbar">
-        <button onMouseDown={(e) => { e.preventDefault(); exec('bold'); }} className="p-2 hover:bg-white/5 rounded text-slate-400 transition-all"><Bold size={14}/></button>
-        <button onMouseDown={(e) => { e.preventDefault(); exec('italic'); }} className="p-2 hover:bg-white/5 rounded text-slate-400 transition-all"><Italic size={14}/></button>
-        <div className="h-6 w-px bg-[#1e293b] mx-1"></div>
-        <button onMouseDown={(e) => { e.preventDefault(); exec('insertUnorderedList'); }} className="p-2 hover:bg-white/5 rounded text-slate-400"><List size={14}/></button>
-        <div className="h-6 w-px bg-[#1e293b] mx-1"></div>
+        <div className="relative">
+          <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'fonts' ? null : 'fonts'); }} className="px-3 py-1.5 bg-white dark:bg-black/20 border border-[var(--border-color)] rounded text-[9px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:border-[#0969da] transition-all flex items-center gap-2">
+            {FONTS.find(f => f.value === activeFont)?.name || 'Font'} <ChevronDown size={10} />
+          </button>
+          {openDropdown === 'fonts' && (
+            <div className="absolute top-full left-0 mt-1 z-[3010] bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded overflow-hidden w-48">
+              {FONTS.map(f => (
+                <button key={f.name} onMouseDown={(e) => { e.preventDefault(); setActiveFont(f.value); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 hover:bg-[#0969da] hover:text-white text-[10px] font-bold uppercase transition-colors" style={{ fontFamily: f.value }}>{f.name}</button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button onMouseDown={(e) => { e.preventDefault(); fileInputRef.current?.click(); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400 transition-all" title="Add Image"><ImageIcon size={14}/></button>
+        
         <button 
           onMouseDown={(e) => { e.preventDefault(); setIsPollMode(!isPollMode); }} 
-          className={`px-3 py-1.5 rounded transition-all flex items-center gap-2 border text-[10px] font-black uppercase tracking-tight ${isPollMode ? 'bg-indigo-600 text-white border-transparent shadow-lg shadow-indigo-600/20' : 'bg-transparent border-[#1e293b] text-slate-500 hover:border-indigo-600'}`}
+          className={`px-3 py-1.5 rounded transition-all flex items-center gap-2 border text-[10px] font-bold uppercase tracking-tight ${isPollMode ? 'bg-[#0969da] text-white border-transparent' : 'bg-transparent border-[var(--border-color)] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'}`}
         >
-          <BarChart2 size={14}/> Init_Poll
+          <BarChart2 size={14}/> <span className="hidden sm:inline">Initialize Poll</span>
         </button>
+
+        <div className="ml-auto flex items-center gap-1">
+          <button onMouseDown={(e) => { e.preventDefault(); setIsFullscreen(!isFullscreen); }} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-600 dark:text-slate-400 transition-all">{isFullscreen ? <Minimize2 size={14}/> : <Maximize2 size={14}/>}</button>
+        </div>
       </div>
 
-      <div className={`relative bg-[#020617] transition-all ${isFullscreen ? 'flex-1' : 'min-h-[160px] max-h-[500px] overflow-y-auto'}`}>
+      {/* CONTENT AREA */}
+      <div className={`relative bg-white dark:bg-[#0d1117] transition-all ${isFullscreen ? 'flex-1' : 'min-h-[160px] max-h-[500px] overflow-y-auto'}`}>
         <div 
           ref={editorRef}
           contentEditable
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
-          className="w-full h-auto min-h-[160px] p-8 text-[14px] outline-none leading-relaxed font-mono text-slate-300"
+          className="w-full h-auto min-h-[160px] p-5 text-[15px] outline-none leading-relaxed rich-content-style font-mono"
           style={{ fontFamily: activeFont }}
-          data-placeholder="[Terminal] > Enter signal metadata..."
+          data-placeholder="Define telemetry parameters and signal context..."
         />
-        {!content && <div className="absolute top-8 left-8 text-slate-600 pointer-events-none text-sm opacity-40 font-mono italic">[Terminal] > Enter signal metadata...</div>}
+        {!content && <div className="absolute top-5 left-5 text-slate-400 pointer-events-none text-sm opacity-40 font-mono italic">Define telemetry parameters and signal context...</div>}
       </div>
 
-      <div className="px-8 py-4 border-t border-[#1e293b] bg-[#0a0f1e] flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 py-1.5 bg-black/40 rounded border border-[#1e293b]">
-             <Activity size={14} className="text-emerald-500 animate-pulse"/> Uplink_Stable
-           </div>
+      {/* POLL CONFIGURATION MATRIX - GITHUB STYLE */}
+      {isPollMode && (
+        <div className="p-5 border-t border-[var(--border-color)] bg-[#f6f8fa] dark:bg-[#161b22] space-y-5 animate-in slide-in-from-bottom-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-[#0969da] rounded-md text-white">
+                <Settings2 size={16} />
+              </div>
+              <h4 className="text-[11px] font-black uppercase text-[var(--text-primary)] tracking-widest">
+                Poll_Configuration_Strata
+              </h4>
+            </div>
+            <div className="flex items-center gap-4 bg-white dark:bg-[#0d1117] px-3 py-1.5 border border-[var(--border-color)] rounded">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Clock size={12}/> Window_Lapse</span>
+              <div className="flex gap-1">
+                {['1', '3', '7'].map(d => (
+                  <button 
+                    key={d} 
+                    onClick={() => setPollDuration(d)}
+                    className={`px-3 py-0.5 rounded text-[10px] font-black transition-all ${pollDuration === d ? 'bg-[#0969da] text-white' : 'text-slate-400 hover:text-[#0969da]'}`}
+                  >
+                    {d}D
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {pollOptions.map((opt, idx) => (
+              <div key={idx} className={`relative group bg-white dark:bg-[#0d1117] border rounded transition-all ${opt.text ? 'border-[#0969da]/40 shadow-sm' : 'border-[var(--border-color)]'}`}>
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <span className="text-[9px] font-black text-[#0969da]/60">NODE_0{idx + 1}</span>
+                  <input 
+                    className="flex-1 bg-transparent border-none text-[13px] font-bold text-[var(--text-primary)] outline-none placeholder:text-slate-400 placeholder:italic"
+                    placeholder="Identify node..."
+                    value={opt.text}
+                    onChange={(e) => {
+                      const newOpts = [...pollOptions];
+                      newOpts[idx].text = e.target.value;
+                      setPollOptions(newOpts);
+                    }}
+                  />
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => {
+                        setCurrentPollOptionIdx(idx);
+                        pollOptionFileRef.current?.click();
+                      }}
+                      className={`p-1.5 rounded hover:bg-slate-100 dark:hover:bg-white/5 transition-colors ${opt.imageUrl ? 'text-[#0969da]' : 'text-slate-400'}`}
+                      title="Attach Visual Asset"
+                    >
+                      <LucideImage size={16} />
+                    </button>
+                    {idx > 1 && (
+                      <button onClick={() => setPollOptions(pollOptions.filter((_, i) => i !== idx))} className="p-1.5 rounded hover:bg-rose-600 hover:text-white text-slate-400 transition-colors">
+                        <Trash2 size={16}/>
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {opt.imageUrl && (
+                  <div className="relative h-24 border-t border-[var(--border-color)] group/img overflow-hidden">
+                    <img src={opt.imageUrl} className="w-full h-full object-cover grayscale-[30%] hover:grayscale-0 transition-all" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                       <button onClick={() => {
+                          const newOpts = [...pollOptions];
+                          newOpts[idx].imageUrl = undefined;
+                          setPollOptions(newOpts);
+                       }} className="p-2 bg-rose-600 text-white rounded-full shadow-lg">
+                          <Trash2 size={14} />
+                       </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {pollOptions.length < 4 && (
+              <button 
+                onClick={() => setPollOptions([...pollOptions, { text: '' }])}
+                className="flex items-center justify-center gap-3 p-4 border border-dashed border-[var(--border-color)] rounded text-slate-400 hover:text-[#0969da] hover:border-[#0969da] transition-all group min-h-[60px]"
+              >
+                <PlusCircle size={20} className="group-hover:rotate-90 transition-transform duration-300"/>
+                <span className="text-[10px] font-black uppercase tracking-widest">Append_Identity_Node</span>
+              </button>
+            )}
+          </div>
         </div>
-        <button 
-          onClick={handlePublish}
-          disabled={isAnalyzing || !content.trim()}
-          className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-3.5 rounded font-black text-[12px] uppercase tracking-[0.2em] transition-all shadow-xl shadow-indigo-600/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
-        >
-          {isAnalyzing ? <Loader2 size={16} className="animate-spin"/> : <Send size={16} />} Commit_Signal
-        </button>
-      </div>
-    </div>
-  );
-};
+      )}
 
-const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, isComment?: boolean }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, isComment }) => {
-  return (
-    <article className="group relative">
-      <div className="absolute left-[1.2rem] top-10 bottom-0 w-px bg-[#1e293b] group-last:hidden"></div>
-      <div className="flex gap-5">
-         <div className="relative shrink-0 z-10">
-            <img 
-              src={post.authorAvatar} 
-              onClick={() => onNavigateToProfile(post.authorId)} 
-              className="w-11 h-11 rounded border border-[#1e293b] bg-[#020617] object-cover cursor-pointer hover:border-indigo-600 transition-all shadow-sm" 
-            />
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[#020617] rounded-full"></div>
-         </div>
-         <div className="flex-1 min-w-0 space-y-3">
-            <div className="flex items-center justify-between text-[10px] font-black uppercase">
-               <div className="flex items-center gap-3 overflow-hidden">
-                  <span onClick={() => onNavigateToProfile(post.authorId)} className="text-white hover:text-indigo-400 cursor-pointer truncate">{post.author}</span>
-                  <AuthoritySeal role={post.authorAuthority} size={15} />
-                  <span className="text-slate-600 font-bold truncate">@ {post.college.toLowerCase()}</span>
-               </div>
-               <span className="text-slate-600 font-mono italic opacity-60 whitespace-nowrap ml-2">{post.timestamp}</span>
+      {/* FOOTER ACTIONS */}
+      <div className="px-5 py-4 border-t border-[var(--border-color)] bg-[#f6f8fa] dark:bg-[#161b22] flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          {isAnalyzing ? (
+             <div className="flex items-center gap-3 px-4 py-1.5 bg-[#0969da]/10 rounded border border-[#0969da]/20 text-[#0969da]">
+               <Loader2 size={14} className="animate-spin" />
+               <span className="text-[10px] font-black uppercase tracking-widest">Neural_Scanning...</span>
+             </div>
+          ) : (
+            <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 py-1.5 bg-white dark:bg-[#0d1117] rounded border border-[var(--border-color)]">
+              <Activity size={14} className="text-emerald-500 animate-pulse"/> Uplink_Stable
             </div>
-            <div onClick={() => !isComment && onOpenThread(post.id)} className={`bg-[#020617] border border-[#1e293b] rounded-md shadow-2xl overflow-hidden transition-all duration-300 hover:border-indigo-500/40 ${isComment ? 'cursor-default' : 'cursor-pointer hover:-translate-y-0.5'}`}>
-               <div className="p-6 space-y-4" style={{ fontFamily: post.customFont }}>
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} className="text-[14px] leading-relaxed font-mono text-slate-300" />
-                  
-                  {post.pollData && (
-                    <PollNode poll={post.pollData} postId={post.id} currentUser={currentUser} />
-                  )}
-               </div>
-               <div className="px-6 py-3 bg-[#0a0f1e] border-t border-[#1e293b] flex items-center justify-between">
-                  <div className="flex items-center gap-8">
-                     <button className="flex items-center gap-2 text-slate-500 hover:text-emerald-500 transition-all">
-                       <TrendingUp size={16} />
-                       <span className="text-[11px] font-black">{post.likes} SYNC</span>
-                     </button>
-                     <button onClick={(e) => { e.stopPropagation(); onOpenThread(post.id); }} className="flex items-center gap-2 text-slate-500 hover:text-indigo-400 transition-all">
-                       <MessageCircle size={16} />
-                       <span className="text-[11px] font-black">{post.commentsCount} LOG</span>
-                     </button>
-                  </div>
-                  <div className="flex gap-2">
-                     <button className="px-3 py-1 bg-white/5 border border-[#1e293b] rounded text-[8px] font-black uppercase text-slate-500 hover:text-white hover:bg-indigo-600 hover:border-transparent transition-all">Trade</button>
-                     <button className="px-3 py-1 bg-white/5 border border-[#1e293b] rounded text-[8px] font-black uppercase text-slate-500 hover:text-white hover:bg-rose-600 hover:border-transparent transition-all">Short</button>
-                  </div>
-               </div>
-            </div>
-         </div>
+          )}
+        </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {isPollMode && (
+            <button onClick={() => setIsPollMode(false)} className="flex-1 sm:flex-none px-6 py-3 text-slate-500 hover:text-rose-500 text-[11px] font-bold uppercase tracking-widest transition-colors">Discard_Poll</button>
+          )}
+          <button 
+            onClick={handlePublish}
+            disabled={isAnalyzing || !content.trim()}
+            className="flex-1 sm:flex-none bg-[#0969da] hover:bg-[#0861c5] text-white px-10 py-3 rounded font-black text-[12px] uppercase tracking-[0.2em] transition-all shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+          >
+            <Send size={16} /> Commit_Signal
+          </button>
+        </div>
       </div>
-    </article>
+
+      <style>{`
+        .rich-content-style:empty:before { content: attr(data-placeholder); color: #656d76; opacity: 0.5; }
+        .rich-content-style h1, .rich-content-style h2 { font-weight: 800; text-transform: uppercase; margin: 1rem 0; letter-spacing: -0.02em; line-height: 1.1; }
+        .rich-content-style ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+        .rich-content-style ol { list-style-type: decimal; padding-left: 1.5rem; margin: 1rem 0; }
+        .content-image-wrapper { margin: 16px 0; display: flex; justify-content: center; }
+        .responsive-doc-image { max-width: 100%; max-height: 450px; border-radius: 4px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+      `}</style>
+    </div>
   );
 };
 
@@ -380,38 +365,144 @@ const PollNode: React.FC<{ poll: PollData, postId: string, currentUser: User }> 
     setHasVoted(true);
   };
 
+  const hasImages = poll.options.some(o => o.imageUrl);
+
   return (
-    <div className="space-y-3 font-mono">
-       <div className="flex items-center justify-between border-b border-[#1e293b] pb-2">
-          <h4 className="text-[10px] font-black uppercase text-indigo-500 tracking-widest flex items-center gap-2"><Gauge size={12}/> VOTE_EXECUTION</h4>
-          <span className="text-[9px] font-bold text-slate-600 uppercase">COMMITS: {poll.totalVotes}</span>
+    <div className="space-y-6 font-mono p-6 border border-[var(--border-color)] bg-[#f6f8fa] dark:bg-[#161b22]/40 rounded relative overflow-hidden group shadow-sm">
+       <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-4 relative z-10">
+          <div className="flex items-center gap-4">
+             <div className={`p-2.5 rounded ${isExpired ? 'bg-slate-200 text-slate-500' : 'bg-[#0969da] text-white shadow-sm'}`}>
+                <BarChart2 size={18}/>
+             </div>
+             <div>
+                <h4 className="text-[12px] font-black uppercase tracking-widest text-[var(--text-primary)]">Sync_Poll_Protocol</h4>
+                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                   {isExpired ? 'Registry_Manifest_Locked' : 'Synchronizing_Identity_Signals...'}
+                </p>
+             </div>
+          </div>
+          <div className="text-right">
+             <p className="text-[11px] font-black text-[#0969da] uppercase leading-none">{poll.totalVotes.toLocaleString()} COMMITS</p>
+             <div className="flex items-center gap-1.5 justify-end mt-1.5">
+                <div className={`w-2 h-2 rounded-full ${isExpired ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]'}`}></div>
+                <span className={`text-[9px] font-black uppercase tracking-widest ${isExpired ? 'text-rose-500' : 'text-emerald-500'}`}>
+                   {isExpired ? 'OFFLINE' : 'LIVE'}
+                </span>
+             </div>
+          </div>
        </div>
-       <div className="space-y-2">
+
+       <div className={`grid gap-4 pt-2 relative z-10 ${hasImages ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
           {poll.options.map(opt => {
              const percentage = poll.totalVotes > 0 ? Math.round((opt.votes / poll.totalVotes) * 100) : 0;
              const myVote = opt.voterIds.includes(currentUser.id);
 
              return (
-                <button 
-                  key={opt.id}
-                  disabled={hasVoted || isExpired}
-                  onClick={() => handleVote(opt.id)}
-                  className={`w-full relative h-10 overflow-hidden border transition-all ${
-                    myVote ? 'border-indigo-500' : 'border-[#1e293b] hover:border-slate-500'
-                  }`}
-                >
-                   {(hasVoted || isExpired) && (
-                      <div className={`absolute inset-y-0 left-0 ${myVote ? 'bg-indigo-600/20' : 'bg-white/5'}`} style={{ width: `${percentage}%` }} />
-                   )}
-                   <div className="relative z-10 px-4 h-full flex items-center justify-between">
-                      <span className="text-[11px] font-black uppercase tracking-tight">{opt.text}</span>
-                      {(hasVoted || isExpired) && <span className="text-[11px] font-black italic">{percentage}%</span>}
-                   </div>
-                </button>
+                <div key={opt.id} className="group/opt">
+                   <button 
+                     disabled={hasVoted || isExpired}
+                     onClick={() => handleVote(opt.id)}
+                     className={`w-full relative flex flex-col items-stretch overflow-hidden rounded-md border transition-all duration-300 ${
+                        myVote ? 'border-[#0969da] bg-[#0969da]/5 shadow-sm' : 
+                        hasVoted || isExpired ? 'border-[var(--border-color)] opacity-90' : 
+                        'border-[var(--border-color)] bg-white dark:bg-[#0d1117] hover:border-[#0969da] hover:bg-[#0969da]/5'
+                     }`}
+                   >
+                      {/* GITHUB STYLE PROGRESS BAR */}
+                      {(hasVoted || isExpired) && (
+                         <div 
+                           className={`absolute inset-y-0 left-0 transition-all duration-1000 ease-out ${
+                             myVote ? 'bg-[#0969da]/10' : 'bg-slate-200 dark:bg-white/10'
+                           }`} 
+                           style={{ width: `${percentage}%` }}
+                         />
+                      )}
+
+                      <div className="relative z-10">
+                         {opt.imageUrl && (
+                            <div className="h-40 overflow-hidden border-b border-inherit">
+                               <img src={opt.imageUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover/opt:scale-105" />
+                            </div>
+                         )}
+                         <div className="px-5 py-4 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                               {myVote && <CheckCircle size={16} className="text-[#0969da] shrink-0 animate-in zoom-in"/>}
+                               <span className={`text-[13px] font-black uppercase truncate tracking-tight transition-colors ${myVote ? 'text-[#0969da]' : ''}`}>
+                                 {opt.text}
+                               </span>
+                            </div>
+                            {(hasVoted || isExpired) && (
+                               <div className="flex items-center gap-2">
+                                  <span className="text-[14px] font-black text-[#0969da]">{percentage}%</span>
+                               </div>
+                            )}
+                         </div>
+                      </div>
+                   </button>
+                </div>
              );
           })}
        </div>
+
+       <div className="flex flex-col sm:flex-row justify-between items-center gap-6 text-[9px] font-black uppercase text-slate-400 tracking-[0.2em] pt-6 border-t border-[var(--border-color)] relative z-10">
+          <div className="flex flex-wrap items-center justify-center gap-6">
+             <span className="flex items-center gap-2 pr-6 border-r border-[var(--border-color)]"><Terminal size={14}/> SHA-256_{postId.slice(-6).toUpperCase()}</span>
+             <span className="flex items-center gap-2"><Activity size={14}/> {poll.totalVotes > 100 ? 'HIGH_SIGNAL_INTENSITY' : 'STABLE_NODE_SYNC'}</span>
+          </div>
+          <div className="flex items-center gap-3 bg-white dark:bg-black/20 px-3 py-1.5 rounded-full border border-[var(--border-color)]">
+             <Clock size={14} className="text-[#0969da]"/>
+             <span>{isExpired ? `DECOMMISSIONED: ${new Date(poll.expiresAt).toLocaleDateString()}` : `AUTO_PURGE: ${new Date(poll.expiresAt).toLocaleDateString()}`}</span>
+          </div>
+       </div>
     </div>
+  );
+};
+
+const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, isComment?: boolean }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, isComment }) => {
+  return (
+    <article className="group relative">
+      <div className="absolute left-[1.2rem] top-10 bottom-0 w-px bg-[var(--border-color)] group-last:hidden"></div>
+      <div className="flex gap-5">
+         <img 
+           src={post.authorAvatar} 
+           alt={post.author} 
+           onClick={() => onNavigateToProfile(post.authorId)} 
+           className="w-11 h-11 rounded border border-[var(--border-color)] bg-white object-cover shrink-0 z-10 cursor-pointer hover:brightness-95 transition-all shadow-sm" 
+         />
+         <div className="flex-1 min-w-0 space-y-3">
+            <div className="flex items-center justify-between text-[11px] font-black uppercase">
+               <div className="flex items-center gap-3 overflow-hidden">
+                  <span onClick={() => onNavigateToProfile(post.authorId)} className="text-[var(--text-primary)] hover:text-[#0969da] hover:underline cursor-pointer truncate">{post.author}</span>
+                  <AuthoritySeal role={post.authorAuthority} size={15} />
+                  {post.isOpportunity && <div className="px-2.5 py-0.5 bg-amber-500/10 text-amber-500 rounded text-[7px] border border-amber-500/20 ml-1">OPPORTUNITY_SIGNAL</div>}
+                  <span className="text-slate-400 font-bold ml-2 truncate opacity-60">@{post.college.toLowerCase()}</span>
+               </div>
+               <span className="text-slate-400 font-mono text-[10px] whitespace-nowrap ml-2 opacity-50 italic">{post.timestamp}</span>
+            </div>
+            <div onClick={() => !isComment && !post.pollData && onOpenThread(post.id)} className={`bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md shadow-sm overflow-hidden transition-all duration-300 hover:border-[#0969da]/40 ${isComment || post.pollData ? 'cursor-default' : 'cursor-pointer hover:shadow-md'}`}>
+               <div className="p-6 space-y-6" style={{ fontFamily: post.customFont }}>
+                  <div dangerouslySetInnerHTML={{ __html: post.content }} className="rich-content-style text-[15px] leading-relaxed font-mono" />
+                  
+                  {/* POLL RENDERING */}
+                  {post.pollData && (
+                    <PollNode poll={post.pollData} postId={post.id} currentUser={currentUser} />
+                  )}
+               </div>
+               <div className="px-6 py-3 bg-[#f6f8fa] dark:bg-black/20 border-t border-[var(--border-color)] flex items-center gap-10">
+                  <button className="flex items-center gap-2.5 text-slate-500 hover:text-rose-500 transition-all active:scale-90">
+                    <Heart size={18} />
+                    <span className="text-[12px] font-black">{post.likes.toLocaleString()}</span>
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); onOpenThread(post.id); }} className="flex items-center gap-2.5 text-slate-500 hover:text-[#0969da] transition-all active:scale-90">
+                    <MessageCircle size={18} />
+                    <span className="text-[12px] font-black">{post.commentsCount.toLocaleString()}</span>
+                  </button>
+                  <div className="ml-auto text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] hidden sm:block">Log_{post.id.slice(-6).toUpperCase()}</div>
+               </div>
+            </div>
+         </div>
+      </div>
+    </article>
   );
 };
 
@@ -433,27 +524,72 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
 
   const handlePost = async (content: string, font: string, poll?: PollData) => {
     setIsAnalyzing(true);
-    const newPost: Post = {
-      id: Date.now().toString(),
-      author: user.name,
-      authorId: user.id,
-      authorRole: user.role,
-      authorAvatar: user.avatar,
-      timestamp: 'Just now',
-      content: content,
-      customFont: font,
-      hashtags: [],
-      likes: 0,
-      commentsCount: 0,
-      comments: [],
-      views: 1,
-      flags: [], 
-      isOpportunity: false,
-      college: collegeFilter as College | 'Global',
-      pollData: poll
-    };
-    db.addPost(newPost);
-    setIsAnalyzing(false);
+    const plainText = content.replace(/<[^>]*>/g, '').trim();
+    const images: { data: string, mimeType: string }[] = [];
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const imgTags = tempDiv.querySelectorAll('img');
+    imgTags.forEach(img => {
+      const src = img.getAttribute('src') || '';
+      if (src.startsWith('data:')) {
+        const [meta, data] = src.split(',');
+        const mimeType = meta.split(':')[1].split(';')[0];
+        images.push({ data, mimeType });
+      }
+    });
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const prompt = `Analyze this signal for academic consumption. Return JSON: { "isSafe": boolean, "unsafeReason": "string|null", "isOpportunity": boolean, "oppType": "Internship|Gig|Grant|Workshop|null", "benefit": "string(3 words)|null" } Text: "${plainText}"`;
+      const contents: any[] = [{ text: prompt }];
+      images.forEach(img => contents.push({ inlineData: { data: img.data, mimeType: img.mimeType } }));
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: { parts: contents },
+        config: { responseMimeType: "application/json" }
+      });
+
+      const analysis = JSON.parse(response.text || '{}');
+      if (analysis.isSafe === false) {
+        setIsAnalyzing(false);
+        triggerSafetyError(`BLOCK: ${analysis.unsafeReason || "Indecent signal detected."}`);
+        return;
+      }
+
+      const newPost: Post = {
+        id: Date.now().toString(),
+        author: user.name,
+        authorId: user.id,
+        authorRole: user.role,
+        authorAvatar: user.avatar,
+        timestamp: 'Just now',
+        content: content,
+        customFont: font,
+        hashtags: [],
+        likes: 0,
+        commentsCount: 0,
+        comments: [],
+        views: 1,
+        flags: [], 
+        isOpportunity: !!analysis.isOpportunity,
+        opportunityData: analysis.isOpportunity ? {
+          type: analysis.oppType || 'Gig',
+          isAIVerified: true,
+          detectedBenefit: analysis.benefit || 'Verified Signal'
+        } : undefined,
+        pollData: poll,
+        college: collegeFilter as College | 'Global'
+      };
+      
+      db.addPost(newPost);
+      setIsAnalyzing(false);
+    } catch (e) { 
+      setIsAnalyzing(false);
+      const newPost: Post = { id: Date.now().toString(), author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar, timestamp: 'Just now', content, customFont: font, hashtags: [], likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], isOpportunity: false, pollData: poll, college: collegeFilter as College | 'Global' };
+      db.addPost(newPost);
+    }
   };
 
   const filteredPosts = (posts || []).filter((p) => {
@@ -462,30 +598,24 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   });
   
   return (
-    <div className="max-w-[1440px] mx-auto pb-40 lg:px-12 lg:py-8 font-sans bg-[#020617] min-h-screen">
-      <VelocityTicker />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 lg:px-0 mt-10">
+    <div className="max-w-[1440px] mx-auto pb-32 lg:px-12 lg:py-8 font-sans">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 px-4 lg:px-0">
          <div className="lg:col-span-8 space-y-10">
-            {!threadId && (
-              <>
-                <NetworkIntensityIndex posts={posts} />
-                <PostCreator onPost={handlePost} isAnalyzing={isAnalyzing} />
-              </>
-            )}
+            {!threadId && <PostCreator onPost={handlePost} isAnalyzing={isAnalyzing} />}
             {threadId && onBack && (
-               <button onClick={onBack} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-indigo-500 transition-colors mb-6">
-                  <ChevronRight className="rotate-180" size={16}/> Back_To_Term
+               <button onClick={onBack} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-[#0969da] transition-colors mb-6">
+                  <ChevronRight className="rotate-180" size={16}/> Return_To_Feed
                </button>
             )}
             <div className="space-y-8">
-               <div className="flex items-center justify-between px-2 border-b border-[#1e293b] pb-4">
+               <div className="flex items-center justify-between px-2">
                   <div className="flex items-center gap-4">
-                     <Command size={18} className="text-indigo-500 animate-pulse" />
-                     <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400">Stream: {collegeFilter.toUpperCase()}</h3>
+                     <Radio size={20} className="text-[#0969da] animate-pulse" />
+                     <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500">Sector_{collegeFilter.toUpperCase()}_Telemetry</h3>
                   </div>
-                  <div className="flex items-center gap-3 px-4 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500">
+                  <div className="flex items-center gap-3 px-4 py-1.5 bg-indigo-600/5 border border-indigo-600/10 rounded-full text-[#0969da]">
                     <Activity size={12}/>
-                    <span className="text-[9px] font-black uppercase tracking-widest">Live_Signal</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Feed_Live</span>
                   </div>
                </div>
                {filteredPosts.map((post) => (
@@ -493,38 +623,35 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                ))}
             </div>
          </div>
-         
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-10">
-            <div className="bg-[#020617] border border-[#1e293b] rounded-md p-8 shadow-2xl">
-               <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 flex items-center gap-4 border-b border-[#1e293b] pb-6">
-                 <MousePointer2 size={20} className="text-indigo-500" /> Hot_Signals
+            <div className="bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-md p-8 shadow-sm">
+               <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 flex items-center gap-4 border-b border-[var(--border-color)] pb-6">
+                 <TrendingUp size={22} className="text-[#0969da]" /> Trending_Signals
                </h3>
-               <div className="space-y-8">
-                  {['#Hackathon', '#Exams', '#Guild89', '#Research'].map((tag) => (
-                    <div key={tag} className="group cursor-pointer flex justify-between items-center transition-all hover:bg-white/5 p-2 rounded">
+               <div className="space-y-6">
+                  {['#ResearchWeek', '#Guild89', '#COCISLabs', '#HillProtocol'].map((tag) => (
+                    <div key={tag} className="group cursor-pointer flex justify-between items-center transition-all hover:translate-x-2">
                        <div>
-                         <p className="text-[15px] font-black text-indigo-400 group-hover:text-indigo-300 uppercase italic">{tag}</p>
-                         <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">VOL: {(Math.random() * 10).toFixed(1)}k SIGNALS</p>
+                         <p className="text-[15px] font-black text-[#0969da] group-hover:underline uppercase tracking-tighter italic">{tag}</p>
+                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 flex items-center gap-2"><Zap size={10} className="fill-current"/> High_Intensity</p>
                        </div>
-                       <div className="text-right">
-                          <span className="text-emerald-500 font-mono text-[10px] font-black">+{(Math.random() * 20).toFixed(1)}%</span>
-                          <div className="w-12 h-1 bg-slate-800 rounded-full mt-2 overflow-hidden">
-                             <div className="h-full bg-emerald-500 w-3/4"></div>
-                          </div>
-                       </div>
+                       <ChevronRight size={20} className="text-slate-300 group-hover:text-[#0969da] transition-all" />
                     </div>
                   ))}
                </div>
             </div>
 
-            <div className="p-10 bg-indigo-600 rounded-md text-white shadow-2xl relative overflow-hidden group border border-white/10">
+            <div className="p-10 bg-[#0969da] rounded-md text-white shadow-xl relative overflow-hidden group">
                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition-transform duration-700"><Zap size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
-                  <h4 className="text-[14px] font-black uppercase tracking-widest italic">Pro_Node_Sync</h4>
-                  <p className="text-[11px] font-bold opacity-80 uppercase leading-relaxed italic border-l-2 border-white/40 pl-4">
-                    Upgrade to Pro Strata for real-time market insights and high-priority vault access.
+                  <div className="flex items-center gap-4">
+                     <LayoutGrid size={24} fill="white"/>
+                     <h4 className="text-[14px] font-black uppercase tracking-widest leading-none">Pro_Strata_Sync</h4>
+                  </div>
+                  <p className="text-[12px] font-bold opacity-80 uppercase leading-relaxed italic">
+                    Synchronize your node with the elite academic strata for prioritized signal indexing and unlimited vault access.
                   </p>
-                  <button className="w-full py-4 bg-white text-indigo-600 rounded font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl hover:bg-slate-50 transition-all active:scale-95">Sync Global Now</button>
+                  <button className="w-full py-4 bg-white text-[#0969da] rounded-md text-[11px] font-black uppercase tracking-[0.2em] shadow-lg hover:bg-slate-50 transition-all active:scale-95">Request_Synchronization</button>
                </div>
             </div>
          </aside>

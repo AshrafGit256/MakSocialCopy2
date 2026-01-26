@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star, Bell, Zap, Target, Activity } from 'lucide-react';
+import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star, Bell } from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -40,30 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           <button onClick={onClose} className="p-3 bg-[var(--bg-secondary)] rounded-2xl text-slate-500 active:scale-90 transition-all"><X size={20} /></button>
         </div>
 
-        <div className="hidden lg:block mb-8 cursor-pointer group" onClick={() => setView('home')}>
+        <div className="hidden lg:block mb-10 cursor-pointer group" onClick={() => setView('home')}>
           <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" alt="MakSocial Logo" className="w-40 grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all group-hover:scale-105" />
-        </div>
-
-        {/* NODE AUTHORITY WIDGET */}
-        <div className="mb-10 px-4 py-6 bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-xl shadow-sm space-y-4">
-           <div className="flex justify-between items-end">
-              <div className="space-y-0.5">
-                 <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Node_Authority</p>
-                 <h4 className="text-lg font-black text-indigo-600 italic tracking-tighter leading-none">LVL_{currentUser.nodeAuthorityLevel || 4}</h4>
-              </div>
-              <div className="p-2 bg-indigo-600/10 rounded-lg text-indigo-600 animate-pulse">
-                 <Target size={14}/>
-              </div>
-           </div>
-           <div className="space-y-1.5">
-              <div className="flex justify-between text-[7px] font-black uppercase text-slate-500">
-                 <span>Sync_Progress</span>
-                 <span>{currentUser.missionProgress || 68}%</span>
-              </div>
-              <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                 <div className="h-full bg-indigo-600" style={{ width: `${currentUser.missionProgress || 68}%` }}></div>
-              </div>
-           </div>
         </div>
 
         <nav className="space-y-1.5">
@@ -125,19 +103,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             <span className="text-[11px] tracking-widest font-black uppercase">OS Customizer</span>
           </button>
         </nav>
-
-        {/* ACTIVE MISSION WIDGET */}
-        <div className="mt-10 px-5 py-5 bg-indigo-600/5 border border-dashed border-indigo-600/30 rounded-xl space-y-3">
-           <div className="flex items-center gap-2">
-              <Zap size={12} className="text-indigo-600" />
-              <span className="text-[9px] font-black uppercase text-indigo-600 tracking-widest">Active_Mission</span>
-           </div>
-           <p className="text-[10px] font-bold text-slate-500 uppercase leading-relaxed">Broadcast a signal to the #ResearchWeek hub to gain +50 XP.</p>
-           <div className="flex justify-between items-center pt-1">
-              <span className="text-[8px] font-black text-indigo-600">PROGRESS: 0/1</span>
-              <Activity size={10} className="text-slate-300" />
-           </div>
-        </div>
 
         {isAdmin && (
           <div className="mt-10">

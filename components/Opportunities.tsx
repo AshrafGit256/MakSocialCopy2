@@ -8,13 +8,136 @@ import {
   Filter, Calendar, ChevronRight, Info, Award,
   Terminal, ExternalLink, GitFork, Eye, 
   Hash, Layers, LayoutGrid, Box, Activity,
-  Globe, Database, Command, TrendingUp, DollarSign
+  Globe, Database, Command
 } from 'lucide-react';
+
+const SignalLabel: React.FC<{ type: string; color: string }> = ({ type, color }) => (
+  <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border border-current ${color}`}>
+    {type}
+  </span>
+);
+
+const OpportunityCard: React.FC<{ 
+  opp: Post; 
+  onDelete: (id: string) => void; 
+  isAdmin: boolean;
+  isLarge?: boolean;
+}> = ({ opp, onDelete, isAdmin, isLarge }) => {
+  const daysLeft = opp.opportunityData?.deadline ? 
+    Math.floor((new Date(opp.opportunityData.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 
+    null;
+  
+  const isUrgent = daysLeft !== null && daysLeft <= 2;
+  const type = opp.opportunityData?.type || 'Gig';
+
+  const typeColors: Record<string, string> = {
+    'Gig': 'text-amber-500 bg-amber-500/5',
+    'Internship': 'text-indigo-500 bg-indigo-500/5',
+    'Grant': 'text-emerald-500 bg-emerald-500/5',
+    'Scholarship': 'text-rose-500 bg-rose-500/5',
+    'Workshop': 'text-cyan-500 bg-cyan-500/5'
+  };
+
+  const hasImage = opp.images && opp.images.length > 0;
+
+  return (
+    <div className={`group relative bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[4px] hover:border-indigo-500/50 transition-all flex flex-col shadow-sm hover:shadow-xl ${isLarge ? 'md:col-span-2 md:row-span-2' : ''}`}>
+      {/* 1. Repository Header */}
+      <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-white/20">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <Box size={14} className="text-slate-400 shrink-0" />
+          <div className="flex items-center text-[11px] font-bold truncate">
+            <span className="text-indigo-600 hover:underline cursor-pointer">{opp.author}</span>
+            <span className="mx-1 text-slate-400">/</span>
+            <span className="text-[var(--text-primary)] truncate">{opp.opportunityData?.detectedBenefit || 'Signal'}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {opp.isOpportunity && <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>}
+          <div className="text-[8px] font-black uppercase text-slate-400 font-mono">v1.0</div>
+        </div>
+      </div>
+
+      {/* 2. Intelligence Body */}
+      {hasImage && (
+        <div className={`relative overflow-hidden border-b border-[var(--border-color)] ${isLarge ? 'h-64' : 'h-40'}`}>
+          <img src={opp.images![0]} alt="Flyer" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+             <span className="text-[8px] font-black text-white uppercase tracking-widest bg-indigo-600 px-2 py-1 rounded">Visual_Manifest_Attached</span>
+          </div>
+        </div>
+      )}
+      
+      <div className="p-6 flex-1 space-y-4">
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            <SignalLabel type={type} color={typeColors[type] || 'text-slate-500'} />
+            <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 border border-[var(--border-color)] text-slate-400">
+               {opp.college} Hub
+            </span>
+          </div>
+          <p className={`text-[var(--text-primary)] leading-relaxed italic ${isLarge ? 'text-lg font-black' : 'text-xs font-medium'}`}>
+            "{opp.content.replace(/<[^>]*>/g, '').slice(0, isLarge ? 200 : 120)}{opp.content.length > 120 ? '...' : ''}"
+          </p>
+        </div>
+
+        {/* Technical Data Points */}
+        <div className="grid grid-cols-2 gap-4 py-2">
+          <div className="space-y-0.5">
+            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Signal_Intensity</p>
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className={`h-1 flex-1 rounded-full ${i < (opp.likes > 100 ? 5 : 3) ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-white/5'}`}></div>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-0.5 text-right">
+            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Time_To_Live</p>
+            <p className={`text-[10px] font-mono font-bold ${isUrgent ? 'text-rose-500' : 'text-[var(--text-primary)]'}`}>
+              {daysLeft !== null ? `${daysLeft}D_REMAINING` : 'PERMANENT'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Terminal Footer */}
+      <div className="px-4 py-3 bg-slate-50/30 dark:bg-black/20 border-t border-[var(--border-color)] flex items-center justify-between">
+        <div className="flex items-center gap-4 text-[10px] font-mono text-slate-500">
+          <div className="flex items-center gap-1.5 hover:text-indigo-500 cursor-pointer transition-colors">
+            <Star size={12} /> {opp.likes}
+          </div>
+          <div className="flex items-center gap-1.5 hover:text-emerald-500 cursor-pointer transition-colors">
+            <GitFork size={12} /> {opp.commentsCount}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+           {isAdmin && (
+             <button onClick={() => onDelete(opp.id)} className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors">
+                <Trash2 size={14}/>
+             </button>
+           )}
+           <button className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-[4px] text-[9px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-sm">
+             Commit <ArrowUpRight size={12}/>
+           </button>
+        </div>
+      </div>
+
+      {/* Masonry-style abstract background for large tiles */}
+      {isLarge && !hasImage && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] text-[60px] font-black select-none">
+          {type.toUpperCase()}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Opportunities: React.FC = () => {
   const [opps, setOpps] = useState<Post[]>([]);
   const [search, setSearch] = useState('');
+  const [activeType, setActiveType] = useState<string>('All');
   const [currentUser] = useState(db.getUser());
+  const isAdmin = currentUser?.badges?.includes('Super Admin');
 
   useEffect(() => {
     const sync = () => {
@@ -26,134 +149,142 @@ const Opportunities: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const filtered = (opps || []).filter((o) => {
+    const matchesSearch = o.content.toLowerCase().includes(search.toLowerCase()) || 
+                         (o.opportunityData?.detectedBenefit || '').toLowerCase().includes(search.toLowerCase());
+    const matchesType = activeType === 'All' || o.opportunityData?.type === activeType;
+    return matchesSearch && matchesType;
+  });
+
+  const handleDelete = (id: string) => {
+    if (confirm("Log: Confirm protocol removal of this opportunity signal?")) {
+      db.deletePost(id);
+      setOpps(db.getOpportunities());
+    }
+  };
+
   return (
-    <div className="max-w-[1600px] mx-auto px-4 lg:px-12 py-8 pb-40 font-mono bg-[#020617] min-h-screen">
+    <div className="max-w-[1600px] mx-auto px-4 lg:px-12 py-8 pb-40 animate-in fade-in duration-700 font-sans">
       
-      {/* TRADING HEADER */}
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-12 border-b border-[#1e293b] pb-10">
-        <div className="space-y-4">
-           <div className="flex items-center gap-6">
-              <div className="p-5 bg-indigo-600 rounded-md shadow-2xl shadow-indigo-600/20 text-white">
-                 <Database size={40} />
+      {/* 1. REFINED COMMAND HEADER */}
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10 mb-12">
+        <div className="space-y-6">
+           <div className="flex items-center gap-4">
+              <div className="p-4 bg-indigo-600 rounded-[var(--radius-main)] shadow-2xl shadow-indigo-600/30 text-white">
+                 <Terminal size={32} />
               </div>
               <div>
-                 <h1 className="text-6xl font-black uppercase tracking-tighter italic leading-none text-white">
-                    Market.<span className="text-indigo-500">Signals</span>
+                 <h1 className="text-5xl font-black uppercase tracking-tighter italic leading-none text-[var(--text-primary)]">
+                    Intelligence.<span className="text-indigo-600">Registry</span>
                  </h1>
-                 <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-sm text-[10px] font-black uppercase">
-                       <Activity size={12} className="animate-pulse" /> Registry_Stable
+                 <div className="flex items-center gap-3 mt-3">
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[8px] font-black uppercase tracking-widest">
+                       <Activity size={10} className="animate-pulse" /> Network.Stable
                     </div>
-                    <span className="text-slate-600 text-[10px] font-black uppercase tracking-[0.4em]">Sector: Global / Pair: UGX-ACAD</span>
+                    <p className="text-[9px] font-bold uppercase text-slate-500 tracking-[0.4em]">Sector: Opportunities / Wing: Global</p>
                  </div>
               </div>
            </div>
         </div>
-        <div className="w-full lg:w-96 relative group">
-           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500" size={20} />
-           <input 
-             className="w-full bg-[#0a0f1e] border border-[#1e293b] rounded-md py-4 pl-12 pr-4 text-xs font-bold uppercase outline-none focus:border-indigo-600 transition-all text-white"
-             placeholder="Query Asset Pair..."
-             value={search}
-             onChange={(e) => setSearch(e.target.value)}
-           />
+
+        <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+           <div className="relative flex-1 lg:w-[450px] group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
+              <input 
+                className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] py-4 pl-12 pr-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all"
+                placeholder="Query alphanumeric signal manifest..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-30 group-focus-within:opacity-100 transition-opacity">
+                 <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-white/10 rounded text-[9px] font-mono">/</span>
+                 <Command size={12}/>
+              </div>
+           </div>
         </div>
       </header>
 
-      {/* THE ORDER BOOK TABLE */}
-      <div className="bg-[#020617] border border-[#1e293b] rounded-md overflow-hidden shadow-2xl">
-         <div className="px-6 py-4 border-b border-[#1e293b] bg-[#0a0f1e] flex justify-between items-center">
-            <h3 className="text-xs font-black uppercase text-slate-500 tracking-[0.3em]">Live_Opportunity_Order_Book</h3>
-            <div className="flex gap-10">
-               <div className="flex flex-col items-end">
-                  <span className="text-[8px] font-black text-slate-600 uppercase">Spread</span>
-                  <span className="text-[11px] font-black text-emerald-500">0.002%</span>
-               </div>
-               <div className="flex flex-col items-end">
-                  <span className="text-[8px] font-black text-slate-600 uppercase">24h_Volume</span>
-                  <span className="text-[11px] font-black text-white">42.5k SIGNALS</span>
-               </div>
+      {/* 2. REGISTRY TELEMETRY (Mini dashboard) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        {[
+          { label: 'Active_Nodes', val: opps.length, icon: <LayoutGrid size={16}/>, color: 'text-indigo-600' },
+          { label: 'Global_Liquidity', val: 'UGX 42.5M', icon: <Database size={16}/>, color: 'text-emerald-500' },
+          { label: 'Uplink_Intensity', val: '98.2%', icon: <Activity size={16}/>, color: 'text-rose-500' },
+          { label: 'Verified_Assets', val: opps.filter(o => o.opportunityData?.isAIVerified).length, icon: <ShieldCheck size={16}/>, color: 'text-amber-500' },
+        ].map((stat, i) => (
+          <div key={i} className="p-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] flex items-center gap-4 transition-transform hover:-translate-y-1 cursor-default group">
+            <div className={`p-3 bg-white dark:bg-black/20 rounded shadow-sm ${stat.color} group-hover:scale-110 transition-transform`}>{stat.icon}</div>
+            <div>
+              <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{stat.label}</p>
+              <p className="text-lg font-black tracking-tighter text-[var(--text-primary)]">{stat.val}</p>
             </div>
-         </div>
-
-         <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-               <thead className="bg-[#020617] text-[9px] font-black uppercase text-slate-600 tracking-widest border-b border-[#1e293b]">
-                  <tr>
-                     <th className="p-6">Asset_Identity</th>
-                     <th className="p-6">Registry_Wing</th>
-                     <th className="p-6">Type</th>
-                     <th className="p-6 text-right">Liquidity (UGX)</th>
-                     <th className="p-6 text-right">Intensity</th>
-                     <th className="p-6 text-center">Execute</th>
-                  </tr>
-               </thead>
-               <tbody className="divide-y divide-[#1e293b]">
-                  {opps.length > 0 ? opps.map(opp => (
-                     <tr key={opp.id} className="hover:bg-white/5 transition-all group">
-                        <td className="p-6">
-                           <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded border border-[#1e293b] bg-[#0a0f1e] flex items-center justify-center text-indigo-500">
-                                 <Command size={18} />
-                              </div>
-                              <div>
-                                 <p className="text-[12px] font-black text-white uppercase truncate max-w-[200px] group-hover:text-indigo-400 transition-colors">{opp.author}</p>
-                                 <p className="text-[9px] font-bold text-slate-600 uppercase mt-1">ID: {opp.id.slice(-6)}</p>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="p-6">
-                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest border border-[#1e293b] px-3 py-1 rounded-sm bg-white/5">{opp.college}</span>
-                        </td>
-                        <td className="p-6">
-                           <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${opp.opportunityData?.type === 'Grant' ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
-                              <span className="text-[10px] font-black text-white uppercase">{opp.opportunityData?.type || 'Gig'}</span>
-                           </div>
-                        </td>
-                        <td className="p-6 text-right">
-                           <p className="text-[12px] font-black text-emerald-500 font-mono tracking-tighter">{(Math.random() * 1000000).toLocaleString()}</p>
-                           <p className="text-[8px] font-bold text-slate-600 uppercase mt-0.5">Est_Net_Yield</p>
-                        </td>
-                        <td className="p-6 text-right">
-                           <div className="flex flex-col items-end gap-1.5">
-                              <span className="text-[10px] font-black text-white">{opp.likes}%</span>
-                              <div className="w-20 h-1 bg-slate-800 rounded-full overflow-hidden">
-                                 <div className="h-full bg-indigo-500" style={{ width: `${opp.likes}%` }}></div>
-                              </div>
-                           </div>
-                        </td>
-                        <td className="p-6 text-center">
-                           <button className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black uppercase tracking-widest rounded-sm transition-all shadow-lg active:scale-95">Open_Position</button>
-                        </td>
-                     </tr>
-                  )) : (
-                    <tr>
-                       <td colSpan={6} className="p-40 text-center space-y-4">
-                          <Terminal size={40} className="mx-auto text-slate-700" />
-                          <p className="text-[11px] font-black uppercase text-slate-600 tracking-[0.4em]">Registry_Buffer_Nullified</p>
-                       </td>
-                    </tr>
-                  )}
-               </tbody>
-            </table>
-         </div>
+          </div>
+        ))}
       </div>
 
-      {/* FOOTER TICKER STRAP */}
-      <div className="mt-12 bg-[#0a0f1e] border border-[#1e293b] rounded-md p-6 flex flex-col md:flex-row items-center justify-between gap-8">
-         <div className="flex items-center gap-6">
-            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-md text-emerald-500">
-               <ShieldCheck size={32} />
-            </div>
-            <div>
-               <h4 className="text-xl font-black text-white uppercase tracking-tighter italic">Execution_Protocol_Verified</h4>
-               <p className="text-[10px] text-slate-500 font-medium italic max-w-xl">"All opportunity trades are logged to the university main chain. Identity synchronization required for settlement."</p>
-            </div>
+      {/* 3. FILTER TABS (GitHub style) */}
+      <div className="flex items-center gap-2 mb-8 border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
+        {['All', 'Gig', 'Internship', 'Grant', 'Scholarship', 'Workshop'].map(type => (
+          <button
+            key={type}
+            onClick={() => setActiveType(type)}
+            className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 whitespace-nowrap ${
+              activeType === type ? 'border-orange-500 text-[var(--text-primary)] bg-indigo-50/50 dark:bg-indigo-600/5' : 'border-transparent text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            {type} {activeType === type && `(${filtered.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* 4. THE DISCOVERY GRID (Instagram Explore Layout) */}
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr">
+          {filtered.map((opp, index) => (
+            <OpportunityCard 
+              key={opp.id} 
+              opp={opp} 
+              onDelete={handleDelete} 
+              isAdmin={isAdmin}
+              isLarge={index === 0 || (index > 0 && index % 7 === 0)} 
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="py-40 text-center space-y-8 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">
+           <div className="w-24 h-24 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full flex items-center justify-center mx-auto shadow-inner relative group">
+              <div className="absolute inset-0 bg-indigo-600 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-10"></div>
+              <Terminal size={40} className="text-slate-300 group-hover:text-indigo-600 transition-colors duration-500" />
+           </div>
+           <div className="space-y-2">
+             <h3 className="text-3xl font-black text-slate-400 uppercase tracking-tighter italic leading-none">Manifest.Nullified</h3>
+             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">No alphanumeric signals match your current query.</p>
+           </div>
+           <button onClick={() => {setSearch(''); setActiveType('All');}} className="px-8 py-3 bg-indigo-600 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Reset Sync</button>
+        </div>
+      )}
+
+      {/* 5. AUDIT FOOTER */}
+      <div className="mt-20 p-10 border border-indigo-600/20 rounded-[4px] bg-indigo-600/5 relative overflow-hidden group">
+         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Globe size={120} />
          </div>
-         <div className="flex gap-4 w-full md:w-auto">
-            <button className="flex-1 md:flex-none px-10 py-4 bg-white/5 border border-[#1e293b] text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all rounded-sm">Audit_Chain</button>
-            <button className="flex-1 md:flex-none px-10 py-4 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-indigo-600/30 hover:bg-indigo-700 active:scale-95 transition-all rounded-sm">Quick_Sync</button>
+         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+            <div className="flex items-center gap-6 text-center md:text-left">
+               <div className="p-4 bg-white dark:bg-slate-900 border border-[var(--border-color)] rounded shadow-xl">
+                  <ShieldCheck size={48} className="text-emerald-500" />
+               </div>
+               <div className="space-y-1">
+                  <h4 className="text-2xl font-black uppercase tracking-tight italic">Protocol.Verification_Matrix</h4>
+                  <p className="text-xs text-slate-500 font-medium italic max-w-xl leading-relaxed">
+                    "All synchronized signals are parsed via neural assessment to ensure academic integrity. Nodes failing verification are pruned automatically from the global registry."
+                  </p>
+               </div>
+            </div>
+            <div className="flex gap-4">
+               <button className="px-10 py-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all shadow-sm">View_Policy</button>
+               <button className="px-10 py-4 bg-indigo-600 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-95 transition-all">Sync.Force</button>
+            </div>
          </div>
       </div>
     </div>

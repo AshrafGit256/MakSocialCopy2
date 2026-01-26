@@ -9,34 +9,6 @@ export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC'
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
-export interface User {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  connections: number;
-  email?: string;
-  college: College | 'Global';
-  status: UserStatus;
-  subscriptionTier: SubscriptionTier; 
-  accountStatus?: 'Active' | 'Inactive' | 'Suspended';
-  verified?: boolean;
-  joinedColleges: (College | 'Global')[];
-  postsCount: number;
-  followersCount: number;
-  followingCount: number;
-  totalLikesCount: number;
-  badges: string[];
-  appliedTo: string[];
-  bio?: string;
-  education?: string;
-  location?: string;
-  skills?: string[];
-  // Gamification fields
-  nodeAuthorityLevel: number;
-  missionProgress: number; 
-}
-
 export interface AuditLog {
   id: string;
   action: string;
@@ -155,6 +127,31 @@ export interface TimelineEvent {
   color: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  connections: number;
+  email?: string;
+  college: College | 'Global';
+  status: UserStatus;
+  subscriptionTier: SubscriptionTier; 
+  accountStatus?: 'Active' | 'Inactive' | 'Suspended';
+  verified?: boolean;
+  joinedColleges: (College | 'Global')[];
+  postsCount: number;
+  followersCount: number;
+  followingCount: number;
+  totalLikesCount: number;
+  badges: string[];
+  appliedTo: string[];
+  bio?: string;
+  education?: string;
+  location?: string;
+  skills?: string[];
+}
+
 export interface Comment {
   id: string;
   author: string;
@@ -235,6 +232,7 @@ export interface CalendarEvent {
   isPromoted?: boolean;
 }
 
+// Market service interface for Bazaar marketplace transactional nodes
 export interface MarketService {
   id: string;
   providerId: string;

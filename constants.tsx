@@ -29,6 +29,75 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 
 export const MOCK_POSTS: Post[] = [
   {
+    id: 'poll-text-1',
+    author: 'COCIS Research Hub',
+    authorId: 'cocis_hub',
+    authorRole: 'Academic Council',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=COCIS',
+    authorAuthority: 'Official',
+    timestamp: '1h ago',
+    content: `<h1>Preferred Tech Stack for Finalist Projects?</h1>
+<p>We are collecting metadata for the upcoming Hackathon. Which framework node should we prioritize for infrastructure support?</p>`,
+    customFont: '"JetBrains Mono"',
+    hashtags: ['#TechStack', '#MakerereAI'],
+    likes: 245,
+    commentsCount: 12,
+    comments: [],
+    views: 1200,
+    flags: [],
+    isOpportunity: false,
+    college: 'COCIS',
+    pollData: {
+      totalVotes: 86,
+      expiresAt: new Date(Date.now() + 86400000).toISOString(),
+      options: [
+        { id: 'opt1', text: 'React + Node.js (V8)', votes: 45, voterIds: [] },
+        { id: 'opt2', text: 'Python + Django (Alpha)', votes: 20, voterIds: [] },
+        { id: 'opt3', text: 'Flutter Mobile Link', votes: 21, voterIds: [] }
+      ]
+    }
+  },
+  {
+    id: 'poll-img-1',
+    author: 'CEDAT Arts Wing',
+    authorId: 'cedat_arts',
+    authorRole: 'Design Cluster',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=CEDAT',
+    authorAuthority: 'Official',
+    timestamp: '3h ago',
+    content: `<h2>Guild Logo Redesign Sequence 🎨</h2>
+<p>Signal synchronization needed. Which visual identity node best represents the 90th Guild cycle?</p>`,
+    customFont: '"Plus Jakarta Sans"',
+    hashtags: ['#Design', '#Guild90'],
+    likes: 560,
+    commentsCount: 45,
+    comments: [],
+    views: 8900,
+    flags: [],
+    isOpportunity: false,
+    college: 'CEDAT',
+    pollData: {
+      totalVotes: 320,
+      expiresAt: new Date(Date.now() + 172800000).toISOString(),
+      options: [
+        { 
+          id: 'img1', 
+          text: 'Minimalist Vector', 
+          imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=400', 
+          votes: 180, 
+          voterIds: [] 
+        },
+        { 
+          id: 'img2', 
+          text: 'Classic Crest', 
+          imageUrl: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=400', 
+          votes: 140, 
+          voterIds: [] 
+        }
+      ]
+    }
+  },
+  {
     id: 'inst-1',
     author: 'MakUnipod',
     authorId: 'mak_unipod',
@@ -66,33 +135,6 @@ export const MOCK_POSTS: Post[] = [
     flags: [],
     isOpportunity: true,
     college: 'CEDAT'
-  },
-  {
-    id: 'inst-2',
-    author: 'Mak AI Lab',
-    authorId: 'mak_ailab',
-    authorRole: 'Research Center',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AILab',
-    authorAuthority: 'Official',
-    timestamp: '2h ago',
-    content: `<h2>Neural Logic Internship Program 🧠</h2>
-<p>Seeking <b>Graduate Research Assistants</b> for the <u>NLP and Computer Vision</u> clusters. Candidates must possess the following alphanumeric credentials:</p>
-<ul style="list-style-type: disc; padding-left: 20px;">
-  <li>Proficiency in <span style="background-color: #fef08a; padding: 2px 5px; border-radius: 4px; color: black;">Python & PyTorch</span></li>
-  <li>Experience with Edge Computing</li>
-  <li>Active participation in COCIS Labs</li>
-</ul>
-<p style="background-color: #ef4444; color: white; padding: 10px; border-radius: 6px; text-align: center; font-weight: 800;">DEADLINE: FRIDAY, 5:00 PM EAT</p>
-<p>Visit our node at <a href="#">ai.mak.ac.ug/internships</a> for synchronization.</p>`,
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#AI', '#COCIS', '#Research'],
-    likes: 892,
-    commentsCount: 34,
-    comments: [],
-    views: 28000,
-    flags: [],
-    isOpportunity: true,
-    college: 'COCIS'
   }
 ];
 
@@ -103,6 +145,7 @@ export const ANALYTICS: AnalyticsData[] = [
   { day: 'Thu', posts: 180, activeUsers: 580, messages: 1600, revenue: 800, engagement: 1770 },
   { day: 'Fri', posts: 250, activeUsers: 720, messages: 2100, revenue: 1200, engagement: 2330 },
   { day: 'Sat', posts: 100, activeUsers: 300, messages: 800, revenue: 400, engagement: 950 },
+  // Fixed typo: changed 'growths' to 'messages' to align with AnalyticsData interface
   { day: 'Sun', posts: 80, activeUsers: 250, messages: 600, revenue: 300, engagement: 775 },
 ];
 
@@ -126,45 +169,6 @@ export const MOCK_CHATS: ChatConversation[] = [
     messages: [
       { id: 'm4', text: 'Sarah, is the Alpha-7 node ready?', timestamp: '09:00 AM', isMe: true },
       { id: 'm5', text: 'Circuit schematic verified. Ready for uplink.', timestamp: '09:15 AM', isMe: false },
-    ]
-  },
-  {
-    id: 'c3',
-    user: { name: 'Admin Registry', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Admin'},
-    lastMessage: 'Protocol updated for semester 2.',
-    unreadCount: 1,
-    messages: [
-      { id: 'm6', text: 'Query: When is the next vault sync?', timestamp: 'Yesterday', isMe: true },
-      { id: 'm7', text: 'Protocol updated for semester 2. Check the Forge.', timestamp: 'Yesterday', isMe: false },
-    ]
-  },
-  {
-    id: 'c4',
-    user: { name: 'Justice LAW', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Justice'},
-    lastMessage: 'Legal brief finalized.',
-    unreadCount: 0,
-    messages: [
-      { id: 'm8', text: 'Handshake: Discussing Article 45 compliance.', timestamp: '2 days ago', isMe: true },
-      { id: 'm9', text: 'Legal brief finalized. Forwarding to CHS node.', timestamp: '2 days ago', isMe: false },
-    ]
-  },
-  {
-    id: 'c5',
-    user: { name: 'Proffesor X', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ProfX'},
-    lastMessage: 'Class scheduled at 2PM in Block B.',
-    unreadCount: 0,
-    messages: [
-      { id: 'm10', text: 'Assignment uplink received.', timestamp: '3 hours ago', isMe: false },
-      { id: 'm11', text: 'Thank you Professor.', timestamp: '2 hours ago', isMe: true },
-    ]
-  },
-  {
-    id: 'c6',
-    user: { name: 'Makerere Guild', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Guild'},
-    lastMessage: 'Bursary applications are open.',
-    unreadCount: 5,
-    messages: [
-      { id: 'm12', text: 'Emergency Guild assembly at Freedom Square.', timestamp: '1 hour ago', isMe: false },
     ]
   }
 ];

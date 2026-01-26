@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../db';
 import { User, Post, TimelineEvent as TimelineType, AuthorityRole } from '../types';
 import { AuthoritySeal } from './Feed'; 
@@ -9,7 +9,7 @@ import {
   Plus, X, Clock, Trash2, ArrowLeft, CheckCircle, Activity,
   Globe, Building2, ShieldCheck, Zap, Info, Calendar, Radio,
   Link as LinkIcon, Share2, MoreHorizontal, Database, Terminal, Users,
-  Target, GitFork, Command
+  Target, GitFork, Command, ChevronRight
 } from 'lucide-react';
 
 interface ProfileProps {
@@ -18,6 +18,60 @@ interface ProfileProps {
   onNavigateToProfile?: (id: string) => void;
   onMessageUser?: (id: string) => void;
 }
+
+const SignalContributionHeatmap: React.FC = () => {
+  const days = 365;
+  const contributionData = useMemo(() => {
+    return Array.from({ length: days }, (_, i) => ({
+      day: i,
+      intensity: Math.floor(Math.random() * 10), // Mock data
+    }));
+  }, []);
+
+  const getIntensityColor = (level: number) => {
+    if (level === 0) return 'bg-slate-200 dark:bg-slate-800';
+    if (level < 3) return 'bg-emerald-900/40';
+    if (level < 6) return 'bg-emerald-700/60';
+    if (level < 9) return 'bg-emerald-500';
+    return 'bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.5)]';
+  };
+
+  return (
+    <div className="glass-panel p-8 rounded-3xl space-y-6">
+      <div className="flex justify-between items-center mb-2">
+        <h4 className="text-[10px] font-black uppercase text-[var(--text-secondary)] tracking-widest flex items-center gap-2">
+          <Activity size={14} className="text-emerald-500" /> Signal_Contribution_Matrix
+        </h4>
+        <div className="flex items-center gap-2 text-[8px] font-bold text-slate-500 uppercase">
+          <span>Less</span>
+          <div className="flex gap-1">
+            {[0, 2, 5, 8, 10].map(l => (
+              <div key={l} className={`w-2 h-2 rounded-sm ${getIntensityColor(l)}`}></div>
+            ))}
+          </div>
+          <span>More</span>
+        </div>
+      </div>
+      
+      <div className="flex gap-1 overflow-x-auto no-scrollbar py-2">
+        <div className="grid grid-rows-7 grid-flow-col gap-1.5 shrink-0">
+          {contributionData.map((d, i) => (
+            <div 
+              key={i} 
+              className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 hover:z-10 cursor-pointer ${getIntensityColor(d.intensity)}`}
+              title={`Signal Intensity: ${d.intensity} / Day ${d.day}`}
+            />
+          ))}
+        </div>
+      </div>
+      
+      <div className="pt-4 border-t border-[var(--border-color)] flex justify-between items-center text-[8px] font-black uppercase tracking-widest text-slate-500">
+        <span>STRATA_STREAK: 12 DAYS</span>
+        <span>TOTAL_COMMITS: 1,402</span>
+      </div>
+    </div>
+  );
+};
 
 const ConnectionProximity: React.FC = () => (
   <div className="glass-panel p-6 rounded-3xl space-y-6">
@@ -132,6 +186,7 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack, onNavigateToP
         {/* CONTENT GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <aside className="lg:col-span-4 space-y-8">
+            <SignalContributionHeatmap />
             <ConnectionProximity />
             
             <div className="glass-panel p-8 rounded-3xl space-y-6">

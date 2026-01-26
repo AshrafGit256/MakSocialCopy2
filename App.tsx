@@ -18,7 +18,29 @@ import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Market from './components/Market';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Command } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Command, CheckCircle2 } from 'lucide-react';
+
+const WhaleAlert: React.FC<{ message: string; onDismiss: () => void }> = ({ message, onDismiss }) => (
+  <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-lg animate-in slide-in-from-top-4 duration-500">
+    <div className="bg-white dark:bg-[#0f172a] border border-[var(--border-color)] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-4 flex items-center gap-4 relative overflow-hidden group">
+      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand-accent group-hover:w-2 transition-all"></div>
+      <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+        <CheckCircle2 className="text-emerald-500" size={24} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-black uppercase text-brand-accent tracking-[0.2em] mb-0.5 flex items-center gap-2">
+          <Zap size={10} fill="currentColor"/> Whale_Alert_Broadcast
+        </p>
+        <p className="text-sm font-bold text-[var(--text-primary)] leading-tight italic truncate">
+          {message}
+        </p>
+      </div>
+      <button onClick={onDismiss} className="p-2 text-slate-400 hover:text-rose-500 transition-colors">
+        <X size={16} />
+      </button>
+    </div>
+  </div>
+);
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -28,7 +50,7 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [activeSector, setActiveSector] = useState<College | 'Global'>('Global');
-  const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState(false);
+  const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
@@ -39,6 +61,12 @@ const App: React.FC = () => {
     if (isLoggedIn) {
       setCurrentUser(db.getUser());
       setNotifications(db.getNotifications());
+      
+      // Verification Example for Whale Alert
+      const timer = setTimeout(() => {
+        setActiveAlert("Prof. Barnabas shared a new 'Final Exam' asset in CHS Wing.");
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [isLoggedIn, view]);
 
@@ -132,6 +160,8 @@ const App: React.FC = () => {
            </div>
         </div>
       )}
+
+      {activeAlert && <WhaleAlert message={activeAlert} onDismiss={() => setActiveAlert(null)} />}
 
       {isSidebarOpen && <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-[2000] lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
       

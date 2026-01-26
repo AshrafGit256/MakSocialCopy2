@@ -8,7 +8,8 @@ import {
   User as UserIcon, GraduationCap, Briefcase, Camera, Save, 
   Plus, X, Clock, Trash2, ArrowLeft, CheckCircle, Activity,
   Globe, Building2, ShieldCheck, Zap, Info, Calendar, Radio,
-  Link as LinkIcon, Share2, MoreHorizontal, Database, Terminal, Users
+  Link as LinkIcon, Share2, MoreHorizontal, Database, Terminal, Users,
+  Target, GitFork, Command
 } from 'lucide-react';
 
 interface ProfileProps {
@@ -17,6 +18,34 @@ interface ProfileProps {
   onNavigateToProfile?: (id: string) => void;
   onMessageUser?: (id: string) => void;
 }
+
+const ConnectionProximity: React.FC = () => (
+  <div className="glass-panel p-6 rounded-3xl space-y-6">
+    <div className="flex justify-between items-center">
+      <h4 className="text-[10px] font-black uppercase text-[var(--text-secondary)] tracking-widest flex items-center gap-2">
+        <Target size={14} className="text-rose-500" /> Neural_Proximity
+      </h4>
+      <span className="text-[8px] font-black text-emerald-500">LIVE_SYNC</span>
+    </div>
+    <div className="space-y-4">
+      {[
+        { hub: 'COCIS Wing', proximity: '84%', color: 'bg-indigo-500' },
+        { hub: 'CEDAT Studio', proximity: '32%', color: 'bg-orange-500' },
+        { hub: 'Academic Vault', proximity: '92%', color: 'bg-emerald-500' }
+      ].map(item => (
+        <div key={item.hub} className="space-y-1.5">
+          <div className="flex justify-between text-[8px] font-black uppercase">
+            <span className="text-[var(--text-secondary)]">{item.hub}</span>
+            <span className="text-[var(--text-primary)]">{item.proximity}</span>
+          </div>
+          <div className="h-1 w-full bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
+            <div className={`h-full ${item.color}`} style={{ width: item.proximity }}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack, onNavigateToProfile, onMessageUser }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -27,220 +56,141 @@ const Profile: React.FC<ProfileProps> = ({ userId, onNavigateBack, onNavigateToP
   const isOwnProfile = !userId || userId === currentUser.id;
 
   useEffect(() => {
-    const sync = () => {
-        const targetId = userId || currentUser.id;
-        const users = db.getUsers();
-        const profileUser = users.find(u => u.id === targetId) || currentUser;
-        setUser(profileUser);
-        setEditForm(profileUser);
-        setPosts(db.getPosts().filter(p => p.authorId === targetId));
-    };
-    sync();
-    const interval = setInterval(sync, 4000);
-    return () => clearInterval(interval);
+    const targetId = userId || currentUser.id;
+    const profileUser = db.getUsers().find(u => u.id === targetId) || currentUser;
+    setUser(profileUser);
+    setEditForm(profileUser);
+    setPosts(db.getPosts().filter(p => p.authorId === targetId));
   }, [userId]);
 
-  if (!user) return <div className="p-20 text-center font-black uppercase tracking-widest text-slate-400">Synchronizing Node Data...</div>;
+  if (!user) return null;
 
-  const handleSaveSettings = () => {
-    if (editForm) {
-      db.saveUser(editForm);
-      setUser(editForm);
-      alert("Local Registry Updated.");
-    }
-  };
-
-  const timelineEvents: TimelineType[] = [
-    { id: 't1', title: 'Registry Sync', description: 'Node verified for current academic sequence.', timestamp: '2 days ago', type: 'achievement', color: 'bg-emerald-500' },
-    { id: 't2', title: 'Signal Transmission', description: 'Broadcast shared across wing hub.', timestamp: '1 week ago', type: 'post', color: 'bg-indigo-500' },
-    { id: 't3', title: 'Initialization', description: 'MakSocial identity matrix activated.', timestamp: '1 month ago', type: 'achievement', color: 'bg-slate-500' }
-  ];
-
-  const authorityRole: AuthorityRole | undefined = user.badges?.includes('Super Admin') ? 'Super Admin' : user.badges?.includes('Official') ? 'Official' : user.badges?.includes('Corporate') ? 'Corporate' : user.verified ? 'Administrator' : undefined;
-  const isInstitution = authorityRole === 'Official' || authorityRole === 'Corporate' || authorityRole === 'Super Admin';
-
-  const banners: Record<string, string> = {
-    'mak_unipod': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400',
-    'mak_ailab': 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1400',
-    'mak_library': 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1400',
-    'vc_office': 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1400',
-    'centenary_bank': 'https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?auto=format&fit=crop&w=1400',
-    'stanbic_bank': 'https://www.intelligentcio.com/africa/wp-content/uploads/sites/5/2023/08/STANBIC-BANK_1000X450.jpg',
-    'covab_agro': 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1400'
-  };
-  const bannerImg = banners[user.id] || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1400';
+  const authorityRole: AuthorityRole | undefined = user.badges?.includes('Super Admin') ? 'Super Admin' : user.badges?.includes('Official') ? 'Official' : user.verified ? 'Administrator' : undefined;
 
   return (
-    <div className="max-w-[1440px] mx-auto pb-40 animate-in fade-in duration-500 bg-[var(--bg-primary)]">
+    <div className="max-w-[1440px] mx-auto pb-40 font-mono">
       
-      {/* 1. PROFESSIONAL HEADER */}
-      <div className="relative">
-        <div className="h-48 lg:h-64 w-full relative overflow-hidden border-b border-[var(--border-color)]">
-          <img src={bannerImg} className="w-full h-full object-cover opacity-80" alt="Banner" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)]/80 to-transparent"></div>
-          {onNavigateBack && (
-            <button onClick={onNavigateBack} className="absolute top-6 left-6 p-2 bg-[var(--bg-primary)]/40 backdrop-blur-md rounded-lg text-[var(--text-primary)] border border-[var(--border-color)] hover:bg-[var(--bg-primary)] transition-all z-20 shadow-xl">
-              <ArrowLeft size={18}/>
-            </button>
-          )}
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative flex flex-col md:flex-row gap-6 -mt-16 pb-8">
-          {/* Avatar */}
-          <div className="relative shrink-0 mx-auto md:mx-0">
-             <div className="bg-[var(--bg-primary)] p-1 rounded-2xl shadow-2xl">
-                <img 
-                  src={user.avatar} 
-                  className={`w-32 h-32 lg:w-40 lg:h-40 object-cover border border-[var(--border-color)] shadow-inner bg-white ${isInstitution ? 'rounded-xl' : 'rounded-full'}`} 
-                  alt="Identity" 
-                />
-             </div>
-             <div className="absolute -bottom-2 -right-2 bg-[var(--bg-primary)] rounded-full p-1 shadow-lg border border-[var(--border-color)]">
-                <AuthoritySeal role={authorityRole} size={28} />
-             </div>
-          </div>
-
-          {/* Profile Info */}
-          <div className="flex-1 flex flex-col justify-end text-center md:text-left space-y-2 mb-2">
-             <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <h1 className="text-2xl lg:text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight leading-none">{user.name}</h1>
-                <div className="flex items-center justify-center md:justify-start gap-2">
-                   <AuthoritySeal role={authorityRole} size={20} />
-                   <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest border border-[var(--border-color)] px-2 py-0.5 rounded-full">{user.role}</span>
-                </div>
-             </div>
-             <p className="text-xs text-slate-500 font-medium max-w-2xl line-clamp-1 italic">"{user.bio || 'Signal pending synchronization...'}"</p>
-             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">
-                <span className="flex items-center gap-1.5"><MapPin size={12} className="text-rose-500" /> {user.location || 'The Hill'}</span>
-                <span className="flex items-center gap-1.5"><Globe size={12} className="text-indigo-500" /> {user.college} HUB</span>
-                <span className="flex items-center gap-1.5"><LinkIcon size={12}/> mak.ac.ug</span>
-             </div>
-          </div>
-
-          {/* Actions - ADDED MESSAGE BUTTON */}
-          <div className="flex items-center justify-center gap-3 self-center md:self-end">
-             {isOwnProfile ? (
-               <button onClick={() => setActiveTab('settings')} className="flex items-center gap-2 px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[var(--border-color)] transition-all">
-                  <Settings size={14}/> Edit_Strata
-               </button>
-             ) : (
-               <>
-                 <button className="px-8 py-2.5 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">Follow_Signal</button>
-                 <button 
-                  onClick={() => onMessageUser && onMessageUser(user.id)}
-                  className="px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2"
-                 >
-                    <MessageCircle size={18}/> Message
-                 </button>
-                 <button className="p-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--border-color)] transition-all"><MoreHorizontal size={18}/></button>
-               </>
-             )}
-          </div>
-        </div>
+      {/* 1. FLUID HEADER */}
+      <div className="relative h-64 lg:h-80 overflow-hidden">
+        <img 
+          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1600" 
+          className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 transition-all duration-1000" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] to-transparent"></div>
+        {onNavigateBack && (
+          <button onClick={onNavigateBack} className="absolute top-8 left-8 p-3 glass-panel rounded-2xl text-[var(--text-primary)] hover:scale-110 transition-all z-50">
+            <ArrowLeft size={20}/>
+          </button>
+        )}
       </div>
 
-      {/* 2. NAVIGATION TABS */}
-      <div className="border-b border-[var(--border-color)] sticky top-0 bg-[var(--bg-primary)]/80 backdrop-blur-xl z-[40]">
-         <div className="max-w-7xl mx-auto px-6 lg:px-12 flex gap-8 overflow-x-auto no-scrollbar">
-            {[
-               { id: 'broadcasts', label: 'Broadcasts', icon: <Radio size={16}/>, count: user.postsCount },
-               { id: 'intelligence', label: isInstitution ? 'Intelligence' : 'Repository', icon: <Database size={16}/> },
-               { id: 'registry', label: 'Registry Logs', icon: <Clock size={16}/> },
-               ...(isOwnProfile ? [{ id: 'settings', label: 'Settings', icon: <Settings size={16}/> }] : []),
-            ].map(tab => (
-               <button 
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 py-4 text-[10px] font-bold uppercase tracking-widest transition-all border-b-2 relative ${
-                     activeTab === tab.id ? 'border-orange-500 text-[var(--text-primary)]' : 'border-transparent text-slate-500 hover:text-slate-800'
-                  }`}
-               >
-                  {tab.icon} {tab.label}
-                  {tab.count !== undefined && <span className="bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full text-[9px] ml-1">{tab.count}</span>}
-               </button>
-            ))}
-         </div>
-      </div>
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 -mt-32 relative z-10 space-y-10">
+        <div className="flex flex-col md:flex-row gap-10 items-end">
+          <div className="relative">
+            <div className="p-1.5 glass-panel rounded-[2.5rem]">
+              <img src={user.avatar} className="w-44 h-44 rounded-[2.2rem] border border-[var(--border-color)] object-cover bg-white" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 p-2 glass-panel rounded-full glow-primary">
+              <AuthoritySeal role={authorityRole} size={32} />
+            </div>
+          </div>
+          
+          <div className="flex-1 space-y-3 mb-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <h1 className="text-5xl font-black uppercase tracking-tighter italic text-[var(--text-primary)] leading-none">{user.name}</h1>
+              <span className="px-3 py-1 bg-indigo-600/10 border border-indigo-600/20 text-indigo-600 text-[10px] font-black uppercase rounded-lg">LVL_{user.nodeAuthorityLevel}</span>
+            </div>
+            <p className="text-sm text-[var(--text-secondary)] font-medium max-w-xl italic leading-relaxed">
+              "{user.bio || 'Signal pending synchronization with global hub...'}"
+            </p>
+            <div className="flex flex-wrap gap-6 pt-2">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-[var(--text-secondary)]">
+                <Globe size={14} className="text-indigo-600" /> {user.college} Sector
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase text-[var(--text-secondary)]">
+                <MapPin size={14} className="text-rose-500" /> The Hill
+              </div>
+            </div>
+          </div>
 
-      {/* 3. CONTENT GRID */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10">
-         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="flex gap-3 mb-4">
+            {isOwnProfile ? (
+              <button onClick={() => setActiveTab('settings')} className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/20 active:scale-95 transition-all">
+                Update_Identity
+              </button>
+            ) : (
+              <>
+                <button onClick={() => onMessageUser?.(user.id)} className="px-8 py-4 glass-panel rounded-2xl font-black text-[10px] uppercase tracking-widest text-[var(--text-primary)] hover:bg-indigo-600 hover:text-white transition-all">
+                  Initialize_Direct
+                </button>
+                <button className="p-4 glass-panel rounded-2xl text-[var(--text-primary)]"><MoreHorizontal size={20}/></button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* CONTENT GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <aside className="lg:col-span-4 space-y-8">
+            <ConnectionProximity />
             
-            {/* Sidebar Column */}
-            <div className="lg:col-span-4 space-y-10">
-               <div className="space-y-6">
-                  <div>
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-[var(--text-primary)] mb-4">Node Profile</h3>
-                    <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                      {user.bio || 'This node identity has not yet synchronized a personal bibliography to the central registry.'}
-                    </p>
-                  </div>
+            <div className="glass-panel p-8 rounded-3xl space-y-6">
+              <h4 className="text-[10px] font-black uppercase text-[var(--text-secondary)] tracking-widest">Global_Stats</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-[8px] font-black text-slate-500 uppercase">Commits</span>
+                  <p className="text-2xl font-black italic">{user.postsCount}</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[8px] font-black text-slate-500 uppercase">Syncs</span>
+                  <p className="text-2xl font-black italic">{user.followersCount}</p>
+                </div>
+              </div>
+            </div>
+          </aside>
 
-                  <div className="space-y-4 pt-2">
-                     <div className="flex items-center gap-3 text-slate-500">
-                        <Users size={16}/>
-                        <div className="text-[11px] font-medium">
-                           <span className="text-[var(--text-primary)] font-black">{user.followersCount.toLocaleString()}</span> followers • <span className="text-[var(--text-primary)] font-black">{user.followingCount.toLocaleString()}</span> signals
-                        </div>
-                     </div>
-                     <div className="flex items-center gap-3 text-slate-500">
-                        <MapPin size={16}/>
-                        <span className="text-[11px] font-medium">{user.location || 'Main Hill Node'}</span>
-                     </div>
-                  </div>
-               </div>
+          <main className="lg:col-span-8">
+            <div className="flex gap-10 border-b border-[var(--border-color)] mb-10">
+               {['broadcasts', 'registry', 'intelligence'].map(tab => (
+                 <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab as any)}
+                  className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all border-b-2 ${activeTab === tab ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500'}`}
+                 >
+                   {tab}
+                 </button>
+               ))}
             </div>
 
-            {/* Main Column */}
-            <div className="lg:col-span-8">
-               {activeTab === 'broadcasts' && (
-                  <div className="space-y-4">
-                     {posts.length > 0 ? posts.map(post => (
-                        <div key={post.id} className="p-6 bg-white dark:bg-[#0d1117] border border-[var(--border-color)] rounded-xl hover:border-indigo-500/30 transition-all space-y-4 group">
-                           <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                 <img src={user.avatar} className="w-8 h-8 rounded-lg border border-[var(--border-color)] bg-white" />
-                                 <div>
-                                    <h5 className="text-[11px] font-black uppercase tracking-tight">{user.name} <span className="text-slate-400 font-normal lowercase ml-2">{post.timestamp}</span></h5>
-                                 </div>
-                              </div>
-                              <Share2 size={14} className="text-slate-300 group-hover:text-slate-500 cursor-pointer" />
-                           </div>
-                           <div dangerouslySetInnerHTML={{ __html: post.content }} className="text-sm text-[var(--text-primary)] leading-relaxed italic" />
-                           <div className="flex items-center gap-6 pt-4 border-t border-[var(--border-color)]">
-                              <button className="flex items-center gap-1.5 text-slate-500 hover:text-rose-500 text-[10px] font-bold"><Heart size={14}/> {post.likes}</button>
-                              <button className="flex items-center gap-1.5 text-slate-500 hover:text-indigo-600 text-[10px] font-bold"><MessageCircle size={14}/> {post.commentsCount}</button>
-                           </div>
-                        </div>
-                     )) : (
-                        <div className="py-20 text-center border border-dashed border-[var(--border-color)] rounded-xl space-y-4">
-                           <Terminal size={32} className="mx-auto text-slate-300" />
-                           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Node has no active signal broadcasts.</p>
-                        </div>
-                     )}
-                  </div>
-               )}
-
-               {activeTab === 'settings' && isOwnProfile && editForm && (
-                  <div className="space-y-8 animate-in fade-in">
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-1">
-                           <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Alias Name</label>
-                           <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold outline-none focus:border-indigo-600 transition-all" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
-                        </div>
-                        <div className="space-y-1">
-                           <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity Bio</label>
-                           <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-3 text-sm font-bold outline-none h-24 resize-none focus:border-indigo-600 transition-all" value={editForm.bio || ''} onChange={e => setEditForm({...editForm, bio: e.target.value})} />
-                        </div>
-                     </div>
-                     <button onClick={handleSaveSettings} className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-all">
-                        Commit Registry Updates
-                     </button>
-                  </div>
-               )}
-               {/* Other tabs content removed for brevity as they are already implementation-complete in base version */}
+            <div className="space-y-6">
+              {posts.map(post => (
+                <div key={post.id} className="glass-panel p-8 rounded-3xl hover:border-indigo-500/50 transition-all duration-500 group">
+                   <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-xl bg-indigo-600/10 flex items-center justify-center text-indigo-600">
+                            <Radio size={18} />
+                         </div>
+                         <div>
+                            <p className="text-[10px] font-black uppercase text-[var(--text-primary)]">Sequence_{post.id.slice(-6)}</p>
+                            <p className="text-[8px] font-bold text-slate-500 uppercase">{post.timestamp}</p>
+                         </div>
+                      </div>
+                      <GitFork size={16} className="text-slate-300" />
+                   </div>
+                   <div dangerouslySetInnerHTML={{ __html: post.content }} className="text-sm leading-relaxed italic text-[var(--text-primary)] mb-8" />
+                   <div className="flex gap-10">
+                      <button className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors">
+                        <Heart size={16}/> <span className="text-[10px] font-black">{post.likes}</span>
+                      </button>
+                      <button className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors">
+                        <MessageCircle size={16}/> <span className="text-[10px] font-black">{post.commentsCount}</span>
+                      </button>
+                   </div>
+                </div>
+              ))}
             </div>
-         </div>
+          </main>
+        </div>
       </div>
     </div>
   );

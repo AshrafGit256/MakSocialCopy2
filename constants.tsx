@@ -29,112 +29,73 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 
 export const MOCK_POSTS: Post[] = [
   {
-    id: 'poll-text-1',
-    author: 'COCIS Research Hub',
+    id: 'poll-text-node-1',
+    author: 'COCIS Council',
     authorId: 'cocis_hub',
-    authorRole: 'Academic Council',
+    authorRole: 'Official Body',
     authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=COCIS',
     authorAuthority: 'Official',
-    timestamp: '1h ago',
-    content: `<h1>Preferred Tech Stack for Finalist Projects?</h1>
-<p>We are collecting metadata for the upcoming Hackathon. Which framework node should we prioritize for infrastructure support?</p>`,
+    timestamp: '15m ago',
+    content: `<h1>Preferred Framework for Finalist Hackathon?</h1>
+<p>We are allocating server clusters. Select your node's primary stack.</p>`,
     customFont: '"JetBrains Mono"',
     hashtags: ['#TechStack', '#MakerereAI'],
-    likes: 245,
-    commentsCount: 12,
+    likes: 86,
+    commentsCount: 24,
     comments: [],
-    views: 1200,
+    views: 450,
     flags: [],
     isOpportunity: false,
     college: 'COCIS',
     pollData: {
-      totalVotes: 86,
+      totalVotes: 142,
       expiresAt: new Date(Date.now() + 86400000).toISOString(),
       options: [
-        { id: 'opt1', text: 'React + Node.js (V8)', votes: 45, voterIds: [] },
-        { id: 'opt2', text: 'Python + Django (Alpha)', votes: 20, voterIds: [] },
-        { id: 'opt3', text: 'Flutter Mobile Link', votes: 21, voterIds: [] }
+        { id: 't1', text: 'React + Node.js (Stable)', votes: 75, voterIds: [] },
+        { id: 't2', text: 'Python + Django (Legacy)', votes: 42, voterIds: [] },
+        { id: 't3', text: 'Flutter (Mobile Wing)', votes: 25, voterIds: [] }
       ]
     }
   },
   {
-    id: 'poll-img-1',
+    id: 'poll-img-node-1',
     author: 'CEDAT Arts Wing',
     authorId: 'cedat_arts',
     authorRole: 'Design Cluster',
     authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=CEDAT',
     authorAuthority: 'Official',
-    timestamp: '3h ago',
-    content: `<h2>Guild Logo Redesign Sequence 🎨</h2>
-<p>Signal synchronization needed. Which visual identity node best represents the 90th Guild cycle?</p>`,
+    timestamp: '1h ago',
+    content: `<h2>Guild 90th Cycle Logo Selection 🎨</h2>
+<p>Which visual identity represents the legacy best?</p>`,
     customFont: '"Plus Jakarta Sans"',
     hashtags: ['#Design', '#Guild90'],
-    likes: 560,
-    commentsCount: 45,
+    likes: 520,
+    commentsCount: 89,
     comments: [],
-    views: 8900,
+    views: 12000,
     flags: [],
     isOpportunity: false,
     college: 'CEDAT',
     pollData: {
-      totalVotes: 320,
+      totalVotes: 890,
       expiresAt: new Date(Date.now() + 172800000).toISOString(),
       options: [
         { 
-          id: 'img1', 
+          id: 'i1', 
           text: 'Minimalist Vector', 
           imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=400', 
-          votes: 180, 
+          votes: 540, 
           voterIds: [] 
         },
         { 
-          id: 'img2', 
-          text: 'Classic Crest', 
+          id: 'i2', 
+          text: 'Heritage Crest', 
           imageUrl: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=400', 
-          votes: 140, 
+          votes: 350, 
           voterIds: [] 
         }
       ]
     }
-  },
-  {
-    id: 'inst-1',
-    author: 'MakUnipod',
-    authorId: 'mak_unipod',
-    authorRole: 'Innovation Wing',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Unipod',
-    authorAuthority: 'Official',
-    timestamp: 'Just now',
-    content: `<h1>Prototyping Grant Signal Activated 🚀</h1>
-<p style="text-align: justify;">We are offering <b>5 PROTOTYPING GRANTS</b> for the semester. If you have an engineering or design node ready for deployment, scan our table below:</p>
-<table style="width:100%; border-collapse: collapse; margin: 1rem 0; border: 1px solid var(--border-color);">
-  <tr style="background-color: rgba(99, 102, 241, 0.1);">
-    <th style="padding: 10px; border: 1px solid var(--border-color);">Batch</th>
-    <th style="padding: 10px; border: 1px solid var(--border-color);">Focus Area</th>
-    <th style="padding: 10px; border: 1px solid var(--border-color);">Grant Amount</th>
-  </tr>
-  <tr>
-    <td style="padding: 10px; border: 1px solid var(--border-color);">Alpha</td>
-    <td style="padding: 10px; border: 1px solid var(--border-color);">Renewable Energy</td>
-    <td style="padding: 10px; border: 1px solid var(--border-color);">UGX 2,500,000</td>
-  </tr>
-  <tr>
-    <td style="padding: 10px; border: 1px solid var(--border-color);">Beta</td>
-    <td style="padding: 10px; border: 1px solid var(--border-color);">IoT Solutions</td>
-    <td style="padding: 10px; border: 1px solid var(--border-color);">UGX 1,800,000</td>
-  </tr>
-</table>
-<blockquote style="border-left: 4px solid #6366f1; padding-left: 10px; font-style: italic;">"Ideas are nodes; prototypes are the uplink."</blockquote>
-<p style="text-align: center;"><span style="color: #6366f1; font-weight: 800; font-size: 1.2rem;">Apply via the Research Vault today!</span></p>`,
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#Innovation', '#MakUnipod', '#CEDAT'],
-    likes: 1540,
-    commentsCount: 89,
-    comments: [],
-    views: 45000,
-    flags: [],
-    isOpportunity: true,
-    college: 'CEDAT'
   }
 ];
 
@@ -145,7 +106,6 @@ export const ANALYTICS: AnalyticsData[] = [
   { day: 'Thu', posts: 180, activeUsers: 580, messages: 1600, revenue: 800, engagement: 1770 },
   { day: 'Fri', posts: 250, activeUsers: 720, messages: 2100, revenue: 1200, engagement: 2330 },
   { day: 'Sat', posts: 100, activeUsers: 300, messages: 800, revenue: 400, engagement: 950 },
-  // Fixed typo: changed 'growths' to 'messages' to align with AnalyticsData interface
   { day: 'Sun', posts: 80, activeUsers: 250, messages: 600, revenue: 300, engagement: 775 },
 ];
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, PollOption } from '../types';
 import { db } from '../db';
@@ -163,22 +164,22 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string, poll?: Pol
           </button>
           {openDropdown === 'align' && (
             <div className="absolute top-full left-0 mt-1 z-[3010] bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-xl rounded p-1 flex gap-1 animate-in fade-in zoom-in-95">
-              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyLeft'); }} className="p-2 hover:bg-indigo-600 hover:text-white rounded"><AlignLeft size={14}/></button>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyCenter'); }} className="p-2 hover:bg-indigo-600 hover:text-white rounded"><AlignCenter size={14}/></button>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyRight'); }} className="p-2 hover:bg-indigo-600 hover:text-white rounded"><AlignRight size={14}/></button>
-              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyFull'); }} className="p-2 hover:bg-indigo-600 hover:text-white rounded"><AlignJustify size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyLeft'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignLeft size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyCenter'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignCenter size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyRight'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignRight size={14}/></button>
+              <button onMouseDown={(e) => { e.preventDefault(); exec('justifyFull'); }} className="p-2 hover:bg-[#0969da] hover:text-white rounded"><AlignJustify size={14}/></button>
             </div>
           )}
         </div>
 
         <div className="relative">
-          <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'fonts' ? null : 'fonts'); }} className="px-3 py-1.5 bg-white dark:bg-black/20 border border-[var(--border-color)] rounded text-[9px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:border-indigo-600 transition-all flex items-center gap-2">
+          <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); setOpenDropdown(openDropdown === 'fonts' ? null : 'fonts'); }} className="px-3 py-1.5 bg-white dark:bg-black/20 border border-[var(--border-color)] rounded text-[9px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:border-[#0969da] transition-all flex items-center gap-2">
             {FONTS.find(f => f.value === activeFont)?.name || 'Font'} <ChevronDown size={10} />
           </button>
           {openDropdown === 'fonts' && (
             <div className="absolute top-full left-0 mt-1 z-[3010] bg-white dark:bg-[#161b22] border border-[var(--border-color)] shadow-2xl rounded overflow-hidden w-48">
               {FONTS.map(f => (
-                <button key={f.name} onMouseDown={(e) => { e.preventDefault(); setActiveFont(f.value); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 hover:bg-indigo-600 hover:text-white text-[10px] font-bold uppercase transition-colors" style={{ fontFamily: f.value }}>{f.name}</button>
+                <button key={f.name} onMouseDown={(e) => { e.preventDefault(); setActiveFont(f.value); setOpenDropdown(null); }} className="w-full text-left px-4 py-2 hover:bg-[#0969da] hover:text-white text-[10px] font-bold uppercase transition-colors" style={{ fontFamily: f.value }}>{f.name}</button>
               ))}
             </div>
           )}
@@ -602,7 +603,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
          <div className="lg:col-span-8 space-y-10">
             {!threadId && <PostCreator onPost={handlePost} isAnalyzing={isAnalyzing} />}
             {threadId && onBack && (
-               <button onClick={onBack} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-indigo-600 transition-colors mb-6">
+               <button onClick={onBack} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 hover:text-[#0969da] transition-colors mb-6">
                   <ChevronRight className="rotate-180" size={16}/> Return_To_Feed
                </button>
             )}
@@ -634,7 +635,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                          <p className="text-[15px] font-black text-[#0969da] group-hover:underline uppercase tracking-tighter italic">{tag}</p>
                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 flex items-center gap-2"><Zap size={10} className="fill-current"/> High_Intensity</p>
                        </div>
-                       <ChevronRight size={20} className="text-slate-300 group-hover:text-indigo-600 transition-all" />
+                       <ChevronRight size={20} className="text-slate-300 group-hover:text-[#0969da] transition-all" />
                     </div>
                   ))}
                </div>

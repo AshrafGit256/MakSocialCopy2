@@ -1,4 +1,3 @@
-
 import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent } from './types';
 import { MOCK_POSTS } from './constants';
 
@@ -68,6 +67,7 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
 export const db = {
   getUsers: (): User[] => parseArray<User>(DB_KEYS.USERS, []),
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
+  // Fixed missing nodeAuthorityLevel and missionProgress for fallback guest user
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID);
@@ -83,7 +83,14 @@ export const db = {
       status: 'Year 1',
       subscriptionTier: 'Free',
       joinedColleges: ['Global'],
-      postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: []
+      postsCount: 0, 
+      followersCount: 0, 
+      followingCount: 0, 
+      totalLikesCount: 0, 
+      badges: [], 
+      appliedTo: [],
+      nodeAuthorityLevel: 0,
+      missionProgress: 0
     };
   },
   saveUser: (user: User) => {

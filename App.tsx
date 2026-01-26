@@ -86,9 +86,29 @@ const App: React.FC = () => {
     db.saveUser({ ...user, email });
   };
 
+  // Fixed missing nodeAuthorityLevel and missionProgress properties to match User interface
   const handleRegister = (email: string, college: College, status: UserStatus) => {
     setIsLoggedIn(true); setuserRole('student'); setView('home');
-    const newUser: User = { id: Date.now().toString(), name: email.split('@')[0], role: 'University Student', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, connections: 0, email, college, status, subscriptionTier: 'Free', joinedColleges: [college], postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: [] };
+    const newUser: User = { 
+      id: Date.now().toString(), 
+      name: email.split('@')[0], 
+      role: 'University Student', 
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, 
+      connections: 0, 
+      email, 
+      college, 
+      status, 
+      subscriptionTier: 'Free', 
+      joinedColleges: [college], 
+      postsCount: 0, 
+      followersCount: 0, 
+      followingCount: 0, 
+      totalLikesCount: 0, 
+      badges: [], 
+      appliedTo: [],
+      nodeAuthorityLevel: 1,
+      missionProgress: 0
+    };
     db.saveUsers([...db.getUsers(), newUser]);
     localStorage.setItem('maksocial_current_user_id', newUser.id);
     setCurrentUser(newUser);

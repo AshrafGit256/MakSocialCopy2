@@ -18,11 +18,11 @@ import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Market from './components/Market';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Command, CheckCircle2, Info } from 'lucide-react';
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Command, CheckCircle2, Info, Radio } from 'lucide-react';
 
 const WhaleAlert: React.FC<{ message: string; onDismiss: () => void }> = ({ message, onDismiss }) => {
   const [progress, setProgress] = useState(100);
-  const duration = 6000; // 6 seconds
+  const duration = 5000; // 5 seconds
 
   useEffect(() => {
     const start = Date.now();
@@ -39,37 +39,33 @@ const WhaleAlert: React.FC<{ message: string; onDismiss: () => void }> = ({ mess
   }, [onDismiss]);
 
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-[95%] max-w-lg animate-in slide-in-from-top-10 duration-500 ease-out">
-      <div className="bg-white/90 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-[var(--border-color)] rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.4)] p-5 flex items-center gap-5 relative overflow-hidden group">
-        {/* Background Glow */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-600/10 blur-3xl rounded-full group-hover:bg-indigo-600/20 transition-all"></div>
+    <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[10000] w-[90%] max-w-lg animate-in slide-in-from-top-4 duration-500 ease-out">
+      <div className="bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl border border-[var(--border-color)] rounded-xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] p-5 flex items-center gap-5 relative overflow-hidden group">
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-accent group-hover:w-1.5 transition-all"></div>
         
-        {/* Verification Icon - High Fidelity */}
         <div className="relative shrink-0">
-          <div className="w-12 h-12 rounded-full bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center">
-            <CheckCircle2 className="text-brand-accent" size={26} />
+          <div className="w-12 h-12 rounded-lg bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center">
+            <Radio className="text-brand-accent" size={24} />
           </div>
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-brand-accent rounded-full border-2 border-white dark:border-[#0f172a] animate-pulse"></div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[9px] font-black uppercase text-brand-accent tracking-[0.3em]">Protocol_Broadcast</span>
-            <div className="h-px flex-1 bg-brand-accent/10"></div>
-          </div>
+          <p className="text-[10px] font-black uppercase text-brand-accent tracking-[0.2em] mb-1 flex items-center gap-2">
+            <Zap size={10} fill="currentColor"/> Network_Broadcasting_Signal
+          </p>
           <p className="text-sm font-bold text-[var(--text-primary)] leading-tight italic line-clamp-2">
             "{message}"
           </p>
         </div>
 
-        {/* Close */}
-        <button onClick={onDismiss} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-rose-500">
+        <button onClick={onDismiss} className="p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-white/5">
           <X size={18} />
         </button>
 
-        {/* Progress Bar - GitHub/AdminLTE inspired timer */}
-        <div className="absolute bottom-0 left-0 h-1 bg-brand-accent/30 transition-none" style={{ width: `${progress}%` }}></div>
+        <div 
+          className="absolute bottom-0 left-0 h-1 bg-brand-accent/40 transition-none" 
+          style={{ width: `${progress}%` }}
+        ></div>
       </div>
     </div>
   );
@@ -95,10 +91,9 @@ const App: React.FC = () => {
       setCurrentUser(db.getUser());
       setNotifications(db.getNotifications());
       
-      // Auto-trigger example alert on successful login
       const timer = setTimeout(() => {
         setActiveAlert("Prof. Barnabas shared a new 'Final Exam' asset in CHS Wing.");
-      }, 2000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [isLoggedIn]);
@@ -204,7 +199,6 @@ const App: React.FC = () => {
         <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-6">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-xl lg:hidden transition-colors"><Menu size={24} /></button>
-            
             <div className="hidden md:flex items-center relative group">
                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] pointer-events-none group-focus-within:text-indigo-600 transition-colors">
                   <Command size={16} />
@@ -212,39 +206,34 @@ const App: React.FC = () => {
                <input 
                   onClick={() => setView('search')}
                   readOnly
-                  placeholder="Registry CLI / type '/' to search..." 
-                  className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl py-2.5 pl-12 pr-6 text-xs font-bold uppercase w-80 outline-none hover:border-indigo-500 transition-all cursor-pointer"
+                  placeholder="Search Protocol..." 
+                  className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg py-2 pl-12 pr-6 text-xs font-bold uppercase w-80 outline-none hover:border-indigo-500 transition-all cursor-pointer"
                />
             </div>
           </div>
-
           <div className="flex items-center gap-3">
-            <button onClick={toggleTheme} className="p-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-indigo-600 rounded-xl transition-all">
-               {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            <button onClick={toggleTheme} className="p-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-indigo-600 rounded-lg transition-all">
+               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <button onClick={() => handleSetView('notifications')} className="p-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-indigo-600 rounded-xl transition-all relative">
-               <Bell size={20} />
-               {notifications.some(n => !n.isRead) && <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full animate-pulse border-2 border-[var(--bg-secondary)]"></span>}
+            <button onClick={() => handleSetView('notifications')} className="p-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-indigo-600 rounded-lg transition-all relative">
+               <Bell size={18} />
+               {notifications.some(n => !n.isRead) && <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-[var(--bg-secondary)]"></span>}
             </button>
             <button onClick={() => handleSetView('profile')} className="ml-2 active:scale-90 transition-transform">
-               <div className="p-0.5 glass-panel rounded-xl">
-                  <img src={currentUser?.avatar} className="w-10 h-10 rounded-lg border border-[var(--border-color)] bg-white object-cover shadow-sm" alt="Node" />
-               </div>
+               <img src={currentUser?.avatar} className="w-9 h-9 rounded-lg border border-[var(--border-color)] bg-white object-cover" alt="Node" />
             </button>
           </div>
         </header>
-
         <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar pb-safe">{renderContent()}</main>
-        
-        <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/80 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-6 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden">
+        <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/80 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-6 py-2 lg:hidden">
           {[
-            { id: 'home', icon: <Home size={24} /> },
-            { id: 'market', icon: <ShoppingBag size={24} /> },
-            { id: 'calendar', icon: <Calendar size={24} /> },
-            { id: 'notifications', icon: <Bell size={24} /> },
-            { id: 'settings', icon: <Settings size={24} /> },
+            { id: 'home', icon: <Home size={22} /> },
+            { id: 'market', icon: <ShoppingBag size={22} /> },
+            { id: 'calendar', icon: <Calendar size={22} /> },
+            { id: 'notifications', icon: <Bell size={22} /> },
+            { id: 'profile', icon: <UserIcon size={22} /> },
           ].map((item) => (
-            <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`p-4 rounded-2xl transition-all ${view === item.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400'}`}>
+            <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`p-3 rounded-xl transition-all ${view === item.id ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>
               {item.icon}
             </button>
           ))}

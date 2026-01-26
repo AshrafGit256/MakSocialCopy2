@@ -160,6 +160,20 @@ export interface Comment {
   timestamp: string;
 }
 
+export interface PollOption {
+  id: string;
+  text: string;
+  imageUrl?: string;
+  votes: number;
+  voterIds: string[];
+}
+
+export interface PollData {
+  options: PollOption[];
+  totalVotes: number;
+  expiresAt: string;
+}
+
 export interface Post {
   id: string;
   author: string;
@@ -191,6 +205,7 @@ export interface Post {
     category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
     isSafe?: boolean;
   };
+  pollData?: PollData;
   isEventBroadcast?: boolean;
   isAd?: boolean;
   eventTitle?: string;

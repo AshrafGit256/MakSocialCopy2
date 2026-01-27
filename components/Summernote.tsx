@@ -20,9 +20,9 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
   const execCommand = (command: string, value?: string) => {
-    // Standard formatBlock handling for headings
+    // For headings, we must use 'formatBlock'
     if (command === 'formatBlock') {
-      document.execCommand('formatBlock', false, value);
+      document.execCommand('formatBlock', false, `<${value}>`);
     } else {
       document.execCommand(command, false, value);
     }
@@ -31,10 +31,10 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   };
 
   const insertLink = () => {
-    const text = prompt("Signal Target Label (Display Text):", "Link Reference");
+    const label = prompt("Signal Label (e.g. Research Proposal):", "Reference Signal");
     const url = prompt("Network Protocol Address (URL):", "https://");
-    if (text && url) {
-      const linkHtml = `<a href="${url}" class="text-indigo-600 underline font-bold" target="_blank">${text}</a>`;
+    if (label && url) {
+      const linkHtml = `<a href="${url}" class="text-slate-600 underline font-bold" target="_blank">${label}</a>`;
       if (editorRef.current) {
         editorRef.current.focus();
         document.execCommand('insertHTML', false, linkHtml);
@@ -46,7 +46,7 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   const insertVideo = () => {
     const url = prompt("Enter Video Asset URL (mp4 link):");
     if (url) {
-      const videoHtml = `<div class="my-4 rounded overflow-hidden border border-slate-300 dark:border-slate-700 bg-black shadow-lg"><video src="${url}" controls class="w-full" /></div><p><br></p>`;
+      const videoHtml = `<div class="my-4 rounded overflow-hidden border border-slate-700 bg-black shadow-lg"><video src="${url}" controls class="w-full" /></div><p><br></p>`;
       if (editorRef.current) {
         editorRef.current.focus();
         document.execCommand('insertHTML', false, videoHtml);
@@ -56,11 +56,11 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   };
 
   const insert5x5Table = () => {
-    let tableHtml = '<table class="w-full border-collapse border border-slate-300 dark:border-slate-700 my-4 text-[10px] uppercase font-mono">';
+    let tableHtml = '<table class="w-full border-collapse border border-slate-700 my-4 text-[10px] uppercase font-mono">';
     for (let i = 0; i < 5; i++) {
       tableHtml += '<tr>';
       for (let j = 0; j < 5; j++) {
-        tableHtml += `<td class="border border-slate-300 dark:border-slate-700 p-2 text-center text-slate-500 font-bold">${i===0 && j===0 ? 'ID' : '...'}</td>`;
+        tableHtml += `<td class="border border-slate-700 p-2 text-center text-slate-500 font-bold">${i===0 && j===0 ? 'ID' : '...'}</td>`;
       }
       tableHtml += '</tr>';
     }
@@ -77,7 +77,7 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (ev) => {
-        const imgHtml = `<img src="${ev.target?.result}" class="max-w-full rounded border border-slate-300 dark:border-slate-700 my-4 shadow-sm" />`;
+        const imgHtml = `<img src="${ev.target?.result}" class="max-w-full rounded border border-slate-700 my-4 shadow-sm" />`;
         if (editorRef.current) {
           editorRef.current.focus();
           document.execCommand('insertHTML', false, imgHtml);
@@ -115,27 +115,17 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   };
 
   return (
-    <div className={`mb-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden transition-all duration-300 ${isExpanded ? 'shadow-xl ring-1 ring-indigo-500/20' : 'shadow-sm'}`}>
-      {/* GitHub Enterprise Style Toolbar */}
+    <div className={`mb-12 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden transition-all duration-300 ${isExpanded ? 'shadow-xl ring-1 ring-slate-500/20' : 'shadow-sm'}`}>
       <div className="flex flex-wrap items-center justify-between px-3 py-2 border-b border-[var(--border-color)] bg-slate-50 dark:bg-[#0d1117] gap-y-2">
         <div className="flex items-center gap-1 flex-wrap">
           <select 
             onChange={(e) => execCommand('formatBlock', e.target.value)}
-            className="h-7 bg-transparent border border-slate-300 dark:border-slate-700 rounded text-[9px] font-black uppercase px-1 text-slate-500 outline-none hover:border-indigo-500 transition-colors"
+            className="h-7 bg-transparent border border-slate-300 dark:border-slate-700 rounded text-[9px] font-black uppercase px-1 text-slate-500 outline-none hover:border-slate-500 transition-colors"
           >
-            <option value="P">Paragraph</option>
-            <option value="H1">H1 Manifest</option>
-            <option value="H2">H2 Section</option>
-            <option value="H3">H3 Point</option>
-          </select>
-
-          <select 
-            onChange={(e) => execCommand('fontName', e.target.value)}
-            className="h-7 bg-transparent border border-slate-300 dark:border-slate-700 rounded text-[9px] font-black uppercase px-1 text-slate-500 outline-none hover:border-indigo-500 transition-colors"
-          >
-            <option value="JetBrains Mono">JetBrains</option>
-            <option value="Inter">Inter UI</option>
-            <option value="monospace">System Mono</option>
+            <option value="p">Paragraph</option>
+            <option value="h1">H1 Manifest</option>
+            <option value="h2">H2 Sector</option>
+            <option value="h3">H3 Node</option>
           </select>
 
           <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
@@ -147,23 +137,20 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
           
           <button onClick={() => execCommand('justifyLeft')} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Align Left"><AlignLeft size={14}/></button>
           <button onClick={() => execCommand('justifyCenter')} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Align Center"><AlignCenter size={14}/></button>
-          <button onClick={() => execCommand('justifyRight')} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Align Right"><AlignRight size={14}/></button>
-
+          
           <div className="w-px h-4 bg-slate-300 dark:bg-slate-700 mx-1"></div>
 
-          <button onClick={insertLink} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Commit Link Target"><LinkIcon size={14}/></button>
-          <button onClick={insert5x5Table} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Data Grid"><TableIcon size={14}/></button>
-          <button onClick={insertVideo} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Embed MP4"><VideoIcon size={14}/></button>
+          <button onClick={insertLink} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Add Link"><LinkIcon size={14}/></button>
+          <button onClick={insert5x5Table} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Insert Table"><TableIcon size={14}/></button>
           
-          <label className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded cursor-pointer" title="Attach Visual Manifest">
+          <label className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded cursor-pointer" title="Attach Image">
             <ImageIcon size={14}/>
             <input type="file" className="hidden" accept="image/*" onChange={handleImage} />
           </label>
-          <button onClick={() => setShowPollBuilder(!showPollBuilder)} className={`p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors ${showPollBuilder ? 'text-indigo-500 bg-indigo-50/5' : 'text-slate-500'}`} title="Census Registry"><BarChart3 size={14}/></button>
+          <button onClick={() => setShowPollBuilder(!showPollBuilder)} className={`p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors ${showPollBuilder ? 'text-slate-700 bg-slate-500/5' : 'text-slate-500'}`} title="Census Build"><BarChart3 size={14}/></button>
         </div>
       </div>
 
-      {/* Editor Surface */}
       <div className="relative">
         <div
           ref={editorRef}
@@ -177,11 +164,10 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
         </div>}
       </div>
 
-      {/* Poll Builder */}
       {showPollBuilder && (
         <div className="px-6 py-5 bg-slate-50 dark:bg-black/40 border-t border-[var(--border-color)] animate-in slide-in-from-top-2">
            <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 flex items-center gap-2"><BarChart3 size={14}/> Active_Census_Interface</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 flex items-center gap-2"><BarChart3 size={14}/> Census_Config</span>
               <button onClick={() => setShowPollBuilder(false)} className="text-slate-400 hover:text-rose-500"><X size={16}/></button>
            </div>
            <div className="space-y-2">
@@ -195,18 +181,17 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
                        setPollOptions(next);
                      }}
                      placeholder={`Censurable Option ${i+1}`}
-                     className="flex-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] px-3 py-2 text-[10px] font-bold outline-none focus:border-indigo-600"
+                     className="flex-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] px-3 py-2 text-[10px] font-bold outline-none focus:border-slate-600"
                    />
                 </div>
               ))}
               {pollOptions.length < 4 && (
-                <button onClick={() => setPollOptions([...pollOptions, ''])} className="text-[9px] font-black uppercase text-indigo-600 hover:underline flex items-center gap-1.5"><Plus size={12}/> Add Option</button>
+                <button onClick={() => setPollOptions([...pollOptions, ''])} className="text-[9px] font-black uppercase text-slate-600 hover:underline flex items-center gap-1.5"><Plus size={12}/> Add Option</button>
               )}
            </div>
         </div>
       )}
 
-      {/* Commit Actions */}
       <div className="flex items-center justify-between px-6 py-3 border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-black/20">
         <div className="flex items-center gap-4">
            <div className="flex items-center gap-2">
@@ -219,7 +204,7 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
            <button 
              onClick={handleSubmit}
              disabled={!content.trim() || content === '<br>'}
-             className="px-6 py-2 bg-[#238636] hover:bg-[#2ea043] disabled:opacity-30 text-white rounded-[4px] text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-all shadow-lg active:scale-95"
+             className="px-6 py-2 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white rounded-[4px] text-[10px] font-black uppercase tracking-[0.15em] flex items-center gap-2 transition-all shadow-lg active:scale-95"
            >
              Commit to Stream <Send size={12}/>
            </button>

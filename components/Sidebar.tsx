@@ -33,14 +33,14 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
       <div className="p-6 overflow-y-auto no-scrollbar flex-1 bg-[var(--sidebar-bg)]">
         <div className="flex items-center justify-between mb-10 lg:hidden">
           <div className="flex flex-col">
-            <h2 className="text-xl font-black italic tracking-tighter uppercase text-indigo-600">MakSocial</h2>
+            <h2 className="text-xl font-black italic tracking-tighter uppercase text-slate-700 dark:text-slate-300">MakSocial</h2>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Terminal Control</p>
           </div>
           <button onClick={onClose} className="p-3 bg-[var(--bg-secondary)] rounded-2xl text-slate-500 active:scale-90 transition-all"><X size={20} /></button>
         </div>
 
         <div className="hidden lg:block mb-10 cursor-pointer group" onClick={() => setView('home')}>
-          <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" alt="MakSocial Logo" className="w-40 grayscale brightness-0 dark:grayscale-0 dark:brightness-100 transition-all group-hover:scale-105" />
+          <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" alt="MakSocial Logo" className="w-40 grayscale transition-all group-hover:scale-105" />
         </div>
 
         <nav className="space-y-1.5">
@@ -54,8 +54,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                 onClick={() => setView(item.id as AppView)}
                 className={`w-full flex items-center justify-between px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
                   activeView === item.id 
-                  ? 'bg-indigo-600 text-white shadow-lg' 
-                  : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
+                  ? 'bg-slate-700 text-white shadow-lg' 
+                  : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-800'
                 }`}
               >
                 <div className="flex items-center space-x-4">
@@ -67,11 +67,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                   </div>
                   <span className="text-[11px] tracking-widest font-black uppercase">{item.label}</span>
                 </div>
-                {isNotifications && unreadNotifications > 0 && (
-                   <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${activeView === 'notifications' ? 'bg-white text-indigo-600' : 'bg-rose-500 text-white'}`}>
-                      {unreadNotifications}
-                   </span>
-                )}
               </button>
             );
           })}
@@ -80,8 +75,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             onClick={() => setView('opportunities')}
             className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
               activeView === 'opportunities' 
-              ? 'bg-amber-600 text-white shadow-lg' 
-              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-amber-600'
+              ? 'bg-slate-800 text-white shadow-lg' 
+              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-900'
             }`}
           >
             <Award size={22} className={activeView === 'opportunities' ? 'text-white' : ''} />
@@ -92,19 +87,19 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
             onClick={() => setView('settings')}
             className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
               activeView === 'settings' 
-              ? 'bg-indigo-600 text-white shadow-lg' 
-              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
+              ? 'bg-slate-700 text-white shadow-lg' 
+              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-800'
             }`}
           >
             <Settings size={22} />
-            <span className="text-[11px] tracking-widest font-black uppercase">OS Customizer</span>
+            <span className="text-[11px] tracking-widest font-black uppercase">UI Customizer</span>
           </button>
         </nav>
 
         {isAdmin && (
           <div className="mt-10">
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Authorized Strata</p>
-            <button onClick={() => setView('admin')} className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all border border-dashed active:scale-[0.98] ${activeView === 'admin' ? 'bg-slate-900 dark:bg-indigo-600 text-white border-transparent' : 'border-[var(--border-color)] text-slate-500 hover:border-indigo-500 hover:text-indigo-600'}`}>
+            <button onClick={() => setView('admin')} className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all border border-dashed active:scale-[0.98] ${activeView === 'admin' ? 'bg-slate-900 text-white border-transparent' : 'border-[var(--border-color)] text-slate-500 hover:border-slate-800 hover:text-slate-800'}`}>
               <Cpu size={22} />
               <span className="text-[11px] font-black uppercase tracking-widest">Admin Terminal</span>
             </button>

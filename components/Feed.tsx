@@ -4,10 +4,10 @@ import { db } from '../db';
 import RichEditor from './Summernote';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { 
-  Heart, MessageCircle, Zap, Radio, Activity, Globe, 
+  Star, MessageCircle, Zap, Radio, Activity, Globe, 
   TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, MoreHorizontal, ShieldCheck, 
-  Database, ArrowLeft, GitCommit, GitFork, Star, Box, Link as LinkIcon,
+  Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin
 } from 'lucide-react';
 
@@ -32,13 +32,6 @@ const NetworkIntensityGraph: React.FC = () => {
                       <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">v4.2_STABLE</span>
                    </div>
                 </div>
-             </div>
-             <div className="w-20 h-10 opacity-30">
-                <ResponsiveContainer width="100%" height="100%">
-                   <AreaChart data={sparkData}>
-                      <Area type="monotone" dataKey="v" stroke="#475569" fill="#475569" fillOpacity={0.2} strokeWidth={2} />
-                   </AreaChart>
-                </ResponsiveContainer>
              </div>
           </div>
        </div>
@@ -65,7 +58,7 @@ const Watchlist: React.FC = () => (
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
   if (!role) return null;
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} className="inline-block align-text-bottom text-indigo-600 ml-1">
+    <svg viewBox="0 0 24 24" width={size} height={size} className="inline-block align-text-bottom text-slate-500 ml-1">
       <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.67-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34-2.19s2.67-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2l-3.53-3.53 1.41-1.41 2.12 2.12 4.96-4.96 1.41 1.41-6.37 6.37z" fill="currentColor"/>
     </svg>
   );
@@ -107,15 +100,15 @@ const PostItem: React.FC<{
   return (
     <article 
       onClick={() => !isThreadView && onOpenThread(post.id)}
-      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-6' : 'mb-10'}`}
+      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
     >
       <div className="flex">
-          {/* Identity Rail - The Commit Line */}
+          {/* Identity Rail */}
           <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
             <img 
                 src={post.authorAvatar} 
                 onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-[4px] border border-[var(--border-color)] bg-white object-cover cursor-pointer grayscale group-hover:grayscale-0 transition-all shadow-sm" 
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer grayscale group-hover:grayscale-0 transition-all shadow-sm" 
             />
             <div className="mt-4 flex flex-col items-center gap-3 flex-1 h-full">
                 <div className="w-px flex-1 bg-gradient-to-b from-[var(--border-color)] via-[var(--border-color)] to-transparent"></div>
@@ -123,9 +116,8 @@ const PostItem: React.FC<{
             </div>
           </div>
 
-          {/* Main Repository Surface */}
           <div className="flex-1 min-w-0">
-            {/* Proper Identity Header */}
+            {/* Post Header */}
             <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div 
@@ -133,37 +125,34 @@ const PostItem: React.FC<{
                     className="flex flex-col cursor-pointer group/name"
                   >
                     <div className="flex items-center">
-                      <span className="text-[13px] font-black text-indigo-600 group-hover/name:underline">{post.author}</span>
+                      <span className="text-[14px] font-black text-slate-800 dark:text-slate-200 group-hover/name:underline uppercase tracking-tight">{post.author}</span>
                       <AuthoritySeal role={post.authorAuthority} size={14} />
                     </div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-0.5">{post.authorRole || 'Member'}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">{post.authorRole || 'Member'}</span>
                   </div>
                   <div className="hidden sm:block h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
-                  <span className="hidden sm:inline px-1.5 py-0.5 border border-indigo-500/20 bg-indigo-500/5 rounded-sm text-[8px] font-black uppercase text-indigo-600">{post.college} HUB</span>
+                  <span className="hidden sm:inline px-1.5 py-0.5 border border-slate-500/20 bg-slate-500/5 rounded-sm text-[8px] font-black uppercase text-slate-500 tracking-widest">{post.college} HUB</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-[9px] font-mono text-slate-400 uppercase">{post.timestamp}</span>
                   <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
                       <Bookmark size={16} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
                   </button>
-                  <button className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><MoreHorizontal size={16}/></button>
                 </div>
             </div>
 
-            {/* Contribution Body */}
             <div className="p-6">
-                {/* Specialized UI for Event Broadcasts */}
                 {post.isEventBroadcast && (
-                   <div className="mb-6 rounded-[4px] border border-indigo-500/20 overflow-hidden bg-indigo-500/5">
-                      <div className="h-40 relative overflow-hidden border-b border-indigo-500/20">
-                         <img src={post.eventFlyer} className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all" />
-                         <div className="absolute top-4 right-4 px-2 py-1 bg-indigo-600 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-xl">Event_Protocol</div>
+                   <div className="mb-8 rounded-[4px] border border-slate-500/20 overflow-hidden bg-slate-500/5">
+                      <div className="h-48 relative overflow-hidden border-b border-slate-500/20">
+                         <img src={post.eventFlyer} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
+                         <div className="absolute top-4 right-4 px-2 py-1 bg-slate-800 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-xl">Event_Broadcasting</div>
                       </div>
-                      <div className="p-4 space-y-3">
-                         <h3 className="text-lg font-black uppercase tracking-tighter text-indigo-600 leading-tight">{post.eventTitle}</h3>
-                         <div className="grid grid-cols-2 gap-4">
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase"><Calendar size={12}/> {post.eventDate}</div>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase"><MapPin size={12}/> {post.eventLocation}</div>
+                      <div className="p-6 space-y-3">
+                         <h3 className="text-xl font-black uppercase tracking-tighter text-slate-700 dark:text-slate-300 leading-tight">{post.eventTitle}</h3>
+                         <div className="grid grid-cols-2 gap-6">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter"><Calendar size={12}/> {post.eventDate}</div>
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter"><MapPin size={12}/> {post.eventLocation}</div>
                          </div>
                       </div>
                    </div>
@@ -172,13 +161,13 @@ const PostItem: React.FC<{
                 <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
                 {post.pollData && (
-                  <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
+                  <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
                       <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
                       {post.pollData.options.map(opt => {
                         const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
                         return (
-                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-indigo-600 transition-all mb-2">
-                              <div className="absolute inset-y-0 left-0 bg-indigo-600/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
+                              <div className="absolute inset-y-0 left-0 bg-slate-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
                               <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
                               <span className="relative z-10 text-[10px] font-black text-slate-400">{percentage}%</span>
                             </div>
@@ -187,57 +176,55 @@ const PostItem: React.FC<{
                   </div>
                 )}
 
-                {/* Tags Manifest */}
                 <div className="flex flex-wrap gap-2 mt-4">
                    {post.hashtags.map(tag => (
-                      <span key={tag} className="text-[9px] font-bold text-indigo-500 hover:underline cursor-pointer">{tag}</span>
+                      <span key={tag} className="text-[9px] font-bold text-slate-500 hover:underline cursor-pointer tracking-wider">{tag}</span>
                    ))}
                 </div>
             </div>
 
-            {/* Interaction Matrix */}
+            {/* Post Interaction Footer */}
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
-                  <button onClick={handleLike} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
-                      <Heart size={16} /> <span className="ticker-text">{post.likes.toLocaleString()} Stars</span>
+                  <button onClick={handleLike} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-amber-500 transition-colors">
+                      <Star size={16} /> <span className="ticker-text">{post.likes.toLocaleString()} Stars</span>
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                  <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
                       <MessageCircle size={16} /> <span className="ticker-text">{post.commentsCount.toLocaleString()} Commits</span>
                   </button>
-                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
                     <GitFork size={14}/> {Math.floor(post.likes / 4)} Forks
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-indigo-500/10 text-indigo-600 border border-indigo-600/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest">
+                  <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-slate-500/10 text-slate-500 border border-slate-500/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest">
                       <Terminal size={10}/> SHA_{SHA_GEN().slice(0,6)}
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-colors"><ExternalLink size={16}/></button>
+                  <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><ExternalLink size={16}/></button>
                 </div>
             </div>
           </div>
       </div>
 
-      {/* Deep Scan: Thread History View */}
       {isThreadView && (
         <div className="border-t border-[var(--border-color)] bg-slate-50/20 dark:bg-black/10">
           <div className="px-6 py-3 bg-slate-100 dark:bg-white/5 border-b border-[var(--border-color)] flex items-center gap-2">
              <MessageSquare size={12} className="text-slate-400" />
-             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Peer Manifest Discussion</span>
+             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Signal_Deep_Scan / Manifest History</span>
           </div>
 
-          <div className="space-y-0">
+          <div className="space-y-0 relative">
              {post.comments && post.comments.length > 0 ? (
                <div className="divide-y divide-[var(--border-color)]">
                   {post.comments.map((comment, idx) => (
                     <div key={comment.id} className="flex gap-4 p-6 hover:bg-slate-100/30 dark:hover:bg-white/5 transition-colors">
                         <div className="w-10 shrink-0 flex flex-col items-center">
-                           <img src={comment.authorAvatar} className="w-8 h-8 rounded border border-[var(--border-color)] bg-white object-cover" />
+                           <img src={comment.authorAvatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" />
                            {idx !== post.comments.length - 1 && <div className="w-px flex-1 bg-slate-200 dark:bg-slate-800 mt-2"></div>}
                         </div>
                         <div className="flex-1 min-w-0">
                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-[12px] font-black text-indigo-600 uppercase tracking-tight">{comment.author}</span>
+                              <span className="text-[12px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{comment.author}</span>
                               <span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span>
                            </div>
                            <p className="text-[13px] font-medium text-[var(--text-primary)] leading-relaxed italic">"{comment.text}"</p>
@@ -247,29 +234,28 @@ const PostItem: React.FC<{
                </div>
              ) : (
                <div className="py-12 text-center space-y-2 opacity-40">
-                  <MessageSquare size={32} className="mx-auto" />
-                  <p className="text-[10px] font-black uppercase tracking-widest">No peer comments detected on this signal branch.</p>
+                  <MessageSquare size={32} className="mx-auto text-slate-500" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No peer comments detected in current branch.</p>
                </div>
              )}
 
-             {/* Branch Contribution Input */}
              <div className="p-6 border-t border-[var(--border-color)] bg-white/50 dark:bg-black/30">
                 <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4">
                    <div className="flex items-center gap-2">
-                      <GitCommit size={14} className="text-indigo-600" />
+                      <GitCommit size={14} className="text-slate-500" />
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">Append contribution to node branch...</span>
                    </div>
                    <textarea 
                      value={newComment}
                      onChange={e => setNewComment(e.target.value)}
-                     placeholder="Type your commit message (feedback, report, or inquiry)..."
-                     className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md p-4 text-[13px] font-medium min-h-[120px] focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 outline-none transition-all placeholder:text-slate-400"
+                     placeholder="Type your peer contribution (feedback, report, or inquiry)..."
+                     className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md p-4 text-[13px] font-medium min-h-[120px] focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 outline-none transition-all placeholder:text-slate-400"
                    />
                    <div className="flex justify-end">
                       <button 
                         type="submit" 
                         disabled={!newComment.trim()}
-                        className="px-6 py-2.5 bg-[#238636] hover:bg-[#2ea043] disabled:opacity-30 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 shadow-md"
+                        className="px-6 py-2.5 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 shadow-md"
                       >
                          Submit Commit <Send size={12}/>
                       </button>
@@ -323,10 +309,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     setUpdateTrigger(prev => prev + 1);
   };
 
-  const handleBookmark = (id: string) => {
-    setBookmarks(db.toggleBookmark(id));
-  };
-
   const filteredPosts = posts.filter(p => {
     if (threadId) return p.id === threadId;
     return !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter);
@@ -344,13 +326,13 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    <ArrowLeft size={14}/> Back to Pulse
                 </button>
                 <div className="flex items-center gap-3">
-                   <GitCommit size={14} className="text-indigo-600 animate-pulse" />
+                   <GitCommit size={14} className="text-slate-500 animate-pulse" />
                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Signal_Deep_Scan_Active</h3>
                 </div>
               </div>
             )}
 
-            <div className="mb-8 px-4 flex items-center gap-4">
+            <div className="mb-12 px-4 flex items-center gap-4">
                <div className="h-px flex-1 bg-[var(--border-color)]"></div>
                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
                   {threadId ? 'Branch Manifest' : collegeFilter === 'Global' ? 'Universal Pulse Stream' : `${collegeFilter} Wing Manifest`}
@@ -367,20 +349,19 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    onOpenThread={onOpenThread} 
                    onNavigateToProfile={onNavigateToProfile}
                    bookmarks={bookmarks}
-                   onBookmark={handleBookmark}
+                   onBookmark={(id) => setBookmarks(db.toggleBookmark(id))}
                    onUpdate={() => setUpdateTrigger(prev => prev + 1)}
                    isThreadView={!!threadId}
                  />
                )) : (
                  <div className="py-40 text-center space-y-6 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">
                     <Database size={48} className="mx-auto text-slate-400" />
-                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registry_Empty: No signals committed to this manifest.</p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-slate-500">Registry_Empty: No signals committed to this manifest.</p>
                  </div>
                )}
             </div>
          </div>
          
-         {/* Telemetry Sidebar Components */}
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
             <NetworkIntensityGraph />
             <Watchlist />
@@ -390,12 +371,12 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
                      <ShieldCheck size={24} className="text-slate-400"/>
-                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none italic">Elite_Strata</h4>
+                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none italic text-slate-100">Registry Elite</h4>
                   </div>
                   <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
                     Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
                   </p>
-                  <button className="w-full py-3 bg-white text-slate-900 rounded-[2px] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-slate-100 transition-all active:scale-95">Commit_Credentials</button>
+                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[2px] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95">Commit_Credentials</button>
                </div>
             </div>
          </aside>

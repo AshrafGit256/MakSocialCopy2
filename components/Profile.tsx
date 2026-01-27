@@ -5,7 +5,7 @@ import { AuthoritySeal } from './Feed';
 import { 
   MapPin, ArrowLeft, Globe, Zap, Radio, Share2, Database, 
   Terminal, Award, Trophy, Bookmark, Mail, Link as LinkIcon, Edit2, Calendar,
-  GitCommit, Heart, MessageCircle, FileVideo, Box, Star, GitFork
+  GitCommit, Star, MessageCircle, FileVideo, Box, GitFork
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -68,7 +68,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
           <aside className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
               <div className="relative group">
-                <img src={user.avatar} className="w-full aspect-square rounded-[6px] border border-[var(--border-color)] bg-white object-cover shadow-sm grayscale group-hover:grayscale-0 transition-all duration-500" />
+                <img src={user.avatar} className="w-full aspect-square rounded-full border border-[var(--border-color)] bg-white object-cover shadow-sm grayscale group-hover:grayscale-0 transition-all duration-500" />
                 <div className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-black rounded-full border border-[var(--border-color)] shadow-xl">
                    <AuthoritySeal role="Official" size={24} />
                 </div>
@@ -83,12 +83,12 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                  <button className="w-full py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] font-black text-[11px] uppercase tracking-widest hover:border-slate-400 transition-all">Edit Parameters</button>
               ) : (
                  <div className="flex gap-2">
-                   <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-2 bg-indigo-600 text-white rounded-[4px] font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-sm">Sync Protocol</button>
-                   <button className="px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-slate-400 hover:text-indigo-500 transition-all"><Zap size={14}/></button>
+                   <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-2 bg-slate-700 text-white rounded-[4px] font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-sm">Sync Protocol</button>
+                   <button className="px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-slate-400 hover:text-slate-600 transition-all"><Zap size={14}/></button>
                  </div>
               )}
 
-              <p className="text-sm font-medium italic text-slate-500 leading-relaxed border-l-2 border-indigo-500/20 pl-4 py-2">
+              <p className="text-sm font-medium italic text-slate-500 leading-relaxed border-l-2 border-slate-500/20 pl-4 py-2">
                 "{user.bio || 'Identity synchronization with the central registry in progress. Node parameters pending update.'}"
               </p>
 
@@ -102,7 +102,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                 <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                    <Mail size={14}/> {user.email || 'node@hidden.net'}
                 </div>
-                <div className="flex items-center gap-3 text-[11px] font-bold text-indigo-500 uppercase tracking-widest truncate">
+                <div className="flex items-center gap-3 text-[11px] font-bold text-slate-600 uppercase tracking-widest truncate">
                    <LinkIcon size={14}/> hillstrata.mak.ac.ug/n/{user.id}
                 </div>
               </div>
@@ -110,12 +110,12 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
               <div className="pt-6 border-t border-[var(--border-color)]">
                  <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Registry Metrics</h4>
                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-1.5 text-xs font-bold hover:text-indigo-500 cursor-pointer">
+                    <div className="flex items-center gap-1.5 text-xs font-bold hover:text-slate-600 cursor-pointer">
                        <Database size={14} className="text-slate-400"/>
                        <span>{user.followersCount}</span> <span className="text-slate-400 font-medium lowercase">links</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold hover:text-indigo-500 cursor-pointer">
-                       <Zap size={14} className="text-slate-400"/>
+                    <div className="flex items-center gap-1.5 text-xs font-bold hover:text-amber-500 cursor-pointer">
+                       <Star size={14} className="text-slate-400"/>
                        <span>{user.totalLikesCount}</span> <span className="text-slate-400 font-medium lowercase">stars</span>
                     </div>
                  </div>
@@ -134,18 +134,18 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                 <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? 'text-[var(--text-primary)]' : 'text-slate-400 hover:text-slate-600'}`}>
                   {tab.icon} {tab.label}
                   <span className="bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-500">{tab.count}</span>
-                  {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500 animate-in fade-in zoom-in-x"></div>}
+                  {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-600 animate-in fade-in zoom-in-x"></div>}
                 </button>
               ))}
             </nav>
 
-            <div className="space-y-4">
+            <div className="space-y-12">
               {displayedPosts.length > 0 ? displayedPosts.map(p => (
                 <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 transition-all group">
                    <div className="px-6 py-3 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
                       <div className="flex items-center gap-2">
                         <Box size={14} className="text-slate-400" />
-                        <span className="text-[11px] font-black uppercase text-indigo-600 tracking-widest">COMMIT_{SHA_GEN().slice(0, 4)}</span>
+                        <span className="text-[11px] font-black uppercase text-slate-600 tracking-widest">COMMIT_{SHA_GEN().slice(0, 4)}</span>
                         <span className="text-slate-300 mx-2">/</span>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{p.timestamp}</span>
                       </div>
@@ -159,7 +159,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                    <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/30 dark:bg-black/10">
                       <div className="flex items-center gap-8">
                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
-                            <Heart size={14} /> <span className="ticker-text">{p.likes.toLocaleString()}</span>
+                            <Star size={14} /> <span className="ticker-text">{p.likes.toLocaleString()}</span>
                          </div>
                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
                             <MessageCircle size={14} /> <span className="ticker-text">{p.commentsCount.toLocaleString()}</span>
@@ -175,7 +175,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                       <h3 className="text-xl font-black uppercase italic tracking-tighter">Manifest_Empty</h3>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No matching signals found in this stratum.</p>
                    </div>
-                   <button onClick={() => setActiveTab('signals')} className="px-8 py-2 bg-indigo-600 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Reset Sequence</button>
+                   <button onClick={() => setActiveTab('signals')} className="px-8 py-2 bg-slate-700 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Reset Sequence</button>
                 </div>
               )}
             </div>

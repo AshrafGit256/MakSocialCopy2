@@ -32,8 +32,6 @@ const App: React.FC = () => {
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  
-  // Safety Notification State
   const [safetyError, setSafetyError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,9 +44,8 @@ const App: React.FC = () => {
       if (saved) {
         const s: AppSettings = JSON.parse(saved);
         const root = document.documentElement;
-        root.style.setProperty('--brand-color', s.primaryColor || '#64748b');
+        root.style.setProperty('--brand-color', s.primaryColor || '#475569');
         root.style.setProperty('--font-main', s.fontFamily);
-        root.setAttribute('data-animations', s.animationsEnabled.toString());
         if (s.themePreset === 'oled') {
           root.classList.add('dark');
           root.style.setProperty('--bg-primary', '#000000');
@@ -59,16 +56,7 @@ const App: React.FC = () => {
       }
     };
     applySettings();
-    window.addEventListener('storage', applySettings);
-    return () => window.removeEventListener('storage', applySettings);
   }, [isLoggedIn, view]);
-
-  useEffect(() => {
-    if (safetyError) {
-      const timer = setTimeout(() => setSafetyError(null), 6000);
-      return () => clearTimeout(timer);
-    }
-  }, [safetyError]);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -96,7 +84,6 @@ const App: React.FC = () => {
 
   const handleSetView = (newView: AppView) => {
     if (userRole === 'admin' && newView !== 'admin') return;
-    // Protocol Check: The Vault is now unrestricted for all verified student nodes
     if (newView !== 'messages') setActiveChatUserId(null);
     setView(newView); setIsSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -104,7 +91,6 @@ const App: React.FC = () => {
 
   const unreadNotifs = notifications.filter(n => !n.isRead).length;
 
-  // STRICT ADMIN VIEW ENFORCEMENT
   if (isLoggedIn && userRole === 'admin') {
     return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
   }
@@ -136,52 +122,32 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative">
-      
-      {/* ADMINLTE V3 STYLE ERROR MESSAGE */}
-      {safetyError && (
-        <div className="fixed top-20 right-6 z-[9999] animate-in slide-in-from-right-4 duration-300">
-           <div className="bg-white border border-[#dee2e6] rounded shadow-lg p-3 pr-8 flex items-start gap-4 max-w-sm relative">
-              <div className="shrink-0 pt-0.5">
-                 <XCircle className="text-[#dc3545]" size={36} />
-              </div>
-              <div className="flex flex-col gap-1">
-                 <p className="text-[#495057] text-sm font-bold leading-tight">
-                    {safetyError}
-                 </p>
-              </div>
-              <button onClick={() => setSafetyError(null)} className="absolute top-2 right-2 text-[#adb5bd] hover:text-[#495057]">
-                <X size={14} />
-              </button>
-           </div>
-        </div>
-      )}
-
       {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden animate-in fade-in" onClick={() => setIsSidebarOpen(false)} />}
       <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} unreadNotifications={unreadNotifs} />
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
-            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full transition-colors lg:hidden"><Menu size={22} /></button>
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden"><Menu size={22} /></button>
             <div className="relative">
-              <button onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)} className="flex items-center gap-2.5 px-3 py-2 bg-[var(--bg-secondary)] hover:bg-indigo-600/10 border border-[var(--border-color)] rounded-xl transition-all group max-w-[180px] sm:max-w-none">
-                <div className="shrink-0 text-indigo-600">{activeSector === 'Global' ? <Globe size={16} /> : <LayoutGrid size={16} />}</div>
-                <div className="flex flex-col text-left overflow-hidden"><span className="text-[10px] font-black uppercase tracking-tighter text-indigo-600 truncate">{activeSector} HUB</span></div>
+              <button onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)} className="flex items-center gap-2.5 px-3 py-2 bg-[var(--bg-secondary)] hover:bg-slate-600/10 border border-[var(--border-color)] rounded-xl transition-all group">
+                <div className="shrink-0 text-slate-600">{activeSector === 'Global' ? <Globe size={16} /> : <LayoutGrid size={16} />}</div>
+                <div className="flex flex-col text-left overflow-hidden"><span className="text-[10px] font-black uppercase tracking-tighter text-slate-600 truncate">{activeSector} HUB</span></div>
                 <ChevronDown size={14} className={`text-slate-400 transition-transform ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSectorDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-[450]" onClick={() => setIsSectorDropdownOpen(false)}></div>
                   <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
-                    <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 ${activeSector === 'Global' ? 'bg-indigo-600 text-white' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}><Globe size={14} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
-                    <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-indigo-600 text-white' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}>{c}</button>))}</div>
+                    <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-2 ${activeSector === 'Global' ? 'bg-slate-600 text-white' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}><Globe size={14} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
+                    <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); if(view !== 'home') setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-slate-600 text-white' : 'hover:bg-[var(--bg-secondary)] text-slate-500'}`}>{c}</button>))}</div>
                   </div>
                 </>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-indigo-600">{isDark ? <Sun size={20} /> : <Moon size={20} />}</button>
-            <button onClick={() => handleSetView('notifications')} className="p-2.5 text-slate-500 hover:text-indigo-600 relative">
+            <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-slate-800">{isDark ? <Sun size={20} /> : <Moon size={20} />}</button>
+            <button onClick={() => handleSetView('notifications')} className="p-2.5 text-slate-500 hover:text-slate-800 relative">
                <Bell size={20} />
                {unreadNotifs > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>}
             </button>
@@ -197,13 +163,8 @@ const App: React.FC = () => {
             { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
             { id: 'settings', icon: <Settings size={22} />, label: 'UI' },
           ].map((item) => (
-            <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${view === item.id ? 'text-indigo-600' : 'text-slate-400'}`}>
-              <div className="relative">
-                {item.icon}
-                {item.id === 'notifications' && unreadNotifs > 0 && (
-                   <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[7px] font-black px-1 rounded-full">{unreadNotifs}</span>
-                )}
-              </div>
+            <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${view === item.id ? 'text-slate-800' : 'text-slate-400'}`}>
+              <div className="relative">{item.icon}</div>
               <span className={`text-[9px] font-black uppercase ${view === item.id ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
             </button>
           ))}

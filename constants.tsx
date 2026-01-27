@@ -5,12 +5,12 @@ import {
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
 export const NAV_ITEMS = [
-  { id: 'home', label: 'Home Feed', icon: <Home size={22} /> },
-  { id: 'search', label: 'Search', icon: <Search size={22} /> },
+  { id: 'home', label: 'Pulse Feed', icon: <Home size={22} /> },
+  { id: 'search', label: 'Registry', icon: <Search size={22} /> },
   { id: 'calendar', label: 'Schedule', icon: <Calendar size={22} /> },
   { id: 'resources', label: 'The Vault', icon: <BookOpen size={22} /> },
   { id: 'notifications', label: 'Signals', icon: <Bell size={22} /> },
-  { id: 'messages', label: 'Direct', icon: <MessageCircle size={22} /> },
+  { id: 'messages', label: 'Uplink', icon: <MessageCircle size={22} /> },
   { id: 'profile', label: 'Terminal', icon: <User size={22} /> },
 ];
 
@@ -29,66 +29,42 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 export const MOCK_POSTS: Post[] = [
   {
     id: 'p-1',
-    author: 'Roy Ssemboga',
-    authorId: 'roy_ssemboga',
-    authorRole: 'Former Guild President',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
-    authorAuthority: 'Student Leader',
-    timestamp: '15m ago',
-    content: `<h1>University Infrastructure Uplink</h1>
-<p>I have received reports regarding connectivity issues in the CEDAT wing. I'm engaging with the technical team to ensure that nodes are restored before the end of the day. Please report specific block numbers below.</p>`,
-    hashtags: ['#MakInfrastructure', '#StudentWelfare'],
-    likes: 412,
-    commentsCount: 3,
-    comments: [
-      { id: 'c1', author: 'Shamim Nambassa', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', text: 'Confirmed. Block B is currently offline since 08:00.', timestamp: '10m ago' },
-      { id: 'c2', author: 'Gilbert Nawangwe', authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC', text: 'Technical teams have been notified and are on site for repairs.', timestamp: '5m ago' }
-    ],
-    views: 2500,
-    flags: [],
-    isOpportunity: false,
-    college: 'CEDAT'
-  },
-  {
-    id: 'p-event-1',
-    author: 'Gilbert Nawangwe',
+    author: 'Prof. Barnabas Nawangwe',
     authorId: 'vc_office',
     authorRole: 'Vice Chancellor',
     authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
     authorAuthority: 'Administrator',
-    timestamp: '1h ago',
-    isEventBroadcast: true,
-    eventTitle: '89th Guild Inauguration Ceremony',
-    eventDate: 'October 25, 2026',
-    eventTime: '10:00 AM',
-    eventLocation: 'Main Hall',
-    eventFlyer: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200',
-    content: `<h2>Official Invitation: Leadership Transition</h2>
-<p>We invite all verified student nodes to witness the official swearing-in of the 89th Guild Cabinet. This ceremony marks a new chapter in student governance on the Hill.</p>`,
-    hashtags: ['#Inauguration89', '#MakLeadership'],
-    likes: 1250,
-    commentsCount: 24,
+    timestamp: '10m ago',
+    content: `<h1>University Research Protocol</h1>
+<p>I am pleased to announce that the central registry has authorized new research grants for the 2026 academic strata. All college hubs should sync their proposals before the examination blackout.</p>`,
+    hashtags: ['#OfficialBroadcast', '#MakerereProgress'],
+    likes: 2410,
+    commentsCount: 15,
     comments: [],
-    views: 8900,
+    views: 18000,
     flags: [],
     isOpportunity: false,
     college: 'Global'
   },
   {
-    id: 'p-ad-1',
-    author: 'Centenary Bank',
-    authorId: 'centenary_node',
-    authorRole: 'Strategic Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Cente',
-    authorAuthority: 'Corporate',
-    timestamp: '2h ago',
-    isAd: true,
-    content: `<h2>Smart Student Banking Protocol</h2>
-<p>Open a CenteStudent account today and enjoy zero maintenance fees and instant mobile banking sync. Get your verified student ID card linked for easier tuition processing.</p>
-<img src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1200" class="rounded-lg my-4" />`,
-    hashtags: ['#FinSync', '#StudentBanking'],
-    likes: 89,
-    commentsCount: 0,
+    id: 'p-event-1',
+    author: 'Makerere Events Node',
+    authorId: 'events_admin',
+    authorRole: 'Official Community Hub',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Events',
+    authorAuthority: 'Official',
+    timestamp: '1h ago',
+    isEventBroadcast: true,
+    eventTitle: '89th Guild Inauguration Gala',
+    eventDate: 'October 30, 2026',
+    eventTime: '10:00 AM',
+    eventLocation: 'Main Hall',
+    eventFlyer: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200',
+    content: `<h2>Leadership Transition Initialized</h2>
+<p>The University Council invites all student nodes to witness the official swearing-in of the 89th Guild Cabinet. Synchronization starts at 1000hrs.</p>`,
+    hashtags: ['#Guild89', '#Leadership'],
+    likes: 890,
+    commentsCount: 2,
     comments: [],
     views: 12400,
     flags: [],
@@ -96,44 +72,65 @@ export const MOCK_POSTS: Post[] = [
     college: 'Global'
   },
   {
-    id: 'p-opp-1',
-    author: 'Dr. Jane Nalule',
-    authorId: 'jane_nalule',
-    authorRole: 'Head of Research',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
-    authorAuthority: 'Lecturer',
-    timestamp: '3h ago',
-    content: `<h2>Research Assistant Manifest: AI Ethics</h2>
-<p>The COCIS AI Lab is recruiting 3 Finalist students for a cross-wing research project on ethical AI strata in East African governance. Experience with Python required.</p>`,
-    hashtags: ['#ResearchOpportunity', '#COCIS', '#AI'],
-    likes: 156,
+    id: 'p-ad-1',
+    author: 'Centenary Bank',
+    authorId: 'centenary_bank',
+    authorRole: 'Strategic Partner',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Bank',
+    authorAuthority: 'Corporate',
+    isAd: true,
+    timestamp: '2h ago',
+    content: `<h1>Smart Student Banking Uplink</h1>
+<p>Open a CenteStudent account today with <b>ZERO</b> maintenance fees. Get instant tuition clearance synchronization and mobile app access. Visit our node at the Main Admin wing.</p>
+<img src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1200" class="rounded-lg my-4" />`,
+    hashtags: ['#FinancialSync', '#SmartBanking'],
+    likes: 420,
     commentsCount: 8,
     comments: [],
-    views: 4200,
+    views: 45000,
     flags: [],
+    isOpportunity: false,
+    college: 'Global'
+  },
+  {
+    id: 'p-opp-1',
+    author: 'COCIS AI Lab',
+    authorId: 'ai_lab_node',
+    authorRole: 'Research Hub',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AI',
+    authorAuthority: 'Academic Council',
+    timestamp: '3h ago',
     isOpportunity: true,
     opportunityData: {
       type: 'Internship',
       isAIVerified: true,
-      detectedBenefit: 'UGX 500k Stipend'
+      detectedBenefit: 'UGX 800k Stipend'
     },
+    content: `<h1>Opportunity: Neural Network Assistant</h1>
+<p>We are recruiting 5 finalist students for the Alpha-Sync project. Experience with Python logic and data stratification is mandatory.</p>`,
+    hashtags: ['#AIRecruitment', '#COCIS', '#Opportunity'],
+    likes: 670,
+    commentsCount: 42,
+    comments: [],
+    views: 8900,
+    flags: [],
     college: 'COCIS'
   },
   {
     id: 'p-2',
-    author: 'Gilbert Nawangwe',
-    authorId: 'vc_office',
-    authorRole: 'Vice Chancellor',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
-    authorAuthority: 'Administrator',
+    author: 'Roy Ssemboga',
+    authorId: 'roy_ssemboga',
+    authorRole: 'Former Guild President',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
+    authorAuthority: 'Student Leader',
     timestamp: '5h ago',
-    content: `<h2>Postgraduate Academic Update</h2>
-<p>The academic council has reviewed the new strata for thesis submissions. All doctoral nodes must ensure their abstracts are uploaded to the central registry for peer review before the November deadline.</p>`,
-    hashtags: ['#MakerereResearch', '#OfficialBroadcast'],
-    likes: 890,
-    commentsCount: 15,
+    content: `<h1>Campus Infrastructure Feedback</h1>
+<p>I have received signals regarding the connectivity issues in the CEDAT wing. I'm engaging with the technical council to ensure the fiber nodes are stabilized before the research deadline.</p>`,
+    hashtags: ['#StudentWelfare', '#CEDAT'],
+    likes: 1250,
+    commentsCount: 89,
     comments: [
-      { id: 'c3', author: 'Roy Ssemboga', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy', text: 'This will help streamline the review cycles significantly.', timestamp: '45m ago' }
+      { id: 'c1', author: 'Shamim Nambassa', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', text: 'Confirmed. Block B is completely offline since 0800hrs.', timestamp: '4h ago' }
     ],
     views: 5600,
     flags: [],

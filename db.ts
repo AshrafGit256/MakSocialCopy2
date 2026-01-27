@@ -1,3 +1,4 @@
+
 import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment } from './types';
 import { MOCK_POSTS } from './constants';
 
@@ -12,6 +13,68 @@ const DB_KEYS = {
   NOTIFICATIONS: 'maksocial_notifications_v5',
   BOOKMARKS: 'maksocial_bookmarks_v1'
 };
+
+// REVENUE_HISTORY constant used in Admin analytics
+export const REVENUE_HISTORY: RevenuePoint[] = [
+  { month: 'Jan', revenue: 800000, expenses: 600000, subscribers: 120, growth: 5 },
+  { month: 'Feb', revenue: 950000, expenses: 650000, subscribers: 150, growth: 12 },
+  { month: 'Mar', revenue: 1200000, expenses: 700000, subscribers: 200, growth: 15 },
+  { month: 'Apr', revenue: 1100000, expenses: 750000, subscribers: 180, growth: -5 },
+  { month: 'May', revenue: 1500000, expenses: 800000, subscribers: 250, growth: 20 },
+  { month: 'Jun', revenue: 1800000, expenses: 850000, subscribers: 300, growth: 25 }
+];
+
+// COURSES_BY_COLLEGE constant used in Resources filtering
+export const COURSES_BY_COLLEGE: Record<College, string[]> = {
+  COCIS: ['Computer Science', 'Information Technology', 'Software Engineering', 'Information Systems'],
+  CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering'],
+  CHUSS: ['Psychology', 'Social Work', 'Journalism', 'Literature'],
+  CONAS: ['Mathematics', 'Physics', 'Biology', 'Chemistry'],
+  CHS: ['Medicine', 'Nursing', 'Public Health', 'Pharmacy'],
+  CAES: ['Agriculture', 'Environmental Science', 'Food Science'],
+  COBAMS: ['Economics', 'Statistics', 'Business Administration', 'Commerce'],
+  CEES: ['Education', 'Adult Education', 'Distance Learning'],
+  LAW: ['Bachelor of Laws', 'Human Rights', 'Commercial Law']
+};
+
+const INITIAL_EVENTS: CalendarEvent[] = [
+  {
+    id: 'ev-1',
+    title: '89th Guild Inauguration Gala',
+    description: 'The official synchronization ceremony for the new student leadership. Protocol includes a networking dinner and leadership workshop.',
+    date: new Date().toISOString().split('T')[0],
+    time: '18:00',
+    location: 'Freedom Square / Main Hall',
+    image: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200',
+    category: 'Social',
+    createdBy: 'vc_office',
+    attendeeIds: []
+  },
+  {
+    id: 'ev-2',
+    title: 'AI & Neural Networks Symposium',
+    description: 'A high-density research session exploring the integration of LLMs in academic curricula. Keynote by the COCIS Dean.',
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    time: '10:00',
+    location: 'COCIS Block B, Auditorium 2',
+    image: 'https://images.unsplash.com/photo-1591453089816-0fbb971b454c?auto=format&fit=crop&w=1200',
+    category: 'Academic',
+    createdBy: 'ai_lab_node',
+    attendeeIds: []
+  },
+  {
+    id: 'ev-3',
+    title: 'Inter-College Athletics Trial',
+    description: 'Sports wing assessment for the upcoming University Games. All nodes in athletics strata must verify participation.',
+    date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+    time: '08:30',
+    location: 'Main Sports Arena',
+    image: 'https://images.unsplash.com/photo-1461896704190-3213c9ad81e1?auto=format&fit=crop&w=1200',
+    category: 'Sports',
+    createdBy: 'sports_node',
+    attendeeIds: []
+  }
+];
 
 const INITIAL_USERS: User[] = [
   {
@@ -34,50 +97,8 @@ const INITIAL_USERS: User[] = [
     bio: 'Architect of the Hill\'s future. 11th Vice Chancellor of Makerere University. Synchronizing global research nodes with the Hill\'s digital DNA. Committed to academic excellence and institutional transformation.',
     location: 'Main Administration Wing',
     skills: ['Institutional Leadership', 'Architecture', 'Strategy', 'Academic Excellence']
-  },
-  {
-    id: 'roy_ssemboga',
-    name: 'Roy Ssemboga',
-    role: 'Former Guild President',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
-    connections: 12000,
-    email: 'roy@guild.mak.ac.ug',
-    college: 'CHS',
-    status: 'Graduate',
-    subscriptionTier: 'Pro',
-    joinedColleges: ['Global', 'CHS'],
-    postsCount: 342,
-    followersCount: 15600,
-    followingCount: 890,
-    totalLikesCount: 24500,
-    badges: ['Verified', 'Student Leader'],
-    appliedTo: [],
-    bio: 'Medical Doctor and 82nd Guild President. Advocacy node for student welfare and academic synchronization.',
-    location: 'Mulago Wing',
-    skills: ['Medicine', 'Public Policy', 'Leadership']
   }
 ];
-
-export const REVENUE_HISTORY: RevenuePoint[] = [
-  { month: 'Jan', revenue: 800000, expenses: 400000, subscribers: 120, growth: 5 },
-  { month: 'Feb', revenue: 950000, expenses: 420000, subscribers: 145, growth: 12 },
-  { month: 'Mar', revenue: 1200000, expenses: 450000, subscribers: 180, growth: 18 },
-  { month: 'Apr', revenue: 1100000, expenses: 480000, subscribers: 175, growth: -2 },
-  { month: 'May', revenue: 1400000, expenses: 500000, subscribers: 210, growth: 22 },
-  { month: 'Jun', revenue: 1600000, expenses: 550000, subscribers: 240, growth: 15 },
-];
-
-export const COURSES_BY_COLLEGE: Record<College, string[]> = {
-  COCIS: ['Computer Science', 'Software Engineering', 'Information Technology', 'Information Systems'],
-  CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering'],
-  CHUSS: ['Psychology', 'Social Work', 'Literature', 'Philosophy'],
-  CONAS: ['Mathematics', 'Physics', 'Biology', 'Chemistry'],
-  CHS: ['Medicine', 'Surgery', 'Nursing', 'Pharmacy'],
-  CAES: ['Agriculture', 'Environment Science', 'Food Science'],
-  COBAMS: ['Economics', 'Business Administration', 'Statistics'],
-  CEES: ['Education', 'Adult Education', 'Open & Distance Learning'],
-  LAW: ['Commercial Law', 'Public Law', 'Civil Law']
-};
 
 const parseArray = <T>(key: string, fallback: T[]): T[] => {
   try {
@@ -118,11 +139,6 @@ export const db = {
     else users.push(user);
     db.saveUsers(users);
   },
-  toggleVerification: (userId: string) => {
-    const users = db.getUsers();
-    const updated = users.map(u => u.id === userId ? { ...u, verified: !u.verified } : u);
-    db.saveUsers(updated);
-  },
   getPosts: (filter?: College | 'Global'): Post[] => {
     let posts = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
     if (filter && filter !== 'Global') {
@@ -134,6 +150,11 @@ export const db = {
   addPost: (post: Post) => {
     const posts = db.getPosts();
     db.savePosts([post, ...posts]);
+  },
+  // Delete a post by ID
+  deletePost: (postId: string) => {
+    const posts = db.getPosts();
+    db.savePosts(posts.filter(p => p.id !== postId));
   },
   likePost: (postId: string) => {
     const posts = db.getPosts();
@@ -158,16 +179,12 @@ export const db = {
     return bookmarks;
   },
   getBookmarks: (): string[] => parseArray<string>(DB_KEYS.BOOKMARKS, []),
-  deletePost: (postId: string) => {
-    const posts = db.getPosts();
-    db.savePosts(posts.filter(p => p.id !== postId));
-  },
   getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
   saveResource: (resource: Resource) => {
     const resources = db.getResources();
     localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...resources]));
   },
-  getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, []),
+  getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, INITIAL_EVENTS),
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...events]));
@@ -178,10 +195,17 @@ export const db = {
       if (ev.id === eventId) {
         const attendees = ev.attendeeIds || [];
         if (!attendees.includes(userId)) return { ...ev, attendeeIds: [...attendees, userId] };
+        else return { ...ev, attendeeIds: attendees.filter(id => id !== userId) }; // Toggle
       }
       return ev;
     });
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
+  },
+  // Toggle verification status for a user
+  toggleVerification: (userId: string) => {
+    const users = db.getUsers();
+    const updated = users.map(u => u.id === userId ? { ...u, verified: !u.verified } : u);
+    db.saveUsers(updated);
   },
   getAds: (): Ad[] => parseArray<Ad>(DB_KEYS.ADS, []),
   getNotifications: (): Notification[] => parseArray<Notification>(DB_KEYS.NOTIFICATIONS, []),

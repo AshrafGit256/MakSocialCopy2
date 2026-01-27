@@ -209,7 +209,6 @@ const PostCreator: React.FC<{ onPost: (content: string, font: string, poll?: Pol
           style={{ fontFamily: activeFont }}
           data-placeholder="Define telemetry parameters and signal context..."
         />
-        // {!content && <div className="absolute top-5 left-5 text-slate-400 pointer-events-none text-sm opacity-40 font-mono italic">Define telemetry parameters and signal context...</div>}
       </div>
 
       {/* POLL CONFIGURATION MATRIX - GITHUB STYLE */}

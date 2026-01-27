@@ -109,7 +109,7 @@ const PostItem: React.FC<{
             <img 
                 src={post.authorAvatar} 
                 onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all shadow-sm" 
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all" 
             />
             <div className="mt-4 flex flex-col items-center gap-3 flex-1 h-full">
                 <div className="w-px flex-1 bg-gradient-to-b from-[var(--border-color)] via-[var(--border-color)] to-transparent"></div>

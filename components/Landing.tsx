@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ArrowRight, Zap, Globe, Users, ShieldCheck, Sparkles, GraduationCap, Radio, Search, MessageSquare, BookOpen } from "lucide-react";
 
@@ -8,27 +7,27 @@ interface LandingProps {
 
 const Landing: React.FC<LandingProps> = ({ onStart }) => {
   return (
-    <div className="bg-[var(--bg-primary)] text-[var(--text-primary)] min-h-screen overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+    <div className="bg-[var(--bg-primary)] text-[var(--text-primary)] min-h-screen overflow-x-hidden selection:bg-slate-500 selection:text-white">
       
       {/* NAVIGATION BAR - BLURRED FLOATING */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-7xl">
         <div className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border border-[var(--border-color)] rounded-[2rem] px-8 py-4 flex justify-between items-center shadow-2xl shadow-black/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
+            <div className="w-10 h-10 bg-slate-600 rounded-xl flex items-center justify-center shadow-lg shadow-slate-600/20">
               <Zap size={22} className="text-white fill-white" />
             </div>
-            <span className="text-xl font-black italic tracking-tighter uppercase text-indigo-600">MakSocial</span>
+            <span className="text-xl font-black italic tracking-tighter uppercase text-slate-600">MakSocial</span>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 transition-colors">Protocol</a>
-            <a href="#network" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 transition-colors">Nodes</a>
-            <a href="#vault" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 transition-colors">Vault</a>
+            <a href="#features" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-600 transition-colors">Protocol</a>
+            <a href="#network" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-600 transition-colors">Nodes</a>
+            <a href="#vault" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-600 transition-colors">Vault</a>
           </div>
 
           <button
             onClick={onStart}
-            className="bg-indigo-600 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
+            className="bg-slate-600 text-white px-8 py-3 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-slate-700 transition-all active:scale-95 shadow-lg shadow-slate-600/20"
           >
             Access Terminal
           </button>
@@ -38,20 +37,20 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       {/* HERO SECTION - UNIVERSITY IMMERSION */}
       <section className="relative pt-48 pb-24 px-6 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-rose-600/5 blur-[120px] rounded-full"></div>
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-slate-600/10 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-zinc-600/5 blur-[120px] rounded-full"></div>
         </div>
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600/10 rounded-full border border-indigo-600/20">
-              <Sparkles size={14} className="text-indigo-600" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600">The Official Hill Protocol | Synchronizing</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-600/10 rounded-full border border-slate-600/20">
+              <Sparkles size={14} className="text-slate-600" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">The Official Hill Protocol | Synchronizing</span>
             </div>
 
             <h1 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter uppercase italic">
               Empowering <br />
-              <span className="text-indigo-600">The Hill's</span> <br />
+              <span className="text-slate-600">The Hill's</span> <br />
               Digital DNA.
             </h1>
 
@@ -62,7 +61,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 onClick={onStart}
-                className="bg-indigo-600 text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-600/30 flex items-center justify-center gap-3 active:scale-95"
+                className="bg-slate-600 text-white px-10 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-700 transition-all shadow-2xl shadow-slate-600/30 flex items-center justify-center gap-3 active:scale-95"
               >
                 Initialize Profile <ArrowRight size={18} />
               </button>
@@ -78,7 +77,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 ))}
               </div>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                <span className="text-indigo-600 font-black">50,000+</span> Student Nodes Active
+                <span className="text-slate-600 font-black">50,000+</span> Student Nodes Active
               </p>
             </div>
           </div>
@@ -90,7 +89,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                  alt="Makerere Architecture" 
                />
-               <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-transparent to-transparent"></div>
+               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
                
                <div className="absolute top-10 right-10 bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-3xl animate-bounce-slow">
                   <div className="flex items-center gap-3">
@@ -110,14 +109,14 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   </p>
                </div>
             </div>
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-600/20 blur-[60px] rounded-full"></div>
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-rose-600/20 blur-[60px] rounded-full"></div>
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-slate-600/20 blur-[60px] rounded-full"></div>
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-zinc-600/20 blur-[60px] rounded-full"></div>
           </div>
         </div>
       </section>
 
       {/* METRIC STRIP */}
-      <section className="bg-indigo-600 py-16">
+      <section className="bg-slate-600 py-16">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12">
           {[
             { label: 'Active Nodes', val: '50k+', icon: <Users size={24}/> },
@@ -140,7 +139,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <section id="features" className="py-32 px-6">
         <div className="max-w-7xl mx-auto space-y-20">
           <div className="text-center space-y-4 max-w-2xl mx-auto">
-            <h2 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.5em]">System Architecture</h2>
+            <h2 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em]">System Architecture</h2>
             <h3 className="text-5xl font-black tracking-tighter uppercase italic">Built for the Global Student.</h3>
           </div>
 
@@ -152,7 +151,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                />
                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
                <div className="absolute bottom-12 left-12 space-y-4">
-                  <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white">
+                  <div className="w-12 h-12 bg-slate-600 rounded-2xl flex items-center justify-center text-white">
                     <Search size={24} />
                   </div>
                   <h4 className="text-4xl font-black text-white uppercase tracking-tighter italic">Signal Discovery</h4>
@@ -160,7 +159,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                </div>
             </div>
 
-            <div className="bg-indigo-600 rounded-[3rem] p-12 flex flex-col justify-between shadow-2xl shadow-indigo-600/20 text-white">
+            <div className="bg-slate-600 rounded-[3rem] p-12 flex flex-col justify-between shadow-2xl shadow-slate-600/20 text-white">
                <div className="w-16 h-16 bg-white/10 rounded-[2rem] flex items-center justify-center">
                   <MessageSquare size={32} />
                </div>
@@ -172,7 +171,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             </div>
 
             <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[3rem] p-12 flex flex-col justify-between shadow-lg">
-               <div className="w-16 h-16 bg-indigo-600/10 rounded-[2rem] flex items-center justify-center text-indigo-600">
+               <div className="w-16 h-16 bg-slate-600/10 rounded-[2rem] flex items-center justify-center text-slate-600">
                   <BookOpen size={32} />
                </div>
                <div className="space-y-4">
@@ -180,19 +179,19 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   <p className="text-slate-500 font-medium text-sm">Access the secure repository of past papers, research assets, and scholarly intelligence curated by the Hill.</p>
                   <div className="flex -space-x-2">
                     {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />)}
-                    <div className="w-8 h-8 rounded-full border-2 border-white bg-indigo-600 flex items-center justify-center text-white text-[8px] font-bold">+1k</div>
+                    <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-600 flex items-center justify-center text-white text-[8px] font-bold">+1k</div>
                   </div>
                </div>
             </div>
 
-            <div className="md:col-span-2 relative h-[500px] rounded-[3rem] overflow-hidden border border-[var(--border-color)] group shadow-xl bg-emerald-950">
+            <div className="md:col-span-2 relative h-[500px] rounded-[3rem] overflow-hidden border border-[var(--border-color)] group shadow-xl bg-slate-950">
                <img 
                  src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200" 
                  className="w-full h-full object-cover grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000" 
                />
-               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-transparent to-transparent"></div>
+               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
                <div className="absolute bottom-12 left-12 space-y-4">
-                  <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center text-white">
+                  <div className="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center text-white">
                     <Radio size={24} />
                   </div>
                   <h4 className="text-4xl font-black text-white uppercase tracking-tighter italic">Wing Broadcasts</h4>
@@ -205,7 +204,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
 
       {/* FINAL CTA */}
       <section className="py-40 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-indigo-600 -z-10">
+        <div className="absolute inset-0 bg-slate-600 -z-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
         </div>
         <div className="max-w-4xl mx-auto text-center space-y-10">
@@ -218,7 +217,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
            </p>
            <button
              onClick={onStart}
-             className="bg-white text-indigo-600 px-16 py-6 rounded-[2rem] font-black text-sm uppercase tracking-[0.3em] hover:bg-slate-100 transition-all shadow-2xl active:scale-95"
+             className="bg-white text-slate-600 px-16 py-6 rounded-[2rem] font-black text-sm uppercase tracking-[0.3em] hover:bg-slate-100 transition-all shadow-2xl active:scale-95"
            >
              Initialize Registration
            </button>
@@ -228,8 +227,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <footer className="py-20 px-6 border-t border-[var(--border-color)]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3">
-            <Zap size={24} className="text-indigo-600 fill-indigo-600" />
-            <span className="text-xl font-black italic tracking-tighter uppercase text-indigo-600">MakSocial</span>
+            <Zap size={24} className="text-slate-600 fill-slate-600" />
+            <span className="text-xl font-black italic tracking-tighter uppercase text-slate-600">MakSocial</span>
           </div>
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">
             © 2026 MakSocial Registry Protocol. Makerere University.

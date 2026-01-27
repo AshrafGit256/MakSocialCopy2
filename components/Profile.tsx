@@ -68,7 +68,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
           <aside className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
               <div className="relative group">
-                <img src={user.avatar} className="w-full aspect-square rounded-full border border-[var(--border-color)] bg-white object-cover shadow-sm transition-all duration-500" />
+                <img src={user.avatar} className="w-full aspect-square rounded-full border border-[var(--border-color)] bg-white object-cover transition-all duration-500" />
                 <div className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-black rounded-full border border-[var(--border-color)] shadow-xl">
                    <AuthoritySeal role="Official" size={24} />
                 </div>

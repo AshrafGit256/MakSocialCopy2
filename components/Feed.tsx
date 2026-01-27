@@ -7,7 +7,8 @@ import {
   Heart, MessageCircle, Zap, Radio, Activity, Globe, 
   ArrowUpRight, TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, Clock, MoreHorizontal, ShieldCheck, 
-  Database, Hash, ArrowLeft, GitCommit, GitFork, Star, Box, Link as LinkIcon
+  Database, Hash, ArrowLeft, GitCommit, GitFork, Star, Box, Link as LinkIcon,
+  CheckCircle2, Tag, AlertCircle
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -70,98 +71,122 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = 
   );
 };
 
-const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark }) => (
-  <article className="mb-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 dark:hover:border-slate-700 transition-all shadow-sm group">
-     <div className="flex">
-        {/* Left Rail Identity Profile (Restored) */}
-        <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10">
-           <img 
-              src={post.authorAvatar} 
-              onClick={() => onNavigateToProfile(post.authorId)}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-[4px] border border-[var(--border-color)] bg-white object-cover cursor-pointer grayscale hover:grayscale-0 transition-all shadow-sm" 
-           />
-           <div className="mt-4 flex flex-col items-center gap-3">
-              <div className="w-px h-12 bg-gradient-to-b from-[var(--border-color)] to-transparent"></div>
-              <GitCommit size={14} className="text-slate-300" />
-           </div>
-        </div>
+const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark }) => {
+  const [labels] = useState(() => {
+    const pool = [
+      { t: 'Research', c: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' },
+      { t: 'Urgent', c: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' },
+      { t: 'Verified', c: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
+      { t: 'Discussion', c: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
+      { t: 'Opportunity', c: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' }
+    ];
+    return [pool[Math.floor(Math.random() * pool.length)]];
+  });
 
-        {/* Right Rail Content */}
-        <div className="flex-1 min-w-0">
-           {/* Post Header - Repository Style */}
-           <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
-              <div className="flex items-center gap-2 overflow-hidden">
-                 <Box size={14} className="text-slate-400" />
-                 <div className="flex items-center text-[12px] font-bold truncate">
-                    <span onClick={() => onNavigateToProfile(post.authorId)} className="text-indigo-600 hover:underline cursor-pointer">{post.author.toLowerCase().replace(/\s/g, '_')}</span>
-                    <span className="mx-1 text-slate-400">/</span>
-                    <span className="text-[var(--text-primary)] truncate">signal_{post.id.slice(-6)}</span>
-                    <AuthoritySeal role={post.authorAuthority} size={12} />
-                 </div>
-                 <span className="hidden sm:inline px-1.5 py-0.5 border border-[var(--border-color)] rounded-full text-[8px] font-black uppercase text-slate-500 ml-2">Public</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <span className="text-[9px] font-mono text-slate-400 hidden md:inline uppercase">{post.timestamp}</span>
-                 <button onClick={() => onBookmark(post.id)} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
-                    <Bookmark size={14} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
-                 </button>
-                 <button className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><MoreHorizontal size={14}/></button>
-              </div>
-           </div>
+  return (
+    <article className="mb-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 dark:hover:border-slate-700 transition-all shadow-sm group">
+      <div className="flex">
+          {/* Left Rail Identity Profile (Restored) */}
+          <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
+            <img 
+                src={post.authorAvatar} 
+                onClick={() => onNavigateToProfile(post.authorId)}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-[4px] border border-[var(--border-color)] bg-white object-cover cursor-pointer grayscale hover:grayscale-0 transition-all shadow-sm" 
+            />
+            <div className="mt-4 flex flex-col items-center gap-3">
+                <div className="w-px h-12 bg-gradient-to-b from-[var(--border-color)] to-transparent"></div>
+                <GitCommit size={14} className="text-slate-300" />
+                <div className="text-[7px] font-bold text-slate-400 uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">v.1.0</div>
+            </div>
+          </div>
 
-           {/* Signal Body */}
-           <div onClick={() => onOpenThread(post.id)} className="p-6 cursor-pointer hover:bg-slate-50/20 dark:hover:bg-white/5 transition-all">
-              <div className="text-[14px] leading-relaxed font-mono text-[var(--text-primary)] mb-4 post-content-markdown" dangerouslySetInnerHTML={{ __html: post.content }} />
-              
-              {post.pollData && (
-                 <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
-                    <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
-                    {post.pollData.options.map(opt => {
-                       const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
-                       return (
-                          <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-indigo-500 transition-all">
-                             <div className="absolute inset-y-0 left-0 bg-indigo-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
-                             <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
-                             <span className="relative z-10 text-[10px] font-black text-slate-400 group-hover/opt:text-slate-900 dark:group-hover/opt:text-white transition-colors">{percentage}%</span>
-                          </div>
-                       );
-                    })}
-                    <p className="text-[8px] font-bold text-slate-400 text-right uppercase mt-4 tracking-tighter italic">Total Commits: {post.pollData.totalVotes}</p>
-                 </div>
-              )}
-              
-              {/* Note: Images are now rendered within post.content via Summernote to avoid duplication */}
-           </div>
+          {/* Right Rail Content */}
+          <div className="flex-1 min-w-0">
+            {/* Post Header - Repository Style */}
+            <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <Box size={14} className="text-slate-400" />
+                  <div className="flex items-center text-[12px] font-bold truncate">
+                      <span onClick={() => onNavigateToProfile(post.authorId)} className="text-indigo-600 hover:underline cursor-pointer">{post.author.toLowerCase().replace(/\s/g, '_')}</span>
+                      <span className="mx-1 text-slate-400">/</span>
+                      <span className="text-[var(--text-primary)] truncate">signal_{post.id.slice(-6)}</span>
+                      <AuthoritySeal role={post.authorAuthority} size={12} />
+                  </div>
+                  <span className="hidden sm:inline px-1.5 py-0.5 border border-[var(--border-color)] rounded-full text-[8px] font-black uppercase text-slate-500 ml-2">Public</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-slate-400 hidden md:inline uppercase">{post.timestamp}</span>
+                  <button onClick={() => onBookmark(post.id)} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
+                      <Bookmark size={14} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
+                  </button>
+                  <button className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><MoreHorizontal size={14}/></button>
+                </div>
+            </div>
 
-           {/* Signal Footer - Git Metrics Style */}
-           <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
-              <div className="flex items-center gap-8">
-                 <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
-                    <Heart size={14} /> <span className="ticker-text">{post.likes.toLocaleString()}</span>
-                 </button>
-                 <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-500 transition-colors">
-                    <MessageCircle size={14} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span>
-                 </button>
-                 <div className="hidden sm:flex items-center gap-4 border-l border-[var(--border-color)] pl-8">
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
-                       <GitFork size={12}/> {Math.floor(post.likes / 5)}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
-                       <Star size={12}/> {Math.floor(post.views / 100)}
-                    </div>
-                 </div>
-              </div>
-              <div className="flex items-center gap-4">
-                 <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-[2px] text-[8px] font-black uppercase">
-                    <Terminal size={10}/> SHA_{SHA_GEN()}
-                 </div>
-                 <button className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"><Share2 size={14}/></button>
-              </div>
-           </div>
-        </div>
-     </div>
-  </article>
-);
+            {/* Signal Body */}
+            <div onClick={() => onOpenThread(post.id)} className="p-6 cursor-pointer hover:bg-slate-50/20 dark:hover:bg-white/5 transition-all">
+                {/* Custom Label UI */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {labels.map((l, i) => (
+                    <span key={i} className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${l.c}`}>
+                      {l.t}
+                    </span>
+                  ))}
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-500 border border-[var(--border-color)]">
+                    {post.college}
+                  </span>
+                </div>
+
+                <div className="text-[14px] leading-relaxed font-mono text-[var(--text-primary)] mb-4 post-content-markdown" dangerouslySetInnerHTML={{ __html: post.content }} />
+                
+                {post.pollData && (
+                  <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
+                      <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
+                      {post.pollData.options.map(opt => {
+                        const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
+                        return (
+                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-indigo-500 transition-all">
+                              <div className="absolute inset-y-0 left-0 bg-indigo-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                              <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
+                              <span className="relative z-10 text-[10px] font-black text-slate-400 group-hover/opt:text-slate-900 dark:group-hover/opt:text-white transition-colors">{percentage}%</span>
+                            </div>
+                        );
+                      })}
+                      <p className="text-[8px] font-bold text-slate-400 text-right uppercase mt-4 tracking-tighter italic">Total Commits: {post.pollData.totalVotes}</p>
+                  </div>
+                )}
+            </div>
+
+            {/* Signal Footer - Git Metrics Style */}
+            <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
+                <div className="flex items-center gap-8">
+                  <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
+                      <Heart size={14} /> <span className="ticker-text">{post.likes.toLocaleString()}</span>
+                  </button>
+                  <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-500 transition-colors">
+                      <MessageCircle size={14} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span>
+                  </button>
+                  <div className="hidden sm:flex items-center gap-4 border-l border-[var(--border-color)] pl-8">
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                        <GitFork size={12}/> {Math.floor(post.likes / 5)}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                        <Star size={12}/> {Math.floor(post.views / 100)}
+                      </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-[2px] text-[8px] font-black uppercase">
+                      <Terminal size={10}/> SHA_{SHA_GEN()}
+                  </div>
+                  <button className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"><Share2 size={14}/></button>
+                </div>
+            </div>
+          </div>
+      </div>
+    </article>
+  );
+};
 
 const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError }) => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -176,7 +201,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   }, []);
 
   const handlePost = (html: string, poll?: PollData) => {
-    // Binary asset extraction minimized to avoid duplication in display
     const newPost: Post = {
       id: `p-${Date.now()}`,
       author: user.name,

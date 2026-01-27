@@ -1,9 +1,7 @@
-
-import React, { useState, useEffect } from 'export React';
+import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Post } from '../types';
 import { AuthoritySeal } from './Feed'; 
-// Added missing GitCommit, Heart, and MessageCircle imports
 import { 
   MapPin, ArrowLeft, Globe, Zap, Radio, Share2, Database, 
   Terminal, Award, Trophy, Bookmark, Mail, Link as LinkIcon, Edit2, Calendar,
@@ -46,7 +44,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
             </div>
          </div>
          <div className="flex items-center gap-3">
-            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[9px] font-black uppercase tracking-widest hover:border-slate-400 transition-all flex items-center gap-2">
+            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[9px] font-black uppercase tracking-widest hover:border-slate-400 transition-all flex items-center gap-2 rounded-[4px]">
                <Share2 size={12}/> Signal_Identity
             </button>
          </div>
@@ -71,11 +69,11 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
               </div>
 
               {isOwnProfile ? (
-                 <button className="w-full py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-4px font-black text-[11px] uppercase tracking-widest hover:border-slate-400 transition-all">Edit Parameters</button>
+                 <button className="w-full py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] font-black text-[11px] uppercase tracking-widest hover:border-slate-400 transition-all">Edit Parameters</button>
               ) : (
                  <div className="flex gap-2">
-                   <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-2 bg-indigo-600 text-white rounded-4px font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-sm">Sync Protocol</button>
-                   <button className="px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-4px text-slate-400 hover:text-indigo-500 transition-all"><Zap size={14}/></button>
+                   <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-2 bg-indigo-600 text-white rounded-[4px] font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-sm">Sync Protocol</button>
+                   <button className="px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-slate-400 hover:text-indigo-500 transition-all"><Zap size={14}/></button>
                  </div>
               )}
 
@@ -132,7 +130,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
 
             <div className="space-y-4">
               {posts.length > 0 ? posts.map(p => (
-                <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-4px p-6 hover:border-slate-400 transition-all group">
+                <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-6 hover:border-slate-400 transition-all group">
                    <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2">
                          <GitCommit size={14} className="text-emerald-500" />
@@ -154,13 +152,13 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                    </div>
                 </div>
               )) : (
-                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-4px bg-slate-50/50 dark:bg-black/5">
+                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-[4px] bg-slate-50/50 dark:bg-black/5">
                    <Database size={48} className="mx-auto text-slate-200" />
                    <div className="space-y-1">
                       <h3 className="text-xl font-black uppercase italic tracking-tighter">Manifest_Empty</h3>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No commit history found for this node stratum.</p>
                    </div>
-                   <button className="px-8 py-2 bg-indigo-600 text-white rounded-4px text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Manual Search</button>
+                   <button className="px-8 py-2 bg-indigo-600 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Manual Search</button>
                 </div>
               )}
             </div>

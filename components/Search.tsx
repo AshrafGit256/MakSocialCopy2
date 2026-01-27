@@ -11,12 +11,13 @@ import {
 } from 'lucide-react';
 
 interface SearchProps {
+  initialQuery?: string;
   onNavigateToProfile: (userId: string) => void;
   onNavigateToPost: (postId: string) => void;
 }
 
-const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }) => {
-  const [query, setQuery] = useState('');
+const Search: React.FC<SearchProps> = ({ initialQuery = '', onNavigateToProfile, onNavigateToPost }) => {
+  const [query, setQuery] = useState(initialQuery);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);

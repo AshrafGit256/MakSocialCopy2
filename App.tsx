@@ -31,6 +31,7 @@ const App: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
+  const [prefilledSearchQuery, setPrefilledSearchQuery] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [safetyError, setSafetyError] = useState<string | null>(null);
 
@@ -85,7 +86,14 @@ const App: React.FC = () => {
   const handleSetView = (newView: AppView) => {
     if (userRole === 'admin' && newView !== 'admin') return;
     if (newView !== 'messages') setActiveChatUserId(null);
+    if (newView !== 'search') setPrefilledSearchQuery(null);
     setView(newView); setIsSidebarOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleHashtagClick = (tag: string) => {
+    setPrefilledSearchQuery(tag);
+    setView('search');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -100,20 +108,20 @@ const App: React.FC = () => {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
-      case 'thread': return <Feed threadId={activeThreadId || undefined} triggerSafetyError={setSafetyError} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
+      case 'home': return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onHashtagClick={handleHashtagClick} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
+      case 'thread': return <Feed threadId={activeThreadId || undefined} triggerSafetyError={setSafetyError} onHashtagClick={handleHashtagClick} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
       case 'messages': return <Chat initialTargetUserId={activeChatUserId || undefined} />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={(id) => { setActiveChatUserId(id); setView('messages'); }} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
+      case 'search': return <Search initialQuery={prefilledSearchQuery || undefined} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'resources': return <Resources />;
       case 'market': return <Market />;
       case 'forge': return <Forge onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
       case 'settings': return <SettingsView />;
       case 'admin': return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
-      default: return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
+      default: return <Feed collegeFilter={activeSector} triggerSafetyError={setSafetyError} onHashtagClick={handleHashtagClick} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} />;
     }
   };
 

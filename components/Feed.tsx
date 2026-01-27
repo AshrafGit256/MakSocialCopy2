@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
@@ -8,14 +8,100 @@ import {
   TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
-  Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash
+  Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
+  Maximize2, Volume2, Play, Pause, X
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
+const NewsBulletin: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoUrl = "https://github.com/AshrafGit256/MakSocialImages/raw/main/Public/journalism2.mp4";
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (isPlaying) videoRef.current.pause();
+      else videoRef.current.play();
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <>
+      <div className="bg-slate-900 border border-slate-700 rounded-[var(--radius-main)] overflow-hidden mb-6 group relative shadow-2xl">
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-2 pointer-events-none">
+          <div className="px-2 py-1 bg-rose-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow-lg animate-pulse flex items-center gap-1">
+             <div className="w-1 h-1 bg-white rounded-full"></div> LIVE_BULLETIN
+          </div>
+        </div>
+        
+        <div className="aspect-video relative bg-black">
+          <video 
+            ref={videoRef}
+            src={videoUrl}
+            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+            loop
+            muted
+            playsInline
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={togglePlay} className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
+              {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
+            </button>
+          </div>
+
+          <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            <button 
+              onClick={() => setIsExpanded(true)}
+              className="p-1.5 bg-black/40 backdrop-blur-md text-white rounded hover:bg-indigo-600 transition-all"
+              title="Expand Scan"
+            >
+              <Maximize2 size={14} />
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-4 bg-slate-900/50 backdrop-blur-md border-t border-white/5">
+          <h4 className="text-[10px] font-black text-white uppercase tracking-tighter italic">Hill_Daily_Digest / Intelligence Sync</h4>
+          <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status: Summarizing Campus Strata Activity</p>
+        </div>
+      </div>
+
+      {/* Expanded Modal */}
+      {isExpanded && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 md:p-10 bg-black/95 backdrop-blur-lg animate-in fade-in">
+          <div className="relative w-full max-w-5xl aspect-video bg-black rounded-[var(--radius-main)] overflow-hidden border border-white/10 shadow-2xl shadow-indigo-600/20">
+            <button 
+              onClick={() => setIsExpanded(false)}
+              className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-rose-600 text-white rounded-full transition-all"
+            >
+              <X size={24} />
+            </button>
+            <video 
+              src={videoUrl}
+              className="w-full h-full object-contain"
+              controls
+              autoPlay
+            />
+            <div className="absolute bottom-10 left-10 space-y-2 pointer-events-none">
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">Protocol_Journalism / Expanded</h2>
+              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">Node: Central_Journalism_Wing // {new Date().toLocaleDateString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
 const NetworkIntensityGraph: React.FC = () => {
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-5 mb-4 relative overflow-hidden group rounded-[4px]">
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-5 mb-4 relative overflow-hidden group rounded-[var(--radius-main)] shadow-sm">
        <div className="relative z-10 space-y-4">
           <div className="flex justify-between items-start">
              <div className="space-y-1">
@@ -38,7 +124,7 @@ const NetworkIntensityGraph: React.FC = () => {
   );
 };
 
-const TrendingHashtags: React.FC<{ posts: Post[] }> = ({ posts }) => {
+const TrendingHashtags: React.FC<{ posts: Post[], onTagClick?: (tag: string) => void }> = ({ posts, onTagClick }) => {
   const topTags = useMemo(() => {
     const counts: Record<string, number> = {};
     posts.forEach(p => {
@@ -53,14 +139,18 @@ const TrendingHashtags: React.FC<{ posts: Post[] }> = ({ posts }) => {
   }, [posts]);
 
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-5 mb-4">
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-5 mb-4 shadow-sm">
        <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
           <Hash size={12} className="text-slate-400" /> Hot_Signals
        </h4>
        <div className="space-y-4">
           {topTags.length > 0 ? topTags.map(([tag, count], i) => (
-            <div key={i} className="flex justify-between items-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 p-1 rounded transition-all">
-               <span className="text-[11px] font-black uppercase text-indigo-600 tracking-tight">{tag}</span>
+            <div 
+              key={i} 
+              onClick={() => onTagClick?.(tag)}
+              className="flex justify-between items-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 p-2 rounded transition-all border border-transparent hover:border-indigo-500/20"
+            >
+               <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-tight group-hover:underline">#{tag.replace('#','')}</span>
                <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">{count} COMMITS</span>
             </div>
           )) : (
@@ -72,7 +162,7 @@ const TrendingHashtags: React.FC<{ posts: Post[] }> = ({ posts }) => {
 };
 
 const Watchlist: React.FC = () => (
-  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-5">
+  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-5 shadow-sm">
      <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
         <Radio size={12} className="text-slate-400" /> Sector_Watchlist
      </h4>
@@ -133,7 +223,7 @@ const PostItem: React.FC<{
   return (
     <article 
       onClick={() => !isThreadView && onOpenThread(post.id)}
-      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
+      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
     >
       <div className="flex">
           {/* Identity Rail */}
@@ -194,12 +284,12 @@ const PostItem: React.FC<{
                 <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
                 {post.pollData && (
-                  <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
+                  <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[var(--radius-main)] shadow-inner">
                       <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
                       {post.pollData.options.map(opt => {
                         const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
                         return (
-                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
+                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
                               <div className="absolute inset-y-0 left-0 bg-slate-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
                               <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
                               <span className="relative z-10 text-[10px] font-black text-slate-400">{percentage}%</span>
@@ -302,7 +392,7 @@ const PostItem: React.FC<{
   );
 };
 
-const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError }) => {
+const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void, onHashtagClick?: (tag: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError, onHashtagClick }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
   const [bookmarks, setBookmarks] = useState<string[]>(db.getBookmarks());
@@ -321,7 +411,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   }, [updateTrigger, collegeFilter, threadId]);
 
   const handlePost = (html: string, poll?: PollData) => {
-    // Extract hashtags from content
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
 
@@ -368,7 +457,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             
             {threadId && (
               <div className="mb-10 flex items-center justify-between px-4">
-                <button onClick={onBack} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-[9px] font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center gap-3">
+                <button onClick={onBack} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] text-[9px] font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center gap-3">
                    <ArrowLeft size={14}/> Back to Pulse
                 </button>
                 <div className="flex items-center gap-3">
@@ -402,20 +491,21 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    onLike={handleLike}
                  />
                )) : (
-                 <div className="py-40 text-center space-y-6 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">
+                 <div className="py-40 text-center space-y-6 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[var(--radius-main)]">
                     <Database size={48} className="mx-auto text-slate-400" />
-                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest text-slate-500">Registry_Empty: No signals committed to this manifest.</p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registry_Empty: No signals committed to this manifest.</p>
                  </div>
                )}
             </div>
          </div>
          
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
+            <NewsBulletin />
             <NetworkIntensityGraph />
-            <TrendingHashtags posts={posts} />
+            <TrendingHashtags posts={posts} onTagClick={onHashtagClick} />
             <Watchlist />
             
-            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[4px]">
+            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[var(--radius-main)] shadow-xl">
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
@@ -425,7 +515,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                   <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
                     Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
                   </p>
-                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[2px] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95">Commit_Credentials</button>
+                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[var(--radius-main)] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95">Commit_Credentials</button>
                </div>
             </div>
          </aside>

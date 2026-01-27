@@ -32,6 +32,9 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
   useEffect(() => {
     const q = query.toLowerCase();
     
+    // Check if query is a hashtag
+    const isHashtagSearch = q.startsWith('#');
+
     const userMatches = (allUsers || []).filter(u => 
       u.name.toLowerCase().includes(q) || 
       u.role.toLowerCase().includes(q) || 
@@ -39,13 +42,25 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
     );
 
     const postMatches = (allPosts || []).filter(p => {
-      const textMatch = p.content.toLowerCase().includes(q) || p.author.toLowerCase().includes(q);
+      let textMatch = false;
+      if (isHashtagSearch) {
+        // Direct hashtag matching in the tags array
+        textMatch = (p.hashtags || []).some(tag => tag.toLowerCase() === q);
+      } else {
+        textMatch = p.content.toLowerCase().includes(q) || p.author.toLowerCase().includes(q);
+      }
+      
       const wingMatch = selectedWing === 'All' || p.college === selectedWing;
       return textMatch && wingMatch;
     });
 
     setFilteredUsers(userMatches);
     setFilteredPosts(postMatches);
+    
+    // Switch to repositories if hashtag is searched
+    if (isHashtagSearch && activeType !== 'Repositories') {
+      setActiveType('Repositories');
+    }
   }, [query, allUsers, allPosts, selectedWing]);
 
   const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -58,7 +73,7 @@ const Search: React.FC<SearchProps> = ({ onNavigateToProfile, onNavigateToPost }
           <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
           <input
             className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2.5 pl-12 pr-4 text-sm font-bold outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all shadow-sm"
-            placeholder="Search Registry for nodes, signals, or academic assets..."
+            placeholder="Search Registry for nodes, #hashtags, or academic assets..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

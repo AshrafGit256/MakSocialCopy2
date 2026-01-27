@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
@@ -8,13 +8,12 @@ import {
   TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
-  Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin
+  Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
 const NetworkIntensityGraph: React.FC = () => {
-  const sparkData = Array.from({ length: 12 }, (_, i) => ({ v: 40 + Math.random() * 50 }));
   return (
     <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-5 mb-4 relative overflow-hidden group rounded-[4px]">
        <div className="relative z-10 space-y-4">
@@ -34,6 +33,39 @@ const NetworkIntensityGraph: React.FC = () => {
                 </div>
              </div>
           </div>
+       </div>
+    </div>
+  );
+};
+
+const TrendingHashtags: React.FC<{ posts: Post[] }> = ({ posts }) => {
+  const topTags = useMemo(() => {
+    const counts: Record<string, number> = {};
+    posts.forEach(p => {
+      (p.hashtags || []).forEach(tag => {
+        const cleanTag = tag.startsWith('#') ? tag : `#${tag}`;
+        counts[cleanTag] = (counts[cleanTag] || 0) + 1;
+      });
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  }, [posts]);
+
+  return (
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-5 mb-4">
+       <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+          <Hash size={12} className="text-slate-400" /> Hot_Signals
+       </h4>
+       <div className="space-y-4">
+          {topTags.length > 0 ? topTags.map(([tag, count], i) => (
+            <div key={i} className="flex justify-between items-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 p-1 rounded transition-all">
+               <span className="text-[11px] font-black uppercase text-indigo-600 tracking-tight">{tag}</span>
+               <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">{count} COMMITS</span>
+            </div>
+          )) : (
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">No signals indexed...</p>
+          )}
        </div>
     </div>
   );
@@ -178,8 +210,8 @@ const PostItem: React.FC<{
                 )}
 
                 <div className="flex flex-wrap gap-2 mt-4">
-                   {post.hashtags.map(tag => (
-                      <span key={tag} className="text-[9px] font-bold text-slate-500 hover:underline cursor-pointer tracking-wider">{tag}</span>
+                   {(post.hashtags || []).map(tag => (
+                      <span key={tag} className="text-[9px] font-bold text-indigo-500 hover:underline cursor-pointer tracking-wider">#{tag.replace('#', '')}</span>
                    ))}
                 </div>
             </div>
@@ -289,6 +321,10 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   }, [updateTrigger, collegeFilter, threadId]);
 
   const handlePost = (html: string, poll?: PollData) => {
+    // Extract hashtags from content
+    const hashtagRegex = /#(\w+)/g;
+    const foundTags = html.match(hashtagRegex) || [];
+
     const newPost: Post = {
       id: `p-${Date.now()}`,
       author: user.name,
@@ -297,7 +333,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       authorAvatar: user.avatar,
       timestamp: 'Just now',
       content: html,
-      hashtags: [],
+      hashtags: foundTags,
       likes: 0,
       commentsCount: 0,
       comments: [],
@@ -376,6 +412,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
          
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
             <NetworkIntensityGraph />
+            <TrendingHashtags posts={posts} />
             <Watchlist />
             
             <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[4px]">

@@ -31,17 +31,18 @@ export const MOCK_POSTS: Post[] = [
     id: 'p-1',
     author: 'Roy Ssemboga',
     authorId: 'roy_ssemboga',
-    authorRole: 'Student Leader',
+    authorRole: 'Former Guild President',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
     authorAuthority: 'Student Leader',
     timestamp: '15m ago',
     content: `<h1>University Infrastructure Uplink</h1>
-<p>We are currently auditing the connectivity nodes in the CEDAT wing. If your stratum is experiencing packet loss, please log your node ID below.</p>`,
+<p>I have received reports regarding connectivity issues in the CEDAT wing. I'm engaging with the technical team to ensure that nodes are restored before the end of the day.</p>`,
     hashtags: ['#MakInfrastructure', '#StudentWelfare'],
-    likes: 124,
-    commentsCount: 42,
+    likes: 245,
+    commentsCount: 3,
     comments: [
-      { id: 'c1', author: 'Shamim Nambassa', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', text: 'Confirmed. Block B is currently offline.', timestamp: '10m ago' }
+      { id: 'c1', author: 'Shamim Nambassa', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', text: 'Thank you Roy. Block B is particularly problematic.', timestamp: '10m ago' },
+      { id: 'c2', author: 'Gilbert Nawangwe', authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC', text: 'Technical teams have been notified and are on site.', timestamp: '5m ago' }
     ],
     views: 1200,
     flags: [],
@@ -50,27 +51,29 @@ export const MOCK_POSTS: Post[] = [
   },
   {
     id: 'p-2',
-    author: 'Prof. Barnabas Nawangwe',
+    author: 'Gilbert Nawangwe',
     authorId: 'vc_office',
-    authorRole: 'Administrator',
+    authorRole: 'Vice Chancellor',
     authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
     authorAuthority: 'Administrator',
     timestamp: '1h ago',
-    content: `<h2>Research Grant Manifest: Phase 4</h2>
-<p>The academic council has approved a new set of liquidity protocols for the AI Research Lab in COCIS. Verified nodes may now apply for strata funding via the Registry Vault.</p>`,
+    content: `<h2>Official Academic Update</h2>
+<p>The academic council is reviewing the new research protocols for the postgraduate strata. We encourage all finalists to verify their graduation parameters in the central registry.</p>`,
     hashtags: ['#MakerereResearch', '#OfficialBroadcast'],
     likes: 890,
-    commentsCount: 15,
-    comments: [],
+    commentsCount: 1,
+    comments: [
+      { id: 'c3', author: 'Roy Ssemboga', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy', text: 'This is a welcome development for all students.', timestamp: '45m ago' }
+    ],
     views: 5600,
     flags: [],
     isOpportunity: true,
     opportunityData: {
       type: 'Grant',
       isAIVerified: true,
-      detectedBenefit: 'UGX 5M Funding'
+      detectedBenefit: 'Research Support'
     },
-    college: 'COCIS'
+    college: 'Global'
   }
 ];
 

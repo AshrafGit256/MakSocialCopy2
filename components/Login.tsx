@@ -20,7 +20,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
     <div className="flex h-screen bg-[var(--bg-primary)] overflow-hidden selection:bg-indigo-500 selection:text-white">
       <div className="hidden lg:block w-1/2 relative bg-[#05080c]">
         <img
-          src="https://images.unsplash.com/phttps://github.com/AshrafGit256/MakSocialImages/blob/main/Public/makerere_at_night.webphoto-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1200"
+          src="https://github.com/AshrafGit256/MakSocialImages/blob/main/Public/makerere_at_night.webp"
           alt="The Hill Architecture"
           className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-1000"
         />

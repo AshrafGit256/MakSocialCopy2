@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+
+import React, { useState, useEffect } from 'export React';
 import { db } from '../db';
-import { User, Post, AuthorityRole } from '../types';
+import { User, Post } from '../types';
 import { AuthoritySeal } from './Feed'; 
+// Added missing GitCommit, Heart, and MessageCircle imports
 import { 
-  MapPin, Edit3, Heart, MessageCircle, ArrowLeft, 
-  Activity, Globe, Zap, Radio, Share2, Database, 
-  Terminal, ShieldCheck, Mail, Target, Award, Trophy, Bookmark
+  MapPin, ArrowLeft, Globe, Zap, Radio, Share2, Database, 
+  Terminal, Award, Trophy, Bookmark, Mail, Link as LinkIcon, Edit2, Calendar,
+  GitCommit, Heart, MessageCircle
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -19,96 +21,146 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
 
   useEffect(() => {
     const targetId = userId || currentUser.id;
-    const profileUser = db.getUsers().find(u => u.id === targetId) || currentUser;
-    setUser(profileUser);
-    setPosts(db.getPosts().filter(p => p.authorId === targetId));
-  }, [userId]);
+    const profileUser = db.getUsers().find(u => u.id === targetId) || (isOwnProfile ? currentUser : null);
+    if (profileUser) {
+      setUser(profileUser);
+      setPosts(db.getPosts().filter(p => p.authorId === targetId));
+    }
+  }, [userId, currentUser.id, isOwnProfile]);
 
-  if (!user) return null;
+  if (!user) return (
+    <div className="flex items-center justify-center h-screen font-mono text-slate-400 uppercase tracking-[0.5em] animate-pulse">
+       Target_Node_Nullified
+    </div>
+  );
 
   return (
-    <div className="max-w-[1440px] mx-auto pb-40 font-mono">
-      {/* Tactical Banner */}
-      <div className="relative h-48 lg:h-64 overflow-hidden border-b border-[var(--border-color)] bg-slate-900">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
-        {onNavigateBack && <button onClick={onNavigateBack} className="absolute top-8 left-8 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-md text-white hover:bg-white/20 transition-all z-20"><ArrowLeft size={18}/></button>}
-        <div className="absolute bottom-6 left-12 right-12 flex justify-between items-end">
-           <div className="flex gap-8 text-[10px] font-black uppercase text-slate-500 tracking-widest">
-              <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> NODE_STABLE</div>
-              <div className="flex items-center gap-2"><MapPin size={12}/> THE_HILL_SECTOR</div>
-           </div>
-           <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">REG_ID: {SHA_GEN()}</span>
-        </div>
+    <div className="max-w-[1440px] mx-auto pb-40 font-mono text-[var(--text-primary)]">
+      {/* 1. Profile Navigation Header */}
+      <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20 sticky top-0 z-[100] backdrop-blur-md">
+         <div className="flex items-center gap-6">
+            <button onClick={onNavigateBack} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-all text-slate-500"><ArrowLeft size={20}/></button>
+            <div className="flex flex-col">
+               <h2 className="text-[14px] font-black uppercase italic tracking-tighter leading-none">{user.name.toLowerCase()}</h2>
+               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Registry_ID: {SHA_GEN()}</span>
+            </div>
+         </div>
+         <div className="flex items-center gap-3">
+            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[9px] font-black uppercase tracking-widest hover:border-slate-400 transition-all flex items-center gap-2">
+               <Share2 size={12}/> Signal_Identity
+            </button>
+         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 -mt-24 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* Node Identity Column */}
-          <aside className="lg:col-span-4 space-y-10">
+          {/* 2. Left Identity Column (Bio/Metadata) */}
+          <aside className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
-              <div className="relative inline-block">
-                <img src={user.avatar} className="relative w-48 h-48 lg:w-56 lg:h-56 rounded-full border-8 border-[var(--bg-primary)] bg-white object-cover shadow-2xl grayscale hover:grayscale-0 transition-all" />
-                <div className="absolute bottom-2 right-2 p-3 bg-[#475569] text-white rounded-full border-4 border-[var(--bg-primary)] shadow-2xl"><AuthoritySeal role="Official" size={28} /></div>
+              <div className="relative group">
+                <img src={user.avatar} className="w-full aspect-square rounded-[6px] border border-[var(--border-color)] bg-white object-cover shadow-sm grayscale group-hover:grayscale-0 transition-all duration-500" />
+                <div className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-black rounded-full border border-[var(--border-color)] shadow-xl">
+                   <AuthoritySeal role="Official" size={24} />
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <h1 className="text-4xl font-black uppercase tracking-tighter italic leading-none">{user.name}</h1>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.4em]">{user.college} Node // {user.status}</p>
-                <p className="text-xs text-slate-500 italic border-l-4 border-slate-700/30 pl-6 leading-relaxed">
-                  "{user.bio || 'Identity synchronization with the central registry in progress.'}"
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-px bg-[var(--border-color)] border border-[var(--border-color)] overflow-hidden shadow-inner">
-                <div className="bg-[var(--bg-secondary)] p-6 text-center">
-                  <span className="text-2xl font-black block leading-none">{user.followersCount}</span>
-                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1">Nodes_Linked</span>
-                </div>
-                <div className="bg-[var(--bg-secondary)] p-6 text-center">
-                  <span className="text-2xl font-black block leading-none">{user.totalLikesCount}</span>
-                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1">Registry_Stars</span>
-                </div>
+              <div className="space-y-2 pt-2">
+                <h1 className="text-3xl font-black uppercase italic tracking-tighter leading-tight">{user.name}</h1>
+                <p className="text-lg text-slate-400 font-bold tracking-tight">@{user.name.toLowerCase().replace(/\s/g, '')}</p>
               </div>
 
               {isOwnProfile ? (
-                 <button className="w-full py-4 bg-[#475569] text-white rounded-[2px] font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-slate-700 transition-all active:scale-95">Edit_Parameters</button>
+                 <button className="w-full py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-4px font-black text-[11px] uppercase tracking-widest hover:border-slate-400 transition-all">Edit Parameters</button>
               ) : (
-                 <button onClick={() => onMessageUser?.(user.id)} className="w-full py-4 bg-[#475569] text-white rounded-[2px] font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95">Direct_Sync</button>
+                 <div className="flex gap-2">
+                   <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-2 bg-indigo-600 text-white rounded-4px font-black text-[11px] uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-95 shadow-sm">Sync Protocol</button>
+                   <button className="px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-4px text-slate-400 hover:text-indigo-500 transition-all"><Zap size={14}/></button>
+                 </div>
               )}
+
+              <p className="text-sm font-medium italic text-slate-500 leading-relaxed border-l-2 border-indigo-500/20 pl-4 py-2">
+                "{user.bio || 'Identity synchronization with the central registry in progress. Node parameters pending update.'}"
+              </p>
+
+              <div className="space-y-3 pt-4 border-t border-[var(--border-color)]">
+                <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                   <MapPin size={14}/> {user.college} HUB
+                </div>
+                <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                   <Calendar size={14}/> Commited {user.status}
+                </div>
+                <div className="flex items-center gap-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                   <Mail size={14}/> {user.email || 'node@hidden.net'}
+                </div>
+                <div className="flex items-center gap-3 text-[11px] font-bold text-indigo-500 uppercase tracking-widest">
+                   <LinkIcon size={14}/> hillstrata.mak.ac.ug/n/{user.id}
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-[var(--border-color)]">
+                 <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4">Registry Metrics</h4>
+                 <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-1.5 text-xs font-bold hover:text-indigo-500 cursor-pointer">
+                       <Database size={14} className="text-slate-400"/>
+                       <span>{user.followersCount}</span> <span className="text-slate-400 font-medium lowercase">links</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs font-bold hover:text-indigo-500 cursor-pointer">
+                       <Zap size={14} className="text-slate-400"/>
+                       <span>{user.totalLikesCount}</span> <span className="text-slate-400 font-medium lowercase">stars</span>
+                    </div>
+                 </div>
+              </div>
             </div>
           </aside>
 
-          {/* Activity Manifest Column */}
-          <main className="lg:col-span-8 space-y-10">
-            <nav className="flex gap-12 border-b border-[var(--border-color)]">
+          {/* 3. Right Activity Column (Feed/Tabs) */}
+          <main className="lg:col-span-8 space-y-8">
+            <nav className="flex items-center gap-8 border-b border-[var(--border-color)]">
               {[
-                { id: 'signals', label: 'Signal_History', icon: <Radio size={16}/> },
-                { id: 'bookmarks', label: 'Vault_Saves', icon: <Bookmark size={16}/> },
-                { id: 'achievements', label: 'Credentials', icon: <Trophy size={16}/> }
+                { id: 'signals', label: 'Signal History', icon: <Radio size={14}/>, count: posts.length },
+                { id: 'bookmarks', label: 'Registry Vault', icon: <Bookmark size={14}/>, count: 0 },
+                { id: 'achievements', label: 'Credentials', icon: <Trophy size={14}/>, count: 12 }
               ].map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-5 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-4 ${activeTab === tab.id ? 'border-[#475569] text-[#475569]' : 'border-transparent text-slate-400 hover:text-slate-800'}`}>
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? 'text-[var(--text-primary)]' : 'text-slate-400 hover:text-slate-600'}`}>
                   {tab.icon} {tab.label}
+                  <span className="bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-500">{tab.count}</span>
+                  {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500 animate-in fade-in zoom-in-x"></div>}
                 </button>
               ))}
             </nav>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               {posts.length > 0 ? posts.map(p => (
-                <div key={p.id} className="pro-card p-8 group hover:border-slate-500 transition-all shadow-sm flex flex-col items-center text-center">
-                   <div className="text-[9px] font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2">
-                      <Terminal size={12}/> ORDER_{SHA_GEN()} / {p.timestamp}
+                <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-4px p-6 hover:border-slate-400 transition-all group">
+                   <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-2">
+                         <GitCommit size={14} className="text-emerald-500" />
+                         <span className="text-[10px] font-black uppercase text-indigo-600 tracking-widest">COMMIT_{p.id.slice(-6)}</span>
+                         <span className="text-slate-300 mx-2">/</span>
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{p.timestamp}</span>
+                      </div>
+                      <div className="flex gap-4 text-[10px] font-bold text-slate-400">
+                         <span className="flex items-center gap-1"><Heart size={12}/> {p.likes}</span>
+                         <span className="flex items-center gap-1"><MessageCircle size={12}/> {p.commentsCount}</span>
+                      </div>
                    </div>
-                   <div dangerouslySetInnerHTML={{ __html: p.content }} className="text-sm font-medium leading-relaxed italic text-slate-700 dark:text-slate-300 max-w-xl" />
-                   <div className="mt-8 pt-6 border-t border-[var(--border-color)] w-full flex justify-center gap-12">
-                      <span className="flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-rose-500"><Heart size={14}/> {p.likes}</span>
-                      <span className="flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-500"><MessageCircle size={14}/> {p.commentsCount}</span>
+                   <div dangerouslySetInnerHTML={{ __html: p.content }} className="text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400 italic" />
+                   <div className="mt-6 flex justify-between items-center">
+                      <div className="flex gap-2">
+                         <span className="px-2 py-0.5 bg-indigo-500/5 border border-indigo-500/10 text-indigo-500 rounded text-[8px] font-black uppercase">PUBLIC_MANIFEST</span>
+                      </div>
+                      <span className="text-[8px] font-mono text-slate-300 uppercase">SYNCHRONIZED_STABLE</span>
                    </div>
                 </div>
               )) : (
-                <div className="py-40 text-center space-y-4 border border-dashed border-[var(--border-color)]">
-                   <Database size={48} className="mx-auto text-slate-300 opacity-30" />
-                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Registry_Log_Empty</p>
+                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-4px bg-slate-50/50 dark:bg-black/5">
+                   <Database size={48} className="mx-auto text-slate-200" />
+                   <div className="space-y-1">
+                      <h3 className="text-xl font-black uppercase italic tracking-tighter">Manifest_Empty</h3>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No commit history found for this node stratum.</p>
+                   </div>
+                   <button className="px-8 py-2 bg-indigo-600 text-white rounded-4px text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Manual Search</button>
                 </div>
               )}
             </div>
@@ -118,4 +170,5 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
     </div>
   );
 };
+
 export default Profile;

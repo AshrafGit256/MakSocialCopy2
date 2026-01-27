@@ -7,15 +7,15 @@ import {
   Heart, MessageCircle, Zap, Radio, Activity, Globe, 
   ArrowUpRight, TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, Clock, MoreHorizontal, ShieldCheck, 
-  Database, Hash, ArrowLeft
+  Database, Hash, ArrowLeft, GitCommit, GitFork, Star, Box, Link as LinkIcon
 } from 'lucide-react';
 
-const SHA_GEN = () => Math.random().toString(16).substring(2, 6).toUpperCase();
+const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
 const NetworkIntensityGraph: React.FC = () => {
   const sparkData = Array.from({ length: 12 }, (_, i) => ({ v: 40 + Math.random() * 50 }));
   return (
-    <div className="pro-card p-5 mb-4 relative overflow-hidden group scanning-line">
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-5 mb-4 relative overflow-hidden group rounded-[4px]">
        <div className="relative z-10 space-y-4">
           <div className="flex justify-between items-start">
              <div className="space-y-1">
@@ -46,7 +46,7 @@ const NetworkIntensityGraph: React.FC = () => {
 };
 
 const Watchlist: React.FC = () => (
-  <div className="pro-card p-5">
+  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-5">
      <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
         <Radio size={12} className="text-slate-400" /> Sector_Watchlist
      </h4>
@@ -71,76 +71,93 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = 
 };
 
 const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark }) => (
-  <article className="pro-card mb-8 group animate-in fade-in slide-in-from-bottom-4 duration-300 border-x-0 sm:border-x">
-     {/* Centered Identity Header */}
-     <div className="p-8 flex flex-col items-center justify-center border-b border-[var(--border-color)] bg-slate-50/50 dark:bg-black/20 relative">
-        <div className="absolute top-6 right-6 flex gap-2">
-           <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-2 rounded-full transition-all ${bookmarks.includes(post.id) ? 'text-orange-500 bg-orange-500/10' : 'text-slate-400 hover:bg-slate-200 dark:hover:bg-white/5'}`}>
-              <Bookmark size={16} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
-           </button>
-           <button className="p-2 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/5 rounded-full transition-all"><MoreHorizontal size={16}/></button>
-        </div>
-        
-        <div className="relative group/avatar cursor-pointer" onClick={() => onNavigateToProfile(post.authorId)}>
+  <article className="mb-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 dark:hover:border-slate-700 transition-all shadow-sm group">
+     <div className="flex">
+        {/* Left Rail Identity Profile (Restored) */}
+        <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10">
            <img 
               src={post.authorAvatar} 
-              className="w-20 h-20 rounded-full border-2 border-[var(--border-color)] bg-white object-cover grayscale group-hover/avatar:grayscale-0 transition-all shadow-xl" 
+              onClick={() => onNavigateToProfile(post.authorId)}
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-[4px] border border-[var(--border-color)] bg-white object-cover cursor-pointer grayscale hover:grayscale-0 transition-all shadow-sm" 
            />
-           <div className="absolute -bottom-1 -right-1 bg-[#475569] text-white rounded-full p-1.5 border-2 border-[var(--bg-primary)]">
-              <AuthoritySeal role={post.authorAuthority} size={14} />
+           <div className="mt-4 flex flex-col items-center gap-3">
+              <div className="w-px h-12 bg-gradient-to-b from-[var(--border-color)] to-transparent"></div>
+              <GitCommit size={14} className="text-slate-300" />
            </div>
         </div>
 
-        <div className="mt-4 text-center space-y-1">
-           <h4 onClick={() => onNavigateToProfile(post.authorId)} className="text-[15px] font-black uppercase tracking-tighter text-[var(--text-primary)] hover:underline cursor-pointer italic">{post.author}</h4>
-           <div className="flex items-center justify-center gap-3">
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{post.college} HUB</span>
-              <span className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></span>
-              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{post.timestamp}</span>
+        {/* Right Rail Content */}
+        <div className="flex-1 min-w-0">
+           {/* Post Header - Repository Style */}
+           <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
+              <div className="flex items-center gap-2 overflow-hidden">
+                 <Box size={14} className="text-slate-400" />
+                 <div className="flex items-center text-[12px] font-bold truncate">
+                    <span onClick={() => onNavigateToProfile(post.authorId)} className="text-indigo-600 hover:underline cursor-pointer">{post.author.toLowerCase().replace(/\s/g, '_')}</span>
+                    <span className="mx-1 text-slate-400">/</span>
+                    <span className="text-[var(--text-primary)] truncate">signal_{post.id.slice(-6)}</span>
+                    <AuthoritySeal role={post.authorAuthority} size={12} />
+                 </div>
+                 <span className="hidden sm:inline px-1.5 py-0.5 border border-[var(--border-color)] rounded-full text-[8px] font-black uppercase text-slate-500 ml-2">Public</span>
+              </div>
+              <div className="flex items-center gap-2">
+                 <span className="text-[9px] font-mono text-slate-400 hidden md:inline uppercase">{post.timestamp}</span>
+                 <button onClick={() => onBookmark(post.id)} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
+                    <Bookmark size={14} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
+                 </button>
+                 <button className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><MoreHorizontal size={14}/></button>
+              </div>
            </div>
-        </div>
-     </div>
 
-     {/* Content - Full Width Reclamation */}
-     <div onClick={() => onOpenThread(post.id)} className="p-8 cursor-pointer hover:bg-slate-50/20 dark:hover:bg-white/5 transition-all">
-        <div className="text-[14px] leading-relaxed font-mono text-[var(--text-primary)] mb-6" dangerouslySetInnerHTML={{ __html: post.content }} />
-        
-        {post.pollData && (
-           <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded shadow-inner">
-              <p className="text-[9px] font-black uppercase text-slate-400 mb-4 flex items-center gap-2"><BarChart3 size={12}/> Active Node Census</p>
-              {post.pollData.options.map(opt => {
-                 const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
-                 return (
-                    <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-indigo-500 transition-all">
-                       <div className="absolute inset-y-0 left-0 bg-[#475569]/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
-                       <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
-                       <span className="relative z-10 text-[10px] font-black text-slate-400 group-hover/opt:text-slate-900 dark:group-hover/opt:text-white transition-colors">{percentage}%</span>
+           {/* Signal Body */}
+           <div onClick={() => onOpenThread(post.id)} className="p-6 cursor-pointer hover:bg-slate-50/20 dark:hover:bg-white/5 transition-all">
+              <div className="text-[14px] leading-relaxed font-mono text-[var(--text-primary)] mb-4 post-content-markdown" dangerouslySetInnerHTML={{ __html: post.content }} />
+              
+              {post.pollData && (
+                 <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
+                    <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
+                    {post.pollData.options.map(opt => {
+                       const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
+                       return (
+                          <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-indigo-500 transition-all">
+                             <div className="absolute inset-y-0 left-0 bg-indigo-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                             <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
+                             <span className="relative z-10 text-[10px] font-black text-slate-400 group-hover/opt:text-slate-900 dark:group-hover/opt:text-white transition-colors">{percentage}%</span>
+                          </div>
+                       );
+                    })}
+                    <p className="text-[8px] font-bold text-slate-400 text-right uppercase mt-4 tracking-tighter italic">Total Commits: {post.pollData.totalVotes}</p>
+                 </div>
+              )}
+              
+              {/* Note: Images are now rendered within post.content via Summernote to avoid duplication */}
+           </div>
+
+           {/* Signal Footer - Git Metrics Style */}
+           <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
+              <div className="flex items-center gap-8">
+                 <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
+                    <Heart size={14} /> <span className="ticker-text">{post.likes.toLocaleString()}</span>
+                 </button>
+                 <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-500 transition-colors">
+                    <MessageCircle size={14} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span>
+                 </button>
+                 <div className="hidden sm:flex items-center gap-4 border-l border-[var(--border-color)] pl-8">
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                       <GitFork size={12}/> {Math.floor(post.likes / 5)}
                     </div>
-                 );
-              })}
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                       <Star size={12}/> {Math.floor(post.views / 100)}
+                    </div>
+                 </div>
+              </div>
+              <div className="flex items-center gap-4">
+                 <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-[2px] text-[8px] font-black uppercase">
+                    <Terminal size={10}/> SHA_{SHA_GEN()}
+                 </div>
+                 <button className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"><Share2 size={14}/></button>
+              </div>
            </div>
-        )}
-
-        {post.images && post.images.length > 0 && (
-           <div className="mt-8 border border-[var(--border-color)] p-1 bg-white/5">
-              <img src={post.images[0]} className="w-full max-h-[600px] object-contain" />
-           </div>
-        )}
-     </div>
-
-     {/* Footer */}
-     <div className="px-8 py-4 bg-slate-50/50 dark:bg-black/20 border-t border-[var(--border-color)] flex items-center justify-between">
-        <div className="flex items-center gap-10">
-           <button className="flex items-center gap-2 text-[11px] font-black text-slate-400 hover:text-rose-500 transition-colors">
-              <Heart size={18} /> <span className="ticker-text">{post.likes.toLocaleString()}</span>
-           </button>
-           <button className="flex items-center gap-2 text-[11px] font-black text-slate-400 hover:text-indigo-500 transition-colors">
-              <MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span>
-           </button>
-        </div>
-        <div className="flex items-center gap-4">
-           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-tighter opacity-50 hidden sm:block">SHA_{SHA_GEN()}</span>
-           <button className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"><Share2 size={16}/></button>
         </div>
      </div>
   </article>
@@ -159,9 +176,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   }, []);
 
   const handlePost = (html: string, poll?: PollData) => {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const imgs = Array.from(doc.querySelectorAll('img')).map(img => img.src);
-    
+    // Binary asset extraction minimized to avoid duplication in display
     const newPost: Post = {
       id: `p-${Date.now()}`,
       author: user.name,
@@ -178,7 +193,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       flags: [],
       isOpportunity: false,
       college: collegeFilter === 'Global' ? user.college : collegeFilter,
-      images: imgs,
       pollData: poll
     };
     db.addPost(newPost);
@@ -201,7 +215,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       <div className="lg:hidden mb-6 px-4">
          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
             <div className="min-w-[280px]"><NetworkIntensityGraph /></div>
-            <div className="min-w-[200px] pro-card p-5">
+            <div className="min-w-[200px] bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-5">
                <span className="text-[9px] font-black uppercase text-slate-400 block mb-4 tracking-widest">Active Hubs</span>
                <div className="flex flex-wrap gap-3">
                   {['#COCIS', '#CEDAT', '#LAW'].map(t => <span key={t} className="text-[10px] font-black text-slate-500 uppercase">{t}</span>)}
@@ -217,14 +231,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             
             {threadId && (
               <div className="mb-10 flex items-center justify-between px-4">
-                <button onClick={onBack} className="px-5 py-2 pro-card rounded text-[9px] font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center gap-3">
+                <button onClick={onBack} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] text-[9px] font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center gap-3">
                    <ArrowLeft size={14}/> Back_to_Registry
                 </button>
                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Signal_Chain_Sequence</h3>
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-4">
                {filteredPosts.length > 0 ? filteredPosts.map((post) => (
                  <PostItem 
                    key={post.id} 
@@ -236,8 +250,8 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    onBookmark={handleBookmark}
                  />
                )) : (
-                 <div className="py-40 text-center space-y-6 pro-card border-dashed">
-                    <Database size={48} className="mx-auto text-slate-700" />
+                 <div className="py-40 text-center space-y-6 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">
+                    <Database size={48} className="mx-auto text-slate-400" />
                     <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registry_Empty: No signals committed to manifest.</p>
                  </div>
                )}
@@ -249,22 +263,22 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             <NetworkIntensityGraph />
             <Watchlist />
             
-            {/* Strata Access */}
-            <div className="bg-[#475569] p-8 text-white relative overflow-hidden group shadow-2xl">
+            {/* Elite Strata Prompt */}
+            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[4px]">
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
-                     <ShieldCheck size={24} className="text-slate-300"/>
+                     <ShieldCheck size={24} className="text-slate-400"/>
                      <h4 className="text-[16px] font-black uppercase tracking-widest leading-none italic">Elite_Strata</h4>
                   </div>
-                  <p className="text-[10px] font-medium opacity-70 uppercase leading-relaxed tracking-tight">
+                  <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
                     Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
                   </p>
-                  <button className="w-full py-4 bg-white text-slate-800 rounded-[2px] font-black text-[10px] uppercase tracking-[0.3em] shadow-2xl hover:bg-slate-100 transition-all active:scale-95">Commit_Credentials</button>
+                  <button className="w-full py-3 bg-white text-slate-900 rounded-[2px] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-slate-100 transition-all active:scale-95">Commit_Credentials</button>
                </div>
             </div>
 
-            <div className="p-6 border border-dashed border-slate-700 bg-slate-50 dark:bg-white/5">
+            <div className="p-6 border border-dashed border-[var(--border-color)] bg-slate-50 dark:bg-white/5 rounded-[4px]">
                <div className="flex items-center gap-3 mb-4">
                   <Terminal size={14} className="text-slate-500" />
                   <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">System_Status</span>

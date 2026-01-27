@@ -72,14 +72,15 @@ const PostItem: React.FC<{
   bookmarks: string[], 
   onBookmark: (id: string) => void, 
   onUpdate: () => void,
-  isThreadView?: boolean
-}> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false }) => {
+  isThreadView?: boolean,
+  isLiked?: boolean,
+  onLike: (id: string) => void
+}> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike }) => {
   const [newComment, setNewComment] = useState('');
   
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    db.likePost(post.id);
-    onUpdate();
+    onLike(post.id);
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -108,7 +109,7 @@ const PostItem: React.FC<{
             <img 
                 src={post.authorAvatar} 
                 onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer grayscale group-hover:grayscale-0 transition-all shadow-sm" 
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all shadow-sm" 
             />
             <div className="mt-4 flex flex-col items-center gap-3 flex-1 h-full">
                 <div className="w-px flex-1 bg-gradient-to-b from-[var(--border-color)] via-[var(--border-color)] to-transparent"></div>
@@ -145,7 +146,7 @@ const PostItem: React.FC<{
                 {post.isEventBroadcast && (
                    <div className="mb-8 rounded-[4px] border border-slate-500/20 overflow-hidden bg-slate-500/5">
                       <div className="h-48 relative overflow-hidden border-b border-slate-500/20">
-                         <img src={post.eventFlyer} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700" />
+                         <img src={post.eventFlyer} className="w-full h-full object-cover transition-all duration-700" />
                          <div className="absolute top-4 right-4 px-2 py-1 bg-slate-800 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-xl">Event_Broadcasting</div>
                       </div>
                       <div className="p-6 space-y-3">
@@ -186,8 +187,8 @@ const PostItem: React.FC<{
             {/* Post Interaction Footer */}
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
-                  <button onClick={handleLike} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-amber-500 transition-colors">
-                      <Star size={16} /> <span className="ticker-text">{post.likes.toLocaleString()} Stars</span>
+                  <button onClick={handleLike} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}>
+                      <Star size={16} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()} Stars</span>
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
                       <MessageCircle size={16} /> <span className="ticker-text">{post.commentsCount.toLocaleString()} Commits</span>
@@ -273,6 +274,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
   const [bookmarks, setBookmarks] = useState<string[]>(db.getBookmarks());
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [updateTrigger, setUpdateTrigger] = useState(0);
   
   useEffect(() => {
@@ -307,6 +309,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     };
     db.addPost(newPost);
     setUpdateTrigger(prev => prev + 1);
+  };
+
+  const handleLike = (id: string) => {
+    if (!likedPosts.has(id)) {
+      db.likePost(id);
+      setLikedPosts(new Set([...likedPosts, id]));
+      setUpdateTrigger(prev => prev + 1);
+    }
   };
 
   const filteredPosts = posts.filter(p => {
@@ -352,6 +362,8 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    onBookmark={(id) => setBookmarks(db.toggleBookmark(id))}
                    onUpdate={() => setUpdateTrigger(prev => prev + 1)}
                    isThreadView={!!threadId}
+                   isLiked={likedPosts.has(post.id)}
+                   onLike={handleLike}
                  />
                )) : (
                  <div className="py-40 text-center space-y-6 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
@@ -9,7 +10,7 @@ import {
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
-  Maximize2, Volume2, VolumeX, Play, Pause, X, Scan, Wifi
+  Maximize2, Volume2, VolumeX, Play, Pause, X, Scan, Wifi, Eye, Shield
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -19,13 +20,14 @@ const NewsBulletin: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const videoUrl = "https://github.com/AshrafGit256/MakSocialImages/raw/main/Public/journalism2.mp4";
+  // Using the raw link for direct video rendering support
+  const videoUrl = "https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/journalism2.mp4";
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (videoRef.current) {
       if (isPlaying) videoRef.current.pause();
-      else videoRef.current.play();
+      else videoRef.current.play().catch(() => {});
       setIsPlaying(!isPlaying);
     }
   };
@@ -41,26 +43,28 @@ const NewsBulletin: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
   return (
     <>
       <div className={`bg-slate-900 border border-slate-700 rounded-[var(--radius-main)] overflow-hidden group relative shadow-2xl transition-all hover:border-indigo-500/50 ${isMobile ? 'mb-8 lg:hidden' : 'mb-6'}`}>
-        {/* Tactical HUD Overlay */}
+        {/* Visual Scanning HUD */}
         <div className="absolute inset-0 pointer-events-none z-10">
-           <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
-           <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500/20 animate-scanline"></div>
+           <div className="absolute top-0 left-0 w-full h-full opacity-5 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.04),rgba(0,255,0,0.01),rgba(0,0,255,0.04))] bg-[length:100%_2px,3px_100%]"></div>
+           <div className="absolute top-0 left-0 w-full h-[1px] bg-indigo-500/30 animate-scanline"></div>
         </div>
 
+        {/* Top Indicators */}
         <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
-          <div className="px-2 py-1 bg-rose-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow-lg flex items-center gap-1.5">
-             <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div> REC_LIVE
+          <div className="px-2 py-0.5 bg-rose-600 text-white text-[7px] font-black uppercase tracking-[0.2em] rounded flex items-center gap-1.5 shadow-lg">
+             <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div> SIGNAL_LIVE
           </div>
-          <div className="px-2 py-1 bg-black/40 backdrop-blur-md text-white text-[7px] font-black uppercase tracking-widest rounded border border-white/10 flex items-center gap-1.5">
-             <Wifi size={10} className="text-emerald-500" /> SYNC_STABLE
+          <div className="px-2 py-0.5 bg-black/40 backdrop-blur-md text-emerald-400 text-[7px] font-black uppercase tracking-widest rounded border border-white/5 flex items-center gap-1.5">
+             <Wifi size={10} /> ENCRYPTED_SYNC
           </div>
         </div>
         
-        <div className="aspect-video relative bg-black cursor-pointer" onClick={togglePlay}>
+        {/* Video Surface */}
+        <div className="aspect-video relative bg-black cursor-pointer overflow-hidden" onClick={togglePlay}>
           <video 
             ref={videoRef}
             src={videoUrl}
-            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
             loop
             muted={isMuted}
             playsInline
@@ -70,53 +74,55 @@ const NewsBulletin: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
           
-          {/* Controllers Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 z-20">
-            <div className="p-4 bg-white/10 backdrop-blur-xl rounded-full text-white transform hover:scale-110 transition-all border border-white/20">
-              {isPlaying ? <Pause size={28} fill="white" /> : <Play size={28} fill="white" className="ml-1" />}
+          {/* Central Playback Controller */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10 z-20">
+            <div className="p-4 bg-white/10 backdrop-blur-2xl rounded-full text-white transform hover:scale-110 transition-all border border-white/10 shadow-2xl">
+              {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" className="ml-1" />}
             </div>
           </div>
 
+          {/* Bottom Controls */}
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between z-30">
             <div className="flex items-center gap-2">
               <button 
-                onClick={(e) => { e.stopPropagation(); toggleMute(e); }}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-main)] font-black text-[8px] uppercase tracking-widest transition-all border ${isMuted ? 'bg-rose-600/20 text-rose-500 border-rose-500/40' : 'bg-emerald-600 text-white border-emerald-500'}`}
+                onClick={toggleMute}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-[2px] font-black text-[8px] uppercase tracking-widest transition-all border ${isMuted ? 'bg-rose-600/20 text-rose-500 border-rose-500/40 hover:bg-rose-600/30' : 'bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-700'}`}
               >
                 {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
-                {isMuted ? 'Protocol_Muted' : 'Audio_Active'}
+                {isMuted ? 'Unmute_Signal' : 'Signal_Active'}
               </button>
             </div>
-            <button 
-              onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
-              className="p-2 bg-black/60 backdrop-blur-md text-white rounded-[var(--radius-main)] hover:bg-indigo-600 transition-all border border-white/10"
-              title="Expand Intelligence Scan"
-            >
-              <Maximize2 size={14} />
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsExpanded(true); }}
+                className="p-1.5 bg-black/60 backdrop-blur-md text-white rounded-[2px] hover:bg-indigo-600 transition-all border border-white/10 shadow-lg"
+                title="Expand Intelligence Scan"
+              >
+                <Maximize2 size={14} />
+              </button>
+            </div>
           </div>
         </div>
         
+        {/* Bulletin Info Box */}
         <div className="p-4 bg-slate-950 border-t border-white/5 relative z-20">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <h4 className="text-[10px] font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
-                <Radio size={10} className="text-rose-500" /> Hill_Daily_Digest / Intel_Stream
-              </h4>
-              <p className="text-[7px] text-slate-500 font-bold uppercase tracking-[0.2em]">Coordinate: Main_Campus_Central</p>
-            </div>
-            <span className="text-[8px] font-mono text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">v4.2_STABLE</span>
+          <div className="flex justify-between items-center mb-1">
+            <h4 className="text-[10px] font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
+              <Radio size={10} className="text-rose-500 animate-pulse" /> Hill_Intelligence / Daily_Log
+            </h4>
+            <span className="text-[8px] font-mono text-indigo-500 font-black">STABLE_v4.2</span>
           </div>
+          <p className="text-[8px] text-slate-500 font-bold uppercase tracking-[0.2em] leading-none">Status: Parsing Campus Activity Sequence...</p>
         </div>
       </div>
 
-      {/* Expanded Modal */}
+      {/* Expanded Intelligence Viewer */}
       {isExpanded && (
-        <div className="fixed inset-0 z-[5000] flex items-center justify-center p-4 md:p-10 bg-black/95 backdrop-blur-2xl animate-in fade-in">
-          <div className="relative w-full max-w-6xl aspect-video bg-black rounded-[var(--radius-main)] overflow-hidden border border-white/10 shadow-2xl shadow-indigo-600/20">
+        <div className="fixed inset-0 z-[6000] flex items-center justify-center p-4 md:p-10 bg-black/98 backdrop-blur-3xl animate-in fade-in zoom-in duration-300">
+          <div className="relative w-full max-w-6xl aspect-video bg-black rounded-[4px] overflow-hidden border border-white/10 shadow-[0_0_100px_rgba(79,70,229,0.2)]">
             <button 
               onClick={() => setIsExpanded(false)}
-              className="absolute top-6 right-6 z-[5001] p-3 bg-white/10 hover:bg-rose-600 text-white rounded-full transition-all border border-white/10"
+              className="absolute top-6 right-6 z-[6001] p-3 bg-white/10 hover:bg-rose-600 text-white rounded-full transition-all border border-white/10 backdrop-blur-xl"
             >
               <X size={24} />
             </button>
@@ -128,10 +134,10 @@ const NewsBulletin: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
             />
             <div className="absolute bottom-10 left-10 space-y-3 pointer-events-none hidden md:block">
               <div className="flex items-center gap-3">
-                 <div className="w-4 h-4 bg-rose-600 rounded-full animate-pulse"></div>
-                 <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Deep_Scan / Protocol_Journalism</h2>
+                 <div className="w-4 h-4 bg-rose-600 rounded-full animate-pulse shadow-[0_0_15px_#e11d48]"></div>
+                 <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic leading-none">Deep_Scan / Campus_Bulletin</h2>
               </div>
-              <p className="text-[12px] font-black text-indigo-400 uppercase tracking-[0.6em] ml-1">Terminal: Central_Journalism_Node // SHA_{SHA_GEN()}</p>
+              <p className="text-[12px] font-black text-indigo-400 uppercase tracking-[0.6em] ml-1">Log: {new Date().toLocaleDateString()} // SHA_{SHA_GEN()}</p>
             </div>
           </div>
         </div>
@@ -139,11 +145,11 @@ const NewsBulletin: React.FC<{ isMobile?: boolean }> = ({ isMobile }) => {
 
       <style>{`
         @keyframes scanline {
-          0% { transform: translateY(-100%); }
+          0% { transform: translateY(-10%); }
           100% { transform: translateY(1000%); }
         }
         .animate-scanline {
-          animation: scanline 8s linear infinite;
+          animation: scanline 6s linear infinite;
         }
       `}</style>
     </>
@@ -213,7 +219,7 @@ const TrendingHashtags: React.FC<{ posts: Post[], onTagClick?: (tag: string) => 
 };
 
 const Watchlist: React.FC = () => (
-  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-5 shadow-sm">
+  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-5 mb-6 shadow-sm">
      <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
         <Radio size={12} className="text-slate-400" /> Sector_Watchlist
      </h4>
@@ -551,13 +557,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </div>
          </div>
          
-         <aside className="hidden lg:flex lg:col-span-4 sticky top-0 h-screen flex-col space-y-6 overflow-y-auto no-scrollbar pt-6 pb-8 pr-1">
+         {/* THE TACTICAL SIDEBAR - RE-ENGINEERED */}
+         <aside className="hidden lg:flex lg:col-span-4 sticky top-4 h-[calc(100vh-2rem)] flex-col space-y-6 overflow-y-auto no-scrollbar pt-2 pb-8 pr-1 z-40">
             <NewsBulletin />
             <NetworkIntensityGraph />
             <TrendingHashtags posts={posts} onTagClick={onHashtagClick} />
             <Watchlist />
             
-            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[var(--radius-main)] shadow-xl shrink-0">
+            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[var(--radius-main)] shadow-2xl shrink-0">
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000 pointer-events-none"><Globe size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
@@ -567,15 +574,25 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                   <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
                     Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
                   </p>
-                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[var(--radius-main)] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95 shadow-lg">Commit_Credentials</button>
+                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[var(--radius-main)] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95 shadow-lg border border-white/20">Commit_Credentials</button>
                </div>
             </div>
 
-            <div className="px-4 py-2 opacity-30 flex flex-wrap gap-x-4 gap-y-2 text-[8px] font-black uppercase tracking-widest shrink-0">
-              <a href="#" className="hover:underline">Hill Protocol</a>
-              <a href="#" className="hover:underline">Node Safety</a>
-              <a href="#" className="hover:underline">Vault Access</a>
-              <span>© 2026 Registry_Core</span>
+            {/* Tactical Footer Elements */}
+            <div className="px-4 py-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] shrink-0">
+               <div className="flex flex-wrap gap-x-4 gap-y-2 text-[8px] font-black uppercase tracking-widest text-slate-400">
+                  {/* Fixed missing Shield icon import from lucide-react */}
+                  <a href="#" className="hover:text-indigo-500 transition-colors flex items-center gap-1"><Shield size={10}/> Safety Protocol</a>
+                  <a href="#" className="hover:text-indigo-500 transition-colors flex items-center gap-1"><Eye size={10}/> Visibility</a>
+                  <a href="#" className="hover:text-indigo-500 transition-colors flex items-center gap-1"><Lock size={10}/> Vault Access</a>
+               </div>
+               <div className="mt-4 pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
+                  <span className="text-[7px] font-black uppercase text-slate-500">© 2026 Registry_Core</span>
+                  <div className="flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                     <span className="text-[8px] font-black text-emerald-600 uppercase">Sys_Online</span>
+                  </div>
+               </div>
             </div>
          </aside>
       </div>

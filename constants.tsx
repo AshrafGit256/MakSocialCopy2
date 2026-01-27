@@ -32,7 +32,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Prof. Barnabas Nawangwe',
     authorId: 'vc_office',
     authorRole: 'Vice Chancellor',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
+    authorAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
     authorAuthority: 'Administrator',
     timestamp: '10m ago',
     content: `<h1>University Research Protocol</h1>

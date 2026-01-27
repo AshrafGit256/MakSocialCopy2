@@ -76,7 +76,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Centenary Bank',
     authorId: 'centenary_bank',
     authorRole: 'Strategic Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Bank',
+    authorAvatar: 'https://yt3.googleusercontent.com/KUU4mqp8QmSUU_LJi0GBUQKtIKCa1sX8lxJ2RZxSQnD-ZxLfESJTovLXRWTGsScZP0NxiZlckQ=s900-c-k-c0x00ffffff-no-rj',
     authorAuthority: 'Corporate',
     isAd: true,
     timestamp: '2h ago',

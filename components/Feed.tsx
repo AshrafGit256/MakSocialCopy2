@@ -9,13 +9,14 @@ import {
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
-  Maximize2, Volume2, Play, Pause, X
+  Maximize2, Volume2, VolumeX, Play, Pause, X
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
 const NewsBulletin: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoUrl = "https://github.com/AshrafGit256/MakSocialImages/raw/main/Public/journalism2.mp4";
@@ -29,10 +30,18 @@ const NewsBulletin: React.FC = () => {
     }
   };
 
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
   return (
     <>
-      <div className="bg-slate-900 border border-slate-700 rounded-[var(--radius-main)] overflow-hidden mb-6 group relative shadow-2xl">
-        <div className="absolute top-3 left-3 z-10 flex items-center gap-2 pointer-events-none">
+      <div className="bg-slate-900 border border-slate-700 rounded-[var(--radius-main)] overflow-hidden mb-6 group relative shadow-2xl transition-all hover:border-indigo-500/50">
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 pointer-events-none">
           <div className="px-2 py-1 bg-rose-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow-lg animate-pulse flex items-center gap-1">
              <div className="w-1 h-1 bg-white rounded-full"></div> LIVE_BULLETIN
           </div>
@@ -44,18 +53,30 @@ const NewsBulletin: React.FC = () => {
             src={videoUrl}
             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
             loop
-            muted
+            muted={isMuted}
             playsInline
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={togglePlay} className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
-              {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
+          {/* Controllers Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+            <button onClick={togglePlay} className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-indigo-600 transition-all transform hover:scale-110">
+              {isPlaying ? <Pause size={20} fill="white" /> : <Play size={20} fill="white" className="ml-1" />}
             </button>
           </div>
 
-          <div className="absolute bottom-3 right-3 flex items-center gap-2">
+          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between z-20">
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={toggleMute}
+                className="p-1.5 bg-black/40 backdrop-blur-md text-white rounded hover:bg-indigo-600 transition-all"
+                title={isMuted ? "Unmute Signal" : "Mute Signal"}
+              >
+                {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+              </button>
+            </div>
             <button 
               onClick={() => setIsExpanded(true)}
               className="p-1.5 bg-black/40 backdrop-blur-md text-white rounded hover:bg-indigo-600 transition-all"
@@ -66,9 +87,14 @@ const NewsBulletin: React.FC = () => {
           </div>
         </div>
         
-        <div className="p-4 bg-slate-900/50 backdrop-blur-md border-t border-white/5">
-          <h4 className="text-[10px] font-black text-white uppercase tracking-tighter italic">Hill_Daily_Digest / Intelligence Sync</h4>
-          <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status: Summarizing Campus Strata Activity</p>
+        <div className="p-4 bg-slate-950/80 backdrop-blur-md border-t border-white/5">
+          <h4 className="text-[10px] font-black text-white uppercase tracking-tighter italic flex items-center gap-2">
+            <Radio size={10} className="text-rose-500" /> Hill_Daily_Digest / Intel_Sync
+          </h4>
+          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest mt-1.5 flex items-center justify-between">
+            <span>Status: Parsing Campus Activity</span>
+            <span className="text-slate-600 font-mono italic">v4.2_STABLE</span>
+          </p>
         </div>
       </div>
 
@@ -88,8 +114,8 @@ const NewsBulletin: React.FC = () => {
               controls
               autoPlay
             />
-            <div className="absolute bottom-10 left-10 space-y-2 pointer-events-none">
-              <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">Protocol_Journalism / Expanded</h2>
+            <div className="absolute bottom-10 left-10 space-y-2 pointer-events-none hidden md:block">
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">Protocol_Journalism / Deep_Scan</h2>
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">Node: Central_Journalism_Wing // {new Date().toLocaleDateString()}</p>
             </div>
           </div>
@@ -114,7 +140,7 @@ const NetworkIntensityGraph: React.FC = () => {
                       <span className="text-[9px] font-black uppercase text-emerald-500 flex items-center gap-0.5">
                          <TrendingUp size={10} /> BULLISH
                       </span>
-                      <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">v4.2_STABLE</span>
+                      <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">REALTIME_FEED</span>
                    </div>
                 </div>
              </div>
@@ -289,7 +315,7 @@ const PostItem: React.FC<{
                       {post.pollData.options.map(opt => {
                         const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
                         return (
-                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
+                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[2px] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
                               <div className="absolute inset-y-0 left-0 bg-slate-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
                               <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
                               <span className="relative z-10 text-[10px] font-black text-slate-400">{percentage}%</span>
@@ -499,14 +525,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </div>
          </div>
          
-         <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
+         <aside className="hidden lg:flex lg:col-span-4 sticky top-6 h-[calc(100vh-2rem)] flex-col space-y-6 overflow-y-auto no-scrollbar pb-8 pr-1">
             <NewsBulletin />
             <NetworkIntensityGraph />
             <TrendingHashtags posts={posts} onTagClick={onHashtagClick} />
             <Watchlist />
             
-            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[var(--radius-main)] shadow-xl">
-               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
+            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[var(--radius-main)] shadow-xl shrink-0">
+               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000 pointer-events-none"><Globe size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
                      <ShieldCheck size={24} className="text-slate-400"/>
@@ -515,8 +541,16 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                   <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
                     Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
                   </p>
-                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[var(--radius-main)] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95">Commit_Credentials</button>
+                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[var(--radius-main)] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95 shadow-lg">Commit_Credentials</button>
                </div>
+            </div>
+
+            {/* Sub-footer for the sidebar */}
+            <div className="px-4 py-2 opacity-30 flex flex-wrap gap-x-4 gap-y-2 text-[8px] font-black uppercase tracking-widest shrink-0">
+              <a href="#" className="hover:underline">Hill Protocol</a>
+              <a href="#" className="hover:underline">Node Safety</a>
+              <a href="#" className="hover:underline">Vault Access</a>
+              <span>© 2026 Registry_Core</span>
             </div>
          </aside>
       </div>

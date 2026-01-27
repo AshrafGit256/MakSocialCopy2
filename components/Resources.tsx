@@ -61,7 +61,8 @@ const Resources: React.FC = () => {
       id: Date.now().toString(),
       title: addForm.title,
       category: addForm.category,
-      college: currentCollege === 'Global' ? currentUser.college : currentCollege as College,
+      // Fix: Ensured college assignment is type-compatible with updated Resource interface
+      college: currentCollege === 'Global' ? currentUser.college : currentCollege,
       course: addForm.course || 'General',
       year: addForm.year,
       author: currentUser.name,

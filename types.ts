@@ -5,7 +5,7 @@ export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduat
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 
-export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff' | 'Official' | 'Corporate';
+export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff' | 'Official' | 'Corporate' | 'Academic Council';
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
@@ -108,7 +108,7 @@ export interface Resource {
   id: string;
   title: string;
   category: ResourceType;
-  college: College;
+  college: College | 'Global';
   course: string;
   year: string;
   author: string;

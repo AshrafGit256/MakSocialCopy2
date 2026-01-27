@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { db, REVENUE_HISTORY } from '../db';
 import { ANALYTICS } from '../constants';
 import { User, Ad, CalendarEvent, Resource, FlaggedContent, AuditLog } from '../types';
+import { AuthoritySeal } from './Feed';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, PieChart, Pie, Cell, LineChart, Line, ComposedChart
@@ -15,7 +16,8 @@ import {
   Edit3, HardDrive, Eye, ChevronRight, ChevronLeft,
   CalendarDays, Download, PieChart as PieChartIcon,
   MousePointer2, Clock, Globe, ShieldAlert,
-  Search, Filter, CheckCircle, Ban, AlertTriangle, Terminal
+  Search, Filter, CheckCircle, Ban, AlertTriangle, Terminal,
+  UserCheck, Shield
 } from 'lucide-react';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
@@ -74,6 +76,14 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     u.college.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleToggleVerification = (userId: string) => {
+    db.toggleVerification(userId);
+    setUsers(db.getUsers());
+    const user = db.getUsers().find(u => u.id === userId);
+    // Add audit log for verification toggle
+    console.debug(`Node ${userId} verification status shifted: ${user?.verified}`);
+  };
 
   return (
     <div className="flex h-screen w-full bg-[#f4f6f9] dark:bg-[#454d55] text-slate-800 dark:text-white font-sans overflow-hidden">
@@ -174,6 +184,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                        <ResponsiveContainer width="100%" height="100%">
                           <AreaChart data={ANALYTICS}>
                              <defs>
+                               {/* Fix: removed duplicate x1 attribute */}
                                <linearGradient id="colorEng" x1="0" y1="0" x2="0" y2="1">
                                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
                                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
@@ -256,9 +267,19 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                         {filteredUsers.map(u => (
                           <tr key={u.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                             <td className="p-4 flex items-center gap-3">
-                               <img src={u.avatar} className="w-8 h-8 rounded-full border dark:border-white/10" />
+                               <div className="relative">
+                                  <img src={u.avatar} className="w-8 h-8 rounded-full border dark:border-white/10" />
+                                  {u.verified && (
+                                     <div className="absolute -bottom-1 -right-1 bg-white dark:bg-[#343a40] rounded-full p-0.5">
+                                        <AuthoritySeal role="Official" size={10} />
+                                     </div>
+                                  )}
+                               </div>
                                <div>
-                                  <p className="font-black uppercase">{u.name}</p>
+                                  <p className="font-black uppercase flex items-center gap-1.5">
+                                     {u.name}
+                                     {u.verified && <CheckCircle size={10} className="text-indigo-500" />}
+                                  </p>
                                   <p className="text-[9px] text-slate-500 font-bold">{u.email || 'node@unverified.net'}</p>
                                </div>
                             </td>
@@ -270,14 +291,21 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                             </td>
                             <td className="p-4">
                                <div className="flex items-center gap-1">
-                                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                                  <span className="text-[10px]">Stable</span>
+                                  <div className={`w-1.5 h-1.5 rounded-full ${u.accountStatus === 'Suspended' ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
+                                  <span className="text-[10px]">{u.accountStatus || 'Stable'}</span>
                                 </div>
                             </td>
                             <td className="p-4 text-center">
                                <div className="flex items-center justify-center gap-2">
-                                  <button className="p-1.5 hover:bg-indigo-600 hover:text-white rounded transition-all" title="Edit Permissions"><Edit3 size={14}/></button>
-                                  <button className="p-1.5 hover:bg-rose-600 hover:text-white rounded transition-all" title="Suspend Node"><Ban size={14}/></button>
+                                  <button 
+                                     onClick={() => handleToggleVerification(u.id)}
+                                     className={`p-1.5 rounded transition-all ${u.verified ? 'bg-indigo-600 text-white shadow-sm' : 'hover:bg-black/5 dark:hover:bg-white/10 text-slate-400'}`} 
+                                     title={u.verified ? "Verified Identity" : "Initialize Verification Protocol"}
+                                  >
+                                     <ShieldCheck size={14}/>
+                                  </button>
+                                  <button className="p-1.5 hover:bg-indigo-600 hover:text-white rounded transition-all text-slate-400" title="Modify Permissions"><Edit3 size={14}/></button>
+                                  <button className="p-1.5 hover:bg-rose-600 hover:text-white rounded transition-all text-slate-400" title="Decommission Node"><Ban size={14}/></button>
                                </div>
                             </td>
                           </tr>

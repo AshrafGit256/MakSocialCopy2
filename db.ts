@@ -93,6 +93,11 @@ export const db = {
     else users.push(user);
     db.saveUsers(users);
   },
+  toggleVerification: (userId: string) => {
+    const users = db.getUsers();
+    const updated = users.map(u => u.id === userId ? { ...u, verified: !u.verified } : u);
+    db.saveUsers(updated);
+  },
   getPosts: (filter?: College | 'Global'): Post[] => {
     let posts = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
     if (filter && filter !== 'Global') {

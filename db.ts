@@ -13,6 +13,51 @@ const DB_KEYS = {
   BOOKMARKS: 'maksocial_bookmarks_v1'
 };
 
+const INITIAL_USERS: User[] = [
+  {
+    id: 'vc_office',
+    name: 'Prof. Barnabas Nawangwe',
+    role: 'Vice Chancellor',
+    avatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
+    connections: 45200,
+    email: 'vc@mak.ac.ug',
+    college: 'Global',
+    status: 'Graduate',
+    subscriptionTier: 'Enterprise',
+    joinedColleges: ['Global'],
+    postsCount: 142,
+    followersCount: 52000,
+    followingCount: 12,
+    totalLikesCount: 89000,
+    badges: ['Official', 'Administrator', 'Verified'],
+    appliedTo: [],
+    bio: 'Architect of the Hill\'s future. 11th Vice Chancellor of Makerere University. Synchronizing global research nodes with the Hill\'s digital DNA. Committed to academic excellence and institutional transformation.',
+    location: 'Main Administration Wing',
+    skills: ['Institutional Leadership', 'Architecture', 'Strategy', 'Academic Excellence']
+  },
+  {
+    id: 'roy_ssemboga',
+    name: 'Roy Ssemboga',
+    role: 'Former Guild President',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
+    connections: 12000,
+    email: 'roy@guild.mak.ac.ug',
+    college: 'CHS',
+    status: 'Graduate',
+    subscriptionTier: 'Pro',
+    joinedColleges: ['Global', 'CHS'],
+    postsCount: 342,
+    followersCount: 15600,
+    followingCount: 890,
+    totalLikesCount: 24500,
+    badges: ['Verified', 'Student Leader'],
+    appliedTo: [],
+    bio: 'Medical Doctor and 82nd Guild President. Advocacy node for student welfare and academic synchronization.',
+    location: 'Mulago Wing',
+    skills: ['Medicine', 'Public Policy', 'Leadership']
+  }
+];
+
 export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jan', revenue: 800000, expenses: 400000, subscribers: 120, growth: 5 },
   { month: 'Feb', revenue: 950000, expenses: 420000, subscribers: 145, growth: 12 },
@@ -46,7 +91,7 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
 };
 
 export const db = {
-  getUsers: (): User[] => parseArray<User>(DB_KEYS.USERS, []),
+  getUsers: (): User[] => parseArray<User>(DB_KEYS.USERS, INITIAL_USERS),
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
   getUser: (id?: string): User => {
     const users = db.getUsers();

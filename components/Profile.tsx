@@ -117,7 +117,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
             <nav className="flex items-center gap-8 border-b border-[var(--border-color)]">
               {[
                 { id: 'signals', label: 'Signal History', icon: <Radio size={14}/>, count: posts.length },
-                { id: 'bookmarks', label: 'Registry Vault', icon: <Bookmark size={14}/>, count: 0 },
+                { id: 'bookmarks', label: 'Registry Vault', icon: <Bookmark size={14}/>, count: db.getBookmarks().length },
                 { id: 'achievements', label: 'Credentials', icon: <Trophy size={14}/>, count: 12 }
               ].map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? 'text-[var(--text-primary)]' : 'text-slate-400 hover:text-slate-600'}`}>

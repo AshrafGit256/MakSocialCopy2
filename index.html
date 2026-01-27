@@ -12,13 +12,13 @@
           extend: {
             colors: {
               brand: {
-                primary: '#475569', // Tactical Gray
+                primary: '#475569', 
                 secondary: '#334155',
                 accent: '#94a3b8'
               }
             },
             borderRadius: {
-              'custom': '2px', // Sharper, tactical corners
+              'custom': '2px',
             },
             fontFamily: {
               mono: ['"JetBrains Mono"', 'monospace'],
@@ -32,20 +32,20 @@
     <style>
         :root {
           --bg-primary: #ffffff;
-          --bg-secondary: #f1f5f9;
+          --bg-secondary: #f8fafc;
           --text-primary: #1e293b;
           --text-secondary: #475569;
-          --border-color: #cbd5e1;
+          --border-color: #e2e8f0;
           --brand-primary: #475569; 
           --radius-main: 2px;
         }
 
         .dark {
-          --bg-primary: #0a0a0a; 
-          --bg-secondary: #111111;
+          --bg-primary: #0d0d0d; 
+          --bg-secondary: #161616;
           --text-primary: #e2e8f0;
           --text-secondary: #94a3b8;
-          --border-color: #222222;
+          --border-color: #2a2a2a;
           --brand-primary: #475569;
         }
 
@@ -54,6 +54,7 @@
             background-color: var(--bg-primary);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.02em;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -69,8 +70,8 @@
           left: 0;
           width: 100%;
           height: 100%;
-          background: linear-gradient(transparent, rgba(71, 85, 105, 0.2), transparent);
-          animation: scan 8s infinite linear;
+          background: linear-gradient(transparent, rgba(71, 85, 105, 0.1), transparent);
+          animation: scan 10s infinite linear;
           pointer-events: none;
         }
         @keyframes scan { to { top: 100%; } }
@@ -80,22 +81,11 @@
         .pro-card {
             border: 1px solid var(--border-color);
             background: var(--bg-secondary);
-            transition: border-color 0.15s ease;
-        }
-        .pro-card:hover {
-            border-color: var(--brand-primary);
+            transition: all 0.2s ease;
         }
         
-        /* Tactical tooltips/badges */
-        .tactical-badge {
-            background: rgba(71, 85, 105, 0.1);
-            border: 1px solid rgba(71, 85, 105, 0.2);
-            color: #475569;
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            letter-spacing: 0.1em;
+        .github-style-shadow {
+            box-shadow: 0 1px 0 rgba(27,31,35,.04);
         }
     </style>
 <script type="importmap">

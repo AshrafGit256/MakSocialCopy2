@@ -1,55 +1,40 @@
+
 import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v17',
-  USERS: 'maksocial_users_v17',
+  POSTS: 'maksocial_posts_v20',
+  USERS: 'maksocial_users_v20',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  RESOURCES: 'maksocial_resources_v8',
-  CALENDAR: 'maksocial_calendar_v9',
-  ADS: 'maksocial_ads_v4',
-  OPPORTUNITIES: 'maksocial_opps_v3',
-  NOTIFICATIONS: 'maksocial_notifications_v1',
-  AUDIT_LOGS: 'maksocial_audit_v1',
-  FLAGGED: 'maksocial_flagged_v1'
+  RESOURCES: 'maksocial_resources_v10',
+  CALENDAR: 'maksocial_calendar_v10',
+  ADS: 'maksocial_ads_v5',
+  OPPORTUNITIES: 'maksocial_opps_v5',
+  NOTIFICATIONS: 'maksocial_notifications_v5',
+  BOOKMARKS: 'maksocial_bookmarks_v1'
 };
 
-const INITIAL_AUDITS: AuditLog[] = [
-  { id: 'a1', action: 'User Suspended', admin: 'SuperAdmin_X', target: 'Node_882', timestamp: '10m ago', severity: 'danger' },
-  { id: 'a2', action: 'Registry Decryption', admin: 'System_Auto', target: 'Vault_Alpha', timestamp: '1h ago', severity: 'info' },
-  { id: 'a3', action: 'Ad Approved', admin: 'AdManager_1', target: 'Centenary_Node', timestamp: '3h ago', severity: 'info' },
-  { id: 'a4', action: 'Failed Login Attempt', admin: 'Sentinel', target: 'IP: 192.168.1.104', timestamp: '5h ago', severity: 'warning' },
-];
-
-const INITIAL_FLAGGED: FlaggedContent[] = [
-  { id: 'f1', contentType: 'post', reason: 'Spam/Advertisement', reportedBy: 'u122', contentPreview: 'Buy cheap assignments now...', timestamp: '2h ago', status: 'pending' },
-  { id: 'f2', contentType: 'user', reason: 'Impersonation', reportedBy: 'u88', contentPreview: 'Profile claiming to be VC', timestamp: '1d ago', status: 'pending' },
-];
-
-const INITIAL_ADS: Ad[] = [
-  { id: 'ad1', clientName: 'Centenary Bank', title: 'Student Loan Protocol', reach: 45000, status: 'Active', budget: 1500000, spent: 850000, clicks: 1200, deadline: '2026-06-01' },
-  { id: 'ad2', clientName: 'SafeBoda', title: 'Campus Delivery Alpha', reach: 28000, status: 'Active', budget: 500000, spent: 480000, clicks: 950, deadline: '2026-05-15' },
-  { id: 'ad3', clientName: 'MTN Uganda', title: 'Data Pulse Bundle', reach: 89000, status: 'Active', budget: 2500000, spent: 1200000, clicks: 5400, deadline: '2026-12-31' },
-];
-
+// @fix: Added missing REVENUE_HISTORY export
 export const REVENUE_HISTORY: RevenuePoint[] = [
-  { month: 'Jan', revenue: 4500000, expenses: 2100000, subscribers: 1240, growth: 12 },
-  { month: 'Feb', revenue: 5200000, expenses: 2300000, subscribers: 1560, growth: 25 },
-  { month: 'Mar', revenue: 4800000, expenses: 2200000, subscribers: 1720, growth: 10 },
-  { month: 'Apr', revenue: 6100000, expenses: 2800000, subscribers: 2100, growth: 22 },
-  { month: 'May', revenue: 7500000, expenses: 3100000, subscribers: 2550, growth: 18 },
+  { month: 'Jan', revenue: 800000, expenses: 400000, subscribers: 120, growth: 5 },
+  { month: 'Feb', revenue: 950000, expenses: 420000, subscribers: 145, growth: 12 },
+  { month: 'Mar', revenue: 1200000, expenses: 450000, subscribers: 180, growth: 18 },
+  { month: 'Apr', revenue: 1100000, expenses: 480000, subscribers: 175, growth: -2 },
+  { month: 'May', revenue: 1400000, expenses: 500000, subscribers: 210, growth: 22 },
+  { month: 'Jun', revenue: 1600000, expenses: 550000, subscribers: 240, growth: 15 },
 ];
 
+// @fix: Added missing COURSES_BY_COLLEGE export
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
-  COCIS: ['Computer Science', 'Software Engineering', 'IT', 'Information Systems'],
-  CEDAT: ['Civil Engineering', 'Electrical Engineering', 'Mechanical', 'Architecture'],
-  CHUSS: ['Psychology', 'Social Work', 'Literature', 'History'],
-  CHS: ['Medicine', 'Nursing', 'Pharmacy', 'Dentistry'],
-  CONAS: ['Physics', 'Chemistry', 'Mathematics', 'Biology'],
-  CAES: ['Agriculture', 'Environmental Science', 'Food Science'],
-  COBAMS: ['Economics', 'Business Admin', 'Statistics'],
-  CEES: ['Education', 'Adult Education'],
-  LAW: ['Bachelor of Laws']
+  COCIS: ['Computer Science', 'Software Engineering', 'Information Technology', 'Information Systems'],
+  CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering'],
+  CHUSS: ['Psychology', 'Social Work', 'Literature', 'Philosophy'],
+  CONAS: ['Mathematics', 'Physics', 'Biology', 'Chemistry'],
+  CHS: ['Medicine', 'Surgery', 'Nursing', 'Pharmacy'],
+  CAES: ['Agriculture', 'Environment Science', 'Food Science'],
+  COBAMS: ['Economics', 'Business Administration', 'Statistics'],
+  CEES: ['Education', 'Adult Education', 'Open & Distance Learning'],
+  LAW: ['Commercial Law', 'Public Law', 'Civil Law']
 };
 
 const parseArray = <T>(key: string, fallback: T[]): T[] => {
@@ -59,7 +44,6 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
     const parsed = JSON.parse(saved);
     return Array.isArray(parsed) ? parsed : fallback;
   } catch (e) {
-    console.error(`Error parsing ${key} from storage:`, e);
     return fallback;
   }
 };
@@ -81,7 +65,6 @@ export const db = {
       college: 'Global',
       status: 'Year 1',
       subscriptionTier: 'Free',
-      verified: true, // Protocol Update: All Guest Nodes are initialized as verified
       joinedColleges: ['Global'],
       postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: []
     };
@@ -109,21 +92,19 @@ export const db = {
   addPost: (post: Post) => {
     const posts = db.getPosts();
     db.savePosts([post, ...posts]);
-    if (post.isOpportunity) db.addOpportunity(post);
   },
-  getOpportunities: (): Post[] => parseArray<Post>(DB_KEYS.OPPORTUNITIES, []),
-  saveOpportunities: (opps: Post[]) => localStorage.setItem(DB_KEYS.OPPORTUNITIES, JSON.stringify(opps)),
-  addOpportunity: (post: Post) => {
-    const opps = db.getOpportunities();
-    if (!opps.find(o => o.id === post.id)) {
-      db.saveOpportunities([post, ...opps]);
-    }
+  toggleBookmark: (postId: string) => {
+    const bookmarks = parseArray<string>(DB_KEYS.BOOKMARKS, []);
+    const index = bookmarks.indexOf(postId);
+    if (index === -1) bookmarks.push(postId);
+    else bookmarks.splice(index, 1);
+    localStorage.setItem(DB_KEYS.BOOKMARKS, JSON.stringify(bookmarks));
+    return bookmarks;
   },
+  getBookmarks: (): string[] => parseArray<string>(DB_KEYS.BOOKMARKS, []),
   deletePost: (postId: string) => {
     const posts = db.getPosts();
     db.savePosts(posts.filter(p => p.id !== postId));
-    const opps = db.getOpportunities();
-    db.saveOpportunities(opps.filter(o => o.id !== postId));
   },
   getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
   saveResource: (resource: Resource) => {
@@ -146,15 +127,19 @@ export const db = {
     });
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
-  getAds: (): Ad[] => parseArray<Ad>(DB_KEYS.ADS, INITIAL_ADS),
-  saveAds: (ads: Ad[]) => localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads)),
+  getAds: (): Ad[] => parseArray<Ad>(DB_KEYS.ADS, []),
   getNotifications: (): Notification[] => parseArray<Notification>(DB_KEYS.NOTIFICATIONS, []),
   saveNotifications: (notifs: Notification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifs)),
   addNotification: (notif: Notification) => {
     const notifs = db.getNotifications();
     db.saveNotifications([notif, ...notifs]);
   },
-  getAuditLogs: (): AuditLog[] => parseArray<AuditLog>(DB_KEYS.AUDIT_LOGS, INITIAL_AUDITS),
-  getFlagged: (): FlaggedContent[] => parseArray<FlaggedContent>(DB_KEYS.FLAGGED, INITIAL_FLAGGED),
+  // @fix: Added missing getOpportunities method
+  getOpportunities: (): Post[] => {
+    const posts = db.getPosts();
+    return posts.filter(p => p.isOpportunity);
+  },
+  getAuditLogs: (): AuditLog[] => [],
+  getFlagged: (): FlaggedContent[] => [],
   getEvents: () => []
 };

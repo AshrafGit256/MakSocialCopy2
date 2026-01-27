@@ -12,9 +12,9 @@
           extend: {
             colors: {
               brand: {
-                primary: 'var(--brand-primary)',
-                secondary: 'var(--brand-secondary)',
-                accent: 'var(--brand-accent)'
+                primary: '#475569', // Tactical Gray
+                secondary: '#64748b',
+                accent: '#94a3b8'
               }
             },
             borderRadius: {
@@ -22,79 +22,45 @@
             },
             fontFamily: {
               mono: ['"JetBrains Mono"', 'monospace'],
-              sans: ['var(--font-main)', 'Inter', 'sans-serif'],
-            },
-            animation: {
-              'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              sans: ['"JetBrains Mono"', 'monospace'], // JetBrains for everything
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-          /* Aura Light Palette - High Precision */
           --bg-primary: #ffffff;
           --bg-secondary: #f8fafc;
           --bg-tertiary: #f1f5f9;
-          --text-primary: #0f172a;
+          --text-primary: #1e293b;
           --text-secondary: #64748b;
           --border-color: #e2e8f0;
-          --card-bg: rgba(255, 255, 255, 0.9);
-          --sidebar-bg: #f8fafc;
-          
-          --brand-primary: #4f46e5; 
-          --brand-secondary: #7c3aed;
-          --brand-accent: #10b981;
-          
-          --font-main: "Inter";
-          --radius-main: 8px; 
+          --brand-primary: #475569; 
+          --radius-main: 4px; /* Tighter geometry */
           --glass-blur: 12px;
         }
 
         .dark {
-          /* Void Dark Palette - Tactical Trading OLED */
-          --bg-primary: #020617; 
-          --bg-secondary: #0a0f1e;
-          --bg-tertiary: #1e293b;
-          --text-primary: #f8fafc;
+          --bg-primary: #0a0a0a; 
+          --bg-secondary: #121212;
+          --bg-tertiary: #1a1a1a;
+          --text-primary: #e2e8f0;
           --text-secondary: #94a3b8;
-          --border-color: #1e293b;
-          --card-bg: rgba(10, 15, 30, 0.7);
-          --sidebar-bg: #020617;
-          
-          --brand-primary: #6366f1;
-          --brand-secondary: #a855f7;
-          --brand-accent: #34d399;
+          --border-color: #262626;
+          --brand-primary: #475569;
         }
 
         body {
-            font-family: var(--font-main), sans-serif;
+            font-family: "JetBrains Mono", monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            transition: background-color 0.2s ease, color 0.2s ease;
             -webkit-font-smoothing: antialiased;
-        }
-
-        .glass-panel {
-          background: var(--card-bg);
-          backdrop-filter: blur(var(--glass-blur));
-          border: 1px solid var(--border-color);
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Tactical Trading Elements */
-        .trading-border {
-          border-left: 2px solid transparent;
-          transition: border-color 0.2s ease;
-        }
-        .trading-border:hover {
-          border-left-color: var(--brand-primary);
-        }
-
-        /* Scanning Line Animation */
         .scanning-line {
           position: relative;
           overflow: hidden;
@@ -107,26 +73,32 @@
           width: 100%;
           height: 100%;
           background: linear-gradient(transparent, var(--brand-primary), transparent);
-          opacity: 0.05;
-          animation: scan 4s infinite linear;
+          opacity: 0.03;
+          animation: scan 6s infinite linear;
           pointer-events: none;
         }
-        @keyframes scan {
-          to { top: 100%; }
-        }
+        @keyframes scan { to { top: 100%; } }
 
-        .ticker-text {
-          font-variant-numeric: tabular-nums;
+        .ticker-text { font-variant-numeric: tabular-nums; }
+        
+        /* Post header styling */
+        .post-card {
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            transition: all 0.2s ease;
+        }
+        .post-card:hover {
+            border-color: var(--brand-primary);
         }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
     "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
     "recharts": "https://esm.sh/recharts@^3.7.0"
   }
 }

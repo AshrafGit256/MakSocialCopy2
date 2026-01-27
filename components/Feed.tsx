@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Post, User, College, AuthorityRole, PollData } from '../types';
+import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
@@ -8,7 +8,7 @@ import {
   ArrowUpRight, TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, Clock, MoreHorizontal, ShieldCheck, 
   Database, Hash, ArrowLeft, GitCommit, GitFork, Star, Box, Link as LinkIcon,
-  CheckCircle2, Tag, AlertCircle, Video as VideoIcon
+  CheckCircle2, Tag, AlertCircle, Video as VideoIcon, Send
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -71,7 +71,9 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = 
   );
 };
 
-const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark }) => {
+const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void, onUpdate: () => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate }) => {
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
   const [labels] = useState(() => {
     const pool = [
       { t: 'Research', c: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' },
@@ -82,10 +84,31 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
     return [pool[Math.floor(Math.random() * pool.length)]];
   });
 
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    db.likePost(post.id);
+    onUpdate();
+  };
+
+  const handleComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    const comment: Comment = {
+      id: `c-${Date.now()}`,
+      author: currentUser.name,
+      authorAvatar: currentUser.avatar,
+      text: newComment,
+      timestamp: 'Just now'
+    };
+    db.addComment(post.id, comment);
+    setNewComment('');
+    onUpdate();
+  };
+
   return (
     <article className="mb-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 dark:hover:border-slate-700 transition-all shadow-sm group">
       <div className="flex">
-          {/* GitHub Identity Rail (Restored) */}
+          {/* GitHub Identity Rail - RESTORED DESIGN */}
           <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
             <img 
                 src={post.authorAvatar} 
@@ -101,21 +124,21 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
 
           {/* Repository Main Content */}
           <div className="flex-1 min-w-0">
-            {/* Repository Header */}
+            {/* Repository Header - RESTORED DESIGN */}
             <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
                 <div className="flex items-center gap-2 overflow-hidden">
                   <Box size={14} className="text-slate-400" />
                   <div className="flex items-center text-[12px] font-bold truncate">
                       <span onClick={() => onNavigateToProfile(post.authorId)} className="text-indigo-600 hover:underline cursor-pointer">{post.author.toLowerCase().replace(/\s/g, '_')}</span>
                       <span className="mx-1 text-slate-400">/</span>
-                      <span className="text-[var(--text-primary)] truncate">signal_{post.id.slice(-6)}</span>
+                      <span className="text-[var(--text-primary)] truncate">signal_{SHA_GEN().slice(0, 4)}</span>
                       <AuthoritySeal role={post.authorAuthority} size={12} />
                   </div>
                   <span className="hidden sm:inline px-1.5 py-0.5 border border-[var(--border-color)] rounded-full text-[8px] font-black uppercase text-slate-500 ml-2">Public</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-mono text-slate-400 hidden md:inline uppercase">{post.timestamp}</span>
-                  <button onClick={() => onBookmark(post.id)} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
+                  <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
                       <Bookmark size={14} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
                   </button>
                   <button className="p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 rounded"><MoreHorizontal size={14}/></button>
@@ -131,18 +154,12 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                     </span>
                   ))}
                   <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-500 border border-[var(--border-color)]">
-                    {post.college}
+                    {post.college} HUB
                   </span>
                 </div>
 
                 <div className="text-[14px] leading-relaxed font-mono text-[var(--text-primary)] mb-4 post-content-markdown" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
-                {post.video && (
-                  <div className="my-4 rounded-[4px] overflow-hidden border border-[var(--border-color)] bg-black relative shadow-lg">
-                     <video src={post.video} controls className="w-full max-h-[500px]" />
-                  </div>
-                )}
-
                 {post.pollData && (
                   <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
                       <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
@@ -161,13 +178,13 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 )}
             </div>
 
-            {/* Engagement Matrix */}
+            {/* Engagement Matrix - RESTORED DESIGN */}
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
-                  <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
+                  <button onClick={handleLike} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
                       <Heart size={14} /> <span className="ticker-text">{post.likes.toLocaleString()}</span>
                   </button>
-                  <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-500 transition-colors">
+                  <button onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-500 transition-colors">
                       <MessageCircle size={14} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span>
                   </button>
                   <div className="hidden sm:flex items-center gap-4 border-l border-[var(--border-color)] pl-8">
@@ -186,6 +203,35 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                   <button className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"><Share2 size={14}/></button>
                 </div>
             </div>
+
+            {/* Comments Branching Expansion */}
+            {showComments && (
+              <div className="px-6 py-4 bg-slate-50/30 dark:bg-black/10 border-t border-[var(--border-color)] animate-in slide-in-from-top-2">
+                 <div className="space-y-4 mb-4">
+                    {post.comments?.map(comment => (
+                       <div key={comment.id} className="flex gap-3 items-start">
+                          <img src={comment.authorAvatar} className="w-6 h-6 rounded border border-[var(--border-color)] bg-white object-cover" />
+                          <div className="flex-1">
+                             <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] font-black text-indigo-600">{comment.author}</span>
+                                <span className="text-[8px] text-slate-400 uppercase">{comment.timestamp}</span>
+                             </div>
+                             <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 italic leading-relaxed">"{comment.text}"</p>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+                 <form onSubmit={handleComment} className="flex gap-2">
+                    <input 
+                       value={newComment}
+                       onChange={e => setNewComment(e.target.value)}
+                       placeholder="Append peer feedback to signal..."
+                       className="flex-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md px-3 py-1.5 text-[11px] font-bold outline-none focus:border-indigo-600"
+                    />
+                    <button type="submit" className="px-4 py-1.5 bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-all text-[9px] font-black uppercase">Commit</button>
+                 </form>
+              </div>
+            )}
           </div>
       </div>
     </article>
@@ -196,13 +242,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
   const [bookmarks, setBookmarks] = useState<string[]>(db.getBookmarks());
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   
   useEffect(() => {
     const sync = () => { setPosts(db.getPosts()); setUser(db.getUser()); setBookmarks(db.getBookmarks()); };
     sync();
     const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [updateTrigger, collegeFilter]);
 
   const handlePost = (html: string, poll?: PollData) => {
     const newPost: Post = {
@@ -224,7 +271,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       pollData: poll
     };
     db.addPost(newPost);
-    setPosts(db.getPosts());
+    setUpdateTrigger(prev => prev + 1);
   };
 
   const handleBookmark = (id: string) => {
@@ -243,12 +290,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       <div className="lg:hidden mb-6 px-4">
          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
             <div className="min-w-[280px]"><NetworkIntensityGraph /></div>
-            <div className="min-w-[200px] bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] p-5">
-               <span className="text-[9px] font-black uppercase text-slate-400 block mb-4 tracking-widest">Active Hubs</span>
-               <div className="flex flex-wrap gap-3">
-                  {['#COCIS', '#CEDAT', '#LAW'].map(t => <span key={t} className="text-[10px] font-black text-slate-500 uppercase">{t}</span>)}
-               </div>
-            </div>
          </div>
       </div>
 
@@ -265,6 +306,15 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
               </div>
             )}
 
+            {/* WING SEPARATION INDICATOR */}
+            <div className="mb-8 px-4 flex items-center gap-4">
+               <div className="h-px flex-1 bg-[var(--border-color)]"></div>
+               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+                  {collegeFilter === 'Global' ? 'Universal Pulse Stream' : `${collegeFilter} Wing Manifest`}
+               </span>
+               <div className="h-px flex-1 bg-[var(--border-color)]"></div>
+            </div>
+
             <div className="space-y-4">
                {filteredPosts.length > 0 ? filteredPosts.map((post) => (
                  <PostItem 
@@ -275,11 +325,12 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                    onNavigateToProfile={onNavigateToProfile}
                    bookmarks={bookmarks}
                    onBookmark={handleBookmark}
+                   onUpdate={() => setUpdateTrigger(prev => prev + 1)}
                  />
                )) : (
                  <div className="py-40 text-center space-y-6 bg-slate-50 dark:bg-white/5 border border-dashed border-[var(--border-color)] rounded-[4px]">
                     <Database size={48} className="mx-auto text-slate-400" />
-                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registry_Empty: No signals committed to manifest.</p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registry_Empty: No signals committed to {collegeFilter} manifest.</p>
                  </div>
                )}
             </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Home, Search, MessageCircle, User, Calendar, BookOpen, Bell, Award
@@ -29,73 +28,49 @@ export const COLLEGE_BANNERS: Record<College, string> = {
 
 export const MOCK_POSTS: Post[] = [
   {
-    id: 'poll-text-node-1',
-    author: 'COCIS Council',
-    authorId: 'cocis_hub',
-    authorRole: 'Official Body',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=COCIS',
-    authorAuthority: 'Official',
+    id: 'p-1',
+    author: 'Roy Ssemboga',
+    authorId: 'roy_ssemboga',
+    authorRole: 'Student Leader',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
+    authorAuthority: 'Student Leader',
     timestamp: '15m ago',
-    content: `<h1>Preferred Framework for Finalist Hackathon?</h1>
-<p>We are allocating server clusters. Select your node's primary stack.</p>`,
-    customFont: '"JetBrains Mono"',
-    hashtags: ['#TechStack', '#MakerereAI'],
-    likes: 86,
-    commentsCount: 24,
-    comments: [],
-    views: 450,
+    content: `<h1>University Infrastructure Uplink</h1>
+<p>We are currently auditing the connectivity nodes in the CEDAT wing. If your stratum is experiencing packet loss, please log your node ID below.</p>`,
+    hashtags: ['#MakInfrastructure', '#StudentWelfare'],
+    likes: 124,
+    commentsCount: 42,
+    comments: [
+      { id: 'c1', author: 'Shamim Nambassa', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', text: 'Confirmed. Block B is currently offline.', timestamp: '10m ago' }
+    ],
+    views: 1200,
     flags: [],
     isOpportunity: false,
-    college: 'COCIS',
-    pollData: {
-      totalVotes: 142,
-      expiresAt: new Date(Date.now() + 86400000).toISOString(),
-      options: [
-        { id: 't1', text: 'React + Node.js (Stable)', votes: 75, voterIds: [] },
-        { id: 't2', text: 'Python + Django (Legacy)', votes: 42, voterIds: [] },
-        { id: 't3', text: 'Flutter (Mobile Wing)', votes: 25, voterIds: [] }
-      ]
-    }
+    college: 'CEDAT'
   },
   {
-    id: 'poll-img-node-1',
-    author: 'CEDAT Arts Wing',
-    authorId: 'cedat_arts',
-    authorRole: 'Design Cluster',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=CEDAT',
-    authorAuthority: 'Official',
+    id: 'p-2',
+    author: 'Prof. Barnabas Nawangwe',
+    authorId: 'vc_office',
+    authorRole: 'Administrator',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=VC',
+    authorAuthority: 'Administrator',
     timestamp: '1h ago',
-    content: `<h2>Guild 90th Cycle Logo Selection 🎨</h2>
-<p>Which visual identity represents the legacy best?</p>`,
-    customFont: '"Plus Jakarta Sans"',
-    hashtags: ['#Design', '#Guild90'],
-    likes: 520,
-    commentsCount: 89,
+    content: `<h2>Research Grant Manifest: Phase 4</h2>
+<p>The academic council has approved a new set of liquidity protocols for the AI Research Lab in COCIS. Verified nodes may now apply for strata funding via the Registry Vault.</p>`,
+    hashtags: ['#MakerereResearch', '#OfficialBroadcast'],
+    likes: 890,
+    commentsCount: 15,
     comments: [],
-    views: 12000,
+    views: 5600,
     flags: [],
-    isOpportunity: false,
-    college: 'CEDAT',
-    pollData: {
-      totalVotes: 890,
-      expiresAt: new Date(Date.now() + 172800000).toISOString(),
-      options: [
-        { 
-          id: 'i1', 
-          text: 'Minimalist Vector', 
-          imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=400', 
-          votes: 540, 
-          voterIds: [] 
-        },
-        { 
-          id: 'i2', 
-          text: 'Heritage Crest', 
-          imageUrl: 'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&w=400', 
-          votes: 350, 
-          voterIds: [] 
-        }
-      ]
-    }
+    isOpportunity: true,
+    opportunityData: {
+      type: 'Grant',
+      isAIVerified: true,
+      detectedBenefit: 'UGX 5M Funding'
+    },
+    college: 'COCIS'
   }
 ];
 
@@ -112,22 +87,22 @@ export const ANALYTICS: AnalyticsData[] = [
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'c1',
-    user: { name: 'Guru A.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ashraf'},
+    user: { name: 'Roy Ssemboga', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy'},
     lastMessage: 'The research notes are in the Vault.',
     unreadCount: 2,
     messages: [
-      { id: 'm1', text: 'Hey, did you see the new AI thesis?', timestamp: '10:00 AM', isMe: false },
+      { id: 'm1', text: 'Roy, did you see the new AI thesis?', timestamp: '10:00 AM', isMe: false },
       { id: 'm2', text: 'Yes, just synced with that node.', timestamp: '10:05 AM', isMe: true },
       { id: 'm3', text: 'The research notes are in the Vault.', timestamp: '10:10 AM', isMe: false },
     ]
   },
   {
     id: 'c2',
-    user: { name: 'Sarah CEDAT', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah'},
+    user: { name: 'Shamim Nambassa', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim'},
     lastMessage: 'Circuit schematic verified.',
     unreadCount: 0,
     messages: [
-      { id: 'm4', text: 'Sarah, is the Alpha-7 node ready?', timestamp: '09:00 AM', isMe: true },
+      { id: 'm4', text: 'Shamim, is the Alpha-7 node ready?', timestamp: '09:00 AM', isMe: true },
       { id: 'm5', text: 'Circuit schematic verified. Ready for uplink.', timestamp: '09:15 AM', isMe: false },
     ]
   }

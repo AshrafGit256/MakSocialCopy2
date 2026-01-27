@@ -1,9 +1,8 @@
-
-import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v20',
+  POSTS: 'maksocial_posts_v21',
   USERS: 'maksocial_users_v20',
   LOGGED_IN_ID: 'maksocial_current_user_id',
   RESOURCES: 'maksocial_resources_v10',
@@ -14,7 +13,6 @@ const DB_KEYS = {
   BOOKMARKS: 'maksocial_bookmarks_v1'
 };
 
-// @fix: Added missing REVENUE_HISTORY export
 export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jan', revenue: 800000, expenses: 400000, subscribers: 120, growth: 5 },
   { month: 'Feb', revenue: 950000, expenses: 420000, subscribers: 145, growth: 12 },
@@ -24,7 +22,6 @@ export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jun', revenue: 1600000, expenses: 550000, subscribers: 240, growth: 15 },
 ];
 
-// @fix: Added missing COURSES_BY_COLLEGE export
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   COCIS: ['Computer Science', 'Software Engineering', 'Information Technology', 'Information Systems'],
   CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering'],
@@ -93,6 +90,20 @@ export const db = {
     const posts = db.getPosts();
     db.savePosts([post, ...posts]);
   },
+  likePost: (postId: string) => {
+    const posts = db.getPosts();
+    const updated = posts.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p);
+    db.savePosts(updated);
+  },
+  addComment: (postId: string, comment: Comment) => {
+    const posts = db.getPosts();
+    const updated = posts.map(p => p.id === postId ? { 
+      ...p, 
+      comments: [...(p.comments || []), comment],
+      commentsCount: (p.commentsCount || 0) + 1
+    } : p);
+    db.savePosts(updated);
+  },
   toggleBookmark: (postId: string) => {
     const bookmarks = parseArray<string>(DB_KEYS.BOOKMARKS, []);
     const index = bookmarks.indexOf(postId);
@@ -134,7 +145,6 @@ export const db = {
     const notifs = db.getNotifications();
     db.saveNotifications([notif, ...notifs]);
   },
-  // @fix: Added missing getOpportunities method
   getOpportunities: (): Post[] => {
     const posts = db.getPosts();
     return posts.filter(p => p.isOpportunity);

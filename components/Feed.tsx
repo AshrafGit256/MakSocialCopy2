@@ -8,7 +8,7 @@ import {
   ArrowUpRight, TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, Clock, MoreHorizontal, ShieldCheck, 
   Database, Hash, ArrowLeft, GitCommit, GitFork, Star, Box, Link as LinkIcon,
-  CheckCircle2, Tag, AlertCircle
+  CheckCircle2, Tag, AlertCircle, Video as VideoIcon
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -77,8 +77,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
       { t: 'Research', c: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400' },
       { t: 'Urgent', c: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' },
       { t: 'Verified', c: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
-      { t: 'Discussion', c: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-      { t: 'Opportunity', c: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' }
+      { t: 'Stable', c: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' }
     ];
     return [pool[Math.floor(Math.random() * pool.length)]];
   });
@@ -86,7 +85,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
   return (
     <article className="mb-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 dark:hover:border-slate-700 transition-all shadow-sm group">
       <div className="flex">
-          {/* Left Rail Identity Profile (Restored) */}
+          {/* GitHub Identity Rail (Restored) */}
           <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
             <img 
                 src={post.authorAvatar} 
@@ -100,9 +99,9 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
             </div>
           </div>
 
-          {/* Right Rail Content */}
+          {/* Repository Main Content */}
           <div className="flex-1 min-w-0">
-            {/* Post Header - Repository Style */}
+            {/* Repository Header */}
             <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
                 <div className="flex items-center gap-2 overflow-hidden">
                   <Box size={14} className="text-slate-400" />
@@ -123,9 +122,8 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 </div>
             </div>
 
-            {/* Signal Body */}
+            {/* Content Manifest */}
             <div onClick={() => onOpenThread(post.id)} className="p-6 cursor-pointer hover:bg-slate-50/20 dark:hover:bg-white/5 transition-all">
-                {/* Custom Label UI */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {labels.map((l, i) => (
                     <span key={i} className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${l.c}`}>
@@ -139,6 +137,12 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
 
                 <div className="text-[14px] leading-relaxed font-mono text-[var(--text-primary)] mb-4 post-content-markdown" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
+                {post.video && (
+                  <div className="my-4 rounded-[4px] overflow-hidden border border-[var(--border-color)] bg-black relative shadow-lg">
+                     <video src={post.video} controls className="w-full max-h-[500px]" />
+                  </div>
+                )}
+
                 {post.pollData && (
                   <div className="my-6 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[2px] shadow-inner">
                       <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
@@ -157,7 +161,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 )}
             </div>
 
-            {/* Signal Footer - Git Metrics Style */}
+            {/* Engagement Matrix */}
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
                   <button className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-rose-500 transition-colors">
@@ -167,10 +171,10 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                       <MessageCircle size={14} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span>
                   </button>
                   <div className="hidden sm:flex items-center gap-4 border-l border-[var(--border-color)] pl-8">
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase" title="Forks (Reposts)">
                         <GitFork size={12}/> {Math.floor(post.likes / 5)}
                       </div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase">
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase" title="Stars (High Impact)">
                         <Star size={12}/> {Math.floor(post.views / 100)}
                       </div>
                   </div>
@@ -249,7 +253,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-         {/* Main Registry Column */}
          <div className="lg:col-span-8 px-0 sm:px-4">
             {!threadId && <RichEditor onPost={handlePost} currentUser={user} />}
             
@@ -282,12 +285,11 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </div>
          </div>
          
-         {/* Telemetry Sidebar (Right) */}
+         {/* Telemetry Sidebar */}
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
             <NetworkIntensityGraph />
             <Watchlist />
             
-            {/* Elite Strata Prompt */}
             <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[4px]">
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
@@ -300,16 +302,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                   </p>
                   <button className="w-full py-3 bg-white text-slate-900 rounded-[2px] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-slate-100 transition-all active:scale-95">Commit_Credentials</button>
                </div>
-            </div>
-
-            <div className="p-6 border border-dashed border-[var(--border-color)] bg-slate-50 dark:bg-white/5 rounded-[4px]">
-               <div className="flex items-center gap-3 mb-4">
-                  <Terminal size={14} className="text-slate-500" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">System_Status</span>
-               </div>
-               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-loose italic">
-                  "Registry protocol synchronization v4.2 stable. End-to-end signal encryption active for all nodes within the Hillstrata network."
-               </p>
             </div>
          </aside>
       </div>

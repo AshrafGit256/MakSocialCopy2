@@ -1,4 +1,3 @@
-
 import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent } from './types';
 import { MOCK_POSTS } from './constants';
 
@@ -82,6 +81,7 @@ export const db = {
       college: 'Global',
       status: 'Year 1',
       subscriptionTier: 'Free',
+      verified: true, // Protocol Update: All Guest Nodes are initialized as verified
       joinedColleges: ['Global'],
       postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: []
     };

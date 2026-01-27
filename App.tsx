@@ -96,10 +96,7 @@ const App: React.FC = () => {
 
   const handleSetView = (newView: AppView) => {
     if (userRole === 'admin' && newView !== 'admin') return;
-    if (newView === 'resources' && currentUser?.subscriptionTier === 'Free') {
-       alert("PROTOCOL LOCKED: Access to the Academic Vault requires a PRO subscription strata.");
-       return;
-    }
+    // Protocol Check: The Vault is now unrestricted for all verified student nodes
     if (newView !== 'messages') setActiveChatUserId(null);
     setView(newView); setIsSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });

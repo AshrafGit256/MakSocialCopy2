@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
@@ -47,7 +46,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
         <nav className="space-y-1.5">
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Registry Control</p>
           {NAV_ITEMS.map((item) => {
-            const isLocked = item.id === 'resources' && currentUser.subscriptionTier === 'Free';
             const isNotifications = item.id === 'notifications';
             
             return (
@@ -58,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                   activeView === item.id 
                   ? 'bg-indigo-600 text-white shadow-lg' 
                   : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-indigo-600'
-                } ${isLocked ? 'opacity-60 cursor-not-allowed' : ''}`}
+                }`}
               >
                 <div className="flex items-center space-x-4">
                   <div className="relative">
@@ -69,7 +67,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                   </div>
                   <span className="text-[11px] tracking-widest font-black uppercase">{item.label}</span>
                 </div>
-                {isLocked && <Lock size={14} className="text-slate-400" />}
                 {isNotifications && unreadNotifications > 0 && (
                    <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${activeView === 'notifications' ? 'bg-white text-indigo-600' : 'bg-rose-500 text-white'}`}>
                       {unreadNotifications}

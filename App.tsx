@@ -142,14 +142,14 @@ const App: React.FC = () => {
       return { 
         backgroundImage: 'linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px)', 
         backgroundSize: '50px 50px',
-        opacity: 0.15
+        opacity: 0.12
       };
     }
     if (currentBg === 'dots') {
       return { 
         backgroundImage: 'radial-gradient(var(--text-primary) 1px, transparent 1px)', 
         backgroundSize: '24px 24px',
-        opacity: 0.08
+        opacity: 0.06
       };
     }
     return {};
@@ -159,10 +159,10 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative">
-      {/* Dynamic Background Layer */}
+      {/* Global Pattern Layer */}
       {currentBg !== 'none' && (
         <div 
-          className="fixed inset-0 pointer-events-none z-0" 
+          className="fixed inset-0 pointer-events-none z-0 transition-all duration-700 ease-in-out animate-in fade-in" 
           style={getBackgroundStyle()}
         />
       )}
@@ -200,24 +200,26 @@ const App: React.FC = () => {
           </div>
         </header>
         <main className="flex-1 overflow-y-auto relative bg-transparent no-scrollbar pb-safe">{renderContent()}</main>
+        
+        {/* REFINED MOBILE BOTTOM NAVBAR: BAZAAR -> CUSTOMIZER */}
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
             { id: 'groups', icon: <Users size={22} />, label: 'Groups' },
-            { id: 'market', icon: <ShoppingBag size={22} />, label: 'Bazaar' },
+            { id: 'settings', icon: <Settings size={22} />, label: 'Custom' }, // REPLACED BAZAAR
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
           ].map((item) => {
             const isActive = view === item.id;
             return (
-              <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>
+              <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${isActive ? 'text-slate-800 dark:text-white' : 'text-slate-400'}`}>
                 <div className="relative">
                    {React.cloneElement(item.icon as React.ReactElement, { 
                      fill: isActive ? "currentColor" : "none",
                      strokeWidth: isActive ? 2.5 : 2
                    })}
                 </div>
-                <span className={`text-[9px] font-black uppercase ${isActive ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
+                <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
               </button>
             );
           })}

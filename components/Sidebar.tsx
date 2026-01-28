@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { NAV_ITEMS } from '../constants';
 import { AppView, User, College } from '../types';
@@ -47,20 +48,26 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Registry Control</p>
           {NAV_ITEMS.map((item) => {
             const isNotifications = item.id === 'notifications';
+            const isActive = activeView === item.id;
             
             return (
               <button
                 key={item.id}
                 onClick={() => setView(item.id as AppView)}
                 className={`w-full flex items-center justify-between px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
-                  activeView === item.id 
+                  isActive 
                   ? 'bg-slate-700 text-white shadow-lg' 
                   : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-800'
                 }`}
               >
                 <div className="flex items-center space-x-4">
                   <div className="relative">
-                     <span className="transition-transform duration-300 group-hover:scale-110 block">{item.icon}</span>
+                     <span className="transition-transform duration-300 group-hover:scale-110 block">
+                        {React.cloneElement(item.icon as React.ReactElement, { 
+                          fill: isActive ? "currentColor" : "none",
+                          strokeWidth: isActive ? 2.5 : 2
+                        })}
+                     </span>
                      {isNotifications && unreadNotifications > 0 && (
                         <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[var(--sidebar-bg)]"></span>
                      )}
@@ -79,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
               : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-900'
             }`}
           >
-            <Award size={22} className={activeView === 'opportunities' ? 'text-white' : ''} />
+            <Award size={22} fill={activeView === 'opportunities' ? "currentColor" : "none"} className={activeView === 'opportunities' ? 'text-white' : ''} />
             <span className="text-[11px] tracking-widest font-black uppercase">Opportunities</span>
           </button>
           
@@ -91,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
               : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-800'
             }`}
           >
-            <Settings size={22} />
+            <Settings size={22} fill={activeView === 'settings' ? "currentColor" : "none"} />
             <span className="text-[11px] tracking-widest font-black uppercase">UI Customizer</span>
           </button>
         </nav>
@@ -100,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           <div className="mt-10">
             <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Authorized Strata</p>
             <button onClick={() => setView('admin')} className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all border border-dashed active:scale-[0.98] ${activeView === 'admin' ? 'bg-slate-900 text-white border-transparent' : 'border-[var(--border-color)] text-slate-500 hover:border-slate-800 hover:text-slate-800'}`}>
-              <Cpu size={22} />
+              <Cpu size={22} fill={activeView === 'admin' ? "currentColor" : "none"} />
               <span className="text-[11px] font-black uppercase tracking-widest">Admin Terminal</span>
             </button>
           </div>

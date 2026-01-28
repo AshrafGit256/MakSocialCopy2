@@ -19,7 +19,6 @@ import NotificationsView from './components/Notifications';
 import Market from './components/Market';
 import Groups from './components/Groups';
 import { db } from './db';
-// Added Users to the imports from lucide-react to resolve the compilation error on line 171
 import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Users } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -160,10 +159,10 @@ const App: React.FC = () => {
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:text-slate-800">{isDark ? <Sun size={20} /> : <Moon size={20} />}</button>
             <button onClick={() => handleSetView('notifications')} className="p-2.5 text-slate-500 hover:text-slate-800 relative">
-               <Bell size={20} />
+               <Bell size={20} fill={view === 'notifications' ? "currentColor" : "none"} />
                {unreadNotifs > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>}
             </button>
-            {currentUser && <button onClick={() => handleSetView('profile')} className="ml-1 active:scale-90 transition-transform"><img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" alt="Profile" /></button>}
+            {currentUser && <button onClick={() => handleSetView('profile')} className="ml-1 active:scale-90 transition-transform"><img src={currentUser.avatar} className={`w-8 h-8 rounded-full border ${view === 'profile' ? 'border-slate-600 border-2' : 'border-[var(--border-color)]'} bg-white object-cover`} alt="Profile" /></button>}
           </div>
         </header>
         <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar pb-safe">{renderContent()}</main>
@@ -174,12 +173,20 @@ const App: React.FC = () => {
             { id: 'market', icon: <ShoppingBag size={22} />, label: 'Bazaar' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
-          ].map((item) => (
-            <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${view === item.id ? 'text-slate-800' : 'text-slate-400'}`}>
-              <div className="relative">{item.icon}</div>
-              <span className={`text-[9px] font-black uppercase ${view === item.id ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
-            </button>
-          ))}
+          ].map((item) => {
+            const isActive = view === item.id;
+            return (
+              <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>
+                <div className="relative">
+                   {React.cloneElement(item.icon as React.ReactElement, { 
+                     fill: isActive ? "currentColor" : "none",
+                     strokeWidth: isActive ? 2.5 : 2
+                   })}
+                </div>
+                <span className={`text-[9px] font-black uppercase ${isActive ? 'opacity-100' : 'opacity-60'}`}>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
       </div>
     </div>

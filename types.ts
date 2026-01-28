@@ -1,3 +1,4 @@
+
 export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
@@ -34,23 +35,125 @@ export interface Group {
   category: string;
 }
 
-export interface AuditLog {
+export interface Resource {
   id: string;
-  action: string;
-  admin: string;
-  target: string;
+  title: string;
+  category: ResourceType;
+  college: College | 'Global';
+  course: string;
+  year: string;
+  author: string;
+  authorRole: string;
+  downloads: number;
+  fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
+  fileData?: string;
   timestamp: string;
-  severity: 'info' | 'warning' | 'danger';
+  aiSummary?: string;
 }
 
-export interface FlaggedContent {
+export interface Post {
   id: string;
-  contentType: 'post' | 'comment' | 'user';
-  reason: string;
-  reportedBy: string;
-  contentPreview: string;
+  author: string;
+  authorId: string;
+  authorRole: string;
+  authorAvatar: string;
+  authorAuthority?: AuthorityRole;
   timestamp: string;
-  status: 'pending' | 'resolved' | 'dismissed';
+  content: string;
+  images?: string[];
+  video?: string;
+  hashtags: string[];
+  likes: number;
+  commentsCount: number;
+  comments: Comment[];
+  views: number;
+  flags: string[]; 
+  isOpportunity: boolean;
+  college: College | 'Global';
+  isEventBroadcast?: boolean;
+  eventTitle?: string;
+  eventDate?: string;
+  eventTime?: string;
+  eventLocation?: string;
+  eventFlyer?: string;
+  opportunityData?: {
+    type: 'Internship' | 'Grant' | 'Gig' | 'Scholarship' | 'Workshop';
+    deadline?: string;
+    isAIVerified: boolean;
+    detectedBenefit: string;
+  };
+  pollData?: PollData;
+  // Fix: Added missing properties used in constants and components
+  isAd?: boolean;
+  eventId?: string;
+  eventRegistrationLink?: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  connections: number;
+  email?: string;
+  college: College | 'Global';
+  status: UserStatus;
+  subscriptionTier: SubscriptionTier; 
+  verified?: boolean;
+  badges: string[];
+  bio?: string;
+  // Fix: Added missing properties used in db.ts and Admin.tsx
+  joinedColleges?: string[];
+  postsCount?: number;
+  followersCount?: number;
+  followingCount?: number;
+  totalLikesCount?: number;
+  appliedTo?: string[];
+  location?: string;
+  skills?: string[];
+  accountStatus?: 'Stable' | 'Suspended';
+}
+
+export interface Comment {
+  id: string;
+  author: string;
+  authorAvatar: string;
+  text: string;
+  timestamp: string;
+}
+
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: number;
+  voterIds: string[];
+}
+
+export interface PollData {
+  options: PollOption[];
+  totalVotes: number;
+  expiresAt: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description: string;
+  date: string; 
+  time: string;
+  location: string;
+  image?: string;
+  category: 'Academic' | 'Social' | 'Sports' | 'Exams' | 'Other';
+  createdBy: string;
+  attendeeIds?: string[]; 
+  registrationLink?: string;
+}
+
+export interface AppSettings {
+  primaryColor: string;
+  fontFamily: string;
+  themePreset: 'standard' | 'oled' | 'tactical' | 'paper';
+  borderRadius: string;
 }
 
 export interface Notification {
@@ -61,28 +164,9 @@ export interface Notification {
   timestamp: string;
   isRead: boolean;
   meta?: {
-    nodeId?: string;
-    nodeAvatar?: string;
-    targetId?: string;
-    reason?: string;
     hash?: string;
+    reason?: string;
   };
-}
-
-export interface AppSettings {
-  primaryColor: string;
-  fontFamily: string;
-  fontSize: 'sm' | 'md' | 'lg' | 'xl';
-  contrast: 'normal' | 'high';
-  density: 'comfortable' | 'compact' | 'tight';
-  borderRadius: string; 
-  animationsEnabled: boolean;
-  motionStrata: 'subtle' | 'standard' | 'extreme';
-  glassmorphism: boolean;
-  glowEffects: boolean;
-  themePreset: 'standard' | 'oled' | 'tactical' | 'paper';
-  showGrid: boolean;
-  accentColor: string;
 }
 
 export interface Ad {
@@ -94,15 +178,6 @@ export interface Ad {
   budget: number;
   spent: number;
   clicks: number;
-  deadline: string; 
-}
-
-export interface RevenuePoint {
-  month: string;
-  revenue: number;
-  expenses: number;
-  subscribers: number;
-  growth: number;
 }
 
 export interface AnalyticsData {
@@ -122,140 +197,31 @@ export interface ChatConversation {
   messages: { id: string; text: string; timestamp: string; isMe: boolean }[];
 }
 
-export interface LiveEvent {
-  id: string;
-  title: string;
-  organizer: string;
-  youtubeUrl: string;
+export interface RevenuePoint {
+  month: string;
+  revenue: number;
+  expenses: number;
+  // Fix: Added missing properties used in db.ts
+  subscribers?: number;
+  growth?: number;
 }
 
-export interface Resource {
+export interface AuditLog {
   id: string;
-  title: string;
-  category: ResourceType;
-  college: College | 'Global';
-  course: string;
-  year: string;
-  author: string;
-  authorRole: string;
-  downloads: number;
-  fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
-  fileData?: string;
+  action: string;
+  admin: string;
+  target: string;
   timestamp: string;
+  severity: 'info' | 'warning' | 'danger';
 }
 
-export interface TimelineEvent {
+export interface FlaggedContent {
   id: string;
-  title: string;
-  description: string;
+  contentType: 'post' | 'comment' | 'user';
+  reason: string;
+  reportedBy: string;
+  contentPreview: string;
   timestamp: string;
-  type: 'post' | 'update' | 'achievement' | 'comment';
-  color: string;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  connections: number;
-  email?: string;
-  college: College | 'Global';
-  status: UserStatus;
-  subscriptionTier: SubscriptionTier; 
-  accountStatus?: 'Active' | 'Inactive' | 'Suspended';
-  verified?: boolean;
-  joinedColleges: (College | 'Global')[];
-  postsCount: number;
-  followersCount: number;
-  followingCount: number;
-  totalLikesCount: number;
-  badges: string[];
-  appliedTo: string[];
-  bio?: string;
-  education?: string;
-  location?: string;
-  skills?: string[];
-}
-
-export interface Comment {
-  id: string;
-  author: string;
-  authorAvatar: string;
-  text: string;
-  timestamp: string;
-}
-
-export interface PollOption {
-  id: string;
-  text: string;
-  imageUrl?: string;
-  votes: number;
-  voterIds: string[];
-}
-
-export interface PollData {
-  options: PollOption[];
-  totalVotes: number;
-  expiresAt: string;
-}
-
-export interface Post {
-  id: string;
-  author: string;
-  authorId: string;
-  authorRole: string;
-  authorAvatar: string;
-  authorAuthority?: AuthorityRole;
-  timestamp: string;
-  content: string;
-  customFont?: string; 
-  images?: string[];
-  video?: string;
-  hashtags: string[];
-  likes: number;
-  commentsCount: number;
-  comments: Comment[];
-  views: number;
-  flags: string[]; 
-  isOpportunity: boolean;
-  college: College | 'Global';
-  parentId?: string; 
-  opportunityData?: {
-    type: 'Internship' | 'Grant' | 'Gig' | 'Scholarship' | 'Workshop';
-    deadline?: string;
-    isAIVerified: boolean;
-    detectedBenefit: string;
-  };
-  aiMetadata?: {
-    category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
-    isSafe?: boolean;
-  };
-  pollData?: PollData;
-  isEventBroadcast?: boolean;
-  isAd?: boolean;
-  eventTitle?: string;
-  eventDate?: string;
-  eventTime?: string;
-  eventLocation?: string;
-  eventId?: string;
-  eventFlyer?: string;
-  eventRegistrationLink?: string;
-}
-
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  description: string;
-  date: string; 
-  time: string;
-  location: string;
-  image?: string;
-  category: 'Academic' | 'Social' | 'Sports' | 'Exams' | 'Other';
-  createdBy: string;
-  attendeeIds?: string[]; 
-  registrationLink?: string;
-  isPromoted?: boolean;
 }
 
 export interface MarketService {
@@ -271,4 +237,11 @@ export interface MarketService {
   rating: number;
   reviewsCount: number;
   isPromoted: boolean;
+}
+
+export interface LiveEvent {
+  id: string;
+  title: string;
+  organizer: string;
+  youtubeUrl: string;
 }

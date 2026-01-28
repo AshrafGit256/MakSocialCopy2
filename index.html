@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MakSocial - Intelligence Registry</title>
+    <title>MakSocial - Nexus Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -12,26 +13,16 @@
           extend: {
             colors: {
               brand: {
-                primary: '#475569', 
-                secondary: '#334155',
-                accent: '#94a3b8'
+                primary: '#4f46e5', 
+                secondary: '#1e1b4b',
+                accent: '#818cf8'
               },
-              primary: {
-                50: '#f8fafc',
-                100: '#f1f5f9',
-                200: '#e2e8f0',
-                300: '#cbd5e1',
-                400: '#94a3b8',
-                500: '#64748b',
-                600: '#475569',
-                700: '#334155',
-                800: '#1e293b',
-                900: '#0f172a',
+              slate: {
                 950: '#020617',
               }
             },
             borderRadius: {
-              'custom': '2px',
+              'nexus': '2px',
             },
             fontFamily: {
               mono: ['"JetBrains Mono"', 'monospace'],
@@ -47,44 +38,68 @@
           --bg-primary: #ffffff;
           --bg-secondary: #f8fafc;
           --text-primary: #1e293b;
-          --text-secondary: #475569;
           --border-color: #e2e8f0;
-          --brand-primary: #475569; 
-          --radius-main: 2px;
+          --accent-glow: rgba(79, 70, 229, 0.1);
         }
 
         .dark {
-          --bg-primary: #0d0d0d; 
-          --bg-secondary: #161616;
+          --bg-primary: #020617; 
+          --bg-secondary: #0b0f1a;
           --text-primary: #e2e8f0;
-          --text-secondary: #94a3b8;
-          --border-color: #2a2a2a;
-          --brand-primary: #475569;
+          --border-color: #1e293b;
+          --accent-glow: rgba(99, 102, 241, 0.15);
         }
 
         body {
             font-family: "JetBrains Mono", monospace;
             background-color: var(--bg-primary);
             color: var(--text-primary);
+            background-image: 
+              linear-gradient(var(--border-color) 1px, transparent 1px),
+              linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-attachment: fixed;
             -webkit-font-smoothing: antialiased;
-            letter-spacing: -0.02em;
+        }
+
+        /* Scanline Overlay Effect */
+        body::before {
+          content: " ";
+          display: block;
+          position: fixed;
+          top: 0; left: 0; bottom: 0; right: 0;
+          background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), 
+                      linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+          background-size: 100% 4px, 3px 100%;
+          z-index: 9999;
+          pointer-events: none;
+          opacity: 0.4;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        .post-content-markdown h1 { font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.75rem; color: #475569; }
-        .post-content-markdown h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #64748b; }
-        .post-content-markdown h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .post-content-markdown p { margin-bottom: 0.75rem; line-height: 1.6; }
-        .post-content-markdown a { color: #475569; text-decoration: underline; font-weight: 700; }
-        
-        .post-content-markdown table { border: 1px solid var(--border-color); width: 100%; border-collapse: collapse; }
-        .post-content-markdown td, .post-content-markdown th { border: 1px solid var(--border-color); padding: 8px; text-align: center; }
+        .nexus-card {
+          background: rgba(11, 15, 26, 0.8);
+          backdrop-filter: blur(12px);
+          border: 1px solid var(--border-color);
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
 
-        .post-editor-surface table { border: 1px solid #ccc; width: 100%; border-collapse: collapse; }
-        .post-editor-surface td { border: 1px solid #ccc; padding: 5px; }
+        .glow-text {
+          text-shadow: 0 0 10px var(--accent-glow);
+        }
 
         .ticker-text { font-variant-numeric: tabular-nums; }
+        
+        @keyframes pulse-border {
+          0% { border-color: var(--border-color); }
+          50% { border-color: #4f46e5; }
+          100% { border-color: var(--border-color); }
+        }
+
+        .active-node {
+          animation: pulse-border 2s infinite;
+        }
     </style>
 <script type="importmap">
 {
@@ -99,7 +114,7 @@
 }
 </script>
 </head>
-<body class="bg-[var(--bg-primary)] overflow-x-hidden antialiased">
+<body class="overflow-x-hidden antialiased">
     <div id="root"></div>
 </body>
 </html>

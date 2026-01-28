@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { Group, GroupMessage, User, College } from '../types';
 import { 
@@ -10,10 +10,11 @@ import {
   CheckCircle2, Box, Info, Layout, Sparkles, 
   Cpu, BarChart3, Download, GitFork, Share2, 
   Settings, Loader2, Zap, History, Target, 
-  TrendingUp, ShieldAlert, Binary, Layers
+  TrendingUp, ShieldAlert, Binary, Layers, Paperclip,
+  Check, CheckCheck
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip } from 'recharts';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
@@ -165,14 +166,14 @@ const Groups: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-[var(--bg-primary)] overflow-hidden font-mono text-[var(--text-primary)]">
+    <div className="flex h-screen bg-[var(--bg-primary)] overflow-hidden font-sans text-[var(--text-primary)]">
       
-      {/* 1. CLUSTER NAVIGATOR */}
+      {/* 1. CLUSTER NAVIGATOR (Left Sidebar) */}
       <aside className="hidden lg:flex w-80 border-r border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] shrink-0 z-20">
         <div className="p-6 border-b border-[var(--border-color)] space-y-5 bg-white/50 dark:bg-black/20">
           <div className="flex items-center justify-between">
             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2">
-               <Binary size={14}/> Active_Manifests
+               <Binary size={14}/> Active_Clusters
             </h2>
             <button 
               onClick={() => setIsCreating(true)}
@@ -203,7 +204,7 @@ const Groups: React.FC = () => {
             >
               {activeGroupId === g.id && <div className="absolute inset-y-0 left-0 w-1.5 bg-indigo-600 animate-pulse"></div>}
               <div className="relative shrink-0">
-                <img src={g.image} className="w-11 h-11 rounded-lg border border-[var(--border-color)] object-cover bg-white shadow-sm grayscale group-hover:grayscale-0 transition-all" />
+                <img src={g.image} className="w-11 h-11 rounded-xl border border-[var(--border-color)] object-cover bg-white shadow-sm transition-all" />
                 {g.isOfficial && (
                    <div className="absolute -top-1 -right-1 bg-indigo-600 rounded-full p-0.5 border-2 border-[var(--sidebar-bg)]">
                       <ShieldCheck size={10} className="text-white" />
@@ -213,25 +214,24 @@ const Groups: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                    <h4 className="text-[11px] font-black uppercase tracking-tight truncate group-hover:text-indigo-600 transition-colors">{g.name}</h4>
-                   <span className="text-[8px] font-mono text-slate-400">SYNC_v4</span>
+                   <span className="text-[8px] font-mono text-slate-400">ID_{g.id.slice(-3)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                   <span className="text-[8px] font-black uppercase text-indigo-500 px-1.5 py-0.5 bg-indigo-500/10 rounded">{g.category} Hub</span>
-                   <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{g.memberIds.length} Nodes</span>
+                   <span className="text-[8px] font-black uppercase text-indigo-500 px-1.5 py-0.5 bg-indigo-500/10 rounded">{g.category}</span>
+                   <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest truncate">{g.messages[g.messages.length-1]?.text.slice(0, 20)}...</span>
                 </div>
               </div>
             </button>
           ))}
         </div>
         
-        {/* SIDEBAR TELEMETRY */}
         <div className="p-6 border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-black/20 space-y-4">
            <div className="flex justify-between items-center text-[8px] font-black uppercase text-slate-500 tracking-widest">
               <span>Registry_Indexing</span>
-              <span className="text-indigo-600">84%</span>
+              <span className="text-indigo-600">92%</span>
            </div>
            <div className="h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-indigo-600 w-[84%] animate-pulse"></div>
+              <div className="h-full bg-indigo-600 w-[92%] animate-pulse"></div>
            </div>
         </div>
       </aside>
@@ -255,7 +255,7 @@ const Groups: React.FC = () => {
                  <div className="flex items-center gap-3">
                     <div className="bg-[var(--bg-secondary)] p-1 rounded-lg border border-[var(--border-color)] flex shadow-inner">
                        <button onClick={() => setViewMode('terminal')} className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${viewMode === 'terminal' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-700'}`}>
-                          <Terminal size={12}/> Terminal
+                          <MessageSquare size={12}/> Terminal
                        </button>
                        <button onClick={() => setViewMode('architecture')} className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${viewMode === 'architecture' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-700'}`}>
                           <Layout size={12}/> Architecture
@@ -269,73 +269,107 @@ const Groups: React.FC = () => {
             <div className="flex-1 flex overflow-hidden">
               
               {/* CENTRAL VIEW AREA */}
-              <div className="flex-1 flex flex-col relative overflow-hidden">
+              <div className="flex-1 flex flex-col relative overflow-hidden bg-slate-50 dark:bg-[#0b0f1a]">
                 {viewMode === 'terminal' ? (
                   <>
-                    <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar" style={{ backgroundImage: 'linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px)', backgroundSize: '40px 40px', backgroundOpacity: 0.05 }}>
+                    {/* CHAT STREAM (WHATSAPP STYLE) */}
+                    <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 no-scrollbar" style={{ backgroundImage: 'linear-gradient(var(--border-color) 0.5px, transparent 0.5px), linear-gradient(90deg, var(--border-color) 0.5px, transparent 0.5px)', backgroundSize: '40px 40px' }}>
                       
                       {/* Neural Snapshot Banner */}
                       {neuralSnapshot && (
-                        <div className="bg-indigo-600/10 border border-indigo-600/30 rounded-xl p-8 mb-10 animate-in slide-in-from-top-4 relative overflow-hidden group">
-                           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Cpu size={100}/></div>
+                        <div className="bg-indigo-600 text-white rounded-2xl p-8 mb-10 animate-in slide-in-from-top-4 relative overflow-hidden group shadow-2xl">
+                           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><Cpu size={100}/></div>
                            <div className="flex items-center justify-between mb-6">
-                              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600 flex items-center gap-3">
-                                 <Sparkles size={16}/> Cluster_Intelligence_Snapshot
+                              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80 flex items-center gap-3">
+                                 <Sparkles size={16}/> Intelligence_Snapshot
                               </h3>
-                              <button onClick={() => setNeuralSnapshot(null)} className="text-slate-400 hover:text-rose-500"><X size={14}/></button>
+                              <button onClick={() => setNeuralSnapshot(null)} className="text-white/40 hover:text-white"><X size={14}/></button>
                            </div>
-                           <div className="text-[11px] text-slate-300 italic whitespace-pre-wrap font-medium leading-relaxed border-l-2 border-indigo-600/20 pl-6">
+                           <div className="text-[12px] italic whitespace-pre-wrap font-medium leading-relaxed border-l-2 border-white/20 pl-6">
                               {neuralSnapshot}
-                           </div>
-                           <div className="mt-6 pt-4 border-t border-indigo-600/10 text-[7px] font-black uppercase text-indigo-500/50 flex justify-between tracking-[0.2em]">
-                              <span>ENCRYPTED BY GEMINI_PROTOCOL_v4.2</span>
-                              <span>CHECKSUM: {SHA_GEN()}</span>
                            </div>
                         </div>
                       )}
 
-                      {activeGroup.messages.map(msg => (
-                        <div key={msg.id} className="flex gap-5 group hover:bg-slate-50/50 dark:hover:bg-white/5 p-3 rounded-lg transition-all border border-transparent hover:border-indigo-600/10">
-                          <img src={msg.authorAvatar} className="w-10 h-10 rounded-lg border border-[var(--border-color)] object-cover shrink-0 bg-white shadow-sm" />
-                          <div className="flex-1 min-w-0 space-y-1">
-                             <div className="flex items-center gap-3">
-                                <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{msg.author}</span>
-                                <span className="text-[8px] font-mono text-slate-400 opacity-60">ID_{SHA_GEN().toLowerCase()}</span>
-                                <span className="text-[8px] font-mono text-slate-400">{msg.timestamp}</span>
-                             </div>
-                             <div className="text-[13px] text-slate-500 leading-relaxed font-medium">
-                                {msg.text}
-                             </div>
-                             {msg.attachment && (
-                                <div className="mt-4 inline-block">
-                                   {msg.attachment.type === 'image' ? (
-                                     <img src={msg.attachment.data} className="max-w-md rounded-xl border border-[var(--border-color)] shadow-2xl transition-transform hover:scale-[1.01]" />
-                                   ) : (
-                                     <div className="flex items-center gap-5 p-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl hover:border-indigo-600 transition-all cursor-pointer group/asset shadow-sm border-l-4 border-l-indigo-600">
-                                        <div className="p-3 bg-indigo-600/10 rounded-lg text-indigo-600 group-hover/asset:bg-indigo-600 group-hover/asset:text-white transition-all">
-                                           <FileText size={24} />
+                      {activeGroup.messages.map(msg => {
+                        const isMe = msg.authorId === currentUser.id;
+                        return (
+                          <div key={msg.id} className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+                            <div className={`flex max-w-[85%] sm:max-w-[70%] gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                              
+                              {!isMe && (
+                                <img src={msg.authorAvatar} className="w-8 h-8 rounded-lg border border-[var(--border-color)] object-cover bg-white mt-1 shrink-0" />
+                              )}
+
+                              <div className="flex flex-col">
+                                {!isMe && (
+                                  <span className="text-[9px] font-black uppercase text-slate-500 mb-1 ml-1 tracking-widest">{msg.author}</span>
+                                )}
+                                
+                                <div className={`p-4 rounded-2xl shadow-sm relative group ${
+                                  isMe 
+                                  ? 'bg-indigo-600 text-white rounded-tr-none' 
+                                  : 'bg-white dark:bg-[#161b22] border border-[var(--border-color)] text-[var(--text-primary)] rounded-tl-none'
+                                }`}>
+                                  
+                                  {msg.attachment && (
+                                    <div className="mb-3">
+                                      {msg.attachment.type === 'image' ? (
+                                        <div className="relative group/img cursor-pointer overflow-hidden rounded-xl border border-black/10">
+                                          <img src={msg.attachment.data} className="max-w-full h-auto transition-transform group-hover/img:scale-105" />
+                                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Download size={24} className="text-white" />
+                                          </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                           <span className="text-[12px] font-black uppercase truncate max-w-[200px]">{msg.attachment.name}</span>
-                                           <span className="text-[8px] text-slate-400 font-bold tracking-[0.3em] mt-1">SECURE_ASSET_PACKET</span>
+                                      ) : (
+                                        <div className={`flex items-center gap-3 p-3 rounded-xl border ${isMe ? 'bg-indigo-700/50 border-white/10' : 'bg-slate-50 dark:bg-black/20 border-[var(--border-color)]'}`}>
+                                          <FileText size={24} className={isMe ? 'text-white' : 'text-indigo-600'} />
+                                          <div className="min-w-0">
+                                            <p className="text-[11px] font-black uppercase truncate">{msg.attachment.name}</p>
+                                            <p className="text-[8px] opacity-60 font-bold uppercase tracking-widest">Secured_Asset</p>
+                                          </div>
+                                          <Download size={14} className="ml-auto opacity-40 hover:opacity-100 cursor-pointer" />
                                         </div>
-                                        <Download size={16} className="ml-6 text-slate-300 group-hover/asset:text-indigo-600" />
-                                     </div>
-                                   )}
+                                      )}
+                                    </div>
+                                  )}
+
+                                  <p className="text-[13px] font-medium leading-relaxed whitespace-pre-wrap">
+                                    {msg.text}
+                                  </p>
+
+                                  <div className={`flex items-center gap-2 mt-2 justify-end ${isMe ? 'text-indigo-200' : 'text-slate-400'}`}>
+                                    <span className="text-[8px] font-mono uppercase tracking-widest">{msg.timestamp}</span>
+                                    {isMe && <CheckCheck size={12} className="text-emerald-300" />}
+                                  </div>
                                 </div>
-                             )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     {/* INPUT TERMINAL */}
                     <div className="p-6 border-t border-[var(--border-color)] bg-white/50 dark:bg-black/20">
                        {isMember ? (
                          <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-2xl shadow-2xl transition-all overflow-hidden">
+                            {attachment && (
+                              <div className="px-6 py-4 bg-indigo-600 text-white flex items-center justify-between animate-in slide-in-from-bottom-2">
+                                <div className="flex items-center gap-3">
+                                  {attachment.type === 'image' ? <ImageIcon size={20}/> : <FileText size={20}/>}
+                                  <div className="min-w-0">
+                                    <p className="text-[10px] font-black uppercase truncate max-w-md">{attachment.name}</p>
+                                    <p className="text-[8px] opacity-60 font-bold uppercase tracking-widest">Ready for Uplink</p>
+                                  </div>
+                                </div>
+                                <button onClick={() => setAttachment(null)} className="p-1 hover:bg-white/10 rounded-full transition-all"><X size={20}/></button>
+                              </div>
+                            )}
+
                             <div className="px-6 py-3 border-b border-[var(--border-color)] bg-slate-50/80 dark:bg-white/5 flex items-center justify-between">
                                <div className="flex items-center gap-4">
-                                  <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-md text-slate-500 hover:text-indigo-600 transition-all"><ImageIcon size={18}/></button>
+                                  <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-md text-slate-500 hover:text-indigo-600 transition-all"><Paperclip size={18}/></button>
                                   <div className="w-px h-6 bg-[var(--border-color)]"></div>
                                   <button onClick={handleNeuralSync} disabled={isSummarizing} className="px-4 py-1.5 hover:bg-indigo-600/10 rounded-md text-indigo-600 transition-all flex items-center gap-2 disabled:opacity-30">
                                      {isSummarizing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16}/>}
@@ -345,40 +379,25 @@ const Groups: React.FC = () => {
                                <div className="hidden sm:flex items-center gap-3">
                                   <div className="flex items-center gap-1.5">
                                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                     <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Active_Handshake</span>
+                                     <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Link_Stable</span>
                                   </div>
                                </div>
                             </div>
                             
-                            <div className="relative">
-                               {attachment && (
-                                  <div className="absolute bottom-full left-6 right-6 bg-indigo-600 p-4 rounded-t-xl flex items-center justify-between shadow-2xl animate-in slide-in-from-bottom-4">
-                                     <div className="flex items-center gap-3 text-white">
-                                        {attachment.type === 'image' ? <ImageIcon size={20}/> : <FileText size={20}/>}
-                                        <span className="text-[10px] font-black uppercase truncate max-w-xs">UPLINK_STAGING: {attachment.name}</span>
-                                     </div>
-                                     <button onClick={() => setAttachment(null)} className="p-1 hover:text-rose-200 text-white"><X size={18}/></button>
-                                  </div>
-                                )}
+                            <div className="flex items-end gap-3 p-4">
                                <textarea 
                                  value={newMessage}
                                  onChange={e => setNewMessage(e.target.value)}
                                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                                 placeholder="Execute logic commit..."
-                                 className="w-full bg-transparent p-6 text-[14px] font-medium outline-none h-28 resize-none placeholder:italic placeholder:text-slate-400"
+                                 placeholder="Enter message signal..."
+                                 className="flex-1 bg-transparent p-2 text-[14px] font-medium outline-none h-10 max-h-40 resize-none placeholder:italic placeholder:text-slate-400 no-scrollbar"
                                />
-                            </div>
-                            
-                            <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/5 flex justify-between items-center">
-                               <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                                  <ShieldCheck size={14}/> Node Verification Active
-                               </div>
                                <button 
                                  onClick={handleSendMessage}
                                  disabled={!newMessage.trim() && !attachment}
-                                 className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 text-white px-10 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 transition-all shadow-xl shadow-indigo-600/30 active:scale-95"
+                                 className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 text-white p-3 rounded-xl shadow-xl shadow-indigo-600/30 active:scale-95 transition-all shrink-0"
                                >
-                                  Broadcast Signal <Send size={14}/>
+                                  <Send size={20}/>
                                 </button>
                             </div>
                          </div>
@@ -397,7 +416,7 @@ const Groups: React.FC = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="flex-1 overflow-y-auto p-12 space-y-12 no-scrollbar animate-in fade-in zoom-in-98 duration-500" style={{ backgroundImage: 'radial-gradient(var(--border-color) 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}>
+                  <div className="flex-1 overflow-y-auto p-12 space-y-12 no-scrollbar animate-in fade-in zoom-in-98 duration-500">
                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* Activity Heatmap */}
                         <div className="bg-white dark:bg-[#0b0f1a] border border-[var(--border-color)] p-10 rounded-[2.5rem] space-y-10 shadow-2xl">
@@ -447,7 +466,7 @@ const Groups: React.FC = () => {
                            <div className="flex items-center justify-between">
                               <div className="space-y-1">
                                  <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3">
-                                    <Database size={18} className="text-indigo-600"/> Shared_Intelligence_Vault
+                                    <Database size={18} className="text-indigo-600"/> Shared_Asset_Vault
                                  </h3>
                                  <p className="text-[9px] text-slate-400 font-bold uppercase">Verified academic assets</p>
                               </div>
@@ -460,7 +479,7 @@ const Groups: React.FC = () => {
                                           <FileText size={20} />
                                        </div>
                                        <div>
-                                          <p className="text-[12px] font-black uppercase tracking-tight">Technical_Report_v{i}.log</p>
+                                          <p className="text-[12px] font-black uppercase tracking-tight">Academic_Log_v{i}.log</p>
                                           <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">Strata: {activeGroup.category} / 4.2 MB</p>
                                        </div>
                                     </div>
@@ -497,7 +516,7 @@ const Groups: React.FC = () => {
                 )}
               </div>
 
-              {/* RIGHT TELEMETRY BAR */}
+              {/* RIGHT TELEMETRY BAR (Member List) */}
               <aside className="hidden xl:flex w-80 border-l border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] p-8 space-y-12 z-20">
                  <div className="space-y-6">
                     <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] flex items-center gap-3">

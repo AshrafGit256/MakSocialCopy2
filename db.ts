@@ -1,3 +1,4 @@
+
 import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment, Group, GroupMessage } from './types';
 import { MOCK_POSTS } from './constants';
 
@@ -18,26 +19,58 @@ const MOCK_GROUPS: Group[] = [
   {
     id: 'g-1',
     name: '89th Guild Cabinet',
-    description: 'Operational hub for the executive leadership of Makerere University. Coordination of student welfare and guild projects.',
+    description: 'Official coordination hub for the Guild Leadership. Strategy sessions and welfare reports.',
     image: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
     isOfficial: true,
     creatorId: 'vc_office',
-    memberIds: ['vc_office', 'guest'],
+    memberIds: ['vc_office', 'u1', 'u2', 'u3'],
     category: 'Global',
     messages: [
-      { id: 'gm1', author: 'Guild President', authorId: 'gp', authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=GP', text: 'All secretaries, finalize the welfare report by EOD.', timestamp: '2h ago' }
+      { id: 'm1', author: 'Guild President', authorId: 'gp', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GP', text: 'Has the welfare report for CEDAT been synchronized yet?', timestamp: '09:00 AM' },
+      { id: 'm2', author: 'Secretary General', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SG', text: 'Processing now. We found some connectivity issues in the North Wing.', timestamp: '09:05 AM' },
+      { id: 'm3', author: 'Prof. Barnabas', authorId: 'vc_office', authorAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg', text: 'Ensure the 89th inauguration ceremony budget is finalized by EOD.', timestamp: '10:30 AM' }
     ]
   },
   {
     id: 'g-2',
-    name: 'COCIS Research Cluster',
-    description: 'A wing for AI, Cybersecurity, and Software Development enthusiasts. Sharing research assets and code reviews.',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=400',
+    name: 'COCIS Alpha-Net',
+    description: 'A deep-tech hub for AI research, cybersecurity drills, and software architecture.',
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400',
     isOfficial: false,
     creatorId: 'u1',
-    memberIds: ['guest'],
+    memberIds: ['u1', 'u4', 'u5'],
     category: 'COCIS',
-    messages: []
+    messages: [
+      { id: 'm4', author: 'Admin Node', authorId: 'u1', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin', text: 'I have uploaded the new neural network weights for the exam-bot project.', timestamp: 'Yesterday' },
+      { id: 'm5', author: 'Security Lead', authorId: 'u4', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sec', text: 'Verified. SHA-256 handshake successful.', timestamp: 'Yesterday', attachment: { name: 'model_weights.bin', type: 'document', data: '#' } }
+    ]
+  },
+  {
+    id: 'g-3',
+    name: 'CEDAT Design Lab',
+    description: 'Visual arts, architecture prototypes, and 3D modeling synchronization.',
+    image: 'https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&w=400',
+    isOfficial: false,
+    creatorId: 'u2',
+    memberIds: ['u2', 'u6'],
+    category: 'CEDAT',
+    messages: [
+      { id: 'm6', author: 'Sarah Design', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', text: 'Check out the proposed structure for the new Student Center.', timestamp: '11:20 AM', attachment: { name: 'render_v1.png', type: 'image', data: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800' } },
+      { id: 'm7', author: 'Architect Node', authorId: 'u6', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arch', text: 'The glass facade looks impressive, but we need to check the structural integrity of the west wing.', timestamp: '11:45 AM' }
+    ]
+  },
+  {
+    id: 'g-4',
+    name: 'Hill Marathon Committee',
+    description: 'Organizing the 2026 Hill Marathon. Athletics and logistics sync.',
+    image: 'https://images.unsplash.com/photo-1461896756981-2258bb3f6714?auto=format&fit=crop&w=400',
+    isOfficial: true,
+    creatorId: 'u3',
+    memberIds: ['u3', 'u7', 'u8'],
+    category: 'Global',
+    messages: [
+      { id: 'm8', author: 'Sports Rep', authorId: 'u3', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sports', text: 'Registration nodes are now active at Freedom Square.', timestamp: '08:00 AM' }
+    ]
   }
 ];
 
@@ -66,25 +99,13 @@ const INITIAL_EVENTS: CalendarEvent[] = [
   {
     id: 'ev-1',
     title: '89th Guild Inauguration Gala',
-    description: 'The official synchronization ceremony for the new student leadership. Protocol includes a networking dinner and leadership workshop.',
+    description: 'The official synchronization ceremony for the new student leadership.',
     date: new Date().toISOString().split('T')[0],
     time: '18:00',
     location: 'Freedom Square / Main Hall',
     image: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200',
     category: 'Social',
     createdBy: 'vc_office',
-    attendeeIds: []
-  },
-  {
-    id: 'ev-2',
-    title: 'AI & Neural Networks Symposium',
-    description: 'A high-density research session exploring the integration of LLMs in academic curricula. Keynote by the COCIS Dean.',
-    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-    time: '10:00',
-    location: 'COCIS Block B, Auditorium 2',
-    image: 'https://images.unsplash.com/photo-1591453089816-0fbb971b454c?auto=format&fit=crop&w=1200',
-    category: 'Academic',
-    createdBy: 'ai_lab_node',
     attendeeIds: []
   }
 ];

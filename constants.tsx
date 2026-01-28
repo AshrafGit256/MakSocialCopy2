@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Home, Search, MessageCircle, User, Calendar, BookOpen, Bell, Award, Users
@@ -48,6 +49,27 @@ export const MOCK_POSTS: Post[] = [
     college: 'Global'
   },
   {
+    id: 'p-ad-airtel',
+    author: 'Airtel Uganda',
+    authorId: 'airtel_official',
+    authorRole: 'Network Partner',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Airtel',
+    authorAuthority: 'Corporate',
+    isAd: true,
+    timestamp: 'Just now',
+    video: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/Airtel2.mp4',
+    content: `<h1>Airtel 5G: Speed for the Hill</h1>
+<p>Experience the most aggressive 5G synchronization in Makerere. Whether it's uploading your research logs or streaming the latest strata updates, Airtel has the bandwidth you need.</p>`,
+    hashtags: ['#Airtel5G', '#TheReason', '#MakConnect'],
+    likes: 3800,
+    commentsCount: 56,
+    comments: [],
+    views: 112000,
+    flags: [],
+    isOpportunity: false,
+    college: 'Global'
+  },
+  {
     id: 'p-ad-mtn',
     author: 'MTN Uganda',
     authorId: 'mtn_official',
@@ -92,76 +114,9 @@ export const MOCK_POSTS: Post[] = [
     flags: [],
     isOpportunity: false,
     college: 'Global'
-  },
-  {
-    id: 'p-ad-1',
-    author: 'Centenary Bank',
-    authorId: 'centenary_bank',
-    authorRole: 'Strategic Partner',
-    authorAvatar: 'https://yt3.googleusercontent.com/KUU4mqp8QmSUU_LJi0GBUQKtIKCa1sX8lxJ2RZxSQnD-ZxLfESJTovLXRWTGsScZP0NxiZlckQ=s900-c-k-c0x00ffffff-no-rj',
-    authorAuthority: 'Corporate',
-    isAd: true,
-    timestamp: '2h ago',
-    content: `<h1>Smart Student Banking Uplink</h1>
-<p>Open a CenteStudent account today with <b>ZERO</b> maintenance fees. Get instant tuition clearance synchronization and mobile app access. Visit our node at the Main Admin wing.</p>
-<img src="https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1200" class="rounded-lg my-4" />`,
-    hashtags: ['#FinancialSync', '#SmartBanking'],
-    likes: 420,
-    commentsCount: 8,
-    comments: [],
-    views: 45000,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global'
-  },
-  {
-    id: 'p-opp-1',
-    author: 'COCIS AI Lab',
-    authorId: 'ai_lab_node',
-    authorRole: 'Research Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AI',
-    authorAuthority: 'Academic Council',
-    timestamp: '3h ago',
-    isOpportunity: true,
-    opportunityData: {
-      type: 'Internship',
-      isAIVerified: true,
-      detectedBenefit: 'UGX 800k Stipend'
-    },
-    content: `<h1>Opportunity: Neural Network Assistant</h1>
-<p>We are recruiting 5 finalist students for the Alpha-Sync project. Experience with Python logic and data stratification is mandatory.</p>`,
-    hashtags: ['#AIRecruitment', '#COCIS', '#Opportunity'],
-    likes: 670,
-    commentsCount: 42,
-    comments: [],
-    views: 8900,
-    flags: [],
-    college: 'COCIS'
-  },
-  {
-    id: 'p-2',
-    author: 'Roy Ssemboga',
-    authorId: 'roy_ssemboga',
-    authorRole: 'Former Guild President',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
-    authorAuthority: 'Student Leader',
-    timestamp: '5h ago',
-    content: `<h1>Campus Infrastructure Feedback</h1>
-<p>I have received signals regarding the connectivity issues in the CEDAT wing. I'm engaging with the technical council to ensure the fiber nodes are stabilized before the research deadline.</p>`,
-    hashtags: ['#StudentWelfare', '#CEDAT'],
-    likes: 1250,
-    commentsCount: 89,
-    comments: [
-      { id: 'c1', author: 'Shamim Nambassa', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', text: 'Confirmed. Block B is completely offline since 0800hrs.', timestamp: '4h ago' }
-    ],
-    views: 5600,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global'
   }
 ];
 
-// MOCK_CHATS export to resolve import errors in Chat.tsx
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'chat-1',
@@ -181,16 +136,6 @@ export const MOCK_CHATS: ChatConversation[] = [
     messages: [
       { id: 'm3', text: 'Requesting CAD assets for wing review.', timestamp: '09:30 AM', isMe: true },
       { id: 'm4', text: 'The CAD assets are synchronized.', timestamp: '09:45 AM', isMe: false }
-    ]
-  },
-  {
-    id: 'chat-3',
-    user: { name: 'Roy Ssemboga', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy' },
-    unreadCount: 0,
-    lastMessage: 'Signal confirmed.',
-    messages: [
-      { id: 'm5', text: 'Has the CEDAT wing connectivity stabilized?', timestamp: '11:00 AM', isMe: true },
-      { id: 'm6', text: 'Signal confirmed. Node 4 is active.', timestamp: '11:10 AM', isMe: false }
     ]
   }
 ];

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { 
-  ArrowRight, Zap, Globe, Users, ShieldCheck, 
+  ArrowRight, Users, Globe, ShieldCheck, 
   Search, MessageSquare, BookOpen, ChevronRight,
   Database, Terminal, Cpu, Activity, Lock,
   FileText, Star, GitFork, ExternalLink, Download,
@@ -35,8 +35,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? 'py-3 bg-[#0d1117]/90 backdrop-blur-md border-b border-[#30363d]' : 'py-6 bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <div className="w-8 h-8 bg-slate-700 rounded flex items-center justify-center">
-              <Zap size={18} className="text-white fill-white" />
+            <div className="w-8 h-8 bg-slate-700 rounded flex items-center justify-center shadow-lg">
+              <Users size={18} className="text-white fill-white/20" />
             </div>
             <span className="text-lg font-black tracking-tight uppercase text-white">MakSocial</span>
           </div>
@@ -139,7 +139,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden flex flex-col">
               <div className="p-4 border-b border-[#30363d] bg-[#0d1117]/50 flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <Zap size={14}/> Opportunity_Nodes
+                  <Database size={14}/> Opportunity_Nodes
                 </span>
                 <span className="text-[8px] font-mono text-slate-500">ACTIVE_RECRUIT</span>
               </div>
@@ -210,7 +210,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <footer className="py-16 px-6 border-t border-[#30363d] bg-[#0d1117] z-10 relative">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3">
-             <Zap size={20} className="text-white fill-white" />
+             <Users size={20} className="text-white fill-white/20" />
              <span className="text-lg font-black uppercase text-white tracking-tighter">MakSocial Protocol</span>
           </div>
           <p className="text-[9px] font-bold text-[#8b949e] uppercase tracking-[0.4em] text-center md:text-right">

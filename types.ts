@@ -92,8 +92,8 @@ export interface AnalyticsData {
 export interface ChatConversation {
   id: string;
   user: { name: string; avatar: string };
-  lastMessage: string;
   unreadCount: number;
+  lastMessage: string;
   messages: { id: string; text: string; timestamp: string; isMe: boolean }[];
 }
 
@@ -112,6 +112,7 @@ export interface Resource {
   course: string;
   year: string;
   author: string;
+  authorRole: string;
   downloads: number;
   fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
   fileData?: string;
@@ -232,7 +233,6 @@ export interface CalendarEvent {
   isPromoted?: boolean;
 }
 
-// Market service interface for Bazaar marketplace transactional nodes
 export interface MarketService {
   id: string;
   providerId: string;

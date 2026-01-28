@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
@@ -9,7 +10,7 @@ import {
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
-  Maximize2, Volume2, Play, Pause, X
+  Maximize2, Volume2, Play, Pause, X, ChevronRight, Cpu, Target, Circle
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -31,7 +32,7 @@ const NewsBulletin: React.FC = () => {
 
   return (
     <>
-      <div className="bg-slate-900 border border-slate-700 rounded-[var(--radius-main)] overflow-hidden mb-6 group relative shadow-2xl">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden mb-8 group relative shadow-2xl transition-all hover:scale-[1.02]">
         <div className="absolute top-3 left-3 z-10 flex items-center gap-2 pointer-events-none">
           <div className="px-2 py-1 bg-rose-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow-lg animate-pulse flex items-center gap-1">
              <div className="w-1 h-1 bg-white rounded-full"></div> LIVE_BULLETIN
@@ -50,8 +51,8 @@ const NewsBulletin: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
           
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={togglePlay} className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
-              {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
+            <button onClick={togglePlay} className="p-4 bg-white/10 backdrop-blur-xl rounded-full text-white hover:bg-white/30 transition-all border border-white/20">
+              {isPlaying ? <Pause size={28} fill="white" /> : <Play size={28} fill="white" />}
             </button>
           </div>
 
@@ -99,28 +100,41 @@ const NewsBulletin: React.FC = () => {
   );
 };
 
+const SidebarModule: React.FC<{ title: string; icon: React.ReactNode; children: React.ReactNode }> = ({ title, icon, children }) => (
+  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-sm transition-all hover:border-slate-400 dark:hover:border-slate-700">
+    <div className="px-5 py-4 border-b border-[var(--border-color)] bg-slate-50/50 dark:bg-black/20 flex items-center gap-3">
+      <span className="text-slate-500">{icon}</span>
+      <h4 className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-[0.2em]">{title}</h4>
+    </div>
+    <div className="p-5">
+      {children}
+    </div>
+  </div>
+);
+
 const NetworkIntensityGraph: React.FC = () => {
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-5 mb-4 relative overflow-hidden group rounded-[var(--radius-main)] shadow-sm">
-       <div className="relative z-10 space-y-4">
-          <div className="flex justify-between items-start">
-             <div className="space-y-1">
-                <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2">
-                   <Activity size={12} /> Network_Intensity
-                </h4>
-                <div className="flex items-center gap-3">
-                   <span className="text-3xl font-black italic tracking-tighter ticker-text text-slate-700 dark:text-slate-300">74.8</span>
-                   <div className="flex flex-col">
-                      <span className="text-[9px] font-black uppercase text-emerald-500 flex items-center gap-0.5">
-                         <TrendingUp size={10} /> BULLISH
-                      </span>
-                      <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">v4.2_STABLE</span>
-                   </div>
+    <SidebarModule title="Network_Flux" icon={<Activity size={14} />}>
+       <div className="space-y-4">
+          <div className="flex items-center justify-between">
+             <div className="flex items-center gap-3">
+                <span className="text-3xl font-black italic tracking-tighter ticker-text text-slate-800 dark:text-slate-100">74.8</span>
+                <div className="flex flex-col">
+                   <span className="text-[9px] font-black uppercase text-emerald-500 flex items-center gap-0.5">
+                      <TrendingUp size={10} /> BULLISH
+                   </span>
+                   <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">v4.2_STABLE</span>
                 </div>
              </div>
+             <div className="w-12 h-12 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center">
+                <Cpu size={18} className="text-indigo-600 animate-pulse" />
+             </div>
+          </div>
+          <div className="h-1.5 w-full bg-slate-100 dark:bg-black/40 rounded-full overflow-hidden">
+             <div className="h-full bg-indigo-600 w-[74.8%] shadow-[0_0_8px_rgba(79,70,229,0.5)]"></div>
           </div>
        </div>
-    </div>
+    </SidebarModule>
   );
 };
 
@@ -139,42 +153,46 @@ const TrendingHashtags: React.FC<{ posts: Post[], onTagClick?: (tag: string) => 
   }, [posts]);
 
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-5 mb-4 shadow-sm">
-       <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-          <Hash size={12} className="text-slate-400" /> Hot_Signals
-       </h4>
-       <div className="space-y-4">
+    <SidebarModule title="Hot_Signals" icon={<Hash size={14} />}>
+       <div className="space-y-1">
           {topTags.length > 0 ? topTags.map(([tag, count], i) => (
-            <div 
+            <button 
               key={i} 
               onClick={() => onTagClick?.(tag)}
-              className="flex justify-between items-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 p-2 rounded transition-all border border-transparent hover:border-indigo-500/20"
+              className="w-full flex justify-between items-center group hover:bg-white dark:hover:bg-white/5 p-2.5 rounded-xl transition-all border border-transparent hover:border-[var(--border-color)]"
             >
-               <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-tight group-hover:underline">#{tag.replace('#','')}</span>
+               <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 group-hover:scale-150 transition-transform"></div>
+                  <span className="text-[12px] font-black uppercase text-slate-700 dark:text-slate-300 tracking-tight">#{tag.replace('#','')}</span>
+               </div>
                <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">{count} COMMITS</span>
-            </div>
+            </button>
           )) : (
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">No signals indexed...</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic text-center py-4">No signals indexed...</p>
           )}
        </div>
-    </div>
+    </SidebarModule>
   );
 };
 
 const Watchlist: React.FC = () => (
-  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] p-5 shadow-sm">
-     <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-        <Radio size={12} className="text-slate-400" /> Sector_Watchlist
-     </h4>
-     <div className="space-y-5">
-        {[{ t: '#COCIS', v: '+12.4%', c: 'text-emerald-500' }, { t: '#CEDAT', v: '-2.1%', c: 'text-rose-500' }, { t: '#LAW', v: '+45.8%', c: 'text-emerald-500' }].map((item, i) => (
-          <div key={i} className="flex justify-between items-center group">
-             <span className="text-[10px] font-black uppercase text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{item.t}</span>
-             <span className={`text-[10px] font-mono font-bold ticker-text ${item.c}`}>{item.v}</span>
+  <SidebarModule title="Sector_Watch" icon={<Target size={14} />}>
+     <div className="space-y-4">
+        {[
+          { t: '#COCIS', v: '+12.4%', c: 'text-emerald-500', trend: 'up' }, 
+          { t: '#CEDAT', v: '-2.1%', c: 'text-rose-500', trend: 'down' }, 
+          { t: '#LAW', v: '+45.8%', c: 'text-emerald-500', trend: 'up' }
+        ].map((item, i) => (
+          <div key={i} className="flex justify-between items-center group bg-white/30 dark:bg-black/10 p-3 rounded-xl border border-transparent hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+             <span className="text-[11px] font-black uppercase text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 transition-colors">{item.t}</span>
+             <div className="flex items-center gap-2">
+                <div className={`w-1 h-4 rounded-full ${item.trend === 'up' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                <span className={`text-[11px] font-mono font-black ticker-text ${item.c}`}>{item.v}</span>
+             </div>
           </div>
         ))}
      </div>
-  </div>
+  </SidebarModule>
 );
 
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
@@ -223,7 +241,7 @@ const PostItem: React.FC<{
   return (
     <article 
       onClick={() => !isThreadView && onOpenThread(post.id)}
-      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
+      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-3xl overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
     >
       <div className="flex">
           {/* Identity Rail */}
@@ -499,24 +517,40 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </div>
          </div>
          
-         <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
+         <aside className="hidden lg:flex lg:col-span-4 flex-col gap-8 sticky top-24 h-fit pb-12">
             <NewsBulletin />
             <NetworkIntensityGraph />
             <TrendingHashtags posts={posts} onTagClick={onHashtagClick} />
             <Watchlist />
             
-            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-[var(--radius-main)] shadow-xl">
-               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
+            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)]">
+               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-1000 rotate-12"><Globe size={160} fill="white"/></div>
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
-                     <ShieldCheck size={24} className="text-slate-400"/>
-                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none italic text-slate-100">Registry Elite</h4>
+                     <div className="p-2 bg-indigo-600 rounded-lg"><ShieldCheck size={24} className="text-white"/></div>
+                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none italic text-slate-100">Tier: Registry Elite</h4>
                   </div>
-                  <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
-                    Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
+                  <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight max-w-[240px]">
+                    Access unrestricted scholarly assets, real-time node tracking, and prioritized strata indexing.
                   </p>
-                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-[var(--radius-main)] font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95">Commit_Credentials</button>
+                  <button className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 flex items-center justify-center gap-3 shadow-lg shadow-indigo-600/20">
+                    Initialize Upgrade <ChevronRight size={14}/>
+                  </button>
                </div>
+               <div className="absolute bottom-[-10px] left-[-10px] w-24 h-24 bg-indigo-600/20 blur-[60px] rounded-full"></div>
+            </div>
+
+            <div className="px-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between text-[8px] font-black uppercase text-slate-500 tracking-widest">
+                <span>Network Integrity</span>
+                <span className="text-indigo-600">99.9%</span>
+              </div>
+              <div className="flex gap-1.5 h-1">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className={`h-full flex-1 rounded-full ${i < 11 ? 'bg-indigo-600 animate-pulse' : 'bg-slate-200 dark:bg-slate-800'}`}></div>
+                ))}
+              </div>
+              <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest italic text-center">Connected via Hill_Secure Protocol v4.2</p>
             </div>
          </aside>
       </div>

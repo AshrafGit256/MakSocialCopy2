@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { 
-  ArrowRight, Share2, Globe, ShieldCheck, 
+  ArrowRight, Users, Globe, ShieldCheck, 
   Search, MessageSquare, BookOpen, ChevronRight,
   Database, Terminal, Cpu, Activity, Lock,
   FileText, Star, GitFork, ExternalLink, Download,
@@ -36,7 +36,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
             <div className="w-8 h-8 bg-slate-700 rounded flex items-center justify-center shadow-lg">
-              <Share2 size={18} className="text-white" />
+              <Users size={18} className="text-white fill-white/20" />
             </div>
             <span className="text-lg font-black tracking-tight uppercase text-white">MakSocial</span>
           </div>
@@ -210,7 +210,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <footer className="py-16 px-6 border-t border-[#30363d] bg-[#0d1117] z-10 relative">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
           <div className="flex items-center gap-3">
-             <Share2 size={20} className="text-white" />
+             <Users size={20} className="text-white fill-white/20" />
              <span className="text-lg font-black uppercase text-white tracking-tighter">MakSocial Protocol</span>
           </div>
           <p className="text-[9px] font-bold text-[#8b949e] uppercase tracking-[0.4em] text-center md:text-right">

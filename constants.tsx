@@ -1,11 +1,12 @@
 import React from 'react';
 import { 
-  Home, Search, MessageCircle, User, Calendar, BookOpen, Bell, Award
+  Home, Search, MessageCircle, User, Calendar, BookOpen, Bell, Award, Users
 } from 'lucide-react';
 import { Post, AnalyticsData, ChatConversation, College } from './types';
 
 export const NAV_ITEMS = [
   { id: 'home', label: 'Pulse Feed', icon: <Home size={22} /> },
+  { id: 'groups', label: 'Groups Hub', icon: <Users size={22} /> },
   { id: 'search', label: 'Registry', icon: <Search size={22} /> },
   { id: 'calendar', label: 'Schedule', icon: <Calendar size={22} /> },
   { id: 'resources', label: 'The Vault', icon: <BookOpen size={22} /> },

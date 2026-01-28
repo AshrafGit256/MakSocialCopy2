@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppView, User, College, UserStatus, AppSettings, Notification } from './types';
 import Landing from './components/Landing';
@@ -16,8 +17,10 @@ import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Market from './components/Market';
+import Groups from './components/Groups';
 import { db } from './db';
-import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag } from 'lucide-react';
+// Added Users to the imports from lucide-react to resolve the compilation error on line 171
+import { Menu, Home, Search as SearchIcon, Calendar, MessageCircle, User as UserIcon, Bell, Settings, Lock, Zap, ArrowLeft, Sun, Moon, Globe, ChevronDown, LayoutGrid, XCircle, X, ShoppingBag, Users } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -113,6 +116,7 @@ const App: React.FC = () => {
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
       case 'messages': return <Chat initialTargetUserId={activeChatUserId || undefined} />;
+      case 'groups': return <Groups />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={(id) => { setActiveChatUserId(id); setView('messages'); }} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'search': return <Search initialQuery={prefilledSearchQuery || undefined} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
@@ -166,10 +170,10 @@ const App: React.FC = () => {
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
+            { id: 'groups', icon: <Users size={22} />, label: 'Groups' },
             { id: 'market', icon: <ShoppingBag size={22} />, label: 'Bazaar' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
-            { id: 'settings', icon: <Settings size={22} />, label: 'UI' },
           ].map((item) => (
             <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 py-1 transition-all ${view === item.id ? 'text-slate-800' : 'text-slate-400'}`}>
               <div className="relative">{item.icon}</div>

@@ -1,5 +1,4 @@
-
-import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment, Group, GroupMessage } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -11,10 +10,37 @@ const DB_KEYS = {
   ADS: 'maksocial_ads_v5',
   OPPORTUNITIES: 'maksocial_opps_v5',
   NOTIFICATIONS: 'maksocial_notifications_v5',
-  BOOKMARKS: 'maksocial_bookmarks_v1'
+  BOOKMARKS: 'maksocial_bookmarks_v1',
+  GROUPS: 'maksocial_groups_v1'
 };
 
-// REVENUE_HISTORY constant used in Admin analytics
+const MOCK_GROUPS: Group[] = [
+  {
+    id: 'g-1',
+    name: '89th Guild Cabinet',
+    description: 'Operational hub for the executive leadership of Makerere University. Coordination of student welfare and guild projects.',
+    image: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    isOfficial: true,
+    creatorId: 'vc_office',
+    memberIds: ['vc_office', 'guest'],
+    category: 'Global',
+    messages: [
+      { id: 'gm1', author: 'Guild President', authorId: 'gp', authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=GP', text: 'All secretaries, finalize the welfare report by EOD.', timestamp: '2h ago' }
+    ]
+  },
+  {
+    id: 'g-2',
+    name: 'COCIS Research Cluster',
+    description: 'A wing for AI, Cybersecurity, and Software Development enthusiasts. Sharing research assets and code reviews.',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=400',
+    isOfficial: false,
+    creatorId: 'u1',
+    memberIds: ['guest'],
+    category: 'COCIS',
+    messages: []
+  }
+];
+
 export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jan', revenue: 800000, expenses: 600000, subscribers: 120, growth: 5 },
   { month: 'Feb', revenue: 950000, expenses: 650000, subscribers: 150, growth: 12 },
@@ -24,7 +50,6 @@ export const REVENUE_HISTORY: RevenuePoint[] = [
   { month: 'Jun', revenue: 1800000, expenses: 850000, subscribers: 300, growth: 25 }
 ];
 
-// COURSES_BY_COLLEGE constant used in Resources filtering
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   COCIS: ['Computer Science', 'Information Technology', 'Software Engineering', 'Information Systems'],
   CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering'],
@@ -61,18 +86,6 @@ const INITIAL_EVENTS: CalendarEvent[] = [
     category: 'Academic',
     createdBy: 'ai_lab_node',
     attendeeIds: []
-  },
-  {
-    id: 'ev-3',
-    title: 'Inter-College Athletics Trial',
-    description: 'Sports wing assessment for the upcoming University Games. All nodes in athletics strata must verify participation.',
-    date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
-    time: '08:30',
-    location: 'Main Sports Arena',
-    image: 'https://images.unsplash.com/photo-1461896704190-3213c9ad81e1?auto=format&fit=crop&w=1200',
-    category: 'Sports',
-    createdBy: 'sports_node',
-    attendeeIds: []
   }
 ];
 
@@ -94,9 +107,9 @@ const INITIAL_USERS: User[] = [
     totalLikesCount: 89000,
     badges: ['Official', 'Administrator', 'Verified'],
     appliedTo: [],
-    bio: 'Architect of the Hill\'s future. 11th Vice Chancellor of Makerere University. Synchronizing global research nodes with the Hill\'s digital DNA. Committed to academic excellence and institutional transformation.',
+    bio: 'Architect of the Hill\'s future.',
     location: 'Main Administration Wing',
-    skills: ['Institutional Leadership', 'Architecture', 'Strategy', 'Academic Excellence']
+    skills: ['Institutional Leadership', 'Strategy']
   }
 ];
 
@@ -119,18 +132,7 @@ export const db = {
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID);
     const found = users.find(u => u.id === currentId);
     if (found) return found;
-    return users[0] || {
-      id: 'guest',
-      name: 'Guest Node',
-      role: 'Visitor',
-      avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Guest',
-      connections: 0,
-      college: 'Global',
-      status: 'Year 1',
-      subscriptionTier: 'Free',
-      joinedColleges: ['Global'],
-      postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: []
-    };
+    return users[0];
   },
   saveUser: (user: User) => {
     const users = db.getUsers();
@@ -141,9 +143,7 @@ export const db = {
   },
   getPosts: (filter?: College | 'Global'): Post[] => {
     let posts = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
-    if (filter && filter !== 'Global') {
-      posts = posts.filter(p => p.college === filter);
-    }
+    if (filter && filter !== 'Global') posts = posts.filter(p => p.college === filter);
     return posts;
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
@@ -151,7 +151,6 @@ export const db = {
     const posts = db.getPosts();
     db.savePosts([post, ...posts]);
   },
-  // Delete a post by ID
   deletePost: (postId: string) => {
     const posts = db.getPosts();
     db.savePosts(posts.filter(p => p.id !== postId));
@@ -195,13 +194,12 @@ export const db = {
       if (ev.id === eventId) {
         const attendees = ev.attendeeIds || [];
         if (!attendees.includes(userId)) return { ...ev, attendeeIds: [...attendees, userId] };
-        else return { ...ev, attendeeIds: attendees.filter(id => id !== userId) }; // Toggle
+        else return { ...ev, attendeeIds: attendees.filter(id => id !== userId) };
       }
       return ev;
     });
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
-  // Toggle verification status for a user
   toggleVerification: (userId: string) => {
     const users = db.getUsers();
     const updated = users.map(u => u.id === userId ? { ...u, verified: !u.verified } : u);
@@ -217,6 +215,28 @@ export const db = {
   getOpportunities: (): Post[] => {
     const posts = db.getPosts();
     return posts.filter(p => p.isOpportunity);
+  },
+  getGroups: (): Group[] => parseArray<Group>(DB_KEYS.GROUPS, MOCK_GROUPS),
+  saveGroups: (groups: Group[]) => localStorage.setItem(DB_KEYS.GROUPS, JSON.stringify(groups)),
+  joinGroup: (groupId: string, userId: string) => {
+    const groups = db.getGroups();
+    const updated = groups.map(g => {
+      if (g.id === groupId && !g.memberIds.includes(userId)) {
+        return { ...g, memberIds: [...g.memberIds, userId] };
+      }
+      return g;
+    });
+    db.saveGroups(updated);
+  },
+  addGroupMessage: (groupId: string, msg: GroupMessage) => {
+    const groups = db.getGroups();
+    const updated = groups.map(g => {
+      if (g.id === groupId) {
+        return { ...g, messages: [...(g.messages || []), msg] };
+      }
+      return g;
+    });
+    db.saveGroups(updated);
   },
   getAuditLogs: (): AuditLog[] => [],
   getFlagged: (): FlaggedContent[] => [],

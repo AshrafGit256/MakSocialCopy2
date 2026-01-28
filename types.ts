@@ -1,4 +1,3 @@
-
 export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
@@ -8,6 +7,32 @@ export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff' | 'Official' | 'Corporate' | 'Academic Council';
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
+
+export interface GroupMessage {
+  id: string;
+  author: string;
+  authorId: string;
+  authorAvatar: string;
+  text: string;
+  timestamp: string;
+  attachment?: {
+    name: string;
+    type: 'image' | 'document';
+    data: string;
+  };
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  isOfficial: boolean;
+  creatorId: string;
+  memberIds: string[];
+  messages: GroupMessage[];
+  category: string;
+}
 
 export interface AuditLog {
   id: string;

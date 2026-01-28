@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ShieldCheck, Zap, ArrowRight, Fingerprint, Lock, Mail, Activity, Terminal } from 'lucide-react';
+import { ShieldCheck, Users, ArrowRight, Fingerprint, Lock, Mail, Activity, Terminal } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (email: string) => void;
@@ -28,8 +28,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
         <div className="absolute inset-0 bg-gradient-to-r from-[#0d1117] via-[#0d1117]/60 to-transparent p-20 flex flex-col justify-end">
            <div className="space-y-8 max-w-lg">
               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-2xl">
-                    <Zap size={24} className="text-black fill-black" />
+                 <div className="w-12 h-12 bg-white rounded-[2px] flex items-center justify-center shadow-2xl">
+                    <Users size={24} className="text-black fill-black/10" />
                  </div>
                  <div className="space-y-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-2">
@@ -44,7 +44,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
                 <span className="text-slate-500">The Hill.</span>
               </h1>
               
-              <div className="p-6 bg-white/5 backdrop-blur-md rounded border border-white/10 space-y-4">
+              <div className="p-6 bg-white/5 backdrop-blur-md rounded-[2px] border border-white/10 space-y-4">
                  <p className="text-slate-300 text-sm font-medium leading-relaxed">
                   "Your digital gateway to the university's exclusive intelligence network. Access granted to verified nodes only."
                  </p>
@@ -68,7 +68,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">New Node?</span>
            <button 
              onClick={onSwitchToRegister} 
-             className="px-4 py-2 border border-[#30363d] rounded text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/5 transition-all"
+             className="px-4 py-2 border border-[#30363d] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/5 transition-all"
            >
              Initialize Registration
            </button>
@@ -76,7 +76,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
 
         <div className="w-full max-w-md space-y-10">
           <div className="space-y-3">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded text-slate-300 text-[9px] font-black uppercase tracking-widest">
+             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-[2px] text-slate-300 text-[9px] font-black uppercase tracking-widest">
                 <Terminal size={14}/> Authentication_v4.2
              </div>
              <h2 className="text-4xl font-black text-white uppercase tracking-tight">Identity Handshake.</h2>
@@ -93,7 +93,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
                      value={email} 
                      onChange={(e) => setEmail(e.target.value)} 
                      placeholder="student@mak.ac.ug" 
-                     className="w-full bg-[#161b22] border border-[#30363d] rounded py-4 pl-12 pr-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
+                     className="w-full bg-[#161b22] border border-[#30363d] rounded-[2px] py-4 pl-12 pr-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
                      required 
                    />
                 </div>
@@ -108,7 +108,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
                    <input 
                      type="password" 
                      placeholder="••••••••" 
-                     className="w-full bg-[#161b22] border border-[#30363d] rounded py-4 pl-12 pr-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
+                     className="w-full bg-[#161b22] border border-[#30363d] rounded-[2px] py-4 pl-12 pr-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
                      required 
                    />
                 </div>
@@ -117,7 +117,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
 
             <button 
               type="submit" 
-              className="w-full bg-white text-black font-black py-5 rounded text-xs uppercase tracking-[0.2em] transition-all shadow-xl hover:bg-[#f0f0f0] active:scale-95 flex items-center justify-center gap-3"
+              className="w-full bg-white text-black font-black py-5 rounded-[2px] text-xs uppercase tracking-[0.2em] transition-all shadow-xl hover:bg-[#f0f0f0] active:scale-95 flex items-center justify-center gap-3"
             >
               Authorize Node Entrance <ArrowRight size={18} />
             </button>

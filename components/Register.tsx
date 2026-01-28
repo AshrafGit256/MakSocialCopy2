@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { College, UserStatus } from '../types';
-import { ShieldCheck, Zap, ArrowRight, User as UserIcon, Mail, BookOpen, GraduationCap, ChevronRight, Terminal, Activity, Database, Fingerprint } from 'lucide-react';
+import { ShieldCheck, Users, ArrowRight, User as UserIcon, Mail, BookOpen, GraduationCap, ChevronRight, Terminal, Activity, Database, Fingerprint } from 'lucide-react';
 
 interface RegisterProps {
   onRegister: (email: string, college: College, status: UserStatus) => void;
@@ -30,8 +30,8 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
         <div className="absolute inset-0 bg-gradient-to-r from-[#0d1117] via-[#0d1117]/70 to-transparent p-20 flex flex-col justify-end">
            <div className="space-y-10 max-w-lg">
               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-2xl">
-                    <Zap size={24} className="text-black fill-black" />
+                 <div className="w-12 h-12 bg-white rounded-[2px] flex items-center justify-center shadow-2xl">
+                    <Users size={24} className="text-black fill-black/10" />
                  </div>
                  <div className="space-y-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-2">
@@ -47,12 +47,12 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
               </h1>
 
               <div className="grid grid-cols-2 gap-4">
-                 <div className="p-5 bg-white/5 backdrop-blur-md rounded border border-white/10 space-y-2">
+                 <div className="p-5 bg-white/5 backdrop-blur-md rounded-[2px] border border-white/10 space-y-2">
                     <BookOpen size={18} className="text-slate-400" />
                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Vault Access</h4>
                     <p className="text-[8px] text-slate-500 font-bold uppercase">Academic Repositories</p>
                  </div>
-                 <div className="p-5 bg-white/5 backdrop-blur-md rounded border border-white/10 space-y-2">
+                 <div className="p-5 bg-white/5 backdrop-blur-md rounded-[2px] border border-white/10 space-y-2">
                     <Fingerprint size={18} className="text-slate-400" />
                     <h4 className="text-[10px] font-black text-white uppercase tracking-widest">Verified Log</h4>
                     <p className="text-[8px] text-slate-500 font-bold uppercase">Official Metadata</p>
@@ -72,7 +72,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
 
         <div className="w-full max-w-md py-12 space-y-10">
           <div className="space-y-3">
-             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded text-slate-300 text-[9px] font-black uppercase tracking-widest">
+             <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-700 rounded-[2px] text-slate-300 text-[9px] font-black uppercase tracking-widest">
                 <Terminal size={14}/> Initialization_Sequence
              </div>
              <h2 className="text-4xl font-black text-white uppercase tracking-tight">Node Registration.</h2>
@@ -85,7 +85,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                 <input 
                   type="text" 
                   placeholder="e.g. John Doe" 
-                  className="w-full bg-[#161b22] border border-[#30363d] rounded py-4 px-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
+                  className="w-full bg-[#161b22] border border-[#30363d] rounded-[2px] py-4 px-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
                   value={name} 
                   onChange={e => setName(e.target.value)} 
                   required 
@@ -97,7 +97,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                 <input 
                   type="email" 
                   placeholder="student@mak.ac.ug" 
-                  className="w-full bg-[#161b22] border border-[#30363d] rounded py-4 px-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
+                  className="w-full bg-[#161b22] border border-[#30363d] rounded-[2px] py-4 px-6 text-sm font-bold text-white outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all" 
                   value={email} 
                   onChange={e => setEmail(e.target.value)} 
                   required 
@@ -108,7 +108,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                 <div className="space-y-2 group">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Primary Hub</label>
                   <select 
-                    className="w-full bg-[#161b22] border border-[#30363d] rounded py-4 px-4 text-[10px] font-black uppercase text-white outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer" 
+                    className="w-full bg-[#161b22] border border-[#30363d] rounded-[2px] py-4 px-4 text-[10px] font-black uppercase text-white outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer" 
                     value={college} 
                     onChange={e => setCollege(e.target.value as College)}
                   >
@@ -118,7 +118,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                 <div className="space-y-2 group">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Strata Stage</label>
                   <select 
-                    className="w-full bg-[#161b22] border border-[#30363d] rounded py-4 px-4 text-[10px] font-black uppercase text-white outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer" 
+                    className="w-full bg-[#161b22] border border-[#30363d] rounded-[2px] py-4 px-4 text-[10px] font-black uppercase text-white outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer" 
                     value={status} 
                     onChange={e => setStatus(e.target.value as UserStatus)}
                   >
@@ -130,7 +130,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
 
             <button 
               type="submit" 
-              className="w-full bg-white text-black font-black py-6 rounded text-xs uppercase tracking-[0.2em] transition-all shadow-xl hover:bg-[#f0f0f0] active:scale-95 flex items-center justify-center gap-3"
+              className="w-full bg-white text-black font-black py-6 rounded-[2px] text-xs uppercase tracking-[0.2em] transition-all shadow-xl hover:bg-[#f0f0f0] active:scale-95 flex items-center justify-center gap-3"
             >
               Commit Node Identity <ArrowRight size={18} />
             </button>

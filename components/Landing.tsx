@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { 
   ArrowRight, Zap, Globe, Users, ShieldCheck, 
@@ -21,20 +22,20 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
   }, []);
 
   return (
-    <div className="bg-[#0d1117] text-[#c9d1d9] min-h-screen overflow-x-hidden selection:bg-indigo-500 selection:text-white font-sans">
+    <div className="bg-[#0d1117] text-[#c9d1d9] min-h-screen overflow-x-hidden selection:bg-slate-700 selection:text-white font-sans">
       
-      {/* BACKGROUND ELEMENTS */}
+      {/* BACKGROUND ELEMENTS - MONOCHROME */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-[0.1]" 
              style={{ backgroundImage: 'linear-gradient(#30363d 1px, transparent 1px), linear-gradient(90deg, #30363d 1px, transparent 1px)', backgroundSize: '50px 50px' }}></div>
-        <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-indigo-600/5 blur-[100px] rounded-full"></div>
+        <div className="absolute top-[-5%] left-[-5%] w-[40%] h-[40%] bg-slate-600/5 blur-[100px] rounded-full"></div>
       </div>
 
       {/* REFINED NAVBAR */}
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${scrolled ? 'py-3 bg-[#0d1117]/90 backdrop-blur-md border-b border-[#30363d]' : 'py-6 bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <div className="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-slate-700 rounded flex items-center justify-center">
               <Zap size={18} className="text-white fill-white" />
             </div>
             <span className="text-lg font-black tracking-tight uppercase text-white">MakSocial</span>
@@ -47,8 +48,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            <button onClick={onStart} className="px-5 py-2 text-white font-bold text-[10px] uppercase tracking-widest hover:text-indigo-400 transition-colors">Sign In</button>
-            <button onClick={onStart} className="bg-[#238636] hover:bg-[#2ea043] text-white px-5 py-2 rounded font-bold text-[10px] uppercase tracking-widest transition-all shadow-lg">Initialize Node</button>
+            <button onClick={onStart} className="px-5 py-2 text-white font-bold text-[10px] uppercase tracking-widest hover:text-slate-400 transition-colors">Sign In</button>
+            <button onClick={onStart} className="bg-slate-200 hover:bg-white text-black px-5 py-2 rounded font-bold text-[10px] uppercase tracking-widest transition-all shadow-lg">Initialize Node</button>
           </div>
         </div>
       </nav>
@@ -57,13 +58,13 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       <section className="relative pt-48 pb-20 px-6 z-10">
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#161b22] rounded border border-[#30363d] mb-10">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-slate-500 rounded-full animate-pulse"></div>
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#8b949e]">Registry Protocol v4.2 Stable</span>
           </div>
 
           <h1 className="text-5xl md:text-8xl font-black leading-[1.1] tracking-tight text-white uppercase mb-8">
             Empowering <br />
-            <span className="text-indigo-500">The Hill's</span> <br />
+            <span className="text-slate-500">The Hill's</span> <br />
             Digital DNA.
           </h1>
           
@@ -86,7 +87,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             {/* 1. PULSE PREVIEW */}
             <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden flex flex-col">
               <div className="p-4 border-b border-[#30363d] bg-[#0d1117]/50 flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                   <Activity size={14}/> Pulse_Stream
                 </span>
                 <span className="text-[8px] font-mono text-slate-500">LIVE_HANDSHAKE</span>
@@ -101,21 +102,16 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                       <span className="font-black text-white">{post.author}</span>
                       <span className="text-slate-500 font-mono">{post.time} ago</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1 group-hover:text-indigo-400 transition-colors">"{post.text}"</p>
+                    <p className="text-[11px] text-slate-400 line-clamp-1 group-hover:text-slate-200 transition-colors">"{post.text}"</p>
                   </div>
                 ))}
-                <div className="pt-4 mt-2 border-t border-[#30363d] flex justify-center">
-                  <button className="text-[9px] font-bold uppercase text-slate-500 hover:text-white flex items-center gap-1">
-                    View full manifest <ChevronRight size={12}/>
-                  </button>
-                </div>
               </div>
             </div>
 
             {/* 2. VAULT PREVIEW */}
             <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden flex flex-col">
               <div className="p-4 border-b border-[#30363d] bg-[#0d1117]/50 flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                   <BookOpen size={14}/> The_Vault_Assets
                 </span>
                 <span className="text-[8px] font-mono text-slate-500">ENCRYPTED_STABLE</span>
@@ -125,9 +121,9 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   { title: 'Computer Architecture II', type: 'PDF', wing: 'COCIS' },
                   { title: 'Structural Analysis', type: 'ZIP', wing: 'CEDAT' }
                 ].map((file, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 bg-[#0d1117] rounded border border-[#30363d] hover:border-emerald-500/50 transition-all cursor-pointer group">
+                  <div key={i} className="flex items-center justify-between p-2 bg-[#0d1117] rounded border border-[#30363d] hover:border-slate-500 transition-all cursor-pointer group">
                     <div className="flex items-center gap-3 overflow-hidden">
-                       <FileText size={16} className="text-slate-500 group-hover:text-emerald-500" />
+                       <FileText size={16} className="text-slate-500 group-hover:text-white" />
                        <div className="min-w-0">
                           <p className="text-[10px] font-black text-white truncate">{file.title}</p>
                           <p className="text-[8px] text-slate-500 uppercase">{file.wing} WING</p>
@@ -142,7 +138,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             {/* 3. OPPORTUNITIES PREVIEW */}
             <div className="bg-[#161b22] border border-[#30363d] rounded-lg overflow-hidden flex flex-col">
               <div className="p-4 border-b border-[#30363d] bg-[#0d1117]/50 flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                   <Zap size={14}/> Opportunity_Nodes
                 </span>
                 <span className="text-[8px] font-mono text-slate-500">ACTIVE_RECRUIT</span>
@@ -154,12 +150,11 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 ].map((opp, i) => (
                   <div key={i} className="space-y-1.5 group cursor-pointer">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-black text-white group-hover:text-amber-500 transition-colors">{opp.title}</span>
-                      <span className="text-[8px] font-black uppercase text-amber-500 px-1.5 py-0.5 bg-amber-500/10 rounded">{opp.type}</span>
+                      <span className="text-[11px] font-black text-white group-hover:text-slate-200 transition-colors">{opp.title}</span>
+                      <span className="text-[8px] font-black uppercase text-slate-300 px-1.5 py-0.5 bg-white/5 rounded">{opp.type}</span>
                     </div>
                     <div className="flex items-center justify-between text-[9px] text-slate-500 font-bold uppercase tracking-tight">
                        <span>{opp.benefit}</span>
-                       {/* Comment: Added ArrowUpRight icon to fix 'Cannot find name' error */}
                        <ArrowUpRight size={12}/>
                     </div>
                   </div>
@@ -186,8 +181,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
               { icon: <MessageSquare size={24}/>, title: 'Encrypted Uplink', desc: 'Secure direct-link messaging for academic peer review.' },
               { icon: <Lock size={24}/>, title: 'Vault Security', desc: 'Highly secure repository for university research assets.' }
             ].map((feature, i) => (
-              <div key={i} className="p-8 bg-[#161b22] border border-[#30363d] rounded-lg group hover:border-indigo-500 transition-all">
-                <div className="text-indigo-500 mb-6 group-hover:scale-110 transition-transform">{feature.icon}</div>
+              <div key={i} className="p-8 bg-[#161b22] border border-[#30363d] rounded-lg group hover:border-slate-500 transition-all">
+                <div className="text-slate-400 mb-6 group-hover:scale-110 transition-transform group-hover:text-white">{feature.icon}</div>
                 <h4 className="text-lg font-black text-white uppercase mb-3">{feature.title}</h4>
                 <p className="text-sm text-[#8b949e] leading-relaxed font-medium">{feature.desc}</p>
               </div>
@@ -197,15 +192,15 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
       </section>
 
       {/* CLOSING CALL TO ACTION */}
-      <section className="py-40 px-6 relative z-10 bg-gradient-to-b from-transparent to-indigo-950/20">
+      <section className="py-40 px-6 relative z-10 bg-gradient-to-b from-transparent to-slate-900/40">
         <div className="max-w-4xl mx-auto text-center space-y-10">
            <h2 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tight leading-none">
              Join The <br /> Registry.
            </h2>
-           <p className="text-lg text-[#8b949e] font-medium max-w-xl mx-auto italic">
+           <p className="text-lg text-[#8b949e] font-medium max-w-xl mx-auto">
              The Hill never sleeps. Establish your node within the most advanced digital ecosystem at Makerere.
            </p>
-           <button onClick={onStart} className="bg-indigo-600 text-white px-12 py-5 rounded font-black text-xs uppercase tracking-[0.3em] hover:bg-indigo-700 transition-all shadow-2xl active:scale-95">
+           <button onClick={onStart} className="bg-white text-black px-12 py-5 rounded font-black text-xs uppercase tracking-[0.3em] hover:bg-slate-200 transition-all shadow-2xl active:scale-95">
               Initialize Enrollment
            </button>
         </div>
@@ -223,7 +218,6 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
           </p>
         </div>
       </footer>
-
     </div>
   );
 };

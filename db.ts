@@ -19,57 +19,59 @@ const MOCK_GROUPS: Group[] = [
   {
     id: 'g-1',
     name: '89th Guild Cabinet',
-    description: 'Official coordination hub for the Guild Leadership. Strategy sessions and welfare reports.',
-    image: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    description: 'Official coordination hub for the Guild Leadership. High-priority strategy sessions and student welfare synchronization.',
+    image: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=400',
     isOfficial: true,
     creatorId: 'vc_office',
-    memberIds: ['vc_office', 'u1', 'u2', 'u3'],
+    memberIds: ['vc_office', 'u1', 'u2', 'u3', 'u4', 'u5'],
     category: 'Global',
     messages: [
-      { id: 'm1', author: 'Guild President', authorId: 'gp', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GP', text: 'Has the welfare report for CEDAT been synchronized yet?', timestamp: '09:00 AM' },
-      { id: 'm2', author: 'Secretary General', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SG', text: 'Processing now. We found some connectivity issues in the North Wing.', timestamp: '09:05 AM' },
-      { id: 'm3', author: 'Prof. Barnabas', authorId: 'vc_office', authorAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg', text: 'Ensure the 89th inauguration ceremony budget is finalized by EOD.', timestamp: '10:30 AM' }
+      { id: 'm1', author: 'Guild President', authorId: 'gp', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GP', text: 'Protocol initialized. We need the CEDAT welfare report by 1400hrs.', timestamp: '09:00 AM' },
+      { id: 'm2', author: 'Secretary General', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SG', text: 'Synchronization in progress. Node 4 is currently gathering data packets from the North Wing.', timestamp: '09:05 AM' },
+      { id: 'm3', author: 'Prof. Barnabas', authorId: 'vc_office', authorAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg', text: 'Ensure the inauguration budget is committed to the registry for audit.', timestamp: '10:30 AM' }
     ]
   },
   {
     id: 'g-2',
     name: 'COCIS Alpha-Net',
-    description: 'A deep-tech hub for AI research, cybersecurity drills, and software architecture.',
+    description: 'A deep-tech hub for AI research, cybersecurity drills, and software architecture synchronization.',
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400',
     isOfficial: false,
     creatorId: 'u1',
-    memberIds: ['u1', 'u4', 'u5'],
+    memberIds: ['u1', 'u4', 'u5', 'u10'],
     category: 'COCIS',
     messages: [
       { id: 'm4', author: 'Admin Node', authorId: 'u1', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin', text: 'I have uploaded the new neural network weights for the exam-bot project.', timestamp: 'Yesterday' },
-      { id: 'm5', author: 'Security Lead', authorId: 'u4', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sec', text: 'Verified. SHA-256 handshake successful.', timestamp: 'Yesterday', attachment: { name: 'model_weights.bin', type: 'document', data: '#' } }
+      { id: 'm5', author: 'Security Lead', authorId: 'u4', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sec', text: 'Verified. SHA-256 handshake successful.', timestamp: 'Yesterday', attachment: { name: 'weights_v4.bin', type: 'document', data: '#' } },
+      { id: 'm6', author: 'Logic Architect', authorId: 'u5', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Logic', text: 'Check out the new UI strata for the dashboard.', timestamp: '08:45 AM', attachment: { name: 'dashboard_v1.png', type: 'image', data: 'https://images.unsplash.com/photo-1551288049-bbda38a5f452?auto=format&fit=crop&w=800' } }
     ]
   },
   {
     id: 'g-3',
     name: 'CEDAT Design Lab',
-    description: 'Visual arts, architecture prototypes, and 3D modeling synchronization.',
+    description: 'Visual arts, architecture prototypes, and 3D modeling synchronization hub.',
     image: 'https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&w=400',
     isOfficial: false,
     creatorId: 'u2',
-    memberIds: ['u2', 'u6'],
+    memberIds: ['u2', 'u6', 'u12'],
     category: 'CEDAT',
     messages: [
-      { id: 'm6', author: 'Sarah Design', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', text: 'Check out the proposed structure for the new Student Center.', timestamp: '11:20 AM', attachment: { name: 'render_v1.png', type: 'image', data: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800' } },
-      { id: 'm7', author: 'Architect Node', authorId: 'u6', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arch', text: 'The glass facade looks impressive, but we need to check the structural integrity of the west wing.', timestamp: '11:45 AM' }
+      { id: 'm7', author: 'Sarah Design', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', text: 'The structural integrity of the west wing facade is being questioned by the council.', timestamp: '11:20 AM' },
+      { id: 'm8', author: 'Architect Node', authorId: 'u6', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arch', text: 'I have the new CAD assets ready. Syncing now.', timestamp: '11:45 AM', attachment: { name: 'facade_v2.png', type: 'image', data: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800' } }
     ]
   },
   {
     id: 'g-4',
-    name: 'Hill Marathon Committee',
-    description: 'Organizing the 2026 Hill Marathon. Athletics and logistics sync.',
-    image: 'https://images.unsplash.com/photo-1461896756981-2258bb3f6714?auto=format&fit=crop&w=400',
-    isOfficial: true,
-    creatorId: 'u3',
-    memberIds: ['u3', 'u7', 'u8'],
-    category: 'Global',
+    name: 'Cyber-Sec Red Team',
+    description: 'Offensive security research and campus infrastructure hardening.',
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=400',
+    isOfficial: false,
+    creatorId: 'u4',
+    memberIds: ['u4', 'u1', 'u8'],
+    category: 'COCIS',
     messages: [
-      { id: 'm8', author: 'Sports Rep', authorId: 'u3', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sports', text: 'Registration nodes are now active at Freedom Square.', timestamp: '08:00 AM' }
+      { id: 'm9', author: 'Lead Infiltrator', authorId: 'u4', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Red', text: 'Successfully bypassed the test node on the LAW wing server.', timestamp: '02:00 PM' },
+      { id: 'm10', author: 'Shield Node', authorId: 'u8', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shield', text: 'Wait, did you log that in the audit registry?', timestamp: '02:05 PM' }
     ]
   }
 ];

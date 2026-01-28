@@ -121,7 +121,7 @@ const Settings: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 lg:px-8 py-10 pb-40 text-[var(--text-primary)] font-mono">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-indigo-600 rounded-xl text-white shadow-xl shadow-indigo-600/20">
+          <div className="p-4 bg-indigo-600 rounded-sm text-white shadow-xl shadow-indigo-600/20">
             <SettingsIcon size={32} />
           </div>
           <div>
@@ -129,7 +129,7 @@ const Settings: React.FC = () => {
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">personalize your node parameters</p>
           </div>
         </div>
-        <button onClick={handleReset} className="flex items-center gap-2 px-6 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-rose-500 transition-all">
+        <button onClick={handleReset} className="flex items-center gap-2 px-6 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-sm text-[9px] font-black uppercase tracking-widest hover:text-rose-500 transition-all">
           <RefreshCcw size={14} /> Factory_Reset
         </button>
       </div>
@@ -145,7 +145,7 @@ const Settings: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-md text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'}`}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-sm text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'}`}
             >
               {tab.icon} {tab.label}
             </button>
@@ -170,7 +170,7 @@ const Settings: React.FC = () => {
                       <button 
                         key={p.id}
                         onClick={() => setSettings({...settings, themePreset: p.id as any})}
-                        className={`p-6 rounded-md border text-left transition-all ${settings.themePreset === p.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600'}`}
+                        className={`p-6 rounded-sm border text-left transition-all ${settings.themePreset === p.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600'}`}
                       >
                          <div className="mb-4">{p.icon}</div>
                          <p className="text-[10px] font-black uppercase tracking-widest">{p.label}</p>
@@ -179,7 +179,7 @@ const Settings: React.FC = () => {
                 </div>
               </div>
 
-              {/* BACKGROUND PATTERN SELECTOR - NEW POLISHED SECTION */}
+              {/* BACKGROUND PATTERN SELECTOR */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                    <Layers size={14}/> Background_Architecture
@@ -193,7 +193,7 @@ const Settings: React.FC = () => {
                       <button 
                         key={bg.id}
                         onClick={() => setSettings({...settings, backgroundPattern: bg.id as any})}
-                        className={`group p-6 rounded-md border text-left transition-all relative overflow-hidden ${settings.backgroundPattern === bg.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600'}`}
+                        className={`group p-6 rounded-sm border text-left transition-all relative overflow-hidden ${settings.backgroundPattern === bg.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600'}`}
                       >
                          {/* Mini Pattern Preview */}
                          <div className={`absolute inset-0 opacity-[0.05] pointer-events-none ${
@@ -219,12 +219,12 @@ const Settings: React.FC = () => {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                    <Hash size={14}/> System_Accent
                 </label>
-                <div className="flex flex-wrap gap-4 p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md">
+                <div className="flex flex-wrap gap-4 p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-sm">
                    {COLORS.map(c => (
                       <button 
                         key={c.hex}
                         onClick={() => setSettings({...settings, primaryColor: c.hex})}
-                        className={`w-12 h-12 rounded-md border-4 transition-all flex items-center justify-center ${settings.primaryColor === c.hex ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`} 
+                        className={`w-12 h-12 rounded-sm border-2 transition-all flex items-center justify-center ${settings.primaryColor === c.hex ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`} 
                         style={{ backgroundColor: c.hex }}
                       >
                         {settings.primaryColor === c.hex && <Check size={20} className="text-white" />}
@@ -238,13 +238,13 @@ const Settings: React.FC = () => {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                    <Maximize2 size={14}/> Typography_Scale
                 </label>
-                <div className="flex items-center gap-8 p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md">
-                   <button onClick={() => adjustFontSize(-1)} className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md hover:text-indigo-600 active:scale-95 transition-all"><Minus size={20}/></button>
+                <div className="flex items-center gap-8 p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-sm">
+                   <button onClick={() => adjustFontSize(-1)} className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm hover:text-indigo-600 active:scale-95 transition-all"><Minus size={20}/></button>
                    <div className="flex-1 text-center">
                       <span className="text-4xl font-black italic tracking-tighter">{fontSizeNumeric}px</span>
                       <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Registry_Scale</p>
                    </div>
-                   <button onClick={() => adjustFontSize(1)} className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md hover:text-indigo-600 active:scale-95 transition-all"><Plus size={20}/></button>
+                   <button onClick={() => adjustFontSize(1)} className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm hover:text-indigo-600 active:scale-95 transition-all"><Plus size={20}/></button>
                 </div>
               </div>
             </div>
@@ -252,7 +252,7 @@ const Settings: React.FC = () => {
 
           {activeTab === 'geometry' && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-2">
-              <div className="p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md space-y-8">
+              <div className="p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-sm space-y-8">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
@@ -277,7 +277,7 @@ const Settings: React.FC = () => {
                       <button 
                         key={f.name}
                         onClick={() => setSettings({...settings, fontFamily: f.value})}
-                        className={`p-4 rounded-md border text-left flex items-center justify-between transition-all ${settings.fontFamily === f.value ? 'bg-indigo-600 text-white border-transparent' : 'bg-[var(--bg-primary)] border-[var(--border-color)] hover:border-indigo-600'}`}
+                        className={`p-4 rounded-sm border text-left flex items-center justify-between transition-all ${settings.fontFamily === f.value ? 'bg-indigo-600 text-white border-transparent' : 'bg-[var(--bg-primary)] border-[var(--border-color)] hover:border-indigo-600'}`}
                         style={{ fontFamily: f.value }}
                       >
                         <span className="text-sm font-bold uppercase">{f.name}</span>
@@ -300,9 +300,9 @@ const Settings: React.FC = () => {
                 <button
                   key={t.id}
                   onClick={() => setSettings({...settings, [t.id]: !settings[t.id as keyof AppSettings]})}
-                  className={`p-6 rounded-md border text-left flex items-start gap-5 transition-all ${settings[t.id as keyof AppSettings] ? 'bg-indigo-600/5 border-indigo-600' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] opacity-60'}`}
+                  className={`p-6 rounded-sm border text-left flex items-start gap-5 transition-all ${settings[t.id as keyof AppSettings] ? 'bg-indigo-600/5 border-indigo-600' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] opacity-60'}`}
                 >
-                  <div className={`p-3 rounded-md ${settings[t.id as keyof AppSettings] ? 'bg-indigo-600 text-white' : 'bg-[var(--bg-primary)] text-slate-400'}`}>
+                  <div className={`p-3 rounded-sm ${settings[t.id as keyof AppSettings] ? 'bg-indigo-600 text-white' : 'bg-[var(--bg-primary)] text-slate-400'}`}>
                     {t.icon}
                   </div>
                   <div className="flex-1">
@@ -320,7 +320,7 @@ const Settings: React.FC = () => {
           )}
 
           {activeTab === 'system' && (
-            <div className="p-8 border border-dashed border-indigo-600/30 rounded-md bg-indigo-600/5 space-y-6 animate-in fade-in">
+            <div className="p-8 border border-dashed border-indigo-600/30 rounded-sm bg-indigo-600/5 space-y-6 animate-in fade-in">
               <ShieldCheck size={48} className="text-indigo-600" />
               <div className="space-y-2">
                 <h3 className="text-2xl font-black uppercase tracking-tight italic">Registry_Status: Verified</h3>
@@ -329,11 +329,11 @@ const Settings: React.FC = () => {
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md">
+                <div className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm">
                   <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Uptime_Sequence</p>
                   <p className="text-sm font-black text-emerald-500">99.98% Stable</p>
                 </div>
-                <div className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md">
+                <div className="p-4 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-sm">
                   <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Decryption_Layer</p>
                   <p className="text-sm font-black text-indigo-500">Hill.Secure_v2</p>
                 </div>

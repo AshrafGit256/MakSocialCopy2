@@ -170,6 +170,7 @@ const App: React.FC = () => {
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },
             { id: 'groups', icon: <Users size={22} />, label: 'Groups' },
+            { id: 'market', icon: <ShoppingBag size={22} />, label: 'Bazaar' },
             { id: 'calendar', icon: <Calendar size={22} />, label: 'Events' },
             { id: 'notifications', icon: <Bell size={22} />, label: 'Signals' },
           ].map((item) => {

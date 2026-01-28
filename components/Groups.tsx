@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { db } from '../db';
 import { Group, GroupMessage, User, College } from '../types';
 import { 
@@ -6,8 +7,13 @@ import {
   ShieldCheck, ArrowUpRight, Send, Image as ImageIcon, 
   FileText, X, Globe, Terminal, Fingerprint, 
   GitCommit, Activity, Database, Lock, MoreVertical,
-  CheckCircle2, Box, Info, Layout
+  CheckCircle2, Box, Info, Layout, Sparkles, 
+  Cpu, BarChart3, Download, GitFork, Share2, 
+  Settings, Loader2, Zap, History, Target, 
+  TrendingUp, ShieldAlert, Binary, Layers
 } from 'lucide-react';
+import { GoogleGenAI } from "@google/genai";
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, PieChart, Pie, Cell } from 'recharts';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
@@ -19,7 +25,9 @@ const Groups: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [attachment, setAttachment] = useState<{name: string, type: 'image' | 'document', data: string} | null>(null);
-  const [mobileMode, setMobileMode] = useState<'list' | 'chat'>('list');
+  const [viewMode, setViewMode] = useState<'terminal' | 'architecture'>('terminal');
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [neuralSnapshot, setNeuralSnapshot] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -40,22 +48,49 @@ const Groups: React.FC = () => {
       }
     };
     sync();
-    const interval = setInterval(sync, 4000);
+    const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && viewMode === 'terminal') {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [activeGroupId, groups, mobileMode]);
+  }, [activeGroupId, groups, viewMode]);
 
   const activeGroup = groups.find(g => g.id === activeGroupId);
   const isMember = activeGroup?.memberIds.includes(currentUser.id);
 
-  const handleJoin = (id: string) => {
-    db.joinGroup(id, currentUser.id);
-    setGroups(db.getGroups());
+  const handleNeuralSync = async () => {
+    if (!activeGroup || activeGroup.messages.length === 0) return;
+    setIsSummarizing(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const historyText = activeGroup.messages.slice(-20).map(m => `${m.author}: ${m.text}`).join('\n');
+      const prompt = `Act as a Cluster Intelligence Architect. Analyze this university group chat transcript:
+      Group Name: ${activeGroup.name}
+      Wing: ${activeGroup.category}
+      Transcript:
+      ${historyText}
+      
+      Generate a "Neural Sync Snapshot". 
+      Format as follows:
+      - CLUSTER_VIBE: (Current atmosphere)
+      - CORE_INTEL: (Key knowledge shared)
+      - ACTION_ITEMS: (Next steps for the nodes)
+      - INTEGRITY_SCORE: (0-100% based on academic relevance)
+      Keep it strictly technical and under 100 words.`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt
+      });
+      setNeuralSnapshot(response.text);
+    } catch (e) {
+      setNeuralSnapshot("INTELLIGENCE_FAILURE: Link unstable. Data packets dropped.");
+    } finally {
+      setIsSummarizing(false);
+    }
   };
 
   const handleSendMessage = () => {
@@ -68,7 +103,7 @@ const Groups: React.FC = () => {
       authorId: currentUser.id,
       authorAvatar: currentUser.avatar,
       text: newMessage,
-      timestamp: 'Just now',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       attachment: attachment || undefined
     };
 
@@ -76,6 +111,7 @@ const Groups: React.FC = () => {
     setGroups(db.getGroups());
     setNewMessage('');
     setAttachment(null);
+    setNeuralSnapshot(null);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,10 +119,9 @@ const Groups: React.FC = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        const type = file.type.startsWith('image/') ? 'image' : 'document';
         setAttachment({
           name: file.name,
-          type: type as 'image' | 'document',
+          type: file.type.startsWith('image/') ? 'image' : 'document',
           data: event.target?.result as string
         });
       };
@@ -94,8 +129,13 @@ const Groups: React.FC = () => {
     }
   };
 
+  const handleJoin = (id: string) => {
+    db.joinGroup(id, currentUser.id);
+    setGroups(db.getGroups());
+  };
+
   const handleCreateGroup = () => {
-    if (!createForm.name) return;
+    if (!createForm.name || !createForm.description) return;
     const newGroup: Group = {
       id: `g-${Date.now()}`,
       name: createForm.name,
@@ -107,12 +147,10 @@ const Groups: React.FC = () => {
       messages: [],
       category: createForm.category
     };
-    const updated = [newGroup, ...db.getGroups()];
-    db.saveGroups(updated);
-    setGroups(updated);
+    db.saveGroups([...groups, newGroup]);
+    setGroups(db.getGroups());
     setIsCreating(false);
     setActiveGroupId(newGroup.id);
-    setCreateForm({ name: '', description: '', image: 'https://api.dicebear.com/7.x/identicon/svg?seed=' + Date.now(), category: 'General' });
   };
 
   const filteredGroups = groups.filter(g => 
@@ -120,246 +158,454 @@ const Groups: React.FC = () => {
     g.category.toLowerCase().includes(search.toLowerCase())
   );
 
+  const activityData = [
+    { time: '08:00', intensity: 30 }, { time: '10:00', intensity: 55 },
+    { time: '12:00', intensity: 92 }, { time: '14:00', intensity: 68 },
+    { time: '16:00', intensity: 100 }, { time: '18:00', intensity: 45 },
+  ];
+
   return (
-    <div className="flex h-full bg-[var(--bg-primary)] overflow-hidden font-mono text-[var(--text-primary)]">
+    <div className="flex h-screen bg-[var(--bg-primary)] overflow-hidden font-mono text-[var(--text-primary)]">
       
-      {/* 1. HUB SELECTOR SIDEBAR (GitHub Style) */}
-      <aside className={`${mobileMode === 'chat' ? 'hidden md:flex' : 'flex'} w-full md:w-80 border-r border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] shrink-0 z-20`}>
-        <div className="p-4 border-b border-[var(--border-color)] space-y-4">
+      {/* 1. CLUSTER NAVIGATOR */}
+      <aside className="hidden lg:flex w-80 border-r border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] shrink-0 z-20">
+        <div className="p-6 border-b border-[var(--border-color)] space-y-5 bg-white/50 dark:bg-black/20">
           <div className="flex items-center justify-between">
             <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-2">
-               <Database size={14}/> Registry_Hubs
+               <Binary size={14}/> Active_Manifests
             </h2>
             <button 
               onClick={() => setIsCreating(true)}
-              className="p-1.5 bg-indigo-600/10 text-indigo-600 rounded hover:bg-indigo-600 hover:text-white transition-all"
+              className="p-1.5 bg-indigo-600/10 text-indigo-600 border border-indigo-600/20 rounded-md hover:bg-indigo-600 hover:text-white transition-all shadow-sm active:scale-90"
             >
               <Plus size={16} />
             </button>
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={14} />
             <input 
-              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2 pl-9 pr-4 text-[10px] font-bold uppercase outline-none focus:border-indigo-600 transition-all"
-              placeholder="Scan for clusters..."
+              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2.5 pl-9 pr-4 text-[10px] font-bold uppercase outline-none focus:border-indigo-600 transition-all shadow-inner"
+              placeholder="Query Hubs..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar">
+        <div className="flex-1 overflow-y-auto no-scrollbar py-2">
           {filteredGroups.map(g => (
             <button 
               key={g.id}
-              onClick={() => { setActiveGroupId(g.id); setMobileMode('chat'); }}
-              className={`w-full flex items-center gap-3 p-4 border-b border-[var(--border-color)] transition-all text-left group ${
-                activeGroupId === g.id ? 'bg-white dark:bg-white/5 border-l-4 border-l-orange-500' : 'hover:bg-slate-50 dark:hover:bg-white/5'
+              onClick={() => setActiveGroupId(g.id)}
+              className={`w-full flex items-center gap-4 px-6 py-4 border-b border-[var(--border-color)] transition-all text-left relative group ${
+                activeGroupId === g.id ? 'bg-white dark:bg-white/5' : 'hover:bg-slate-50 dark:hover:bg-white/5'
               }`}
             >
+              {activeGroupId === g.id && <div className="absolute inset-y-0 left-0 w-1.5 bg-indigo-600 animate-pulse"></div>}
               <div className="relative shrink-0">
-                <img src={g.image} className="w-12 h-12 rounded-[var(--radius-main)] border border-[var(--border-color)] object-cover bg-white" />
+                <img src={g.image} className="w-11 h-11 rounded-lg border border-[var(--border-color)] object-cover bg-white shadow-sm grayscale group-hover:grayscale-0 transition-all" />
                 {g.isOfficial && (
                    <div className="absolute -top-1 -right-1 bg-indigo-600 rounded-full p-0.5 border-2 border-[var(--sidebar-bg)]">
-                      <Star size={8} fill="white" className="text-white" />
+                      <ShieldCheck size={10} className="text-white" />
                    </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                   <h4 className="text-[11px] font-black uppercase tracking-tight truncate">{g.name}</h4>
-                   <span className="text-[8px] font-mono text-slate-400">ID_{g.id.slice(-3)}</span>
+                   <h4 className="text-[11px] font-black uppercase tracking-tight truncate group-hover:text-indigo-600 transition-colors">{g.name}</h4>
+                   <span className="text-[8px] font-mono text-slate-400">SYNC_v4</span>
                 </div>
                 <div className="flex items-center gap-2">
-                   <span className="text-[8px] font-black uppercase text-indigo-500">{g.category}</span>
+                   <span className="text-[8px] font-black uppercase text-indigo-500 px-1.5 py-0.5 bg-indigo-500/10 rounded">{g.category} Hub</span>
                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{g.memberIds.length} Nodes</span>
                 </div>
               </div>
             </button>
           ))}
         </div>
+        
+        {/* SIDEBAR TELEMETRY */}
+        <div className="p-6 border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-black/20 space-y-4">
+           <div className="flex justify-between items-center text-[8px] font-black uppercase text-slate-500 tracking-widest">
+              <span>Registry_Indexing</span>
+              <span className="text-indigo-600">84%</span>
+           </div>
+           <div className="h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-indigo-600 w-[84%] animate-pulse"></div>
+           </div>
+        </div>
       </aside>
 
-      {/* 2. MAIN TERMINAL (GitHub Repo Style) */}
-      <main className={`${mobileMode === 'list' ? 'hidden md:flex' : 'flex'} flex-1 flex-col bg-[var(--bg-primary)] min-w-0 h-full relative`}>
+      {/* 2. MAIN CLUSTER WORKSPACE */}
+      <main className="flex-1 flex flex-col bg-[var(--bg-primary)] min-w-0 h-full relative">
         {activeGroup ? (
           <>
-            {/* Group Header */}
-            <div className="border-b border-[var(--border-color)] bg-slate-50/50 dark:bg-[#161b22]/50 p-6 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* WORKSPACE HEADER */}
+            <div className="border-b border-[var(--border-color)] bg-white/80 dark:bg-black/80 backdrop-blur-md p-6 z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                  <div className="flex items-center gap-4 overflow-hidden">
-                    <button onClick={() => setMobileMode('list')} className="md:hidden p-2 -ml-2 text-slate-500 hover:text-indigo-600">
-                       <X size={20}/>
-                    </button>
-                    <div className="flex items-center text-base sm:text-lg font-black gap-2 truncate">
-                      <Box size={20} className="text-slate-400 hidden sm:block" />
-                      <span className="text-indigo-600 hover:underline cursor-pointer">{activeGroup.category.toLowerCase()}</span>
+                    <div className="flex items-center text-lg sm:text-2xl font-black gap-2 truncate">
+                      <Layers size={24} className="text-slate-400 hidden sm:block" />
+                      <span className="text-indigo-600 hover:underline cursor-pointer lowercase">{activeGroup.category.toLowerCase()}</span>
                       <span className="text-slate-400">/</span>
-                      <span className="truncate">{activeGroup.name.toLowerCase()}</span>
-                      {activeGroup.isOfficial && <CheckCircle2 size={16} className="text-indigo-500 shrink-0" />}
+                      <span className="truncate italic tracking-tighter uppercase">{activeGroup.name}</span>
                     </div>
-                    <span className="px-2 py-0.5 border border-[var(--border-color)] rounded-full text-[9px] font-black uppercase text-slate-500">Public</span>
                  </div>
-                 {!isMember ? (
-                   <button 
-                     onClick={() => handleJoin(activeGroup.id)}
-                     className="px-6 py-2 bg-indigo-600 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2"
-                   >
-                     <Plus size={14}/> Join Protocol
-                   </button>
-                 ) : (
-                   <div className="flex items-center gap-3">
-                      <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[8px] font-black uppercase rounded-md flex items-center gap-2">
-                        <Activity size={10} className="animate-pulse" /> Synchronized
-                      </div>
-                      <button className="p-2 text-slate-400 hover:text-[var(--text-primary)]"><MoreVertical size={18}/></button>
-                   </div>
-                 )}
-              </div>
-
-              <div className="p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md space-y-2">
-                 <div className="flex items-center gap-2 text-[9px] font-black uppercase text-slate-400 tracking-widest">
-                    <Info size={12}/> Operational_Instructions
+                 
+                 <div className="flex items-center gap-3">
+                    <div className="bg-[var(--bg-secondary)] p-1 rounded-lg border border-[var(--border-color)] flex shadow-inner">
+                       <button onClick={() => setViewMode('terminal')} className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${viewMode === 'terminal' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-700'}`}>
+                          <Terminal size={12}/> Terminal
+                       </button>
+                       <button onClick={() => setViewMode('architecture')} className={`px-4 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${viewMode === 'architecture' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-700'}`}>
+                          <Layout size={12}/> Architecture
+                       </button>
+                    </div>
+                    <button className="p-2 text-slate-400 hover:text-indigo-600 transition-colors"><Settings size={18}/></button>
                  </div>
-                 <p className="text-xs text-slate-500 leading-relaxed italic">"{activeGroup.description}"</p>
               </div>
             </div>
 
-            {/* Message Stream */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar" style={{ backgroundImage: 'radial-gradient(var(--border-color) 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}>
-              {activeGroup.messages.length > 0 ? activeGroup.messages.map(msg => (
-                <div key={msg.id} className="flex gap-4 group">
-                  <img src={msg.authorAvatar} className="w-10 h-10 rounded-[var(--radius-main)] border border-[var(--border-color)] object-cover shrink-0 bg-white" />
-                  <div className="flex-1 min-w-0 space-y-1">
-                     <div className="flex items-center gap-3">
-                        <span className="text-[12px] font-black uppercase tracking-tight">{msg.author}</span>
-                        <span className="text-[9px] font-mono text-slate-400 opacity-60">commit {SHA_GEN().slice(0,6)}</span>
-                        <span className="text-[9px] font-mono text-slate-400">{msg.timestamp}</span>
+            <div className="flex-1 flex overflow-hidden">
+              
+              {/* CENTRAL VIEW AREA */}
+              <div className="flex-1 flex flex-col relative overflow-hidden">
+                {viewMode === 'terminal' ? (
+                  <>
+                    <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar" style={{ backgroundImage: 'linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px)', backgroundSize: '40px 40px', backgroundOpacity: 0.05 }}>
+                      
+                      {/* Neural Snapshot Banner */}
+                      {neuralSnapshot && (
+                        <div className="bg-indigo-600/10 border border-indigo-600/30 rounded-xl p-8 mb-10 animate-in slide-in-from-top-4 relative overflow-hidden group">
+                           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Cpu size={100}/></div>
+                           <div className="flex items-center justify-between mb-6">
+                              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-600 flex items-center gap-3">
+                                 <Sparkles size={16}/> Cluster_Intelligence_Snapshot
+                              </h3>
+                              <button onClick={() => setNeuralSnapshot(null)} className="text-slate-400 hover:text-rose-500"><X size={14}/></button>
+                           </div>
+                           <div className="text-[11px] text-slate-300 italic whitespace-pre-wrap font-medium leading-relaxed border-l-2 border-indigo-600/20 pl-6">
+                              {neuralSnapshot}
+                           </div>
+                           <div className="mt-6 pt-4 border-t border-indigo-600/10 text-[7px] font-black uppercase text-indigo-500/50 flex justify-between tracking-[0.2em]">
+                              <span>ENCRYPTED BY GEMINI_PROTOCOL_v4.2</span>
+                              <span>CHECKSUM: {SHA_GEN()}</span>
+                           </div>
+                        </div>
+                      )}
+
+                      {activeGroup.messages.map(msg => (
+                        <div key={msg.id} className="flex gap-5 group hover:bg-slate-50/50 dark:hover:bg-white/5 p-3 rounded-lg transition-all border border-transparent hover:border-indigo-600/10">
+                          <img src={msg.authorAvatar} className="w-10 h-10 rounded-lg border border-[var(--border-color)] object-cover shrink-0 bg-white shadow-sm" />
+                          <div className="flex-1 min-w-0 space-y-1">
+                             <div className="flex items-center gap-3">
+                                <span className="text-[11px] font-black uppercase tracking-tight text-slate-700 dark:text-slate-300">{msg.author}</span>
+                                <span className="text-[8px] font-mono text-slate-400 opacity-60">ID_{SHA_GEN().toLowerCase()}</span>
+                                <span className="text-[8px] font-mono text-slate-400">{msg.timestamp}</span>
+                             </div>
+                             <div className="text-[13px] text-slate-500 leading-relaxed font-medium">
+                                {msg.text}
+                             </div>
+                             {msg.attachment && (
+                                <div className="mt-4 inline-block">
+                                   {msg.attachment.type === 'image' ? (
+                                     <img src={msg.attachment.data} className="max-w-md rounded-xl border border-[var(--border-color)] shadow-2xl transition-transform hover:scale-[1.01]" />
+                                   ) : (
+                                     <div className="flex items-center gap-5 p-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl hover:border-indigo-600 transition-all cursor-pointer group/asset shadow-sm border-l-4 border-l-indigo-600">
+                                        <div className="p-3 bg-indigo-600/10 rounded-lg text-indigo-600 group-hover/asset:bg-indigo-600 group-hover/asset:text-white transition-all">
+                                           <FileText size={24} />
+                                        </div>
+                                        <div className="flex flex-col">
+                                           <span className="text-[12px] font-black uppercase truncate max-w-[200px]">{msg.attachment.name}</span>
+                                           <span className="text-[8px] text-slate-400 font-bold tracking-[0.3em] mt-1">SECURE_ASSET_PACKET</span>
+                                        </div>
+                                        <Download size={16} className="ml-6 text-slate-300 group-hover/asset:text-indigo-600" />
+                                     </div>
+                                   )}
+                                </div>
+                             )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* INPUT TERMINAL */}
+                    <div className="p-6 border-t border-[var(--border-color)] bg-white/50 dark:bg-black/20">
+                       {isMember ? (
+                         <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-2xl shadow-2xl transition-all overflow-hidden">
+                            <div className="px-6 py-3 border-b border-[var(--border-color)] bg-slate-50/80 dark:bg-white/5 flex items-center justify-between">
+                               <div className="flex items-center gap-4">
+                                  <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-md text-slate-500 hover:text-indigo-600 transition-all"><ImageIcon size={18}/></button>
+                                  <div className="w-px h-6 bg-[var(--border-color)]"></div>
+                                  <button onClick={handleNeuralSync} disabled={isSummarizing} className="px-4 py-1.5 hover:bg-indigo-600/10 rounded-md text-indigo-600 transition-all flex items-center gap-2 disabled:opacity-30">
+                                     {isSummarizing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16}/>}
+                                     <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Initialize_Neural_Sync</span>
+                                  </button>
+                               </div>
+                               <div className="hidden sm:flex items-center gap-3">
+                                  <div className="flex items-center gap-1.5">
+                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                     <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Active_Handshake</span>
+                                  </div>
+                               </div>
+                            </div>
+                            
+                            <div className="relative">
+                               {attachment && (
+                                  <div className="absolute bottom-full left-6 right-6 bg-indigo-600 p-4 rounded-t-xl flex items-center justify-between shadow-2xl animate-in slide-in-from-bottom-4">
+                                     <div className="flex items-center gap-3 text-white">
+                                        {attachment.type === 'image' ? <ImageIcon size={20}/> : <FileText size={20}/>}
+                                        <span className="text-[10px] font-black uppercase truncate max-w-xs">UPLINK_STAGING: {attachment.name}</span>
+                                     </div>
+                                     <button onClick={() => setAttachment(null)} className="p-1 hover:text-rose-200 text-white"><X size={18}/></button>
+                                  </div>
+                                )}
+                               <textarea 
+                                 value={newMessage}
+                                 onChange={e => setNewMessage(e.target.value)}
+                                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
+                                 placeholder="Execute logic commit..."
+                                 className="w-full bg-transparent p-6 text-[14px] font-medium outline-none h-28 resize-none placeholder:italic placeholder:text-slate-400"
+                               />
+                            </div>
+                            
+                            <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/5 flex justify-between items-center">
+                               <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                  <ShieldCheck size={14}/> Node Verification Active
+                               </div>
+                               <button 
+                                 onClick={handleSendMessage}
+                                 disabled={!newMessage.trim() && !attachment}
+                                 className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 text-white px-10 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 transition-all shadow-xl shadow-indigo-600/30 active:scale-95"
+                               >
+                                  Broadcast Signal <Send size={14}/>
+                                </button>
+                            </div>
+                         </div>
+                       ) : (
+                         <div className="p-12 border border-dashed border-amber-600/40 bg-amber-500/5 rounded-3xl flex flex-col items-center gap-6 text-center shadow-inner">
+                            <Lock size={48} className="text-amber-500 opacity-40" />
+                            <div className="space-y-2">
+                               <h3 className="text-xl font-black uppercase italic tracking-tighter text-amber-600">Protocol_Access_Denied</h3>
+                               <p className="text-[10px] font-bold uppercase text-slate-500 tracking-[0.2em] leading-relaxed max-w-md mx-auto">
+                                  Identity not indexed in cluster manifest. Initialize enrollment protocol to establish uplink.
+                               </p>
+                            </div>
+                            <button onClick={() => handleJoin(activeGroup.id)} className="px-12 py-4 bg-amber-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-amber-600/20 active:scale-95 transition-all">Synchronize Node</button>
+                         </div>
+                       )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex-1 overflow-y-auto p-12 space-y-12 no-scrollbar animate-in fade-in zoom-in-98 duration-500" style={{ backgroundImage: 'radial-gradient(var(--border-color) 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}>
+                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* Activity Heatmap */}
+                        <div className="bg-white dark:bg-[#0b0f1a] border border-[var(--border-color)] p-10 rounded-[2.5rem] space-y-10 shadow-2xl">
+                           <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3">
+                                    <BarChart3 size={18} className="text-indigo-600"/> Cluster_Temporal_Flux
+                                 </h3>
+                                 <p className="text-[9px] text-slate-400 font-bold uppercase">Signals per coordinate period</p>
+                              </div>
+                              <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[8px] font-black uppercase text-emerald-500">High Frequency</div>
+                           </div>
+                           <div className="h-64 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                 <AreaChart data={activityData}>
+                                    <defs>
+                                       <linearGradient id="colorInt" x1="0" y1="0" x2="0" y2="1">
+                                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                       </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="time" hide />
+                                    <YAxis hide />
+                                    <RechartsTooltip />
+                                    <Area type="monotone" dataKey="intensity" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorInt)" />
+                                 </AreaChart>
+                              </ResponsiveContainer>
+                           </div>
+                           <div className="grid grid-cols-3 gap-6">
+                              <div className="text-center p-5 bg-slate-50 dark:bg-black/20 rounded-2xl border border-[var(--border-color)] group hover:border-indigo-600 transition-colors">
+                                 <p className="text-2xl font-black text-indigo-600">{activeGroup.memberIds.length}</p>
+                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Indexed_Nodes</p>
+                              </div>
+                              <div className="text-center p-5 bg-slate-50 dark:bg-black/20 rounded-2xl border border-[var(--border-color)] group hover:border-indigo-600 transition-colors">
+                                 <p className="text-2xl font-black text-indigo-600">{activeGroup.messages.length}</p>
+                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Data_Packets</p>
+                              </div>
+                              <div className="text-center p-5 bg-slate-50 dark:bg-black/20 rounded-2xl border border-[var(--border-color)] group hover:border-indigo-600 transition-colors">
+                                 <p className="text-2xl font-black text-indigo-600">92%</p>
+                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Log_Integrity</p>
+                              </div>
+                           </div>
+                        </div>
+
+                        {/* Recent Assets Index */}
+                        <div className="bg-white dark:bg-[#0b0f1a] border border-[var(--border-color)] p-10 rounded-[2.5rem] space-y-8 shadow-2xl">
+                           <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 flex items-center gap-3">
+                                    <Database size={18} className="text-indigo-600"/> Shared_Intelligence_Vault
+                                 </h3>
+                                 <p className="text-[9px] text-slate-400 font-bold uppercase">Verified academic assets</p>
+                              </div>
+                           </div>
+                           <div className="space-y-5">
+                              {[1, 2, 3].map(i => (
+                                 <div key={i} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-black/20 border border-[var(--border-color)] rounded-2xl hover:border-indigo-600 transition-all cursor-pointer group">
+                                    <div className="flex items-center gap-5">
+                                       <div className="p-3 bg-white dark:bg-slate-900 border border-[var(--border-color)] rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                                          <FileText size={20} />
+                                       </div>
+                                       <div>
+                                          <p className="text-[12px] font-black uppercase tracking-tight">Technical_Report_v{i}.log</p>
+                                          <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">Strata: {activeGroup.category} / 4.2 MB</p>
+                                       </div>
+                                    </div>
+                                    <Download size={18} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                                 </div>
+                              ))}
+                           </div>
+                           <button className="w-full py-5 border-2 border-dashed border-[var(--border-color)] rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:border-indigo-600 hover:text-indigo-600 transition-all flex items-center justify-center gap-3 shadow-inner">
+                              <GitFork size={16}/> Fork Global Assets to Cluster
+                           </button>
+                        </div>
                      </div>
-                     <div className="text-[13px] text-slate-500 leading-relaxed font-medium">
-                        {msg.text}
+
+                     {/* Strategic Brief */}
+                     <div className="p-12 bg-indigo-600 rounded-[3rem] text-white relative overflow-hidden shadow-[0_40px_100px_-20px_rgba(79,70,229,0.5)]">
+                        <div className="absolute top-0 right-0 p-12 opacity-10"><Binary size={200} /></div>
+                        <div className="relative z-10 space-y-8">
+                           <div className="flex items-center gap-4">
+                              <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20">
+                                 <ShieldCheck size={32}/>
+                              </div>
+                              <h3 className="text-3xl font-black uppercase tracking-tighter italic">Operational_Charter</h3>
+                           </div>
+                           <p className="text-lg font-medium leading-relaxed italic text-indigo-100 max-w-3xl border-l-4 border-white/20 pl-8">
+                              "{activeGroup.description}"
+                           </p>
+                           <div className="flex flex-wrap gap-4 pt-4">
+                              <button className="px-10 py-4 bg-white text-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-slate-100 transition-all shadow-2xl active:scale-95">Verify Hub Security</button>
+                              <button className="px-10 py-4 bg-white/10 border border-white/20 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] hover:bg-white/20 transition-all">Export Manifest</button>
+                           </div>
+                        </div>
                      </div>
-                     {msg.attachment && (
-                        <div className="mt-3 inline-block">
-                           {msg.attachment.type === 'image' ? (
-                             <img src={msg.attachment.data} className="max-w-md rounded-md border border-[var(--border-color)] shadow-sm" />
-                           ) : (
-                             <div className="flex items-center gap-3 p-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md hover:border-indigo-600 transition-all cursor-pointer">
-                                <FileText size={18} className="text-indigo-600" />
-                                <div className="flex flex-col">
-                                   <span className="text-[10px] font-black uppercase truncate max-w-[200px]">{msg.attachment.name}</span>
-                                   <span className="text-[7px] text-slate-400 font-bold tracking-widest">DOWNLOAD_ASSET_READY</span>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT TELEMETRY BAR */}
+              <aside className="hidden xl:flex w-80 border-l border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] p-8 space-y-12 z-20">
+                 <div className="space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] flex items-center gap-3">
+                       <Target size={16} className="text-indigo-600"/> Top_Pulse_Nodes
+                    </h4>
+                    <div className="space-y-4">
+                       {activeGroup.memberIds.slice(0, 6).map(id => {
+                          const u = db.getUsers().find(user => user.id === id) || currentUser;
+                          return (
+                             <div key={id} className="flex items-center justify-between group cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                   <img src={u.avatar} className="w-10 h-10 rounded-xl border border-[var(--border-color)] bg-white object-cover group-hover:scale-110 transition-transform" />
+                                   <div className="flex flex-col">
+                                      <span className="text-[11px] font-black uppercase truncate w-28 group-hover:text-indigo-600 transition-colors">{u.name}</span>
+                                      <span className="text-[8px] text-slate-400 font-bold">NODE_ID: {id.slice(0,4)}</span>
+                                   </div>
+                                </div>
+                                <div className="w-10 h-1 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                                   <div className="h-full bg-emerald-500 w-[85%]"></div>
                                 </div>
                              </div>
-                           )}
-                        </div>
-                     )}
-                  </div>
-                </div>
-              )) : (
-                <div className="py-24 text-center space-y-6 opacity-30">
-                   <Terminal size={48} className="mx-auto" />
-                   <p className="text-[10px] font-black uppercase tracking-widest">No protocol activity detected.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Input Buffer */}
-            {isMember ? (
-              <div className="p-6 border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-[#0d1117]/50">
-                 <div className="relative group">
-                    <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-600/20 focus-within:border-indigo-600 transition-all">
-                       <div className="px-3 py-2 border-b border-[var(--border-color)] bg-slate-50 dark:bg-white/5 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                             <button onClick={() => fileInputRef.current?.click()} className="p-1.5 hover:bg-black/5 rounded text-slate-400 hover:text-indigo-600" title="Attach Asset"><ImageIcon size={16}/></button>
-                             <div className="h-4 w-px bg-[var(--border-color)]"></div>
-                             <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">Commit_Buffer_Active</span>
-                          </div>
-                       </div>
-                       
-                       {attachment && (
-                          <div className="p-3 bg-indigo-600/5 border-b border-[var(--border-color)] flex items-center justify-between animate-in slide-in-from-top-2">
-                             <div className="flex items-center gap-2">
-                                {attachment.type === 'image' ? <ImageIcon size={14}/> : <FileText size={14}/>}
-                                <span className="text-[10px] font-bold uppercase truncate max-w-xs">{attachment.name}</span>
-                             </div>
-                             <button onClick={() => setAttachment(null)} className="p-1 hover:text-rose-500"><X size={14}/></button>
-                          </div>
-                       )}
-
-                       <textarea 
-                         value={newMessage}
-                         onChange={e => setNewMessage(e.target.value)}
-                         onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                         placeholder="Enter commit message (Shift+Enter for newline)..."
-                         className="w-full bg-transparent p-4 text-[13px] font-medium outline-none h-24 resize-none placeholder:italic placeholder:text-slate-400"
-                       />
-                       
-                       <div className="px-3 py-2 flex justify-end">
-                          <button 
-                            onClick={handleSendMessage}
-                            disabled={!newMessage.trim() && !attachment}
-                            className="bg-[#238636] hover:bg-[#2ea043] disabled:opacity-30 text-white px-6 py-2 rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg active:scale-95"
-                          >
-                             BroadCast <Send size={12}/>
-                          </button>
-                       </div>
+                          );
+                       })}
                     </div>
-                    <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
                  </div>
-              </div>
-            ) : (
-              <div className="p-6 border-t border-[var(--border-color)] bg-amber-500/5 flex items-center justify-center">
-                 <p className="text-[10px] font-black uppercase text-amber-600 tracking-widest flex items-center gap-2">
-                    <Lock size={14}/> Protocol Locked. Join Hub to Broadcast Intelligence.
-                 </p>
-              </div>
-            )}
+
+                 <div className="pt-10 border-t border-[var(--border-color)] space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] flex items-center gap-3">
+                       <History size={16} className="text-indigo-600"/> Cluster_Activity_Log
+                    </h4>
+                    <div className="space-y-6">
+                       {[1, 2, 3].map(i => (
+                          <div key={i} className="relative pl-6 border-l-2 border-indigo-600/20 space-y-2 group">
+                             <div className="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-indigo-600 group-hover:scale-150 transition-transform shadow-[0_0_8px_#6366f1]"></div>
+                             <p className="text-[10px] font-black uppercase text-indigo-600 leading-none">COMMIT_SEQ_{SHA_GEN()}</p>
+                             <p className="text-[9px] text-slate-500 font-medium italic">Asset indexed to global strata successfully.</p>
+                             <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">{i * 15}m ago</p>
+                          </div>
+                       ))}
+                    </div>
+                 </div>
+
+                 <div className="mt-auto p-6 bg-slate-900 dark:bg-black rounded-[2rem] border border-slate-800 space-y-5 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5"><TrendingUp size={60} /></div>
+                    <div className="flex items-center justify-between">
+                       <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Neural_Sentiment</span>
+                       <span className="text-[10px] font-black text-emerald-500">OPTIMAL</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                       <div className="h-full bg-indigo-600 w-[94%] animate-pulse"></div>
+                    </div>
+                    <p className="text-[8px] text-slate-400 font-medium italic text-center">"Node behavior suggests high academic throughput."</p>
+                 </div>
+              </aside>
+            </div>
+            
+            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-20 text-center space-y-6">
-             <div className="w-24 h-24 bg-indigo-600/5 rounded-full flex items-center justify-center border-2 border-dashed border-indigo-600/20">
-                <Users size={48} className="text-indigo-600/30" />
+          <div className="flex-1 flex flex-col items-center justify-center p-20 text-center space-y-12">
+             <div className="relative group">
+                <div className="absolute -inset-8 bg-indigo-600/10 blur-[60px] rounded-full group-hover:bg-indigo-600/20 transition-all duration-700"></div>
+                <div className="w-40 h-40 bg-indigo-600/5 rounded-[4rem] flex items-center justify-center border-2 border-dashed border-indigo-600/30 shadow-inner transition-all group-hover:border-indigo-600 group-hover:scale-105">
+                   <Users size={80} className="text-indigo-600/20 group-hover:text-indigo-600 transition-colors" />
+                </div>
              </div>
-             <div className="space-y-2">
-                <h3 className="text-2xl font-black uppercase tracking-tighter italic">Select Cluster Node</h3>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] max-w-xs mx-auto leading-loose">
-                   Join academic hubs, share research, and collaborate on the hill.
+             <div className="space-y-4">
+                <h3 className="text-5xl font-black uppercase tracking-tighter italic text-[var(--text-primary)]">Select Strategic Cluster</h3>
+                <p className="text-[12px] text-slate-500 font-bold uppercase tracking-[0.5em] max-w-md mx-auto leading-loose">
+                   Join high-frequency research environments, synchronize wing intelligence, and collaborate with peer-nodes in encrypted hubs.
                 </p>
              </div>
-             <button onClick={() => setMobileMode('list')} className="md:hidden px-8 py-3 bg-indigo-600 text-white rounded-[var(--radius-main)] text-[10px] font-black uppercase">View Hub Registry</button>
+             <div className="flex gap-6">
+                <button onClick={() => setIsCreating(true)} className="px-12 py-5 bg-indigo-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-2xl shadow-indigo-600/30 active:scale-95 transition-all flex items-center gap-4 hover:bg-indigo-700"><Plus size={20}/> Initialize_Hub</button>
+                <button className="px-12 py-5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-white transition-all shadow-sm active:scale-95">Explore_Registry</button>
+             </div>
           </div>
         )}
       </main>
 
-      {/* 3. CREATE HUB MODAL */}
+      {/* CREATE HUB MODAL */}
       {isCreating && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
-           <div className="bg-[var(--bg-primary)] w-full max-w-lg p-10 rounded-[var(--radius-main)] shadow-2xl space-y-8 border border-[var(--border-color)]">
-              <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-6">
-                 <div className="flex items-center gap-3 text-indigo-600">
-                    <Plus size={20} />
-                    <h2 className="text-xl font-black uppercase tracking-tighter italic">Initialize_Hub</h2>
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 bg-black/90 backdrop-blur-xl animate-in fade-in">
+           <div className="bg-[var(--bg-primary)] w-full max-w-xl p-12 rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] space-y-10 border border-[var(--border-color)] relative">
+              <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-8">
+                 <div className="flex items-center gap-4 text-indigo-600">
+                    <Target size={32} />
+                    <h2 className="text-3xl font-black uppercase tracking-tighter italic">Initialize_Cluster</h2>
                  </div>
-                 <button onClick={() => setIsCreating(false)} className="text-slate-500 hover:text-rose-500"><X size={24}/></button>
+                 <button onClick={() => setIsCreating(false)} className="text-slate-400 hover:text-rose-500 transition-colors active:scale-90"><X size={40}/></button>
               </div>
-              <div className="space-y-6">
-                 <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Hub_Identity (Name)</label>
-                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] p-4 text-xs font-bold outline-none focus:border-indigo-600 transition-all" value={createForm.name} onChange={e => setCreateForm({...createForm, name: e.target.value})} placeholder="e.g. COCIS Alpha Sync" />
+              <div className="space-y-8">
+                 <div className="space-y-3 group">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 group-focus-within:text-indigo-600 transition-colors">Cluster_Identity (Name)</label>
+                    <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-5 text-sm font-bold outline-none focus:border-indigo-600 transition-all shadow-inner placeholder:opacity-30" value={createForm.name} onChange={e => setCreateForm({...createForm, name: e.target.value})} placeholder="e.g. COCIS_Neural_Net_v4" />
                  </div>
-                 <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Wing_Sector</label>
-                    <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] p-4 text-xs font-bold outline-none" value={createForm.category} onChange={e => setCreateForm({...createForm, category: e.target.value})}>
-                       <option value="General">Universal</option>
-                       {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => <option key={c} value={c}>{c} Wing</option>)}
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Operational_Sector</label>
+                    <select className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-5 text-sm font-bold outline-none cursor-pointer hover:border-indigo-600 transition-all appearance-none" value={createForm.category} onChange={e => setCreateForm({...createForm, category: e.target.value})}>
+                       <option value="General">Universal Wing</option>
+                       {['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => <option key={c} value={c}>{c} Hub</option>)}
                     </select>
                  </div>
-                 <div className="space-y-2">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Operational_Instructions</label>
-                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] p-4 text-xs font-bold outline-none h-24 resize-none focus:border-indigo-600 transition-all" value={createForm.description} onChange={e => setCreateForm({...createForm, description: e.target.value})} placeholder="Define hub parameters and goals..." />
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Protocol_Directives</label>
+                    <textarea className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-5 text-sm font-bold outline-none h-32 resize-none focus:border-indigo-600 transition-all shadow-inner placeholder:italic placeholder:opacity-30" value={createForm.description} onChange={e => setCreateForm({...createForm, description: e.target.value})} placeholder="Define strategic cluster objectives..." />
                  </div>
-                 <button onClick={handleCreateGroup} className="w-full bg-indigo-600 hover:bg-indigo-700 py-5 rounded-[var(--radius-main)] text-white font-black text-[10px] uppercase tracking-[0.3em] shadow-xl active:scale-95 transition-all">Register Cluster in Registry</button>
+                 <button onClick={handleCreateGroup} className="w-full bg-indigo-600 hover:bg-indigo-700 py-6 rounded-2xl text-white font-black text-xs uppercase tracking-[0.5em] shadow-2xl shadow-indigo-600/30 active:scale-95 transition-all">Commit Cluster to Registry</button>
               </div>
            </div>
         </div>
@@ -367,6 +613,11 @@ const Groups: React.FC = () => {
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse {
+           0%, 100% { opacity: 1; }
+           50% { opacity: .5; }
+        }
       `}</style>
     </div>
   );

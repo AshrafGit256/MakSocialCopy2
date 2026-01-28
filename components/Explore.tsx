@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Search, TrendingUp, Users, MapPin, Sparkles, Hash, 
@@ -48,9 +47,9 @@ const Explore: React.FC = () => {
     try {
       // Re-initialize GenAI client right before the call to ensure fresh key access
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Maps grounding is only supported in Gemini 2.5 series models.
       const response = await ai.models.generateContent({
-        // Updated to the correct full model name alias for Gemini Flash Lite 2.5 series
-        model: "gemini-flash-lite-latest",
+        model: "gemini-2.5-flash",
         contents: `Provide information about ${searchQuery} at Makerere University. Give me navigation tips and significance.`,
         config: {
           tools: [{ googleMaps: {} }],
@@ -62,7 +61,7 @@ const Explore: React.FC = () => {
           }
         }
       });
-      // Correctly accessing .text property on the response as per guidelines
+      // The GenerateContentResponse object features a text property (not a method).
       setMapResponse(response.text || "Scanning complete. Location identified.");
     } catch (e) {
       console.error(e);

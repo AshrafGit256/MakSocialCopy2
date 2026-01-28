@@ -47,6 +47,27 @@ export const MOCK_POSTS: Post[] = [
     college: 'Global'
   },
   {
+    id: 'p-ad-mtn',
+    author: 'MTN Uganda',
+    authorId: 'mtn_official',
+    authorRole: 'Pulse Partner',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    authorAuthority: 'Corporate',
+    isAd: true,
+    timestamp: 'Just now',
+    video: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MTN.mp4',
+    content: `<h1>MTN Pulse: Node Synchronization</h1>
+<p>Get the most aggressive data bundles on the Hill. Dial <b>*157#</b> to synchronize your device with the Pulse strata. No sugary coating, just pure bandwidth for your research nodes.</p>`,
+    hashtags: ['#MTNPulse', '#DataSync', '#MakerereConnect'],
+    likes: 5400,
+    commentsCount: 120,
+    comments: [],
+    views: 98000,
+    flags: [],
+    isOpportunity: false,
+    college: 'Global'
+  },
+  {
     id: 'p-event-1',
     author: 'Makerere Events Node',
     authorId: 'events_admin',
@@ -139,36 +160,46 @@ export const MOCK_POSTS: Post[] = [
   }
 ];
 
-export const ANALYTICS: AnalyticsData[] = [
-  { day: 'Mon', posts: 120, activeUsers: 450, messages: 1200, revenue: 400, engagement: 1275 },
-  { day: 'Tue', posts: 150, activeUsers: 520, messages: 1400, revenue: 600, engagement: 1530 },
-  { day: 'Wed', posts: 200, activeUsers: 600, messages: 1800, revenue: 550, engagement: 1900 },
-  { day: 'Thu', posts: 180, activeUsers: 580, messages: 1600, revenue: 800, engagement: 1770 },
-  { day: 'Fri', posts: 250, activeUsers: 720, messages: 2100, revenue: 1200, engagement: 2330 },
-  { day: 'Sat', posts: 100, activeUsers: 300, messages: 800, revenue: 400, engagement: 950 },
-  { day: 'Sun', posts: 80, activeUsers: 250, messages: 600, revenue: 300, engagement: 775 },
-];
-
+// MOCK_CHATS export to resolve import errors in Chat.tsx
 export const MOCK_CHATS: ChatConversation[] = [
   {
-    id: 'c1',
-    user: { name: 'Roy Ssemboga', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy'},
-    lastMessage: 'The research notes are in the Vault.',
+    id: 'chat-1',
+    user: { name: 'Dr. John S.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John' },
     unreadCount: 2,
+    lastMessage: 'Handshake successful. Ready for uplink.',
     messages: [
-      { id: 'm1', text: 'Roy, did you see the new AI thesis?', timestamp: '10:00 AM', isMe: false },
-      { id: 'm2', text: 'Yes, just synced with that node.', timestamp: '10:05 AM', isMe: true },
-      { id: 'm3', text: 'The research notes are in the Vault.', timestamp: '10:10 AM', isMe: false },
+      { id: 'm1', text: 'Initializing protocol...', timestamp: '10:00 AM', isMe: false },
+      { id: 'm2', text: 'Handshake successful. Ready for uplink.', timestamp: '10:01 AM', isMe: false }
     ]
   },
   {
-    id: 'c2',
-    user: { name: 'Shamim Nambassa', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim'},
-    lastMessage: 'Circuit schematic verified.',
+    id: 'chat-2',
+    user: { name: 'Sarah CEDAT', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
     unreadCount: 0,
+    lastMessage: 'The CAD assets are synchronized.',
     messages: [
-      { id: 'm4', text: 'Shamim, is the Alpha-7 node ready?', timestamp: '09:00 AM', isMe: true },
-      { id: 'm5', text: 'Circuit schematic verified. Ready for uplink.', timestamp: '09:15 AM', isMe: false },
+      { id: 'm3', text: 'Requesting CAD assets for wing review.', timestamp: '09:30 AM', isMe: true },
+      { id: 'm4', text: 'The CAD assets are synchronized.', timestamp: '09:45 AM', isMe: false }
+    ]
+  },
+  {
+    id: 'chat-3',
+    user: { name: 'Roy Ssemboga', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy' },
+    unreadCount: 0,
+    lastMessage: 'Signal confirmed.',
+    messages: [
+      { id: 'm5', text: 'Has the CEDAT wing connectivity stabilized?', timestamp: '11:00 AM', isMe: true },
+      { id: 'm6', text: 'Signal confirmed. Node 4 is active.', timestamp: '11:10 AM', isMe: false }
     ]
   }
+];
+
+export const ANALYTICS: AnalyticsData[] = [
+  { day: 'Mon', posts: 120, activeUsers: 450, messages: 1200, revenue: 400, engagement: 1275 },
+  { day: 'Tue', posts: 145, activeUsers: 480, messages: 1350, revenue: 420, engagement: 1350 },
+  { day: 'Wed', posts: 180, activeUsers: 520, messages: 1600, revenue: 500, engagement: 1550 },
+  { day: 'Thu', posts: 210, activeUsers: 600, messages: 1900, revenue: 620, engagement: 1800 },
+  { day: 'Fri', posts: 240, activeUsers: 710, messages: 2400, revenue: 780, engagement: 2100 },
+  { day: 'Sat', posts: 110, activeUsers: 320, messages: 900, revenue: 350, engagement: 950 },
+  { day: 'Sun', posts: 90, activeUsers: 280, messages: 750, revenue: 280, engagement: 820 }
 ];

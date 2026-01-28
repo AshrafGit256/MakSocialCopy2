@@ -1,3 +1,4 @@
+
 export type AppView = 'landing' | 'login' | 'register' | 'home' | 'messages' | 'profile' | 'admin' | 'network' | 'market' | 'events' | 'analytics' | 'forge' | 'groups' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
@@ -83,6 +84,7 @@ export interface AppSettings {
   themePreset: 'standard' | 'oled' | 'tactical' | 'paper';
   showGrid: boolean;
   accentColor: string;
+  backgroundPattern: 'none' | 'grid' | 'dots';
 }
 
 export interface Ad {

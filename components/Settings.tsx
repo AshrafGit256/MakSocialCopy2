@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { AppSettings } from '../types';
 import { 
@@ -8,7 +9,7 @@ import {
   ChevronRight, Laptop, Moon, Sun, Ghost,
   MousePointer2, Square, Circle, Info, Eye,
   Plus, Minus, Hash, Command, Globe, Settings as SettingsIcon,
-  FileText
+  FileText, MinusSquare
 } from 'lucide-react';
 
 const COLORS = [
@@ -45,7 +46,8 @@ const Settings: React.FC = () => {
       glowEffects: true,
       themePreset: 'tactical',
       showGrid: true,
-      accentColor: '#6366f1'
+      accentColor: '#6366f1',
+      backgroundPattern: 'none'
     };
   });
 
@@ -64,7 +66,6 @@ const Settings: React.FC = () => {
     root.style.setProperty('--radius-main', settings.borderRadius);
     root.style.setProperty('--base-font-size', `${fontSizeNumeric}px`);
     
-    // Theme application logic - FIXED THEME BUG
     if (settings.themePreset === 'oled') {
       root.classList.add('dark');
       root.style.setProperty('--bg-primary', '#000000');
@@ -110,7 +111,8 @@ const Settings: React.FC = () => {
       glowEffects: true,
       themePreset: 'tactical',
       showGrid: true,
-      accentColor: '#6366f1'
+      accentColor: '#6366f1',
+      backgroundPattern: 'none'
     });
     setFontSizeNumeric(14);
   };
@@ -153,6 +155,7 @@ const Settings: React.FC = () => {
         <main className="lg:col-span-9 space-y-10">
           {activeTab === 'visuals' && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-2">
+              {/* THEME SELECTOR */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                    <Monitor size={14}/> Environment_Strata
@@ -176,6 +179,42 @@ const Settings: React.FC = () => {
                 </div>
               </div>
 
+              {/* BACKGROUND PATTERN SELECTOR - NEW POLISHED SECTION */}
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                   <Layers size={14}/> Background_Architecture
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   {[
+                     { id: 'none', label: 'Clean Slate', desc: 'Minimal solid color', icon: <MinusSquare size={16}/> },
+                     { id: 'grid', label: 'Subtle Grid', desc: 'Precision square matrix', icon: <Grid3X3 size={16}/> },
+                     { id: 'dots', label: 'Tactical Dots', desc: 'Radial data points', icon: <Circle size={16} className="fill-current"/> }
+                   ].map(bg => (
+                      <button 
+                        key={bg.id}
+                        onClick={() => setSettings({...settings, backgroundPattern: bg.id as any})}
+                        className={`group p-6 rounded-md border text-left transition-all relative overflow-hidden ${settings.backgroundPattern === bg.id ? 'bg-indigo-600 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600'}`}
+                      >
+                         {/* Mini Pattern Preview */}
+                         <div className={`absolute inset-0 opacity-[0.05] pointer-events-none ${
+                           bg.id === 'grid' ? 'bg-[linear-gradient(currentColor_1px,transparent_1px),linear-gradient(90deg,currentColor_1px,transparent_1px)] bg-[size:10px_10px]' : 
+                           bg.id === 'dots' ? 'bg-[radial-gradient(currentColor_1px,transparent_1px)] bg-[size:6px_6px]' : ''
+                         }`}></div>
+                         
+                         <div className="relative z-10">
+                            <div className="mb-4 text-slate-400 group-hover:text-white transition-colors">{bg.icon}</div>
+                            <p className="text-[10px] font-black uppercase tracking-widest">{bg.label}</p>
+                            <p className="text-[8px] font-bold opacity-60 uppercase mt-1">{bg.desc}</p>
+                         </div>
+                         {settings.backgroundPattern === bg.id && (
+                           <div className="absolute top-3 right-3"><Check size={14}/></div>
+                         )}
+                      </button>
+                   ))}
+                </div>
+              </div>
+
+              {/* ACCENT COLOR */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                    <Hash size={14}/> System_Accent
@@ -194,6 +233,7 @@ const Settings: React.FC = () => {
                 </div>
               </div>
 
+              {/* TYPOGRAPHY */}
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                    <Maximize2 size={14}/> Typography_Scale

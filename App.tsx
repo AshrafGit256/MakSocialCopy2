@@ -36,6 +36,7 @@ const App: React.FC = () => {
   const [prefilledSearchQuery, setPrefilledSearchQuery] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [safetyError, setSafetyError] = useState<string | null>(null);
+  const [currentBg, setCurrentBg] = useState<'none' | 'grid' | 'dots'>('none');
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -49,12 +50,17 @@ const App: React.FC = () => {
         const root = document.documentElement;
         root.style.setProperty('--brand-color', s.primaryColor || '#475569');
         root.style.setProperty('--font-main', s.fontFamily);
+        setCurrentBg(s.backgroundPattern || 'none');
+        
         if (s.themePreset === 'oled') {
           root.classList.add('dark');
           root.style.setProperty('--bg-primary', '#000000');
         } else if (s.themePreset === 'paper') {
           root.classList.remove('dark');
           root.style.setProperty('--bg-primary', '#ffffff');
+        } else if (s.themePreset === 'tactical') {
+          root.classList.add('dark');
+          root.style.setProperty('--bg-primary', '#0d1117');
         }
       }
     };
@@ -129,14 +135,42 @@ const App: React.FC = () => {
   };
 
   const isAuthView = view === 'landing' || view === 'login' || view === 'register';
+  
+  // Custom background styles based on pattern
+  const getBackgroundStyle = () => {
+    if (currentBg === 'grid') {
+      return { 
+        backgroundImage: 'linear-gradient(var(--border-color) 1px, transparent 1px), linear-gradient(90deg, var(--border-color) 1px, transparent 1px)', 
+        backgroundSize: '50px 50px',
+        opacity: 0.15
+      };
+    }
+    if (currentBg === 'dots') {
+      return { 
+        backgroundImage: 'radial-gradient(var(--text-primary) 1px, transparent 1px)', 
+        backgroundSize: '24px 24px',
+        opacity: 0.08
+      };
+    }
+    return {};
+  };
+
   if (!isLoggedIn && isAuthView) return renderContent();
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans relative">
+      {/* Dynamic Background Layer */}
+      {currentBg !== 'none' && (
+        <div 
+          className="fixed inset-0 pointer-events-none z-0" 
+          style={getBackgroundStyle()}
+        />
+      )}
+      
       {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden animate-in fade-in" onClick={() => setIsSidebarOpen(false)} />}
       <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} unreadNotifications={unreadNotifs} />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <header className="sticky top-0 z-[80] bg-[var(--sidebar-bg)] border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+        <header className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 py-3 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden"><Menu size={22} /></button>
             <div className="relative">
@@ -165,7 +199,7 @@ const App: React.FC = () => {
             {currentUser && <button onClick={() => handleSetView('profile')} className="ml-1 active:scale-90 transition-transform"><img src={currentUser.avatar} className={`w-8 h-8 rounded-full border ${view === 'profile' ? 'border-slate-600 border-2' : 'border-[var(--border-color)]'} bg-white object-cover`} alt="Profile" /></button>}
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto relative bg-[var(--bg-primary)] no-scrollbar pb-safe">{renderContent()}</main>
+        <main className="flex-1 overflow-y-auto relative bg-transparent no-scrollbar pb-safe">{renderContent()}</main>
         <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[var(--sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--border-color)] flex items-center justify-between px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden">
           {[
             { id: 'home', icon: <Home size={22} />, label: 'Feed' },

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { db, REVENUE_HISTORY } from '../db';
 import { ANALYTICS } from '../constants';
@@ -16,11 +17,9 @@ import {
   MousePointer2, Clock, Globe, ShieldAlert,
   Search, Filter, CheckCircle, Ban, AlertTriangle, Terminal,
   UserCheck, Shield, Cpu, Binary, Radar,
-  // Fix: Added missing ArrowLeft icon from lucide-react
   ArrowLeft, ArrowUpRight, ArrowDownRight, Layers, FileJson, Share2,
   Lock, RefreshCcw, Database, Server, Flame, Trophy, Grid, List, Check,
-  ImageIcon, Power, Sliders, Command, Radio, Target,
-  // Fix: Added missing MoreVertical icon from lucide-react
+  Image as ImageIcon, Power, Sliders, Command, Radio, Target,
   Briefcase, Rocket, Gauge, Compass, Palette, MoreHorizontal, MoreVertical,
   ChevronDown, ExternalLink, FilterX, Laptop, MousePointer, 
   Layout as LayoutIcon, AlignLeft, AlignRight, Maximize, Type,
@@ -640,8 +639,125 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         </div>
       </div>
 
+      {/* FLOATING CUSTOMIZER TRIGGER */}
+      <button 
+        onClick={() => setIsCustomizerOpen(true)}
+        className="fixed bottom-10 right-10 z-[200] p-4 rounded-full text-white shadow-2xl hover:scale-110 active:scale-95 transition-all animate-bounce-slow"
+        style={{ backgroundColor: palette.primary }}
+      >
+        <Settings2 size={24} />
+      </button>
+
+      {/* THE ADMIN CUSTOMIZER (KI DRAWER) */}
+      {isCustomizerOpen && (
+        <div className="fixed inset-0 z-[500] flex justify-end animate-in fade-in duration-300">
+           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsCustomizerOpen(false)}></div>
+           
+           <div className="relative w-full max-w-sm h-full bg-[#1e1e2d] text-[#c9d1d9] shadow-2xl flex flex-col border-l border-white/5 animate-in slide-in-from-right duration-300 overflow-hidden">
+              
+              {/* Customizer Header */}
+              <div className="p-6 flex justify-between items-start border-b border-white/5" style={{ backgroundColor: palette.primary }}>
+                 <div>
+                    <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Admin Customizer</h2>
+                    <p className="text-[10px] text-white/70 font-bold uppercase tracking-widest mt-1 italic">Style your terminal protocols</p>
+                 </div>
+                 <button onClick={() => setIsCustomizerOpen(false)} className="p-2 text-white/40 hover:text-white transition-colors">
+                    <X size={24} />
+                 </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 space-y-12 no-scrollbar">
+                 
+                 {/* Sidebar Option */}
+                 <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                       <h3 className="text-[10px] font-black uppercase text-white tracking-[0.3em]">Sidebar Option</h3>
+                       <div className="h-px flex-1 bg-white/5"></div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                       {[
+                         { id: 'vertical', label: 'Vertical', icon: <LayoutIcon size={18}/> },
+                         { id: 'horizontal', label: 'Horizontal', icon: <MoreHorizontal size={18}/> },
+                         { id: 'dark', label: 'Dark', icon: <Moon size={18}/> }
+                       ].map(opt => (
+                          <button 
+                            key={opt.id} 
+                            onClick={() => setSidebarOption(opt.id as any)}
+                            className={`p-5 rounded-xl border transition-all flex flex-col items-center gap-2 relative ${sidebarOption === opt.id ? 'bg-white/5 border-emerald-500 text-white' : 'bg-black/20 border-white/5 opacity-50 hover:opacity-100'}`}
+                          >
+                             <div className={`p-3 rounded-lg ${sidebarOption === opt.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-white/40'}`}>
+                                {opt.icon}
+                             </div>
+                             <span className="text-[9px] font-black uppercase">{opt.label}</span>
+                             {sidebarOption === opt.id && <div className="absolute top-2 left-2 w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>}
+                          </button>
+                       ))}
+                    </div>
+                 </div>
+
+                 {/* Layout Option */}
+                 <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                       <h3 className="text-[10px] font-black uppercase text-white tracking-[0.3em]">Layout Option</h3>
+                       <div className="h-px flex-1 bg-white/5"></div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                       {[
+                         { id: 'ltr', label: 'LTR', icon: <AlignLeft size={18}/> },
+                         { id: 'rtl', label: 'RTL', icon: <AlignRight size={18}/> },
+                         { id: 'box', label: 'Boxed', icon: <Maximize size={18}/> }
+                       ].map(opt => (
+                          <button 
+                            key={opt.id} 
+                            onClick={() => setLayoutOption(opt.id as any)}
+                            className={`p-5 rounded-xl border transition-all flex flex-col items-center gap-2 relative ${layoutOption === opt.id ? 'bg-white/5 border-emerald-500 text-white' : 'bg-black/20 border-white/5 opacity-50 hover:opacity-100'}`}
+                          >
+                             <div className={`p-3 rounded-lg ${layoutOption === opt.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-white/40'}`}>
+                                {opt.icon}
+                             </div>
+                             <span className="text-[9px] font-black uppercase">{opt.label}</span>
+                             {layoutOption === opt.id && <div className="absolute top-2 left-2 w-1.5 h-1.5 bg-indigo-600 rounded-full"></div>}
+                          </button>
+                       ))}
+                    </div>
+                 </div>
+
+                 {/* Color Hint */}
+                 <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                       <h3 className="text-[10px] font-black uppercase text-white tracking-[0.3em]">Color Palette</h3>
+                       <div className="h-px flex-1 bg-white/5"></div>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                       {ACCENT_PALETTES.map((pal, i) => (
+                          <button 
+                            key={i} 
+                            onClick={() => setPalette(pal)}
+                            className={`relative group w-12 h-20 rounded-lg overflow-hidden border-2 transition-all hover:scale-105 active:scale-95 ${palette.name === pal.name ? 'border-indigo-600 ring-4 ring-indigo-600/10 shadow-2xl' : 'border-white/10 opacity-60 hover:opacity-100'}`}
+                          >
+                             <div className="h-1/2 w-full" style={{ backgroundColor: pal.primary }}></div>
+                             <div className="h-1/2 w-full" style={{ backgroundColor: pal.secondary }}></div>
+                             {palette.name === pal.name && <div className="absolute top-1 left-1"><Check size={8} className="text-white"/></div>}
+                          </button>
+                       ))}
+                    </div>
+                 </div>
+              </div>
+
+              <div className="p-8 border-t border-white/5 grid grid-cols-2 gap-4">
+                 <button className="py-4 bg-white/5 text-white/40 rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-white transition-all">Default_OS</button>
+                 <button onClick={() => setIsCustomizerOpen(false)} className="py-4 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-2xl hover:bg-indigo-700 transition-all active:scale-95">Commit_Sync</button>
+              </div>
+           </div>
+        </div>
+      )}
+
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .animate-bounce-slow { animation: bounce 3s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        /* platform-wide palette application */
         :root {
           --admin-primary: #10918a;
           --admin-secondary: #d1d5db;

@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications' | 'market' | 'forge';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -79,7 +79,7 @@ export interface ChatMessage {
 
 export interface ChatConversation {
   id: string;
-  user: { name: string; avatar: string; status: 'online' | 'offline'; role?: string };
+  user: { name: string; avatar: string; status: 'online' | 'offline'; role?: string; phone?: string };
   unreadCount: number;
   lastMessage: string;
   lastTimestamp: string;
@@ -143,8 +143,15 @@ export interface Comment {
   timestamp: string;
 }
 
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: number;
+  voterIds: string[];
+}
+
 export interface PollData {
-  options: { id: string; text: string; votes: number; voterIds: string[] }[];
+  options: PollOption[];
   totalVotes: number;
   expiresAt: string;
 }
@@ -169,9 +176,10 @@ export interface Post {
   isAd?: boolean;
   video?: string;
   college: College | 'Global';
+  parentId?: string;
   opportunityData?: {
-    type: 'Internship' | 'Grant' | 'Gig' | 'Scholarship' | 'Workshop';
     deadline?: string;
+    type: 'Internship' | 'Grant' | 'Gig' | 'Scholarship' | 'Workshop';
     isAIVerified: boolean;
     detectedBenefit: string;
   };

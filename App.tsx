@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { AppView, User, College, UserStatus, AppSettings } from './types';
+import { AppView, User, College, UserStatus } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -86,7 +85,6 @@ const App: React.FC = () => {
       case 'settings': return <SettingsView />;
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
-      case 'admin': return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };
@@ -104,7 +102,7 @@ const App: React.FC = () => {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-white hover:bg-white/5 rounded-full lg:hidden"><Menu size={22} /></button>
             <div className="relative">
               <button onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)} className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl transition-all group">
-                <div className="shrink-0 text-[#10918a]">{activeSector === 'Global' ? <Globe size={18} /> : <LayoutGrid size={18} />}</div>
+                <div className="shrink-0 text-[#10918a]">{activeSector === 'Global' ? <Globe size={18} /> : <LayoutLayout size={18} />}</div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#10918a]">{activeSector} HUB</span>
                 <ChevronDown size={14} className={`text-slate-500 transition-transform ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -123,23 +121,12 @@ const App: React.FC = () => {
           </div>
         </header>
         <main className="flex-1 overflow-y-auto no-scrollbar">{renderContent()}</main>
-        
-        <nav className="fixed bottom-0 left-0 right-0 z-[85] bg-[#1e1e2d]/95 backdrop-blur-xl border-t border-white/5 flex items-center justify-between px-4 pt-3 pb-8 lg:hidden">
-          {[
-            { id: 'home', icon: <Home size={22} />, label: 'Feed' },
-            { id: 'chats', icon: <MessageCircle size={22} />, label: 'Chats' },
-            { id: 'search', icon: <Search size={22} />, label: 'Registry' },
-            { id: 'settings', icon: <Settings size={22} />, label: 'Config' },
-          ].map((item) => (
-            <button key={item.id} onClick={() => handleSetView(item.id as AppView)} className={`flex-1 flex flex-col items-center gap-1 transition-all ${view === item.id ? 'text-[#10918a]' : 'text-slate-500'}`}>
-              {item.icon}
-              <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
-            </button>
-          ))}
-        </nav>
       </div>
     </div>
   );
 };
+
+// Fix: Removed duplicate import and corrected redundant component declaration.
+const LayoutLayout: React.FC<{ size: number }> = ({ size }) => <LayoutGrid size={size} />;
 
 export default App;

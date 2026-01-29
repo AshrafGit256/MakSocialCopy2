@@ -16,9 +16,6 @@ export interface EmailAttachment {
   type: 'file' | 'folder';
 }
 
-export type EmailFolder = 'inbox' | 'sent' | 'draft' | 'starred' | 'spam' | 'trash';
-export type EmailLabel = 'Social' | 'Company' | 'Important' | 'Private';
-
 export interface PlatformEmail {
   id: string;
   from: string;
@@ -33,28 +30,155 @@ export interface PlatformEmail {
   fullDate: string;
   isRead: boolean;
   isStarred: boolean;
-  folder: EmailFolder;
-  label?: EmailLabel;
+  folder: 'inbox' | 'sent' | 'draft' | 'trash' | 'spam';
+  label?: 'Social' | 'Company' | 'Important' | 'Private';
   attachments?: EmailAttachment[];
 }
 
-export interface ChatMessage {
+export interface GroupMessage {
   id: string;
+  author: string;
+  authorId: string;
+  authorAvatar: string;
   text: string;
   timestamp: string;
-  isMe: boolean;
-  author?: string;
-  authorAvatar?: string;
+  attachment?: {
+    name: string;
+    type: 'image' | 'document';
+    data: string;
+  };
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  isOfficial: boolean;
+  creatorId: string;
+  memberIds: string[];
+  messages: GroupMessage[];
+  category: string;
+}
+
+export interface AuditLog {
+  id: string;
+  action: string;
+  admin: string;
+  target: string;
+  timestamp: string;
+  severity: 'info' | 'warning' | 'danger';
+}
+
+export interface FlaggedContent {
+  id: string;
+  contentType: 'post' | 'comment' | 'user';
+  reason: string;
+  reportedBy: string;
+  contentPreview: string;
+  timestamp: string;
+  status: 'pending' | 'resolved' | 'dismissed';
+}
+
+export interface Notification {
+  id: string;
+  type: 'skill_match' | 'engagement' | 'follow' | 'event' | 'system';
+  title: string;
+  description: string;
+  timestamp: string;
+  isRead: boolean;
+  meta?: {
+    nodeId?: string;
+    nodeAvatar?: string;
+    targetId?: string;
+    reason?: string;
+    hash?: string;
+  };
+}
+
+export interface AppSettings {
+  primaryColor: string;
+  fontFamily: string;
+  fontSize: 'sm' | 'md' | 'lg' | 'xl';
+  contrast: 'normal' | 'high';
+  density: 'comfortable' | 'compact' | 'tight';
+  borderRadius: string; 
+  animationsEnabled: boolean;
+  motionStrata: 'subtle' | 'standard' | 'extreme';
+  glassmorphism: boolean;
+  glowEffects: boolean;
+  themePreset: 'standard' | 'oled' | 'tactical' | 'paper';
+  showGrid: boolean;
+  accentColor: string;
+  backgroundPattern: 'none' | 'grid' | 'dots';
+}
+
+export interface Ad {
+  id: string;
+  clientName: string;
+  title: string;
+  reach: number;
+  status: 'Active' | 'Pending' | 'Completed';
+  budget: number;
+  spent: number;
+  clicks: number;
+  deadline: string; 
+}
+
+export interface RevenuePoint {
+  month: string;
+  revenue: number;
+  expenses: number;
+  subscribers: number;
+  growth: number;
+}
+
+export interface AnalyticsData {
+  day: string;
+  posts: number;
+  activeUsers: number;
+  messages: number;
+  revenue: number;
+  engagement: number;
 }
 
 export interface ChatConversation {
   id: string;
-  user: { name: string; avatar: string; role?: string; status?: 'online' | 'offline' };
+  user: { name: string; avatar: string };
   unreadCount: number;
   lastMessage: string;
-  lastTimestamp: string;
-  isGroup: boolean;
-  messages: ChatMessage[];
+  messages: { id: string; text: string; timestamp: string; isMe: boolean }[];
+}
+
+export interface LiveEvent {
+  id: string;
+  title: string;
+  organizer: string;
+  youtubeUrl: string;
+}
+
+export interface Resource {
+  id: string;
+  title: string;
+  category: ResourceType;
+  college: College | 'Global';
+  course: string;
+  year: string;
+  author: string;
+  authorRole: string;
+  downloads: number;
+  fileType: 'PDF' | 'DOCX' | 'PPTX' | 'ZIP';
+  fileData?: string;
+  timestamp: string;
+}
+
+export interface TimelineEvent {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  type: 'post' | 'update' | 'achievement' | 'comment';
+  color: string;
 }
 
 export interface User {
@@ -121,7 +245,9 @@ export interface Post {
   authorAuthority?: AuthorityRole;
   timestamp: string;
   content: string;
+  customFont?: string; 
   images?: string[];
+  video?: string;
   hashtags: string[];
   likes: number;
   commentsCount: number;
@@ -130,24 +256,27 @@ export interface Post {
   flags: string[]; 
   isOpportunity: boolean;
   college: College | 'Global';
+  parentId?: string; 
   opportunityData?: {
     type: 'Internship' | 'Grant' | 'Gig' | 'Scholarship' | 'Workshop';
     deadline?: string;
     isAIVerified: boolean;
     detectedBenefit: string;
   };
+  aiMetadata?: {
+    category: 'Academic' | 'Social' | 'Finance' | 'Career' | 'Urgent';
+    isSafe?: boolean;
+  };
   pollData?: PollData;
   isEventBroadcast?: boolean;
+  isAd?: boolean;
   eventTitle?: string;
   eventDate?: string;
   eventTime?: string;
   eventLocation?: string;
+  eventId?: string;
   eventFlyer?: string;
   eventRegistrationLink?: string;
-  isAd?: boolean;
-  video?: string;
-  eventId?: string;
-  parentId?: string;
 }
 
 export interface CalendarEvent {
@@ -162,69 +291,7 @@ export interface CalendarEvent {
   createdBy: string;
   attendeeIds?: string[]; 
   registrationLink?: string;
-}
-
-export interface AppSettings {
-  primaryColor: string;
-  fontFamily: string;
-  fontSize: 'sm' | 'md' | 'lg' | 'xl';
-  borderRadius: string; 
-  themePreset: 'standard' | 'oled' | 'tactical' | 'paper';
-  backgroundPattern: 'none' | 'grid' | 'dots';
-}
-
-export interface AnalyticsData {
-  day: string;
-  posts: number;
-  activeUsers: number;
-  messages: number;
-  revenue: number;
-  engagement: number;
-}
-
-export interface Ad {
-  id: string;
-  title: string;
-  image?: string;
-  video?: string;
-  url: string;
-  college: College | 'Global';
-}
-
-export interface Resource {
-  id: string;
-  title: string;
-  category: ResourceType;
-  college: College | 'Global';
-  course: string;
-  year: string;
-  author: string;
-  authorRole: string;
-  downloads: number;
-  fileType: string;
-  fileData?: string;
-  timestamp: string;
-}
-
-export interface LiveEvent {
-  id: string;
-  title: string;
-  youtubeUrl: string;
-  organizer: string;
-  status: 'live' | 'upcoming' | 'ended';
-}
-
-export interface MakNotification {
-  id: string;
-  title: string;
-  description: string;
-  timestamp: string;
-  isRead: boolean;
-  type: 'skill_match' | 'engagement' | 'follow' | 'event' | 'system';
-  meta?: {
-    hash?: string;
-    reason?: string;
-  };
+  isPromoted?: boolean;
 }
 
 export interface MarketService {
@@ -240,30 +307,4 @@ export interface MarketService {
   rating: number;
   reviewsCount: number;
   isPromoted: boolean;
-}
-
-export interface GroupMessage {
-  id: string;
-  author: string;
-  authorId: string;
-  authorAvatar: string;
-  text: string;
-  timestamp: string;
-  attachment?: {
-    name: string;
-    type: 'image' | 'document';
-    data: string;
-  };
-}
-
-export interface Group {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  isOfficial: boolean;
-  creatorId: string;
-  memberIds: string[];
-  messages: GroupMessage[];
-  category: string;
 }

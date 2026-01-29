@@ -6,7 +6,7 @@ import {
   FileText, Search, Download, Plus, BookOpen, 
   Filter, GraduationCap, Briefcase, FileCode,
   FileArchive, Clock, Layers, Trash2, X, ChevronDown,
-  ChevronRight, CalendarDays, Book, Eye, Upload, File as FileIcon,
+  ChevronRight, CalendarDays, Book, Eye, Upload, File,
   Database, Shield, Fingerprint, Activity, Server,
   Lock, ArrowUpRight, FilterX, UserCheck
 } from 'lucide-react';
@@ -120,6 +120,8 @@ const Resources: React.FC = () => {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-40 animate-in fade-in duration-500 font-mono text-[var(--text-primary)]">
+      
+      {/* 1. TACTICAL HEADER */}
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-indigo-600 rounded-md shadow-lg text-white">
@@ -147,6 +149,7 @@ const Resources: React.FC = () => {
         </div>
       </header>
 
+      {/* 2. FILTER MATRIX */}
       <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md mb-8 divide-y divide-[var(--border-color)] overflow-hidden shadow-sm">
         <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="flex flex-col gap-1.5">
@@ -202,6 +205,7 @@ const Resources: React.FC = () => {
         </div>
       </div>
 
+      {/* 3. REGISTRY STREAM */}
       <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md overflow-hidden relative shadow-sm">
         {isScanning && (
           <div className="absolute inset-0 z-10 bg-[var(--bg-primary)]/40 backdrop-blur-[1px] flex items-center justify-center">
@@ -294,6 +298,7 @@ const Resources: React.FC = () => {
           </table>
         </div>
 
+        {/* Mobile View */}
         <div className="md:hidden divide-y divide-[var(--border-color)]">
           {filteredResources.length > 0 ? filteredResources.map(res => (
             <div key={res.id} className="p-5 space-y-4 hover:bg-[var(--bg-secondary)] transition-all">
@@ -335,6 +340,7 @@ const Resources: React.FC = () => {
         </div>
       </div>
 
+      {/* Upload Modal */}
       {isAdding && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
            <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[var(--border-color)] max-h-[90vh] overflow-y-auto no-scrollbar">
@@ -347,6 +353,7 @@ const Resources: React.FC = () => {
               </div>
               
               <div className="space-y-4">
+                 {/* FILE SELECTOR (PROMINENT) */}
                  <div className="space-y-2">
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">1. Document_Container</label>
                     <div className="relative group">
@@ -428,6 +435,7 @@ const Resources: React.FC = () => {
         </div>
       )}
 
+      {/* Preview Modal */}
       {previewResource && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
            <div className="bg-[var(--bg-primary)] w-full max-w-3xl rounded-md shadow-2xl flex flex-col border border-[var(--border-color)] overflow-hidden">

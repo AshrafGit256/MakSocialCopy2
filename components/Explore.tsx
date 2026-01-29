@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
-  TrendingUp, Users, MapPin, Sparkles, Hash, 
+  Search, TrendingUp, Users, MapPin, Sparkles, Hash, 
   Globe, Zap, ArrowUpRight, Radio, Cpu, Fingerprint,
   Mic2, BookOpen, Trophy, Palette, Code, ChevronRight,
   Navigation, Navigation2, Clock, Car, Footprints, Info,
@@ -14,12 +13,14 @@ const Explore: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchingMap, setIsSearchingMap] = useState(false);
   const [mapResponse, setMapResponse] = useState<string | null>(null);
+  // Fixed state to use latitude/longitude property names as required by the GenAI Maps tool
   const [userCoords, setUserCoords] = useState<{latitude: number, longitude: number} | null>(null);
   const [estimationMode, setEstimationMode] = useState<'walking' | 'driving'>('walking');
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
+        // Corrected property names to match the expected schema for latLng grounding in retrievalConfig
         (pos) => setUserCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
         (err) => console.debug("Location blocked", err)
       );
@@ -44,7 +45,9 @@ const Explore: React.FC = () => {
     if (!searchQuery.trim()) return;
     setIsSearchingMap(true);
     try {
+      // Re-initialize GenAI client right before the call to ensure fresh key access
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Maps grounding is only supported in Gemini 2.5 series models.
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: `Provide information about ${searchQuery} at Makerere University. Give me navigation tips and significance.`,
@@ -52,11 +55,13 @@ const Explore: React.FC = () => {
           tools: [{ googleMaps: {} }],
           toolConfig: {
             retrievalConfig: {
+              // Ensure coordinates match the expected latitude/longitude schema for grounding
               latLng: userCoords || { latitude: 0.3348, longitude: 32.5684 }
             }
           }
         }
       });
+      // The GenerateContentResponse object features a text property (not a method).
       setMapResponse(response.text || "Scanning complete. Location identified.");
     } catch (e) {
       console.error(e);
@@ -68,6 +73,8 @@ const Explore: React.FC = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto px-6 lg:px-12 py-12 space-y-16 pb-40 animate-in fade-in duration-700">
+      
+      {/* 1. Global Intelligence Header */}
       <section className="relative flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
         <div className="space-y-4">
           <div className="flex items-center gap-4">
@@ -90,7 +97,7 @@ const Explore: React.FC = () => {
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-[2.5rem] blur opacity-20 group-focus-within:opacity-40 transition duration-500"></div>
             <div className="relative flex items-center gap-4 bg-[var(--sidebar-bg)] border border-[var(--border-color)] rounded-[2.2rem] px-8 py-5">
-              <SearchIcon className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={24} />
+              <Search className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={24} />
               <input 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -109,6 +116,7 @@ const Explore: React.FC = () => {
         </div>
       </section>
 
+      {/* 2. Campus Navigation & Intelligence Module (The "Google Map" Re-imagined) */}
       <section className="space-y-8">
         <div className="flex items-center justify-between">
            <div className="space-y-1">
@@ -124,6 +132,7 @@ const Explore: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[650px]">
+          {/* THE MAP TERMINAL */}
           <div className="lg:col-span-8 relative rounded-[3rem] overflow-hidden border border-[var(--border-color)] bg-slate-900 group shadow-2xl">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15959.02705494916!2d32.5645!3d0.3348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb868202958f%3A0xc5403e058c40b793!2sMakerere%20University!5e0!3m2!1sen!2sug!4v1715694712202!5m2!1sen!2sug" 
@@ -132,6 +141,7 @@ const Explore: React.FC = () => {
               allowFullScreen 
               loading="lazy"
             />
+            {/* Overlay Navigation HUD */}
             <div className="absolute top-8 left-8 p-6 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl rounded-[2rem] border border-white/20 shadow-2xl space-y-4 max-w-xs animate-in slide-in-from-left-5">
                <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
@@ -148,6 +158,7 @@ const Explore: React.FC = () => {
                )}
             </div>
 
+            {/* Quick Actions HUD */}
             <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
                <div className="flex gap-3">
                   {poi.map(item => (
@@ -163,6 +174,7 @@ const Explore: React.FC = () => {
             </div>
           </div>
 
+          {/* SIDEBAR: ROUTE PROCESSOR */}
           <div className="lg:col-span-4 flex flex-col gap-6 h-full">
              <div className="flex-1 glass-card bg-[var(--sidebar-bg)] border-[var(--border-color)] p-8 rounded-[3rem] shadow-xl space-y-8 overflow-y-auto no-scrollbar">
                 <div className="space-y-2">
@@ -211,6 +223,7 @@ const Explore: React.FC = () => {
         </div>
       </section>
 
+      {/* 3. Trending Intensity Grid */}
       <section className="space-y-8">
         <div className="flex items-center justify-between">
           <h3 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-3 italic">
@@ -243,6 +256,7 @@ const Explore: React.FC = () => {
         </div>
       </section>
 
+      {/* 4. Intelligence Reports Section */}
       <section className="space-y-8">
         <h3 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tight flex items-center gap-3 italic">
           <Sparkles size={28} className="text-amber-500" /> Curated Assets

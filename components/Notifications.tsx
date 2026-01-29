@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { MakNotification } from '../types';
+import { Notification } from '../types';
 import { 
   Bell, Star, UserPlus, Zap, Clock, ShieldCheck, 
   Trash2, CheckCircle2, Terminal, Filter, MoreHorizontal,
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 const Notifications: React.FC = () => {
-  const [notifications, setNotifications] = useState<MakNotification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread' | 'engagements' | 'ai'>('all');
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Notifications: React.FC = () => {
     setNotifications(updated);
   };
 
-  const getIcon = (type: MakNotification['type']) => {
+  const getIcon = (type: Notification['type']) => {
     switch (type) {
       case 'skill_match': return <Zap size={16} className="text-amber-500" />;
       case 'engagement': return <Star size={16} className="text-indigo-500" />;
@@ -54,6 +54,7 @@ const Notifications: React.FC = () => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-mono text-[var(--text-primary)]">
       
+      {/* 1. Header Cluster */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div className="flex items-center gap-4">
            <div className="p-4 bg-indigo-600 rounded-md text-white shadow-xl shadow-indigo-600/20">
@@ -74,6 +75,7 @@ const Notifications: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* 2. Side Filters */}
         <aside className="lg:col-span-3 space-y-1">
            <h3 className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-widest mb-3">Signal_Categories</h3>
            {[
@@ -95,6 +97,7 @@ const Notifications: React.FC = () => {
            ))}
         </aside>
 
+        {/* 3. Notifications List */}
         <main className="lg:col-span-9 space-y-0.5 border border-[var(--border-color)] rounded-md overflow-hidden bg-[var(--bg-primary)]">
            <div className="px-4 py-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center justify-between">
               <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
@@ -147,6 +150,7 @@ const Notifications: React.FC = () => {
         </main>
       </div>
 
+      {/* 4. Technical Footer */}
       <div className="mt-20 p-6 border border-dashed border-indigo-600/30 rounded-md bg-indigo-600/5 flex items-center gap-6">
          <div className="p-3 bg-white dark:bg-slate-900 rounded border border-[var(--border-color)]">
             <Hash size={24} className="text-indigo-600" />

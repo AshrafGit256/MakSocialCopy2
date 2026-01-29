@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { NAV_ITEMS } from '../constants';
-import { AppView, User, College } from '../types';
+import { AppView, User } from '../types';
 import { db } from '../db';
-import { ShieldCheck, LogOut, Radio, Sun, Moon, Cpu, X, BookOpen, Layers, Settings, Lock, Award, Star, Bell } from 'lucide-react';
+import { 
+  Home, Search, MessageCircle, User as UserIcon, Calendar, 
+  BookOpen, Bell, Settings, ShieldCheck, LogOut, Award, Star, Cpu 
+} from 'lucide-react';
 
 interface SidebarProps {
   activeView: AppView;
@@ -16,107 +18,54 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onClose, unreadNotifications = 0 }) => {
-  const [currentUser, setCurrentUser] = useState<User>(db.getUser());
+  const [currentUser] = useState<User>(db.getUser());
 
-  useEffect(() => {
-    setCurrentUser(db.getUser());
-  }, [activeView]);
-
-  const sidebarClasses = `
-    fixed inset-y-0 left-0 z-[2001] w-[85%] max-w-[320px] bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] 
-    flex flex-col h-full shadow-[25px_0_100px_-12px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-in-out
-    lg:static lg:translate-x-0 lg:z-50 lg:shadow-none lg:w-72
-    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-  `;
+  const navItems = [
+    { id: 'home', label: 'Pulse Feed', icon: <Home size={22} /> },
+    { id: 'chats', label: 'Chats Hub', icon: <MessageCircle size={22} /> },
+    { id: 'search', label: 'Registry', icon: <Search size={22} /> },
+    { id: 'calendar', label: 'Schedule', icon: <Calendar size={22} /> },
+    { id: 'resources', label: 'The Vault', icon: <BookOpen size={22} /> },
+    { id: 'notifications', label: 'Signals', icon: <Bell size={22} /> },
+    { id: 'profile', label: 'Terminal', icon: <UserIcon size={22} /> },
+  ];
 
   return (
-    <aside className={sidebarClasses}>
-      <div className="p-6 overflow-y-auto no-scrollbar flex-1 bg-[var(--sidebar-bg)]">
-        <div className="flex items-center justify-between mb-10 lg:hidden">
-          <div className="flex flex-col">
-            <h2 className="text-xl font-black italic tracking-tighter uppercase text-slate-700 dark:text-slate-300">MakSocial</h2>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-0.5">Terminal Control</p>
+    <aside className={`fixed inset-y-0 left-0 z-[2001] w-72 bg-[#1e1e2d] border-r border-white/5 flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className="p-6 flex-1 overflow-y-auto no-scrollbar">
+        <div className="flex items-center gap-3 mb-10 cursor-pointer" onClick={() => setView('home')}>
+          <div className="w-10 h-10 rounded-xl bg-[#10918a] flex items-center justify-center shadow-xl shadow-[#10918a]/20">
+            <ShieldCheck size={24} className="text-white" />
           </div>
-          <button onClick={onClose} className="p-3 bg-[var(--bg-secondary)] rounded-2xl text-slate-500 active:scale-90 transition-all"><X size={20} /></button>
+          <span className="text-xl font-black italic tracking-tighter uppercase text-white">MakSocial</span>
         </div>
 
-        <div className="hidden lg:block mb-10 cursor-pointer group" onClick={() => setView('home')}>
-          <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" alt="MakSocial Logo" className="w-40 grayscale transition-all group-hover:scale-105" />
-        </div>
-
-        <nav className="space-y-1.5">
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Registry Control</p>
-          {NAV_ITEMS.map((item) => {
-            const isNotifications = item.id === 'notifications';
-            const isActive = activeView === item.id;
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => setView(item.id as AppView)}
-                className={`w-full flex items-center justify-between px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
-                  isActive 
-                  ? 'bg-slate-700 text-white shadow-lg' 
-                  : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-800'
-                }`}
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                     <span className="transition-transform duration-300 group-hover:scale-110 block">
-                        {React.cloneElement(item.icon as React.ReactElement, { 
-                          fill: isActive ? "currentColor" : "none",
-                          strokeWidth: isActive ? 2.5 : 2
-                        })}
-                     </span>
-                     {isNotifications && unreadNotifications > 0 && (
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[var(--sidebar-bg)]"></span>
-                     )}
-                  </div>
-                  <span className="text-[11px] tracking-widest font-black uppercase">{item.label}</span>
-                </div>
-              </button>
-            );
-          })}
-
-          <button
-            onClick={() => setView('opportunities')}
-            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
-              activeView === 'opportunities' 
-              ? 'bg-slate-800 text-white shadow-lg' 
-              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-900'
-            }`}
-          >
-            <Award size={22} fill={activeView === 'opportunities' ? "currentColor" : "none"} className={activeView === 'opportunities' ? 'text-white' : ''} />
-            <span className="text-[11px] tracking-widest font-black uppercase">Opportunities</span>
-          </button>
-          
-          <button
-            onClick={() => setView('settings')}
-            className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all group active:scale-[0.98] ${
-              activeView === 'settings' 
-              ? 'bg-slate-700 text-white shadow-lg' 
-              : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-slate-800'
-            }`}
-          >
-            <Settings size={22} fill={activeView === 'settings' ? "currentColor" : "none"} />
-            <span className="text-[11px] tracking-widest font-black uppercase">UI Customizer</span>
-          </button>
+        <nav className="space-y-1">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setView(item.id as AppView)}
+              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all ${activeView === item.id ? 'bg-[#10918a]/20 text-[#10918a] shadow-lg' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+            >
+              {item.icon}
+              <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
+            </button>
+          ))}
         </nav>
 
         {isAdmin && (
-          <div className="mt-10">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 ml-4">Authorized Strata</p>
-            <button onClick={() => setView('admin')} className={`w-full flex items-center space-x-4 px-5 py-4 rounded-[var(--radius-main)] transition-all border border-dashed active:scale-[0.98] ${activeView === 'admin' ? 'bg-slate-900 text-white border-transparent' : 'border-[var(--border-color)] text-slate-500 hover:border-slate-800 hover:text-slate-800'}`}>
-              <Cpu size={22} fill={activeView === 'admin' ? "currentColor" : "none"} />
+          <div className="mt-10 pt-10 border-t border-white/5">
+            <button onClick={() => setView('admin')} className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all ${activeView === 'admin' ? 'bg-[#10918a]/20 text-[#10918a]' : 'text-slate-500 hover:text-white'}`}>
+              <Cpu size={22} />
               <span className="text-[11px] font-black uppercase tracking-widest">Admin Terminal</span>
             </button>
           </div>
         )}
       </div>
 
-      <div className="p-6 border-t border-[var(--border-color)] space-y-4 bg-[var(--sidebar-bg)]">
-        <button onClick={onLogout} className="w-full py-4 bg-rose-500/10 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-sm">
-          <LogOut size={20} /><span className="ml-2 text-[10px] font-black uppercase tracking-widest">Terminate Signal</span>
+      <div className="p-6 border-t border-white/5 bg-[#1e1e2d]/50">
+        <button onClick={onLogout} className="w-full py-4 bg-rose-600/10 text-rose-500 rounded-xl hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-xl">
+          <LogOut size={18} /> Terminate
         </button>
       </div>
     </aside>

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
-import { Notification } from '../types';
+import { MakNotification } from '../types';
 import { 
   Bell, Star, UserPlus, Zap, Clock, ShieldCheck, 
   Trash2, CheckCircle2, Terminal, Filter, MoreHorizontal,
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 const Notifications: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<MakNotification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread' | 'engagements' | 'ai'>('all');
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Notifications: React.FC = () => {
     setNotifications(updated);
   };
 
-  const getIcon = (type: Notification['type']) => {
+  const getIcon = (type: MakNotification['type']) => {
     switch (type) {
       case 'skill_match': return <Zap size={16} className="text-amber-500" />;
       case 'engagement': return <Star size={16} className="text-indigo-500" />;

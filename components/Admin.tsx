@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db, REVENUE_HISTORY } from '../db';
 import { ANALYTICS } from '../constants';
-import { User, Ad, CalendarEvent, Resource, Post } from '../types';
+import { User, Ad, CalendarEvent, Resource, Post, AuthorityRole } from '../types';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend, PieChart, Pie, Cell, LineChart, Line, ComposedChart
@@ -23,7 +23,8 @@ import {
   Briefcase, Rocket, Gauge, Compass, Palette, MoreHorizontal,
   ChevronDown, ExternalLink, FilterX, Laptop, MousePointer, 
   Layout as LayoutIcon, AlignLeft, AlignRight, Maximize, Type,
-  Moon, Minus, Settings2
+  Moon, Minus, Settings2, Facebook, Twitter, Instagram, Linkedin,
+  PenTool, Code2, Megaphone as MarketingIcon, GraduationCap, BriefcaseIcon
 } from 'lucide-react';
 
 const ACCENT_PALETTES = [
@@ -40,6 +41,7 @@ type AdminTab = 'Dashboard' | 'Users' | 'Calendar' | 'Ads' | 'Treasury' | 'Repor
 const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   // Layout States
   const [activeTab, setActiveTab] = useState<AdminTab>('Dashboard');
+  const [userCategory, setUserCategory] = useState<'All' | 'Student' | 'Lecturer' | 'Administrator' | 'Corporate'>('All');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -51,9 +53,20 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const [textSize, setTextSize] = useState(14);
 
   // Data Sync
-  const users = db.getUsers();
+  const allUsers = db.getUsers();
   const posts = db.getPosts();
-  const events = db.getCalendarEvents();
+
+  // Filtered Users Logic
+  const filteredUsers = useMemo(() => {
+    if (userCategory === 'All') return allUsers;
+    return allUsers.filter(u => {
+      if (userCategory === 'Administrator') return u.badges?.includes('Administrator') || u.badges?.includes('Super Admin');
+      if (userCategory === 'Student') return u.status !== 'Graduate';
+      if (userCategory === 'Lecturer') return u.role.includes('Lecturer');
+      if (userCategory === 'Corporate') return u.badges?.includes('Corporate');
+      return true;
+    });
+  }, [allUsers, userCategory]);
 
   // Helper: Apply CSS variables for the palette
   useEffect(() => {
@@ -74,13 +87,12 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   ];
 
   const stats = [
-    { label: 'Network Nodes', value: users.length, trend: '+14%', color: 'text-indigo-500' },
+    { label: 'Network Nodes', value: allUsers.length, trend: '+14%', color: 'text-indigo-500' },
     { label: 'Active Signals', value: posts.length, trend: '+8%', color: 'text-emerald-500' },
     { label: 'Global Liquidity', value: '42.8M', trend: '-2%', color: 'text-amber-500' },
     { label: 'Security Uptime', value: '99.9%', trend: 'Stable', color: 'text-rose-500' },
   ];
 
-  // Render Sidebar Content (used in both Vertical and Horizontal modes)
   const renderNavLinks = () => (
     <ul className={`flex ${sidebarOption === 'horizontal' ? 'flex-row gap-2' : 'flex-col space-y-1'}`}>
       {navItems.map(item => {
@@ -107,12 +119,12 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
   return (
     <div 
-      className={`min-h-screen w-full bg-[#f1f5f9] flex transition-all duration-500 ${layoutOption === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}
+      className={`min-h-screen w-full bg-[#0d1117] flex transition-all duration-500 ${layoutOption === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}
       style={{ fontSize: 'var(--admin-text-base)', direction: layoutOption === 'rtl' ? 'rtl' : 'ltr' }}
     >
-      {/* 1. SIDEBAR (VERTICAL MODE) */}
+      {/* 1. SIDEBAR */}
       {sidebarOption !== 'horizontal' && (
-        <aside className={`transition-all duration-300 flex flex-col shrink-0 z-[100] ${isSidebarOpen ? 'w-64' : 'w-20'} ${sidebarOption === 'dark' ? 'bg-[#1e1e2d] text-white' : 'bg-[#2b3445] text-white shadow-2xl'}`}>
+        <aside className={`transition-all duration-300 flex flex-col shrink-0 z-[100] ${isSidebarOpen ? 'w-64' : 'w-20'} ${sidebarOption === 'dark' ? 'bg-[#181a1b] text-white' : 'bg-[#1e1e2d] text-white border-r border-white/5'}`}>
            <div className="h-16 flex items-center px-6 border-b border-white/5 shrink-0">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3 shadow-xl" style={{ backgroundColor: palette.primary }}>
                  <ShieldCheck size={18} className="text-white" />
@@ -131,29 +143,29 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
       )}
 
       {/* 2. MAIN VIEWPORT */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all ${layoutOption === 'box' ? 'bg-[#e2e8f0] p-4 lg:p-8' : ''}`}>
+      <div className={`flex-1 flex flex-col min-w-0 transition-all ${layoutOption === 'box' ? 'bg-[#000] p-4 lg:p-10' : ''}`}>
         
-        <div className={`flex flex-col h-full overflow-hidden shadow-2xl bg-white ${layoutOption === 'box' ? 'max-w-[1400px] mx-auto rounded-[2rem] border border-slate-200' : ''}`}>
+        <div className={`flex flex-col h-full overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-[#0d1117] ${layoutOption === 'box' ? 'max-w-[1440px] mx-auto rounded-[2.5rem] border border-white/10' : ''}`}>
           
           {/* TOP HEADER */}
-          <header className="h-16 border-b border-slate-100 flex items-center justify-between px-6 bg-white shrink-0 z-[90]">
+          <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-[#0d1117] shrink-0 z-[90]">
              <div className="flex items-center gap-6">
                 {sidebarOption !== 'horizontal' && (
-                  <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-slate-100 rounded text-slate-400"><Menu size={20}/></button>
+                  <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-white/5 rounded text-slate-400"><Menu size={20}/></button>
                 )}
-                <div className="flex items-center text-[10px] font-bold text-slate-400 gap-2 uppercase tracking-widest">
-                   <span className="hover:text-slate-800 cursor-pointer">Admin</span>
+                <div className="flex items-center text-[10px] font-bold text-slate-500 gap-2 uppercase tracking-widest">
+                   <span className="hover:text-white cursor-pointer">Admin</span>
                    <ChevronRight size={12}/>
-                   <span className="text-slate-800">{activeTab}</span>
+                   <span className="text-white">{activeTab}</span>
                 </div>
              </div>
              
              <div className="flex items-center gap-4">
                 <div className="hidden sm:flex flex-col items-end">
-                   <span className="text-[10px] font-black uppercase text-slate-800">Super Administrator</span>
-                   <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">Registry.Live</span>
+                   <span className="text-[10px] font-black uppercase text-white">Registry Architect</span>
+                   <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">Root_Access</span>
                 </div>
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" className="w-10 h-10 rounded-full border border-slate-100" />
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" className="w-10 h-10 rounded-full border border-white/10" />
              </div>
           </header>
 
@@ -165,83 +177,119 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
           )}
 
           {/* MAIN CONTENT AREA */}
-          <main className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f8fafc] no-scrollbar">
+          <main className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#0d1117] no-scrollbar">
             
             {activeTab === 'Dashboard' && (
               <div className="space-y-10 animate-in fade-in duration-500">
-                 {/* STATS */}
                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {stats.map(s => (
-                      <div key={s.label} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
+                      <div key={s.label} className="bg-[#161b22] p-6 rounded-2xl border border-white/5 shadow-sm hover:shadow-md transition-shadow group">
                          <div className="flex justify-between items-start mb-4">
-                            <div className={`p-3 rounded-xl bg-slate-50 ${s.color} transition-colors group-hover:bg-slate-100`}><Activity size={20}/></div>
-                            <span className="text-[9px] font-black uppercase text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded">{s.trend}</span>
+                            <div className={`p-3 rounded-xl bg-white/5 ${s.color}`}><Activity size={20}/></div>
+                            <span className="text-[9px] font-black uppercase text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">{s.trend}</span>
                          </div>
-                         <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{s.label}</p>
-                         <h3 className="text-3xl font-black text-slate-800 mt-1 italic tracking-tighter">{s.value}</h3>
+                         <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">{s.label}</p>
+                         <h3 className="text-3xl font-black text-white mt-1 italic tracking-tighter">{s.value}</h3>
                       </div>
                     ))}
                  </div>
+                 {/* Placeholder for more dashboard items */}
+              </div>
+            )}
 
-                 {/* ANALYTICS CHARTS */}
-                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div className="lg:col-span-8 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col h-[450px]">
-                       <div className="flex justify-between items-center mb-8">
-                          <div>
-                             <h4 className="text-sm font-black uppercase tracking-widest text-slate-800">Signal Traffic Analysis</h4>
-                             <p className="text-[10px] text-slate-400 uppercase font-bold mt-1">Real-time network telemetry</p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                             <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: palette.primary }}></div><span className="text-[9px] font-bold uppercase text-slate-500">Uplink</span></div>
-                             <button className="p-2 hover:bg-slate-50 rounded-lg text-slate-400"><MoreHorizontal size={16}/></button>
-                          </div>
-                       </div>
-                       <div className="flex-1">
-                          <ResponsiveContainer width="100%" height="100%">
-                             <AreaChart data={ANALYTICS}>
-                                <defs>
-                                   <linearGradient id="colorPrimary" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="5%" stopColor={palette.primary} stopOpacity={0.2}/>
-                                      <stop offset="95%" stopColor={palette.primary} stopOpacity={0}/>
-                                   </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }} />
-                                <Area type="monotone" dataKey="posts" stroke={palette.primary} strokeWidth={4} fillOpacity={1} fill="url(#colorPrimary)" />
-                             </AreaChart>
-                          </ResponsiveContainer>
-                       </div>
-                    </div>
+            {/* USERS SECTION (KI ADMIN STYLE) */}
+            {activeTab === 'Users' && (
+              <div className="space-y-10 animate-in slide-in-from-bottom-4 duration-500">
+                 {/* USER TABS */}
+                 <div className="bg-[#161b22] border border-white/5 rounded-2xl p-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    {[
+                      { id: 'All', label: 'Universal Nodes', icon: <Globe size={14}/> },
+                      { id: 'Student', label: 'Students', icon: <GraduationCap size={14}/> },
+                      { id: 'Lecturer', label: 'Academic Staff', icon: <PenTool size={14}/> },
+                      { id: 'Administrator', label: 'Registry Admin', icon: <ShieldCheck size={14}/> },
+                      { id: 'Corporate', label: 'External Partners', icon: <BriefcaseIcon size={14}/> },
+                    ].map(cat => (
+                      <button 
+                        key={cat.id}
+                        onClick={() => setUserCategory(cat.id as any)}
+                        className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${userCategory === cat.id ? 'bg-[#1e1e2d] text-white shadow-xl ring-1 ring-white/10' : 'text-slate-500 hover:text-white'}`}
+                      >
+                         <span style={{ color: userCategory === cat.id ? palette.primary : 'inherit' }}>{cat.icon}</span>
+                         {cat.label}
+                      </button>
+                    ))}
+                 </div>
 
-                    <div className="lg:col-span-4 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                       <h4 className="text-sm font-black uppercase tracking-widest text-slate-800 mb-8 flex items-center gap-2"><Trophy size={18} className="text-amber-500"/> Sector Ranking</h4>
-                       <div className="space-y-6">
-                          {['COCIS', 'CEDAT', 'LAW', 'COBAMS', 'CHUSS'].map((sector, i) => (
-                            <div key={sector} className="flex items-center justify-between group cursor-pointer">
-                               <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-900 transition-colors">0{i+1}</div>
-                                  <div>
-                                     <p className="text-[11px] font-black uppercase text-slate-800 leading-none">{sector}_HUB</p>
-                                     <p className="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-widest">Active Segments</p>
-                                  </div>
+                 {/* USER GRID */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {filteredUsers.length > 0 ? filteredUsers.map(user => (
+                      <div key={user.id} className="bg-[#161b22] border border-white/5 rounded-[2rem] overflow-hidden group hover:border-white/20 transition-all flex flex-col shadow-2xl">
+                         {/* Card Header Gradient */}
+                         <div className="h-28 w-full bg-gradient-to-r from-indigo-500/20 via-emerald-500/20 to-rose-500/20 relative">
+                            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
+                         </div>
+                         
+                         {/* Avatar Pop-out */}
+                         <div className="px-8 -mt-12 relative z-10 flex justify-center">
+                            <div className="relative">
+                               <img src={user.avatar} className="w-24 h-24 rounded-full border-4 border-[#161b22] bg-white object-cover shadow-2xl" />
+                               <div className="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-4 border-[#161b22] rounded-full"></div>
+                            </div>
+                         </div>
+
+                         <div className="p-8 text-center flex-1 flex flex-col">
+                            <h3 className="text-xl font-black text-white uppercase tracking-tighter italic">{user.name}</h3>
+                            <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.3em] mt-2">{user.college} {user.role.toUpperCase()}</p>
+                            
+                            {/* Technical Stats Grid */}
+                            <div className="grid grid-cols-3 gap-4 py-8 border-y border-white/5 my-6">
+                               <div className="space-y-1">
+                                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Projects</p>
+                                  <p className="text-sm font-black text-white">{user.postsCount + 12}</p>
                                </div>
-                               <div className="text-right">
-                                  <p className="text-[11px] font-black" style={{ color: palette.primary }}>{85 - (i*10)}%</p>
-                                  <p className="text-[7px] text-slate-400 uppercase font-black">Sync.Rank</p>
+                               <div className="space-y-1 border-x border-white/5 px-2">
+                                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Tasks</p>
+                                  <p className="text-sm font-black text-white">15</p>
+                               </div>
+                               <div className="space-y-1">
+                                  <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Position</p>
+                                  <p className="text-sm font-black text-white truncate px-1">{user.status.split(' ')[0]}</p>
                                </div>
                             </div>
-                          ))}
-                       </div>
-                       <button className="w-full mt-10 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-600 text-[9px] font-black uppercase tracking-widest transition-all">Full Sector Manifest</button>
-                    </div>
+
+                            <p className="text-xs text-slate-400 font-medium italic leading-relaxed line-clamp-2 px-2">
+                               "{user.bio || 'Node established within the hill registry. Telemetry streams active and synchronized.'}"
+                            </p>
+
+                            {/* Social Uplinks */}
+                            <div className="mt-auto pt-8 flex justify-center gap-3">
+                               {[
+                                 { icon: <Facebook size={12}/>, bg: 'bg-[#3b5998]' },
+                                 { icon: <Twitter size={12}/>, bg: 'bg-[#1da1f2]' },
+                                 { icon: <Instagram size={12}/>, bg: 'bg-[#e1306c]' },
+                                 { icon: <Linkedin size={12}/>, bg: 'bg-[#25d366]' }
+                               ].map((social, i) => (
+                                 <button key={i} className={`w-8 h-8 rounded-full ${social.bg} text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-transform shadow-lg`}>
+                                    {social.icon}
+                                 </button>
+                               ))}
+                            </div>
+                         </div>
+                      </div>
+                    )) : (
+                      <div className="col-span-full py-40 text-center space-y-6">
+                         <div className="w-20 h-20 bg-white/5 border border-dashed border-white/10 rounded-full flex items-center justify-center mx-auto">
+                            <Users size={32} className="text-slate-500" />
+                         </div>
+                         <p className="text-[10px] font-black uppercase text-slate-500 tracking-[0.4em]">No matching nodes in this strata.</p>
+                      </div>
+                    )}
                  </div>
               </div>
             )}
 
-            {/* TAB PLACEHOLDER */}
-            {activeTab !== 'Dashboard' && (
+            {/* TAB PLACEHOLDERS */}
+            {!['Dashboard', 'Users'].includes(activeTab) && (
                <div className="flex flex-col items-center justify-center py-40 opacity-30 space-y-6">
                   <Database size={64} style={{ color: palette.primary }} />
                   <div className="text-center">

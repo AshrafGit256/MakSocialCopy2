@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { User, PlatformEmail } from '../types';
 import { 
@@ -18,7 +18,9 @@ import {
   Undo2, AlignLeft, AlignCenter, AlignRight, 
   Settings, Check, CheckSquare, MoreVertical, Layout, 
   Eye, Download, Palette, Type, Globe, Sun, Moon,
-  AlertCircle, Clock, ChevronDown, Reply, ReplyAll, Forward
+  AlertCircle, Clock, ChevronDown, Reply, ReplyAll, Forward,
+  File, Image as ImageIcon, RotateCw, Trash, MoreHorizontal,
+  ChevronUp, ExternalLink, Printer
 } from 'lucide-react';
 
 const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
@@ -48,255 +50,324 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   };
 
   const stats = [
-    { label: 'Active Nodes', value: db.getUsers().length, trend: '+12%', color: 'text-indigo-500' },
-    { label: 'Signal Stream', value: db.getPosts().length, trend: '+5%', color: 'text-emerald-500' },
-    { label: 'Treasury Cap', value: '42.8M', trend: '-2%', color: 'text-amber-500' },
-    { label: 'System Health', value: '99.9%', trend: 'Stable', color: 'text-rose-500' },
+    { label: 'Total Nodes', value: db.getUsers().length, trend: '+12%', color: 'text-indigo-500' },
+    { label: 'Active Signals', value: db.getPosts().length, trend: '+5%', color: 'text-emerald-500' },
+    { label: 'Protocol Uptime', value: '99.9%', trend: 'Stable', color: 'text-rose-500' },
+    { label: 'Network Latency', value: '14ms', trend: '-2ms', color: 'text-amber-500' },
   ];
 
+  const EmailSidebar = () => (
+    <aside className="w-full lg:w-64 flex flex-col shrink-0 gap-6">
+      <button 
+        onClick={() => setEmailView('compose')}
+        className="w-full py-3.5 bg-[#007bff] hover:bg-[#0069d9] text-white rounded-[2px] font-black text-[12px] uppercase tracking-widest shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+      >
+        <Plus size={16}/> Compose
+      </button>
+
+      <div className="bg-white dark:bg-[#161b22] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] overflow-hidden">
+        <div className="px-4 py-3 bg-[#f8fafc] dark:bg-[#0d1117] border-b border-[#e2e8f0] dark:border-[#30363d] flex items-center justify-between">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Folders</span>
+          <ChevronUp size={14} className="text-slate-400" />
+        </div>
+        <nav className="p-1">
+          {[
+            { id: 'inbox', icon: <Inbox size={14}/>, count: '12', color: 'text-[#007bff]' },
+            { id: 'sent', icon: <Send size={14}/> },
+            { id: 'draft', icon: <FileText size={14}/> },
+            { id: 'junk', icon: <Filter size={14}/>, count: '65', badgeColor: 'bg-[#ffc107] text-black' },
+            { id: 'trash', icon: <Trash size={14}/> }
+          ].map(item => (
+            <button 
+              key={item.id} 
+              onClick={() => {setEmailFolder(item.id as any); setEmailView('list');}}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-[11px] font-bold uppercase tracking-widest transition-all ${emailFolder === item.id ? 'bg-[#007bff] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'}`}
+            >
+              <div className="flex items-center gap-3">{item.icon} <span className="capitalize">{item.id}</span></div>
+              {item.count && <span className={`px-1.5 py-0.5 rounded-[2px] text-[9px] font-black ${item.badgeColor || 'bg-[#007bff] text-white'}`}>{item.count}</span>}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="bg-white dark:bg-[#161b22] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] overflow-hidden">
+        <div className="px-4 py-3 bg-[#f8fafc] dark:bg-[#0d1117] border-b border-[#e2e8f0] dark:border-[#30363d] flex items-center justify-between">
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Labels</span>
+          <ChevronUp size={14} className="text-slate-400" />
+        </div>
+        <div className="p-2 space-y-1">
+          {[
+            { id: 'Important', color: 'border-rose-500' },
+            { id: 'Promotions', color: 'border-amber-500' },
+            { id: 'Social', color: 'border-blue-500' }
+          ].map(label => (
+            <button key={label.id} className="w-full flex items-center gap-3 px-3 py-2 text-[11px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <div className={`w-3 h-3 rounded-full border-2 ${label.color}`}></div>
+              <span>{label.id}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </aside>
+  );
+
   return (
-    <div className={`min-h-screen w-full bg-[#0d1117] flex font-sans text-[#c9d1d9] transition-all duration-500 ${layoutOpt === 'box' ? 'p-6 lg:p-10' : ''}`}>
-      <div className={`flex-1 flex overflow-hidden ${layoutOpt === 'box' ? 'rounded-[2rem] border border-white/5 shadow-2xl bg-[#0d1117]' : ''} ${layoutOpt === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`min-h-screen w-full bg-[#f4f6f9] dark:bg-[#0d1117] flex font-sans text-[#1e293b] dark:text-[#c9d1d9] transition-all duration-500 ${layoutOpt === 'box' ? 'p-4 lg:p-10' : ''}`}>
+      <div className={`flex-1 flex overflow-hidden ${layoutOpt === 'box' ? 'rounded-[4px] border border-[#e2e8f0] dark:border-[#30363d] shadow-2xl bg-white dark:bg-[#0d1117]' : ''} ${layoutOpt === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
         
         {/* SIDEBAR */}
-        <aside className={`transition-all duration-300 flex flex-col shrink-0 z-[100] ${isSidebarOpen ? 'w-64' : 'w-20'} bg-[#1e1e2d] border-r border-white/5`}>
-          <div className="h-16 flex items-center px-6 border-b border-white/5 shrink-0 gap-3">
-            <div className="w-8 h-8 rounded bg-[#10918a] flex items-center justify-center shadow-xl">
-              <ShieldCheck size={18} className="text-white" />
+        <aside className={`transition-all duration-300 flex flex-col shrink-0 z-[100] ${isSidebarOpen ? 'w-64' : 'w-20'} bg-[#343a40] border-r border-white/5`}>
+          <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0 gap-3">
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-xl">
+              <ShieldCheck size={18} className="text-[#343a40]" />
             </div>
-            {isSidebarOpen && <span className="font-black text-xs uppercase tracking-widest italic text-white">Ki.Admin</span>}
+            {isSidebarOpen && <span className="font-black text-xs uppercase tracking-widest text-white">Admin Terminal</span>}
           </div>
           <nav className="flex-1 py-8 overflow-y-auto no-scrollbar px-3 space-y-1">
             {[
               { id: 'Dashboard', icon: <LayoutDashboard size={18}/> },
+              { id: 'Users', icon: <Users size={18}/> },
               { id: 'Email', icon: <Inbox size={18}/> },
-              { id: 'Calendar', icon: <CalendarIcon size={18}/> },
               { id: 'Security', icon: <Shield size={18}/> },
             ].map(item => (
               <button 
                 key={item.id} 
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center px-4 py-3 rounded-xl transition-all ${activeTab === item.id ? 'bg-[#10918a]/20 text-[#10918a] shadow-lg' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                className={`w-full flex items-center px-4 py-3 rounded-[2px] transition-all ${activeTab === item.id ? 'bg-white/10 text-white border-l-4 border-[#007bff]' : 'text-[#c2c7d0] hover:text-white hover:bg-white/5'}`}
               >
                 {item.icon}
                 {isSidebarOpen && <span className="ml-4 text-[11px] font-black uppercase tracking-widest">{item.id}</span>}
               </button>
             ))}
           </nav>
-          <div className="p-4 border-t border-white/5">
-            <button onClick={onLogout} className="w-full py-3 bg-rose-600/10 text-rose-500 rounded-xl hover:bg-rose-600 hover:text-white transition-all font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-2">
-              <LogOut size={14}/> {isSidebarOpen && "Logout"}
-            </button>
-          </div>
         </aside>
 
         {/* MAIN CONTENT AREA */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#0d1117] overflow-hidden">
-          <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#0d1117] shrink-0 z-[90]">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <header className="h-16 border-b border-[#e2e8f0] dark:border-[#30363d] flex items-center justify-between px-8 bg-white dark:bg-[#0d1117] shrink-0 z-[90]">
             <div className="flex items-center gap-6">
-              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-white/5 rounded text-slate-400"><Menu size={20}/></button>
+              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded text-slate-500"><Menu size={20}/></button>
               <div className="relative group w-64 hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-                <input className="w-full bg-white/5 border-none rounded-full py-2 pl-10 pr-4 text-xs text-white focus:ring-1 focus:ring-[#10918a] outline-none" placeholder="Search..." />
+                <input className="w-full bg-[#f1f5f9] dark:bg-[#161b22] border border-transparent dark:border-[#30363d] rounded-[2px] py-2 pl-10 pr-4 text-xs dark:text-white focus:border-[#007bff] outline-none" placeholder="Search..." />
               </div>
             </div>
             <div className="flex items-center gap-5">
-              <button className="text-slate-500 hover:text-white"><Globe size={18}/></button>
-              <button className="text-slate-500 hover:text-white relative"><Bell size={18}/><span className="absolute top-0 right-0 w-1.5 h-1.5 bg-rose-500 rounded-full border border-[#0d1117]"></span></button>
-              <button onClick={() => setCustomizerOpen(true)} className="p-2 bg-[#10918a]/10 text-[#10918a] rounded-lg animate-spin-slow"><Settings size={18}/></button>
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" className="w-9 h-9 rounded-full border border-white/10" alt="Admin" />
+              <button className="text-slate-500 hover:text-slate-900 dark:hover:text-white"><Globe size={18}/></button>
+              <button className="text-slate-500 hover:text-slate-900 dark:hover:text-white relative"><Bell size={18}/><span className="absolute top-0 right-0 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-[#0d1117]"></span></button>
+              <button onClick={() => setCustomizerOpen(true)} className="p-2 bg-[#007bff]/10 text-[#007bff] rounded-[2px] animate-spin-slow"><Settings size={18}/></button>
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" className="w-9 h-9 rounded-full border border-slate-200 dark:border-white/10" alt="Admin" />
             </div>
           </header>
 
           <main className="flex-1 overflow-y-auto no-scrollbar relative p-4 lg:p-8">
             {activeTab === 'Email' && (
-              <div className="h-full flex flex-col animate-in fade-in duration-500">
-                <div className="mb-6 flex flex-col">
-                  <h1 className="text-2xl font-black text-white">Email</h1>
-                  <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
-                    <span className="text-[#10918a]">Apps</span> <ChevronRight size={10}/> <span>{emailView === 'read' ? 'Read Email' : 'Email'}</span>
+              <div className="max-w-[1600px] mx-auto space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <h1 className="text-2xl font-black uppercase text-[var(--text-primary)]">
+                    {emailView === 'list' ? 'Inbox' : emailView === 'read' ? 'Read Email' : 'Compose'}
+                  </h1>
+                  <div className="flex items-center gap-2 text-[11px] text-slate-500 font-bold uppercase tracking-widest">
+                    <span className="text-[#007bff]">Home</span> <ChevronRight size={10}/> <span>Email</span>
                   </div>
                 </div>
 
-                <div className="flex-1 flex flex-col lg:flex-row gap-8">
-                  {/* EMAIL SIDEBAR */}
-                  <aside className="w-full lg:w-64 flex flex-col shrink-0 space-y-8">
-                    <button className="w-full py-4 bg-[#10918a] text-white rounded-lg font-black text-[12px] uppercase tracking-widest shadow-xl transition-all active:scale-95">Compose</button>
-                    <nav className="flex flex-col gap-1">
-                      {[
-                        { id: 'inbox', icon: <Inbox size={18}/>, count: '10+' },
-                        { id: 'sent', icon: <Send size={18}/> },
-                        { id: 'draft', icon: <FileText size={18}/> },
-                        { id: 'starred', icon: <Star size={18}/>, count: '2+' },
-                        { id: 'spam', icon: <AlertCircle size={18}/> },
-                        { id: 'trash', icon: <Trash2 size={18}/> }
-                      ].map(item => (
-                        <button 
-                          key={item.id} 
-                          onClick={() => {setEmailFolder(item.id as any); setEmailView('list');}}
-                          className={`flex items-center justify-between px-4 py-3 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all ${emailFolder === item.id ? 'bg-[#10918a]/10 text-[#10918a]' : 'text-slate-500 hover:text-white'}`}
-                        >
-                          <div className="flex items-center gap-4">{item.icon} <span className="capitalize">{item.id}</span></div>
-                          {item.count && <span className="text-[10px] opacity-70">{item.count}</span>}
-                        </button>
-                      ))}
-                    </nav>
+                <div className="flex flex-col lg:flex-row gap-8">
+                  <EmailSidebar />
 
-                    <div className="pt-8 border-t border-white/5 space-y-4">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-white px-4">Labels</h4>
-                      {[
-                        { id: 'Social', color: 'bg-rose-500' },
-                        { id: 'Company', color: 'bg-amber-500' },
-                        { id: 'Important', color: 'bg-emerald-500' },
-                        { id: 'Private', color: 'bg-indigo-500' }
-                      ].map(label => (
-                        <button key={label.id} className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-500 hover:text-white transition-colors">
-                          <div className={`w-2 h-2 rounded-full ${label.color}`}></div>
-                          <span>{label.id}</span>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="pt-8 border-t border-white/5 space-y-3">
-                       {['All Mail', 'Primary', 'Promotions', 'Social'].map(cat => (
-                         <button key={cat} className="w-full flex items-center gap-4 px-4 py-2 text-[11px] font-bold text-slate-500 hover:text-white transition-colors">
-                           {cat === 'Primary' ? <Bookmark size={14}/> : cat === 'Promotions' ? <Tag size={14}/> : <Inbox size={14}/>}
-                           <span>{cat}</span>
-                         </button>
-                       ))}
-                    </div>
-                  </aside>
-
-                  {/* EMAIL CONTENT AREA */}
-                  <div className="flex-1 bg-[#1e1e2d] border border-white/5 rounded-3xl overflow-hidden flex flex-col shadow-2xl relative min-h-[600px]">
+                  <div className="flex-1 bg-white dark:bg-[#161b22] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] shadow-sm flex flex-col relative min-h-[700px]">
                     {emailView === 'list' ? (
                       <>
-                        <div className="p-6 border-b border-white/5 flex items-center gap-4">
-                          <div className="bg-[#10918a]/20 p-3 rounded-xl text-[#10918a]"><Search size={18}/></div>
-                          <input className="flex-1 bg-transparent border-none outline-none text-sm text-white font-bold" placeholder="Search..." />
-                          <button className="p-2 text-slate-500"><MoreVertical size={18}/></button>
+                        <div className="p-4 border-b border-[#e2e8f0] dark:border-[#30363d] flex flex-wrap items-center justify-between gap-4 bg-[#f8fafc] dark:bg-[#0d1117]">
+                          <div className="flex items-center gap-1">
+                            <button className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500 hover:text-rose-500"><Trash size={14}/></button>
+                            <button className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500"><RotateCw size={14}/></button>
+                            <button className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500"><MoreHorizontal size={14}/></button>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
+                              <span>1-50/200</span>
+                              <div className="flex ml-2">
+                                <button className="p-1 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px]"><ChevronLeft size={14}/></button>
+                                <button className="p-1 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px]"><ChevronRight size={14}/></button>
+                              </div>
+                            </div>
+                            <div className="relative">
+                              <input className="bg-white dark:bg-[#0d1117] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] py-1.5 pl-3 pr-10 text-[11px] w-48 font-bold outline-none" placeholder="Search Mail" />
+                              <button className="absolute right-0 top-0 bottom-0 px-3 bg-[#007bff] text-white"><Search size={14}/></button>
+                            </div>
+                          </div>
                         </div>
                         <div className="flex-1 overflow-y-auto no-scrollbar">
                           {emails.map((email, i) => (
                             <div 
                               key={email.id} 
                               onClick={() => handleReadEmail(email)}
-                              className="px-4 lg:px-8 py-6 border-b border-white/5 border-dashed flex items-center gap-4 lg:gap-6 hover:bg-white/[0.02] cursor-pointer group"
+                              className="px-4 py-3.5 border-b border-[#e2e8f0] dark:border-[#30363d] flex items-center gap-6 hover:bg-[#f8fafc] dark:hover:bg-white/[0.02] cursor-pointer group transition-colors"
                             >
-                              <input type="checkbox" className="w-4 h-4 rounded bg-white/5 border-white/10" onClick={e => e.stopPropagation()}/>
-                              <button className="text-slate-600 hover:text-amber-500"><Star size={16} fill={email.isStarred ? "currentColor" : "none"}/></button>
-                              <img src={email.fromAvatar} className="w-10 h-10 rounded-full border border-white/5" />
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-[12px] font-black text-white uppercase truncate">{email.fromName}</h4>
-                                <p className="text-[11px] text-slate-500 truncate mt-1 italic">"{email.body}"</p>
+                              <div className="flex items-center gap-4 shrink-0">
+                                <input type="checkbox" className="w-4 h-4 rounded-[2px] bg-white dark:bg-black/20 border-[#e2e8f0] dark:border-[#30363d]" onClick={e => e.stopPropagation()}/>
+                                <button className={`hover:text-amber-500 ${email.isStarred ? 'text-amber-500' : 'text-slate-300'}`}><Star size={16} fill={email.isStarred ? "currentColor" : "none"}/></button>
                               </div>
-                              <div className="flex flex-col items-end gap-2 shrink-0">
-                                <span className="text-[10px] font-mono text-slate-500 uppercase">{email.timestamp}</span>
-                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${
-                                  email.label === 'Important' ? 'bg-emerald-500/10 text-emerald-500' :
-                                  email.label === 'Social' ? 'bg-rose-500/10 text-rose-500' :
-                                  'bg-indigo-500/10 text-indigo-500'
-                                }`}>{email.label}</span>
+                              <div className="w-48 shrink-0 flex items-center gap-3">
+                                <img src={email.fromAvatar} className="w-8 h-8 rounded-full border border-slate-100 dark:border-[#30363d]" />
+                                <span className="text-[12px] font-black text-[#007bff] truncate uppercase">{email.fromName}</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[12px] font-bold text-slate-800 dark:text-slate-300 truncate">
+                                  {email.subject} <span className="text-slate-400 font-normal"> - {email.body.slice(0, 80)}...</span>
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-4 shrink-0">
+                                {email.attachments && <Paperclip size={14} className="text-slate-400"/>}
+                                <span className="text-[10px] font-mono text-slate-500 uppercase">{email.timestamp} ago</span>
                               </div>
                             </div>
                           ))}
                         </div>
                       </>
-                    ) : (
-                      /* READ EMAIL VIEW */
+                    ) : emailView === 'read' ? (
+                      /* READ EMAIL VIEW - High Fidelity matching screenshot */
                       <div className="flex-1 flex flex-col overflow-hidden animate-in slide-in-from-right-4">
-                        <div className="p-4 lg:p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                           <div className="flex items-center gap-2 lg:gap-4">
-                              <button onClick={() => setEmailView('list')} className="p-2 hover:bg-white/5 rounded text-[#10918a]"><ArrowLeft size={18}/></button>
-                              <div className="flex items-center gap-2 lg:gap-3">
-                                 <button className="p-2 text-slate-500 hover:text-amber-500"><Star size={18}/></button>
-                                 <button className="p-2 text-slate-500 hover:text-white"><Clock size={18}/></button>
-                                 <button className="p-2 text-slate-500 hover:text-rose-500"><Trash2 size={18}/></button>
-                                 <button className="p-2 text-slate-500 hover:text-white"><Folder size={18}/></button>
-                                 <button className="p-2 text-slate-500 hover:text-white"><Tag size={18}/></button>
-                              </div>
+                        <div className="p-4 border-b border-[#e2e8f0] dark:border-[#30363d] flex items-center justify-between bg-[#f8fafc] dark:bg-[#0d1117]">
+                           <div className="flex items-center gap-1">
+                              <button onClick={() => setEmailView('list')} className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500 hover:text-[#007bff]"><ArrowLeft size={14}/></button>
+                              <button className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500"><Trash size={14}/></button>
+                              <button className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500"><Reply className="rotate-180" size={14}/></button>
+                              <button className="p-2 border border-[#e2e8f0] dark:border-[#30363d] bg-white dark:bg-[#161b22] rounded-[2px] text-slate-500"><Forward size={14}/></button>
                            </div>
                            <div className="flex items-center gap-4 text-[11px] text-slate-500 font-bold uppercase">
-                              <span className="hidden sm:inline">2 to 10</span>
+                              <span>2 to 10</span>
                               <div className="flex gap-1">
-                                 <button className="p-1 hover:bg-white/5 rounded"><ChevronLeft size={16}/></button>
-                                 <button className="p-1 hover:bg-white/5 rounded"><ChevronRight size={16}/></button>
+                                 <button className="p-1 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px]"><ChevronLeft size={14}/></button>
+                                 <button className="p-1 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px]"><ChevronRight size={14}/></button>
                               </div>
                            </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 lg:p-10 no-scrollbar space-y-10">
+                        <div className="flex-1 overflow-y-auto p-10 no-scrollbar space-y-8">
                            <div className="flex justify-between items-start">
-                              <div className="flex items-center gap-4">
-                                 <img src={selectedEmail?.fromAvatar} className="w-12 h-12 rounded-full border-2 border-white/10" />
-                                 <div>
-                                    <h3 className="text-[13px] font-black text-white">{selectedEmail?.from}</h3>
-                                    <button className="text-[10px] text-slate-500 font-bold flex items-center gap-1 hover:text-white transition-colors">to me <ChevronDown size={10}/></button>
+                              <div>
+                                 <h2 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{selectedEmail?.subject || 'Message Subject Is Placed Here'}</h2>
+                                 <div className="flex items-center gap-3 mt-4">
+                                    <img src={selectedEmail?.fromAvatar} className="w-10 h-10 rounded-full border border-[#e2e8f0] dark:border-[#30363d]" />
+                                    <div>
+                                       <h3 className="text-[13px] font-black text-[#007bff]">{selectedEmail?.from}</h3>
+                                       <p className="text-[10px] text-slate-500 font-bold flex items-center gap-1">to me <ChevronDown size={10}/></p>
+                                    </div>
                                  </div>
                               </div>
-                              <div className="text-right space-y-1">
-                                 <p className="text-[11px] font-bold text-slate-400">{selectedEmail?.fullDate}</p>
-                                 <p className="text-[9px] font-black uppercase text-indigo-500">{selectedEmail?.label || 'Direct'}</p>
+                              <div className="text-right">
+                                 <p className="text-[11px] font-bold text-slate-400 uppercase">{selectedEmail?.fullDate || '15 Feb. 2025 11:03 PM'}</p>
                               </div>
                            </div>
 
                            <div className="space-y-6">
-                              <h2 className="text-xl font-black text-white">{selectedEmail?.subject}</h2>
-                              <div className="text-[14px] text-slate-400 leading-loose font-medium whitespace-pre-line">
+                              <p className="text-[14px] text-slate-600 dark:text-slate-400 leading-relaxed font-medium">Hello John,</p>
+                              <div className="text-[14px] text-slate-600 dark:text-slate-400 leading-[1.8] font-medium whitespace-pre-line">
                                 {selectedEmail?.body}
                               </div>
-                              <div className="pt-10 border-t border-white/5 border-dashed">
-                                 <p className="text-xs text-slate-500 font-bold">Best,</p>
-                                 <p className="text-sm font-black text-white mt-1">{selectedEmail?.fromName}</p>
+                              <div className="pt-8">
+                                 <p className="text-sm text-slate-500 font-bold italic">Thanks,</p>
+                                 <p className="text-sm font-black text-slate-800 dark:text-white mt-1 uppercase tracking-tight">{selectedEmail?.fromName}</p>
                               </div>
                            </div>
 
-                           {/* ATTACHED SECTION */}
-                           {selectedEmail?.attachments && (
-                             <div className="space-y-4 pt-4">
-                                <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                                  <Paperclip size={14}/> Attached
-                                </h4>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                   {selectedEmail.attachments.map(att => (
-                                     <div key={att.id} className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl group hover:border-[#10918a] transition-all cursor-pointer shadow-sm">
-                                        <div className={`p-3 rounded-lg ${att.type === 'folder' ? 'bg-[#d1a67d]/20 text-[#d1a67d]' : 'bg-[#10918a]/20 text-[#10918a]'}`}>
-                                          {att.type === 'folder' ? <Folder size={24}/> : <FileText size={24}/>}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                           <p className="text-[11px] font-black text-white truncate">{att.name}</p>
-                                           <p className="text-[9px] text-slate-500 font-bold">{att.size}</p>
-                                        </div>
-                                        <Download size={16} className="text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                     </div>
-                                   ))}
+                           {/* ATTACHMENT CARDS - Matching Screenshot */}
+                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-10 border-t border-[#e2e8f0] dark:border-[#30363d]">
+                              {[
+                                { id: 1, name: 'Sep2014-report.pdf', size: '1,245 KB', type: 'pdf' },
+                                { id: 2, name: 'App Description.docx', size: '1,245 KB', type: 'docx' },
+                                { id: 3, name: 'photo1.png', size: '2.67 MB', type: 'image', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300' },
+                                { id: 4, name: 'photo2.png', size: '1.9 MB', type: 'image', img: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=300' }
+                              ].map(att => (
+                                <div key={att.id} className="bg-white dark:bg-[#0d1117] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] overflow-hidden group shadow-sm">
+                                  <div className="h-24 bg-slate-50 dark:bg-black/20 flex items-center justify-center relative">
+                                    {att.type === 'image' ? (
+                                      <img src={att.img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                                    ) : att.type === 'pdf' ? (
+                                      <FileText size={40} className="text-rose-500" />
+                                    ) : (
+                                      <FileText size={40} className="text-blue-500" />
+                                    )}
+                                  </div>
+                                  <div className="p-3 space-y-3">
+                                    <p className="text-[11px] font-black text-slate-800 dark:text-slate-300 truncate flex items-center gap-2 uppercase">
+                                      {att.type === 'pdf' ? <FileText size={12}/> : att.type === 'image' ? <ImageIcon size={12}/> : <File size={12}/>}
+                                      {att.name}
+                                    </p>
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[9px] text-slate-400 font-bold uppercase">{att.size}</span>
+                                      <button className="p-1.5 bg-[#f8fafc] dark:bg-[#161b22] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] text-slate-500 hover:text-[#007bff]"><Download size={12}/></button>
+                                    </div>
+                                  </div>
                                 </div>
-                             </div>
-                           )}
+                              ))}
+                           </div>
 
-                           {/* REPLY AREA */}
-                           <div className="pt-10">
-                              <div className="bg-[#0d1117] border border-white/5 rounded-2xl overflow-hidden shadow-inner">
-                                 <div className="flex flex-wrap items-center gap-1 p-3 border-b border-white/5 bg-white/[0.02]">
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Insert Code"><Code size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Undo"><Undo2 size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Redo"><Redo2 size={16}/></button>
-                                    <div className="w-px h-4 bg-white/10 mx-1"></div>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Bold"><Bold size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white font-serif font-black" title="Italic">I</button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Align Left"><AlignLeft size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Align Center"><AlignCenter size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Align Right"><AlignRight size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Bullet List"><List size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Attach"><Paperclip size={16}/></button>
-                                    <button className="p-2 text-slate-500 hover:text-white" title="Emoji"><Smile size={16}/></button>
-                                 </div>
-                                 <textarea className="w-full bg-transparent p-6 outline-none text-sm text-white placeholder:text-slate-600 h-48 resize-none font-medium leading-relaxed" placeholder="Type Message..."></textarea>
+                           <div className="flex gap-2 pt-10">
+                              <button className="px-6 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2 hover:bg-slate-100 transition-all"><Trash size={14}/> Delete</button>
+                              <button className="px-6 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2 hover:bg-slate-100 transition-all"><Printer size={14}/> Print</button>
+                              <div className="flex-1"></div>
+                              <button className="px-8 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2 hover:bg-slate-100 transition-all"><Reply className="rotate-180" size={14}/> Reply</button>
+                              <button className="px-8 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 flex items-center gap-2 hover:bg-slate-100 transition-all">Forward <Forward size={14}/></button>
+                           </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* COMPOSE NEW MESSAGE VIEW - Matching Screenshot */
+                      <div className="flex-1 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4">
+                        <div className="px-6 py-4 border-b border-[#e2e8f0] dark:border-[#30363d] flex items-center justify-between bg-[#f8fafc] dark:bg-[#0d1117]">
+                           <h2 className="text-xs font-black uppercase tracking-widest text-slate-500">Compose New Message</h2>
+                           <button onClick={() => setEmailView('list')} className="p-2 text-slate-400 hover:text-rose-500"><X size={20}/></button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar bg-white dark:bg-[#0d1117]">
+                           <div className="relative group">
+                             <input className="w-full bg-white dark:bg-[#161b22] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] py-3 px-4 text-xs font-bold dark:text-white outline-none focus:border-[#007bff]" placeholder="To:" />
+                           </div>
+                           <div className="relative group">
+                             <input className="w-full bg-white dark:bg-[#161b22] border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] py-3 px-4 text-xs font-bold dark:text-white outline-none focus:border-[#007bff]" placeholder="Subject:" />
+                           </div>
+
+                           <div className="border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] overflow-hidden flex flex-col h-[500px]">
+                              {/* Rich Text Toolbar - High Density */}
+                              <div className="flex flex-wrap items-center gap-1 p-2 bg-[#f8fafc] dark:bg-[#161b22] border-b border-[#e2e8f0] dark:border-[#30363d]">
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Redo2 className="rotate-180" size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Bold size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Italic size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500 font-serif font-black italic underline">U</button>
+                                 <div className="w-px h-5 bg-[#e2e8f0] dark:bg-[#30363d] mx-1"></div>
+                                 <select className="bg-white dark:bg-black/20 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] text-[10px] px-2 py-1 outline-none text-slate-500 font-bold uppercase">
+                                    <option>Source Sans Pro</option>
+                                    <option>JetBrains Mono</option>
+                                 </select>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500 font-black">A</button>
+                                 <div className="w-px h-5 bg-[#e2e8f0] dark:bg-[#30363d] mx-1"></div>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><AlignLeft size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><AlignCenter size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><AlignRight size={14}/></button>
+                                 <div className="w-px h-5 bg-[#e2e8f0] dark:bg-[#30363d] mx-1"></div>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><List size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Plus size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><ImageIcon size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><MoreHorizontal size={14}/></button>
+                                 <div className="w-px h-5 bg-[#e2e8f0] dark:bg-[#30363d] mx-1"></div>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Code size={14}/></button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500 text-[10px] font-black">?</button>
                               </div>
-                              <div className="flex flex-wrap gap-3 mt-6">
-                                 <button className="px-8 py-3 bg-[#10918a] text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl hover:brightness-110 transition-all active:scale-95"><Reply className="rotate-180" size={14}/> Reply</button>
-                                 <button className="px-8 py-3 bg-[#10918a]/10 text-[#10918a] border border-[#10918a]/20 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-[#10918a]/20 transition-all"><ReplyAll size={14}/> Reply All</button>
-                                 <button className="px-8 py-3 bg-[#10918a]/10 text-[#10918a] border border-[#10918a]/20 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-[#10918a]/20 transition-all">Forward <Forward size={14}/></button>
+                              <textarea className="flex-1 p-8 bg-white dark:bg-[#0d1117] outline-none text-[15px] dark:text-white font-medium leading-loose resize-none" placeholder="Type message..."></textarea>
+                           </div>
+
+                           <div className="space-y-4">
+                              <button className="flex items-center gap-2 px-4 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"><Paperclip size={14}/> Attachment</button>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Max. 32MB</p>
+                           </div>
+
+                           <div className="flex items-center justify-between pt-8 border-t border-[#e2e8f0] dark:border-[#30363d]">
+                              <button className="px-6 py-2 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 hover:text-rose-500 hover:border-rose-500 transition-all"><X size={14}/> Discard</button>
+                              <div className="flex gap-3">
+                                 <button className="px-8 py-2 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-white/10 transition-all"><FileText size={14}/> Draft</button>
+                                 <button className="px-10 py-2.5 bg-[#007bff] hover:bg-[#0069d9] text-white rounded-[2px] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-xl transition-all active:scale-95"><Send size={16}/> Send</button>
                               </div>
                            </div>
                         </div>
@@ -309,36 +380,39 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
             {activeTab === 'Dashboard' && (
               <div className="space-y-10 animate-in fade-in duration-500">
-                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {stats.map(s => (
-                      <div key={s.label} className="bg-[#1e1e2d] p-8 rounded-2xl border border-white/5 shadow-2xl group transition-all hover:-translate-y-1">
+                      <div key={s.label} className="bg-white dark:bg-[#161b22] p-6 rounded-[2px] border border-[#e2e8f0] dark:border-[#30363d] shadow-sm relative overflow-hidden group">
                          <div className="flex justify-between items-start mb-6">
-                            <div className={`p-3 rounded-xl bg-white/5 ${s.color}`}><Activity size={20}/></div>
-                            <span className="text-[9px] font-black uppercase text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">{s.trend}</span>
+                            <div className="p-3 bg-slate-50 dark:bg-black/20 rounded-[2px] border border-[#e2e8f0] dark:border-[#30363d] text-[#007bff]">
+                              {s.label.includes('Nodes') ? <Users size={20}/> : <Activity size={20}/>}
+                            </div>
+                            <span className={`text-[10px] font-black uppercase ${s.trend.startsWith('+') ? 'text-emerald-500' : 'text-rose-500'}`}>{s.trend}</span>
                          </div>
-                         <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">{s.label}</p>
-                         <h3 className="text-3xl font-black text-white mt-1 italic tracking-tighter ticker-text">{s.value}</h3>
+                         <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1 italic tracking-tighter ticker-text">{s.value}</h3>
+                         <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1">{s.label}</p>
+                         <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#007bff] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       </div>
                     ))}
                  </div>
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-[#1e1e2d] p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
-                       <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-widest flex items-center gap-2"><TrendingUp size={16} className="text-[#10918a]"/> Signal Intensity</h4>
-                       <div className="h-64"><ResponsiveContainer width="100%" height="100%"><AreaChart data={ANALYTICS}><Area type="monotone" dataKey="posts" stroke="#10918a" strokeWidth={3} fill="#10918a33" /></AreaChart></ResponsiveContainer></div>
+                    <div className="bg-white dark:bg-[#161b22] p-8 rounded-[2px] border border-[#e2e8f0] dark:border-[#30363d] shadow-sm space-y-8">
+                       <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-widest flex items-center gap-2"><TrendingUp size={16} className="text-[#007bff]"/> Signal Intensity</h4>
+                       <div className="h-64"><ResponsiveContainer width="100%" height="100%"><AreaChart data={ANALYTICS}><Area type="monotone" dataKey="posts" stroke="#007bff" strokeWidth={3} fill="#007bff11" /></AreaChart></ResponsiveContainer></div>
                     </div>
-                    <div className="bg-[#1e1e2d] p-8 rounded-3xl border border-white/5 shadow-2xl space-y-8">
-                       <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-widest flex items-center gap-2"><Database size={16} className="text-[#10918a]"/> Asset distribution</h4>
-                       <div className="h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={ANALYTICS}><Bar dataKey="messages" fill="#10918a" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div>
+                    <div className="bg-white dark:bg-[#161b22] p-8 rounded-[2px] border border-[#e2e8f0] dark:border-[#30363d] shadow-sm space-y-8">
+                       <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-widest flex items-center gap-2"><Database size={16} className="text-[#007bff]"/> Node Manifests</h4>
+                       <div className="h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={ANALYTICS}><Bar dataKey="messages" fill="#007bff" radius={[2, 2, 0, 0]} /></BarChart></ResponsiveContainer></div>
                     </div>
                  </div>
               </div>
             )}
           </main>
 
-          <footer className="h-14 border-t border-white/5 flex items-center justify-between px-8 bg-[#0d1117] shrink-0 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-            <div className="hidden sm:block">Copyright © 2025 <span className="text-white">ki-admin</span>. All rights reserved ❤️ V1.0.0</div>
+          <footer className="h-14 border-t border-[#e2e8f0] dark:border-[#30363d] flex items-center justify-between px-8 bg-white dark:bg-[#0d1117] shrink-0 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <div className="hidden sm:block">Copyright © 2025 <span className="text-[#007bff]">ki-admin</span>. All rights reserved ❤️ V1.0.0</div>
             <div className="flex items-center gap-4">
-              <button className="hover:text-white transition-colors">Need Help?</button>
+              <button className="hover:text-slate-900 dark:hover:text-white transition-colors">Need Help?</button>
             </div>
           </footer>
         </div>
@@ -347,33 +421,31 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         {customizerOpen && (
           <div className="fixed inset-0 z-[200] flex justify-end">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCustomizerOpen(false)}></div>
-            <aside className="relative w-full max-w-sm h-full bg-[#1e1e2d] border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
-              <div className="p-8 border-b border-white/10 bg-[#10918a]/10 flex justify-between items-start">
+            <aside className="relative w-full max-w-sm h-full bg-white dark:bg-[#1e1e2d] border-l border-[#e2e8f0] dark:border-white/10 flex flex-col animate-in slide-in-from-right duration-300 overflow-y-auto no-scrollbar">
+              <div className="p-8 border-b border-[#e2e8f0] dark:border-white/10 bg-[#f8fafc] dark:bg-[#007bff]/10 flex justify-between items-start">
                  <div className="space-y-2">
-                    <h2 className="text-xl font-black uppercase tracking-tight text-white leading-none">Admin Customizer</h2>
-                    <p className="text-[10px] text-[#10918a] font-bold">it's time to style according to your choice ..!</p>
+                    <h2 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-white leading-none">Admin Customizer</h2>
+                    <p className="text-[10px] text-[#007bff] font-bold uppercase tracking-widest">Style synchronization sequence</p>
                  </div>
-                 <button onClick={() => setCustomizerOpen(false)} className="p-2 text-white/50 hover:text-white transition-colors"><X size={24}/></button>
+                 <button onClick={() => setCustomizerOpen(false)} className="p-2 text-slate-400 hover:text-rose-500 transition-colors"><X size={24}/></button>
               </div>
 
               <div className="p-8 space-y-12">
-                 {/* Sidebar Option */}
                  <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-white/5 pb-2">Sidebar option</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 border-b border-[#e2e8f0] dark:border-white/5 pb-2">Sidebar option</h3>
                     <div className="grid grid-cols-3 gap-4">
                        {[
                          { id: 'vertical', label: 'Vertical' },
                          { id: 'horizontal', label: 'Horizontal' },
                          { id: 'dark', label: 'Dark' }
                        ].map(opt => (
-                         <button key={opt.id} onClick={() => setSidebarOpt(opt.id as any)} className={`relative p-1 rounded-lg border-2 transition-all overflow-hidden ${sidebarOpt === opt.id ? 'border-[#10918a]' : 'border-white/5 hover:border-white/20'}`}>
-                            {/* Added comment: Imported Check icon above to fix missing name error */}
-                            {sidebarOpt === opt.id && <div className="absolute top-1 left-1 bg-emerald-500 rounded-full p-0.5 z-10"><Check size={10} className="text-white"/></div>}
-                            <div className="aspect-[4/5] bg-white/5 rounded-md flex flex-col p-2 space-y-1">
-                               <div className="h-1 w-1/2 bg-white/10 rounded"></div>
-                               <div className="h-1 w-3/4 bg-white/10 rounded"></div>
-                               <div className={`mt-2 flex-1 rounded border-dashed border border-white/10 flex items-center justify-center bg-[#10918a]/5`}>
-                                  <span className="text-[7px] font-black uppercase text-white/40">{opt.label}</span>
+                         <button key={opt.id} onClick={() => setSidebarOpt(opt.id as any)} className={`relative p-1 rounded-[2px] border-2 transition-all overflow-hidden ${sidebarOpt === opt.id ? 'border-[#007bff]' : 'border-slate-200 dark:border-white/5 hover:border-[#007bff]/40'}`}>
+                            {sidebarOpt === opt.id && <div className="absolute top-1 left-1 bg-[#007bff] rounded-full p-0.5"><Check size={10} className="text-white"/></div>}
+                            <div className="aspect-[4/5] bg-slate-100 dark:bg-white/5 rounded-sm flex flex-col p-2 space-y-1">
+                               <div className="h-1 w-1/2 bg-slate-300 dark:bg-white/10 rounded-full"></div>
+                               <div className="h-1 w-3/4 bg-slate-300 dark:bg-white/10 rounded-full"></div>
+                               <div className={`mt-2 flex-1 rounded border-dashed border border-slate-300 dark:border-white/10 flex items-center justify-center`}>
+                                  <span className="text-[7px] font-black uppercase text-slate-400">{opt.label}</span>
                                </div>
                             </div>
                          </button>
@@ -381,45 +453,40 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                     </div>
                  </div>
 
-                 {/* Layout Option */}
                  <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-white/5 pb-2">Layout option</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 border-b border-[#e2e8f0] dark:border-white/5 pb-2">Layout option</h3>
                     <div className="grid grid-cols-3 gap-4">
                        {[
                          { id: 'ltr', label: 'LTR' },
                          { id: 'rtl', label: 'RTL' },
                          { id: 'box', label: 'Box' }
                        ].map(opt => (
-                         <button key={opt.id} onClick={() => setLayoutOpt(opt.id as any)} className={`relative p-1 rounded-lg border-2 transition-all overflow-hidden ${layoutOpt === opt.id ? 'border-[#10918a]' : 'border-white/5 hover:border-white/20'}`}>
-                            {/* Added comment: Imported Check icon above to fix missing name error */}
-                            {layoutOpt === opt.id && <div className="absolute top-1 left-1 bg-emerald-500 rounded-full p-0.5 z-10"><Check size={10} className="text-white"/></div>}
-                            <div className={`aspect-[4/5] ${opt.id === 'box' ? 'bg-white text-slate-900 shadow-xl' : 'bg-white/5'} rounded-md flex items-center justify-center`}>
-                               <span className={`text-[8px] font-black uppercase ${opt.id === 'box' ? 'text-slate-900' : 'text-white/40'}`}>{opt.label}</span>
+                         <button key={opt.id} onClick={() => setLayoutOpt(opt.id as any)} className={`relative p-1 rounded-[2px] border-2 transition-all overflow-hidden ${layoutOpt === opt.id ? 'border-[#007bff]' : 'border-slate-200 dark:border-white/5 hover:border-[#007bff]/40'}`}>
+                            {layoutOpt === opt.id && <div className="absolute top-1 left-1 bg-[#007bff] rounded-full p-0.5"><Check size={10} className="text-white"/></div>}
+                            <div className={`aspect-[4/5] ${opt.id === 'box' ? 'bg-[#007bff]/10 border-2 border-[#007bff]' : 'bg-slate-100 dark:bg-white/5'} rounded-sm flex items-center justify-center`}>
+                               <span className={`text-[8px] font-black uppercase ${opt.id === 'box' ? 'text-[#007bff]' : 'text-slate-400'}`}>{opt.label}</span>
                             </div>
                          </button>
                        ))}
                     </div>
                  </div>
 
-                 {/* Color Hint */}
                  <div className="space-y-6">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-white/5 pb-2">Color Hint</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 border-b border-[#e2e8f0] dark:border-white/5 pb-2">Color Hint</h3>
                     <div className="flex flex-wrap gap-3">
                        {[
+                         { c1: '#007bff', c2: '#cbd5e1' },
                          { c1: '#10918a', c2: '#cbd5e1' },
                          { c1: '#7e57c2', c2: '#3f51b5' },
-                         { c1: '#a1887f', c2: '#795548' },
-                         { c1: '#4db6ac', c2: '#26a69a' },
-                         { c1: '#1e88e5', c2: '#0d47a1' },
-                         { c1: '#880e4f', c2: '#4a148c' }
+                         { c1: '#f43f5e', c2: '#cbd5e1' },
+                         { c1: '#1e293b', c2: '#cbd5e1' }
                        ].map((c, i) => (
                          <button 
                            key={i} 
                            onClick={() => setActiveColor(c.c1)} 
-                           className={`w-12 h-16 rounded-xl border-2 overflow-hidden transition-all relative ${activeColor === c.c1 ? 'border-[#10918a] scale-110 shadow-lg' : 'border-white/5 hover:border-white/20'}`}
+                           className={`w-10 h-16 rounded-[4px] border-2 overflow-hidden transition-all relative ${activeColor === c.c1 ? 'border-[#007bff] scale-110 shadow-lg' : 'border-slate-200 dark:border-white/5 hover:border-[#007bff]/40'}`}
                          >
-                            {/* Added comment: Imported Check icon above to fix missing name error */}
-                            {activeColor === c.c1 && <div className="absolute top-1 left-1 bg-emerald-500 rounded-full p-0.5 z-10"><Check size={10} className="text-white"/></div>}
+                            {activeColor === c.c1 && <div className="absolute top-1 left-1 bg-[#007bff] rounded-full p-0.5 z-10"><Check size={10} className="text-white"/></div>}
                             <div className="h-1/2 w-full" style={{ backgroundColor: c.c1 }}></div>
                             <div className="h-1/2 w-full" style={{ backgroundColor: c.c2 }}></div>
                          </button>
@@ -427,17 +494,15 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                     </div>
                  </div>
 
-                 {/* Text Size */}
                  <div className="space-y-6 pb-20">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-white border-b border-white/5 pb-2">Text size</h3>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 border-b border-[#e2e8f0] dark:border-white/5 pb-2">Text size</h3>
                     <div className="flex gap-2">
                        {['sm', 'md', 'lg'].map(sz => (
                          <button 
                            key={sz} 
                            onClick={() => setTextSize(sz as any)}
-                           className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${textSize === sz ? 'bg-[#10918a] border-transparent text-white' : 'border-white/10 text-slate-500 hover:text-white'}`}
+                           className={`px-6 py-2 rounded-[2px] text-[10px] font-black uppercase tracking-widest border transition-all ${textSize === sz ? 'bg-[#007bff] border-transparent text-white' : 'border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                          >
-                            {/* Added comment: Imported Check icon above to fix missing name error */}
                             {textSize === sz && <Check size={12} className="inline mr-2"/>}
                             {sz}
                          </button>
@@ -452,7 +517,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .animate-spin-slow { animation: spin 6s linear infinite; }
+        .animate-spin-slow { animation: spin 8s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .ticker-text { font-variant-numeric: tabular-nums; }
       `}</style>

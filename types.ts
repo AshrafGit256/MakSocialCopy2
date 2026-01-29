@@ -9,6 +9,21 @@ export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC'
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
+export interface PlatformEmail {
+  id: string;
+  from: string;
+  fromName: string;
+  to: string[];
+  cc?: string[];
+  bcc?: string[];
+  subject: string;
+  body: string;
+  timestamp: string;
+  isRead: boolean;
+  folder: 'inbox' | 'sent' | 'drafts' | 'trash';
+  isFlagged?: boolean;
+}
+
 export interface GroupMessage {
   id: string;
   author: string;
@@ -162,6 +177,7 @@ export interface User {
   avatar: string;
   connections: number;
   email?: string;
+  altEmail?: string;
   college: College | 'Global';
   status: UserStatus;
   subscriptionTier: SubscriptionTier; 
@@ -178,6 +194,13 @@ export interface User {
   education?: string;
   location?: string;
   skills?: string[];
+  socials?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+    gmail?: string;
+  };
 }
 
 export interface Comment {

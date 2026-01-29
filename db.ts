@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment, Group, GroupMessage } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, Ad, RevenuePoint, ResourceType, Notification, AuditLog, FlaggedContent, Comment, Group, GroupMessage, PlatformEmail } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -12,101 +12,53 @@ const DB_KEYS = {
   OPPORTUNITIES: 'maksocial_opps_v5',
   NOTIFICATIONS: 'maksocial_notifications_v5',
   BOOKMARKS: 'maksocial_bookmarks_v1',
-  GROUPS: 'maksocial_groups_v1'
+  GROUPS: 'maksocial_groups_v1',
+  EMAILS: 'maksocial_emails_v1'
 };
 
-const MOCK_GROUPS: Group[] = [
-  {
-    id: 'g-1',
-    name: '89th Guild Cabinet',
-    description: 'Official coordination hub for the Guild Leadership. Strategy sessions and welfare reports.',
-    image: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
-    isOfficial: true,
-    creatorId: 'vc_office',
-    memberIds: ['vc_office', 'u1', 'u2', 'u3'],
-    category: 'Global',
-    messages: [
-      { id: 'm1', author: 'Guild President', authorId: 'gp', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GP', text: 'Has the welfare report for CEDAT been synchronized yet?', timestamp: '09:00 AM' },
-      { id: 'm2', author: 'Secretary General', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SG', text: 'Processing now. We found some connectivity issues in the North Wing.', timestamp: '09:05 AM' },
-      { id: 'm3', author: 'Prof. Barnabas', authorId: 'vc_office', authorAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg', text: 'Ensure the 89th inauguration ceremony budget is finalized by EOD.', timestamp: '10:30 AM' }
-    ]
-  },
-  {
-    id: 'g-2',
-    name: 'COCIS Alpha-Net',
-    description: 'A deep-tech hub for AI research, cybersecurity drills, and software architecture.',
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=400',
-    isOfficial: false,
-    creatorId: 'u1',
-    memberIds: ['u1', 'u4', 'u5'],
-    category: 'COCIS',
-    messages: [
-      { id: 'm4', author: 'Admin Node', authorId: 'u1', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin', text: 'I have uploaded the new neural network weights for the exam-bot project.', timestamp: 'Yesterday' },
-      { id: 'm5', author: 'Security Lead', authorId: 'u4', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sec', text: 'Verified. SHA-256 handshake successful.', timestamp: 'Yesterday', attachment: { name: 'model_weights.bin', type: 'document', data: '#' } }
-    ]
-  },
-  {
-    id: 'g-3',
-    name: 'CEDAT Design Lab',
-    description: 'Visual arts, architecture prototypes, and 3D modeling synchronization.',
-    image: 'https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&w=400',
-    isOfficial: false,
-    creatorId: 'u2',
-    memberIds: ['u2', 'u6'],
-    category: 'CEDAT',
-    messages: [
-      { id: 'm6', author: 'Sarah Design', authorId: 'u2', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', text: 'Check out the proposed structure for the new Student Center.', timestamp: '11:20 AM', attachment: { name: 'render_v1.png', type: 'image', data: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800' } },
-      { id: 'm7', author: 'Architect Node', authorId: 'u6', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arch', text: 'The glass facade looks impressive, but we need to check the structural integrity of the west wing.', timestamp: '11:45 AM' }
-    ]
-  },
-  {
-    id: 'g-4',
-    name: 'Hill Marathon Committee',
-    description: 'Organizing the 2026 Hill Marathon. Athletics and logistics sync.',
-    image: 'https://images.unsplash.com/photo-1461896756981-2258bb3f6714?auto=format&fit=crop&w=400',
-    isOfficial: true,
-    creatorId: 'u3',
-    memberIds: ['u3', 'u7', 'u8'],
-    category: 'Global',
-    messages: [
-      { id: 'm8', author: 'Sports Rep', authorId: 'u3', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sports', text: 'Registration nodes are now active at Freedom Square.', timestamp: '08:00 AM' }
-    ]
-  }
-];
-
 export const REVENUE_HISTORY: RevenuePoint[] = [
-  { month: 'Jan', revenue: 800000, expenses: 600000, subscribers: 120, growth: 5 },
-  { month: 'Feb', revenue: 950000, expenses: 650000, subscribers: 150, growth: 12 },
-  { month: 'Mar', revenue: 1200000, expenses: 700000, subscribers: 200, growth: 15 },
-  { month: 'Apr', revenue: 1100000, expenses: 750000, subscribers: 180, growth: -5 },
-  { month: 'May', revenue: 1500000, expenses: 800000, subscribers: 250, growth: 20 },
-  { month: 'Jun', revenue: 1800000, expenses: 850000, subscribers: 300, growth: 25 }
+  { month: 'Jan', revenue: 4000, expenses: 2500, subscribers: 120, growth: 5 },
+  { month: 'Feb', revenue: 4500, expenses: 2600, subscribers: 145, growth: 8 },
+  { month: 'Mar', revenue: 5000, expenses: 2800, subscribers: 180, growth: 12 },
+  { month: 'Apr', revenue: 6200, expenses: 3100, subscribers: 210, growth: 15 },
+  { month: 'May', revenue: 7800, expenses: 3500, subscribers: 240, growth: 20 },
+  { month: 'Jun', revenue: 3500, expenses: 2000, subscribers: 250, growth: -5 }
 ];
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
-  COCIS: ['Computer Science', 'Information Technology', 'Software Engineering', 'Information Systems'],
+  COCIS: ['Computer Science', 'Software Engineering', 'Information Systems', 'Information Technology'],
   CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering'],
-  CHUSS: ['Psychology', 'Social Work', 'Journalism', 'Literature'],
+  CHUSS: ['Psychology', 'Philosophy', 'Literature', 'Social Work'],
   CONAS: ['Mathematics', 'Physics', 'Biology', 'Chemistry'],
-  CHS: ['Medicine', 'Nursing', 'Public Health', 'Pharmacy'],
+  CHS: ['Medicine', 'Nursing', 'Pharmacy', 'Public Health'],
   CAES: ['Agriculture', 'Environmental Science', 'Food Science'],
-  COBAMS: ['Economics', 'Statistics', 'Business Administration', 'Commerce'],
-  CEES: ['Education', 'Adult Education', 'Distance Learning'],
-  LAW: ['Bachelor of Laws', 'Human Rights', 'Commercial Law']
+  COBAMS: ['Economics', 'Statistics', 'Business Administration', 'Actuarial Science'],
+  CEES: ['Education', 'Adult Education', 'Human Resource Development'],
+  LAW: ['Civil Law', 'Criminal Law', 'International Law', 'Human Rights']
 };
 
-const INITIAL_EVENTS: CalendarEvent[] = [
+const MOCK_EMAILS: PlatformEmail[] = [
   {
-    id: 'ev-1',
-    title: '89th Guild Inauguration Gala',
-    description: 'The official synchronization ceremony for the new student leadership.',
-    date: new Date().toISOString().split('T')[0],
-    time: '18:00',
-    location: 'Freedom Square / Main Hall',
-    image: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200',
-    category: 'Social',
-    createdBy: 'vc_office',
-    attendeeIds: []
+    id: 'em-1',
+    from: 'vc@mak.ac.ug',
+    fromName: 'Prof. Barnabas Nawangwe',
+    to: ['admin@mak.ac.ug'],
+    subject: 'Hill Intelligence Strategy 2026',
+    body: 'The central registry requires a full audit of all active signals in the COCIS wing before the end of the semester.',
+    timestamp: '10:00 AM',
+    isRead: false,
+    folder: 'inbox'
+  },
+  {
+    id: 'em-2',
+    from: 'support@mak.ac.ug',
+    fromName: 'Technical Council',
+    to: ['admin@mak.ac.ug'],
+    subject: 'System Maintenance: Node Blackout',
+    body: 'We are scheduling a brief blackout for neural network maintenance on Saturday at 0300hrs.',
+    timestamp: 'Yesterday',
+    isRead: true,
+    folder: 'inbox'
   }
 ];
 
@@ -118,6 +70,7 @@ const INITIAL_USERS: User[] = [
     avatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
     connections: 45200,
     email: 'vc@mak.ac.ug',
+    altEmail: 'barnabas.n@gmail.com',
     college: 'Global',
     status: 'Graduate',
     subscriptionTier: 'Enterprise',
@@ -130,7 +83,49 @@ const INITIAL_USERS: User[] = [
     appliedTo: [],
     bio: 'Architect of the Hill\'s future.',
     location: 'Main Administration Wing',
-    skills: ['Institutional Leadership', 'Strategy']
+    skills: ['Institutional Leadership', 'Strategy'],
+    socials: { twitter: '@ProfBarnabas', linkedin: 'bnawangwe', gmail: 'barnabas.n@gmail.com' }
+  },
+  {
+    id: 'u-jayda',
+    name: 'Jayda Ferry',
+    role: 'Marketing Management',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jayda',
+    connections: 840,
+    email: 'jayda.f@mak.ac.ug',
+    altEmail: 'jayda.ferry88@gmail.com',
+    college: 'COBAMS',
+    status: 'Finalist',
+    subscriptionTier: 'Pro',
+    joinedColleges: ['COBAMS'],
+    postsCount: 20,
+    followersCount: 450,
+    followingCount: 210,
+    totalLikesCount: 1200,
+    badges: [],
+    appliedTo: [],
+    bio: 'The Marketing Development Manager builds a customer base for the food platform.',
+    socials: { facebook: 'jayda.ferry', twitter: '@jayda_f', gmail: 'jayda.ferry88@gmail.com' }
+  },
+  {
+    id: 'u-liya',
+    name: 'Liya Tokyo',
+    role: 'CEO',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liya',
+    connections: 2500,
+    email: 'liya.t@admin.mak.ac.ug',
+    college: 'Global',
+    status: 'Graduate',
+    subscriptionTier: 'Enterprise',
+    joinedColleges: ['Global'],
+    postsCount: 45,
+    followersCount: 8900,
+    followingCount: 15,
+    totalLikesCount: 15000,
+    badges: ['Administrator', 'Verified'],
+    appliedTo: [],
+    bio: 'Manage overall operations and make major decisions affecting the platform.',
+    socials: { linkedin: 'liyatokyo' }
   }
 ];
 
@@ -204,7 +199,7 @@ export const db = {
     const resources = db.getResources();
     localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...resources]));
   },
-  getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, INITIAL_EVENTS),
+  getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, []),
   saveCalendarEvent: (event: CalendarEvent) => {
     const events = db.getCalendarEvents();
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...events]));
@@ -237,7 +232,7 @@ export const db = {
     const posts = db.getPosts();
     return posts.filter(p => p.isOpportunity);
   },
-  getGroups: (): Group[] => parseArray<Group>(DB_KEYS.GROUPS, MOCK_GROUPS),
+  getGroups: (): Group[] => parseArray<Group>(DB_KEYS.GROUPS, []),
   saveGroups: (groups: Group[]) => localStorage.setItem(DB_KEYS.GROUPS, JSON.stringify(groups)),
   joinGroup: (groupId: string, userId: string) => {
     const groups = db.getGroups();
@@ -258,6 +253,12 @@ export const db = {
       return g;
     });
     db.saveGroups(updated);
+  },
+  getEmails: (): PlatformEmail[] => parseArray<PlatformEmail>(DB_KEYS.EMAILS, MOCK_EMAILS),
+  saveEmails: (emails: PlatformEmail[]) => localStorage.setItem(DB_KEYS.EMAILS, JSON.stringify(emails)),
+  sendEmail: (email: PlatformEmail) => {
+    const emails = db.getEmails();
+    db.saveEmails([email, ...emails]);
   },
   getAuditLogs: (): AuditLog[] => [],
   getFlagged: (): FlaggedContent[] => [],

@@ -9,19 +9,30 @@ export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC'
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
+export interface EmailAttachment {
+  id: string;
+  name: string;
+  size: string;
+  type: 'file' | 'folder';
+}
+
 export interface PlatformEmail {
   id: string;
   from: string;
   fromName: string;
+  fromAvatar: string;
   to: string[];
   cc?: string[];
   bcc?: string[];
   subject: string;
   body: string;
   timestamp: string;
+  fullDate: string;
   isRead: boolean;
-  folder: 'inbox' | 'sent' | 'drafts' | 'trash';
-  isFlagged?: boolean;
+  isStarred: boolean;
+  folder: 'inbox' | 'sent' | 'draft' | 'trash' | 'spam';
+  label?: 'Social' | 'Company' | 'Important' | 'Private';
+  attachments?: EmailAttachment[];
 }
 
 export interface GroupMessage {

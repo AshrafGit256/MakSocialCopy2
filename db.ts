@@ -13,7 +13,7 @@ const DB_KEYS = {
   NOTIFICATIONS: 'maksocial_notifications_v5',
   BOOKMARKS: 'maksocial_bookmarks_v1',
   GROUPS: 'maksocial_groups_v1',
-  EMAILS: 'maksocial_emails_v1'
+  EMAILS: 'maksocial_emails_v2'
 };
 
 export const REVENUE_HISTORY: RevenuePoint[] = [
@@ -40,25 +40,52 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
 const MOCK_EMAILS: PlatformEmail[] = [
   {
     id: 'em-1',
-    from: 'vc@mak.ac.ug',
-    fromName: 'Prof. Barnabas Nawangwe',
+    from: 'gene.hart@mak.ac.ug',
+    fromName: 'Gene Hart',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Gene',
     to: ['admin@mak.ac.ug'],
     subject: 'Hill Intelligence Strategy 2026',
-    body: 'The central registry requires a full audit of all active signals in the COCIS wing before the end of the semester.',
-    timestamp: '10:00 AM',
+    body: 'Hello Admin!\n\nI hope you\'re doing well. I would like to schedule a one-on-one meeting with you to discussing a new project. I\'ll send over the agenda in advance.\n\nThe meeting will be in my office, will you be available one-on-one 10 Oct, 2024 at 10PM? It\'s important that we have this meeting so that we can continue to work effectively together.\n\nI hope you can make it!\nBest,\nAR team',
+    timestamp: 'sep 23',
+    fullDate: 'Sep 23 2024, 4:00 PM',
     isRead: false,
-    folder: 'inbox'
+    isStarred: false,
+    folder: 'inbox',
+    label: 'Important',
+    attachments: [
+      { id: 'at-1', name: "Meeting Paper's", size: '1MB', type: 'file' },
+      { id: 'at-2', name: "Project Details", size: '18 Files', type: 'folder' }
+    ]
   },
   {
     id: 'em-2',
-    from: 'support@mak.ac.ug',
-    fromName: 'Technical Council',
+    from: 'neil.fisher@gmail.com',
+    fromName: 'Neil Fisher',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Neil',
     to: ['admin@mak.ac.ug'],
     subject: 'System Maintenance: Node Blackout',
-    body: 'We are scheduling a brief blackout for neural network maintenance on Saturday at 0300hrs.',
-    timestamp: 'Yesterday',
+    body: 'It enables users to easily send and receive documents, images, links and other data nodes across the hill.',
+    timestamp: 'Oct 23',
+    fullDate: 'Oct 23 2024, 11:30 AM',
     isRead: true,
-    folder: 'inbox'
+    isStarred: true,
+    folder: 'inbox',
+    label: 'Company'
+  },
+  {
+    id: 'em-3',
+    from: 'simon.young@mak.ac.ug',
+    fromName: 'Simon Young',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Simon',
+    to: ['admin@mak.ac.ug'],
+    subject: 'Cluster Authorization Request',
+    body: 'Companies can use email to convey information to a large number of nodes.',
+    timestamp: 'Dec 22',
+    fullDate: 'Dec 22 2024, 9:00 AM',
+    isRead: true,
+    isStarred: false,
+    folder: 'inbox',
+    label: 'Social'
   }
 ];
 
@@ -106,26 +133,6 @@ const INITIAL_USERS: User[] = [
     appliedTo: [],
     bio: 'The Marketing Development Manager builds a customer base for the food platform.',
     socials: { facebook: 'jayda.ferry', twitter: '@jayda_f', gmail: 'jayda.ferry88@gmail.com' }
-  },
-  {
-    id: 'u-liya',
-    name: 'Liya Tokyo',
-    role: 'CEO',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Liya',
-    connections: 2500,
-    email: 'liya.t@admin.mak.ac.ug',
-    college: 'Global',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    joinedColleges: ['Global'],
-    postsCount: 45,
-    followersCount: 8900,
-    followingCount: 15,
-    totalLikesCount: 15000,
-    badges: ['Administrator', 'Verified'],
-    appliedTo: [],
-    bio: 'Manage overall operations and make major decisions affecting the platform.',
-    socials: { linkedin: 'liyatokyo' }
   }
 ];
 

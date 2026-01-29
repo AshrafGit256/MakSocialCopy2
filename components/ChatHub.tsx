@@ -1,0 +1,256 @@
+
+import React, { useState, useEffect, useRef } from 'react';
+import { db } from '../db';
+import { ChatConversation, ChatMessage } from '../types';
+import { 
+  MessageSquare, Users, Phone, Video, Settings, Search, 
+  MoreVertical, Send, Mic, Image, Paperclip, Smile,
+  ChevronRight, ArrowLeft, Zap, Info, ShieldCheck, 
+  Radio, BookOpen, Clock, CheckCircle2, UserPlus,
+  Plus, Edit3, Trash2
+} from 'lucide-react';
+
+const ChatHub: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'Chat' | 'Updates' | 'Contact'>('Chat');
+  const [chatType, setChatType] = useState<'Private' | 'Group'>('Private');
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [currentUser] = useState(db.getUser());
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sync = () => {
+      const chats = db.getChats();
+      setConversations(chats);
+      if (chats.length > 0 && !activeChatId) setActiveChatId(chats[0].id);
+    };
+    sync();
+  }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [activeChatId, conversations]);
+
+  const activeChat = conversations.find(c => c.id === activeChatId);
+
+  const handleSend = () => {
+    if (!newMessage.trim() || !activeChatId) return;
+    const msg: ChatMessage = {
+      id: `m-${Date.now()}`,
+      text: newMessage,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isMe: true
+    };
+    const updated = conversations.map(c => c.id === activeChatId ? { ...c, messages: [...c.messages, msg], lastMessage: newMessage, lastTimestamp: msg.timestamp } : c);
+    setConversations(updated);
+    db.saveChats(updated);
+    setNewMessage('');
+  };
+
+  const filteredConversations = conversations.filter(c => 
+    (chatType === 'Private' ? !c.isGroup : c.isGroup)
+  );
+
+  return (
+    <div className="flex h-full bg-[#0d1117] overflow-hidden text-[#c9d1d9] font-sans border-t border-white/5">
+      {/* 1. Sidebar */}
+      <aside className="w-80 border-r border-white/5 flex flex-col bg-[#0d1117] shrink-0 z-20">
+        <div className="p-6 space-y-6">
+          {/* My Profile Brief */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <img src={currentUser.avatar} className="w-12 h-12 rounded-full border border-white/10" />
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0d1117] rounded-full"></div>
+              </div>
+              <div>
+                <h3 className="text-sm font-black uppercase text-white">{currentUser.name}</h3>
+                <p className="text-[10px] font-bold text-slate-500 uppercase">{currentUser.role}</p>
+              </div>
+            </div>
+            <button className="p-2 text-slate-500 hover:text-white"><Settings size={18}/></button>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-6 border-b border-white/5">
+            {[
+              { id: 'Chat', icon: <MessageSquare size={18}/> },
+              { id: 'Updates', icon: <Radio size={18}/> },
+              { id: 'Contact', icon: <Phone size={18}/> }
+            ].map(tab => (
+              <button 
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`pb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest relative transition-all ${activeTab === tab.id ? 'text-[#10918a]' : 'text-slate-500'}`}
+              >
+                {tab.icon} {tab.id}
+                {activeTab === tab.id && <div className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#10918a]"></div>}
+              </button>
+            ))}
+          </div>
+
+          {/* Chat Type Toggles (only if Chat tab is active) */}
+          {activeTab === 'Chat' && (
+            <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/5">
+              <button 
+                onClick={() => setChatType('Private')}
+                className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${chatType === 'Private' ? 'bg-[#10918a]/20 text-[#10918a] shadow-lg border border-[#10918a]/30' : 'text-slate-500 hover:text-slate-300'}`}
+              >
+                <Lock size={14}/> Private
+              </button>
+              <button 
+                onClick={() => setChatType('Group')}
+                className={`flex-1 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${chatType === 'Group' ? 'bg-[#10918a]/20 text-[#10918a] shadow-lg border border-[#10918a]/30' : 'text-slate-500 hover:text-slate-300'}`}
+              >
+                <Users size={14}/> Group
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Conversation List */}
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          {activeTab === 'Chat' ? (
+            filteredConversations.map(chat => (
+              <button 
+                key={chat.id}
+                onClick={() => setActiveChatId(chat.id)}
+                className={`w-full flex items-center gap-4 px-6 py-5 border-b border-white/5 transition-all text-left group ${activeChatId === chat.id ? 'bg-[#10918a]/5' : 'hover:bg-white/5'}`}
+              >
+                <div className="relative shrink-0">
+                  <img src={chat.user.avatar} className="w-12 h-12 rounded-full border border-white/10" />
+                  {chat.user.status === 'online' && <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0d1117] rounded-full"></div>}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <h4 className="text-[12px] font-black uppercase tracking-tight truncate">{chat.user.name}</h4>
+                    <span className="text-[9px] font-mono text-slate-500">{chat.lastTimestamp}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 truncate italic font-medium">
+                    {chat.unreadCount > 0 ? <span className="text-[#10918a] not-italic">typing...</span> : chat.lastMessage}
+                  </p>
+                </div>
+                {chat.unreadCount > 0 && <span className="bg-[#10918a] text-white px-2 py-0.5 rounded-full text-[8px] font-black">{chat.unreadCount}+</span>}
+              </button>
+            ))
+          ) : (
+            <div className="py-20 text-center opacity-30 space-y-4">
+              <Zap size={48} className="mx-auto" />
+              <p className="text-[10px] font-black uppercase tracking-[0.4em]">Section offline</p>
+            </div>
+          )}
+        </div>
+
+        <button className="m-6 p-4 bg-[#10918a] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-all absolute bottom-20 left-64 lg:static lg:ml-auto">
+          <Plus size={24} />
+        </button>
+      </aside>
+
+      {/* 2. Main Chat Area */}
+      <main className="flex-1 flex flex-col min-w-0 h-full relative bg-[#0d1117]">
+        {activeChat ? (
+          <>
+            {/* Header */}
+            <div className="h-20 border-b border-white/5 px-8 flex items-center justify-between bg-[#0d1117]/80 backdrop-blur-md shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <img src={activeChat.user.avatar} className="w-12 h-12 rounded-full border border-white/10" />
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#0d1117] rounded-full"></div>
+                </div>
+                <div>
+                  <h2 className="text-base font-black uppercase tracking-tight">{activeChat.user.name}</h2>
+                  <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div> Online
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button className="p-3 bg-[#10918a]/10 text-[#10918a] rounded-xl hover:bg-[#10918a] hover:text-white transition-all"><Phone size={18}/></button>
+                <button className="p-3 bg-[#10918a]/10 text-[#10918a] rounded-xl hover:bg-[#10918a] hover:text-white transition-all"><Video size={18}/></button>
+                <button className="p-3 bg-white/5 text-slate-500 rounded-xl hover:text-white transition-all"><Settings size={18}/></button>
+              </div>
+            </div>
+
+            {/* Message Feed with Pattern Background */}
+            <div 
+              ref={scrollRef} 
+              className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar relative"
+              style={{
+                backgroundImage: 'linear-gradient(rgba(13, 17, 23, 0.95), rgba(13, 17, 23, 0.95)), url("https://www.transparenttextures.com/patterns/cubes.png")',
+                backgroundBlendMode: 'overlay'
+              }}
+            >
+              <div className="flex items-center gap-4 mb-12">
+                <div className="h-px flex-1 bg-white/5"></div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Today</span>
+                <div className="h-px flex-1 bg-white/5"></div>
+              </div>
+
+              {activeChat.messages.map(msg => (
+                <div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
+                  <div className={`flex gap-3 max-w-[80%] ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <img src={msg.isMe ? currentUser.avatar : activeChat.user.avatar} className="w-8 h-8 rounded-full border border-white/5 self-end mb-1" />
+                    <div className="flex flex-col gap-1">
+                      <div className={`p-4 rounded-2xl shadow-xl leading-relaxed text-sm font-medium ${
+                        msg.isMe 
+                        ? 'bg-[#10918a] text-white rounded-br-none' 
+                        : 'bg-[#d1a67d] text-slate-900 rounded-bl-none'
+                      }`}>
+                        {msg.text}
+                      </div>
+                      <span className={`text-[9px] font-mono text-slate-500 uppercase tracking-widest ${msg.isMe ? 'text-right' : 'text-left'}`}>
+                        {msg.timestamp} {msg.isMe && <CheckCheck className="inline ml-1 text-emerald-500" size={10}/>}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Input Terminal */}
+            <div className="p-6 bg-[#0d1117] border-t border-white/5">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-2 flex items-center gap-2 shadow-inner">
+                <button className="p-3 text-slate-500 hover:text-white transition-colors"><Smile size={20}/></button>
+                <input 
+                  value={newMessage}
+                  onChange={e => setNewMessage(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSend()}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:text-slate-600"
+                />
+                <div className="flex items-center gap-1">
+                  <button onClick={handleSend} className="bg-[#10918a] text-white p-3 rounded-xl shadow-lg shadow-[#10918a]/30 active:scale-95 transition-all"><Send size={18}/></button>
+                  <button className="p-3 text-slate-500 hover:text-white transition-colors"><Mic size={20}/></button>
+                  <button className="p-3 text-slate-500 hover:text-white transition-colors"><Image size={20}/></button>
+                  <button className="p-3 text-slate-500 hover:text-white transition-colors"><Paperclip size={20}/></button>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center opacity-10 space-y-6">
+            <MessageSquare size={120} />
+            <h2 className="text-4xl font-black uppercase italic tracking-tighter">Awaiting Uplink</h2>
+          </div>
+        )}
+      </main>
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .animate-spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
+    </div>
+  );
+};
+
+const CheckCheck: React.FC<{ size?: number; className?: string }> = ({ size = 16, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 6L7 17l-5-5" />
+    <path d="m22 10-7.5 7.5L13 16" />
+  </svg>
+);
+
+export default ChatHub;

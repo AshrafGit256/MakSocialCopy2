@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Home, Search, MessageCircle, User, Calendar, BookOpen, Bell, Award, Users
@@ -52,11 +53,11 @@ export const MOCK_POSTS: Post[] = [
     author: 'MTN Uganda',
     authorId: 'mtn_official',
     authorRole: 'Pulse Partner',
-    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocial10.png',
     authorAuthority: 'Corporate',
     isAd: true,
     timestamp: 'Just now',
-    video: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MTN.mp4',
+    video: 'https://raw.githubusercontent.com/AshrafGit256/MTN.mp4',
     content: `<h1>MTN Pulse: Node Synchronization</h1>
 <p>Get the most aggressive data bundles on the Hill. Dial <b>*157#</b> to synchronize your device with the Pulse strata. No sugary coating, just pure bandwidth for your research nodes.</p>`,
     hashtags: ['#MTNPulse', '#DataSync', '#MakerereConnect'],
@@ -162,12 +163,15 @@ export const MOCK_POSTS: Post[] = [
 ];
 
 // MOCK_CHATS export to resolve import errors in Chat.tsx
+// Added lastTimestamp and isGroup to fix compilation errors
 export const MOCK_CHATS: ChatConversation[] = [
   {
     id: 'chat-1',
     user: { name: 'Dr. John S.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John' },
     unreadCount: 2,
     lastMessage: 'Handshake successful. Ready for uplink.',
+    lastTimestamp: '10:01 AM',
+    isGroup: false,
     messages: [
       { id: 'm1', text: 'Initializing protocol...', timestamp: '10:00 AM', isMe: false },
       { id: 'm2', text: 'Handshake successful. Ready for uplink.', timestamp: '10:01 AM', isMe: false }
@@ -178,6 +182,8 @@ export const MOCK_CHATS: ChatConversation[] = [
     user: { name: 'Sarah CEDAT', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
     unreadCount: 0,
     lastMessage: 'The CAD assets are synchronized.',
+    lastTimestamp: '09:45 AM',
+    isGroup: false,
     messages: [
       { id: 'm3', text: 'Requesting CAD assets for wing review.', timestamp: '09:30 AM', isMe: true },
       { id: 'm4', text: 'The CAD assets are synchronized.', timestamp: '09:45 AM', isMe: false }
@@ -188,6 +194,8 @@ export const MOCK_CHATS: ChatConversation[] = [
     user: { name: 'Roy Ssemboga', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy' },
     unreadCount: 0,
     lastMessage: 'Signal confirmed.',
+    lastTimestamp: '11:10 AM',
+    isGroup: false,
     messages: [
       { id: 'm5', text: 'Has the CEDAT wing connectivity stabilized?', timestamp: '11:00 AM', isMe: true },
       { id: 'm6', text: 'Signal confirmed. Node 4 is active.', timestamp: '11:10 AM', isMe: false }

@@ -144,7 +144,6 @@ export interface Post {
   eventLocation?: string;
   eventFlyer?: string;
   eventRegistrationLink?: string;
-  // Added properties to fix compilation errors
   isAd?: boolean;
   video?: string;
   eventId?: string;
@@ -174,7 +173,6 @@ export interface AppSettings {
   backgroundPattern: 'none' | 'grid' | 'dots';
 }
 
-// Added missing interface AnalyticsData
 export interface AnalyticsData {
   day: string;
   posts: number;
@@ -184,7 +182,6 @@ export interface AnalyticsData {
   engagement: number;
 }
 
-// Added missing interface Ad
 export interface Ad {
   id: string;
   title: string;
@@ -194,7 +191,6 @@ export interface Ad {
   college: College | 'Global';
 }
 
-// Added missing interface Resource
 export interface Resource {
   id: string;
   title: string;
@@ -210,7 +206,6 @@ export interface Resource {
   timestamp: string;
 }
 
-// Added missing interface LiveEvent
 export interface LiveEvent {
   id: string;
   title: string;
@@ -219,8 +214,7 @@ export interface LiveEvent {
   status: 'live' | 'upcoming' | 'ended';
 }
 
-// Added missing interface Notification
-export interface Notification {
+export interface MakNotification {
   id: string;
   title: string;
   description: string;
@@ -233,7 +227,6 @@ export interface Notification {
   };
 }
 
-// Added missing interface MarketService
 export interface MarketService {
   id: string;
   providerId: string;
@@ -249,7 +242,6 @@ export interface MarketService {
   isPromoted: boolean;
 }
 
-// Added missing interface GroupMessage
 export interface GroupMessage {
   id: string;
   author: string;
@@ -264,7 +256,6 @@ export interface GroupMessage {
   };
 }
 
-// Added missing interface Group
 export interface Group {
   id: string;
   name: string;

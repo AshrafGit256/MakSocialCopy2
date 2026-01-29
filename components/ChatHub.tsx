@@ -4,7 +4,7 @@ import { db } from '../db';
 import { ChatConversation, ChatMessage } from '../types';
 import { 
   MessageSquare, Users, Phone, Video, Settings, Search, 
-  MoreVertical, Send, Mic, Image, Paperclip, Smile,
+  MoreVertical, Send, Mic, Image as ImageIcon, Paperclip, Smile,
   ChevronRight, ArrowLeft, Zap, Info, ShieldCheck, 
   Radio, BookOpen, Clock, CheckCircle2, UserPlus,
   Plus, Edit3, Trash2
@@ -55,10 +55,8 @@ const ChatHub: React.FC = () => {
 
   return (
     <div className="flex h-full bg-[#0d1117] overflow-hidden text-[#c9d1d9] font-sans border-t border-white/5">
-      {/* 1. Sidebar */}
       <aside className="w-80 border-r border-white/5 flex flex-col bg-[#0d1117] shrink-0 z-20">
         <div className="p-6 space-y-6">
-          {/* My Profile Brief */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -73,7 +71,6 @@ const ChatHub: React.FC = () => {
             <button className="p-2 text-slate-500 hover:text-white"><Settings size={18}/></button>
           </div>
 
-          {/* Navigation Tabs */}
           <div className="flex items-center gap-6 border-b border-white/5">
             {[
               { id: 'Chat', icon: <MessageSquare size={18}/> },
@@ -91,7 +88,6 @@ const ChatHub: React.FC = () => {
             ))}
           </div>
 
-          {/* Chat Type Toggles (only if Chat tab is active) */}
           {activeTab === 'Chat' && (
             <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/5">
               <button 
@@ -110,7 +106,6 @@ const ChatHub: React.FC = () => {
           )}
         </div>
 
-        {/* Conversation List */}
         <div className="flex-1 overflow-y-auto no-scrollbar">
           {activeTab === 'Chat' ? (
             filteredConversations.map(chat => (
@@ -148,11 +143,9 @@ const ChatHub: React.FC = () => {
         </button>
       </aside>
 
-      {/* 2. Main Chat Area */}
       <main className="flex-1 flex flex-col min-w-0 h-full relative bg-[#0d1117]">
         {activeChat ? (
           <>
-            {/* Header */}
             <div className="h-20 border-b border-white/5 px-8 flex items-center justify-between bg-[#0d1117]/80 backdrop-blur-md shrink-0">
               <div className="flex items-center gap-4">
                 <div className="relative">
@@ -173,7 +166,6 @@ const ChatHub: React.FC = () => {
               </div>
             </div>
 
-            {/* Message Feed with Pattern Background */}
             <div 
               ref={scrollRef} 
               className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar relative"
@@ -209,7 +201,6 @@ const ChatHub: React.FC = () => {
               ))}
             </div>
 
-            {/* Input Terminal */}
             <div className="p-6 bg-[#0d1117] border-t border-white/5">
               <div className="bg-white/5 border border-white/10 rounded-2xl p-2 flex items-center gap-2 shadow-inner">
                 <button className="p-3 text-slate-500 hover:text-white transition-colors"><Smile size={20}/></button>
@@ -223,7 +214,7 @@ const ChatHub: React.FC = () => {
                 <div className="flex items-center gap-1">
                   <button onClick={handleSend} className="bg-[#10918a] text-white p-3 rounded-xl shadow-lg shadow-[#10918a]/30 active:scale-95 transition-all"><Send size={18}/></button>
                   <button className="p-3 text-slate-500 hover:text-white transition-colors"><Mic size={20}/></button>
-                  <button className="p-3 text-slate-500 hover:text-white transition-colors"><Image size={20}/></button>
+                  <button className="p-3 text-slate-500 hover:text-white transition-colors"><ImageIcon size={20}/></button>
                   <button className="p-3 text-slate-500 hover:text-white transition-colors"><Paperclip size={20}/></button>
                 </div>
               </div>

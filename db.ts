@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent, ChatConversation, PlatformEmail, Notification, Group, GroupMessage } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, ChatConversation, PlatformEmail, MakNotification, Group, GroupMessage } from './types';
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
@@ -13,6 +13,19 @@ const DB_KEYS = {
   EMAILS: 'maksocial_emails_v25',
   NOTIFICATIONS: 'maksocial_notifications_v25',
   GROUPS: 'maksocial_groups_v25'
+};
+
+/* Added COURSES_BY_COLLEGE to resolve Resource view mapping errors */
+export const COURSES_BY_COLLEGE: Record<College, string[]> = {
+  COCIS: ['Computer Science', 'Information Technology', 'Software Engineering', 'Information Systems'],
+  CEDAT: ['Architecture', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering', 'Surveying'],
+  CHUSS: ['Psychology', 'Social Work', 'Journalism & Communication', 'Philosophy', 'Literature'],
+  CHS: ['Medicine and Surgery', 'Nursing', 'Pharmacy', 'Dentistry', 'Public Health'],
+  CONAS: ['Biology', 'Chemistry', 'Physics', 'Mathematics', 'Geology'],
+  CAES: ['Agriculture', 'Environmental Science', 'Food Science', 'Forestry'],
+  COBAMS: ['Economics', 'Business Administration', 'Statistics', 'Commerce'],
+  CEES: ['Education', 'Adult and Community Education', 'External Studies'],
+  LAW: ['Bachelor of Laws (LLB)']
 };
 
 const INITIAL_EMAILS: PlatformEmail[] = [
@@ -165,8 +178,8 @@ export const db = {
   getChats: (): ChatConversation[] => parseArray<ChatConversation>(DB_KEYS.CHATS, INITIAL_CHATS),
   saveChats: (chats: ChatConversation[]) => localStorage.setItem(DB_KEYS.CHATS, JSON.stringify(chats)),
   getOpportunities: (): Post[] => db.getPosts().filter(p => p.isOpportunity),
-  getNotifications: (): Notification[] => parseArray<Notification>(DB_KEYS.NOTIFICATIONS, []),
-  saveNotifications: (notifications: Notification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifications)),
+  getNotifications: (): MakNotification[] => parseArray<MakNotification>(DB_KEYS.NOTIFICATIONS, []),
+  saveNotifications: (notifications: MakNotification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifications)),
   getEvents: (): any[] => [],
   deletePost: (id: string) => db.savePosts(db.getPosts().filter(p => p.id !== id)),
   getGroups: (): Group[] => parseArray<Group>(DB_KEYS.GROUPS, []),
@@ -181,25 +194,4 @@ export const db = {
     const updated = groups.map(g => g.id === groupId ? { ...g, memberIds: Array.from(new Set([...g.memberIds, userId])) } : g);
     db.saveGroups(updated);
   }
-};
-
-export const REVENUE_HISTORY = [
-  { month: 'Jan', revenue: 4000, expenses: 2500, subscribers: 120, growth: 5 },
-  { month: 'Feb', revenue: 4500, expenses: 2600, subscribers: 145, growth: 8 },
-  { month: 'Mar', revenue: 5000, expenses: 2800, subscribers: 180, growth: 12 },
-  { month: 'Apr', revenue: 6200, expenses: 3100, subscribers: 210, growth: 15 },
-  { month: 'May', revenue: 7800, expenses: 3500, subscribers: 240, growth: 20 },
-  { month: 'Jun', revenue: 3500, expenses: 2000, subscribers: 250, growth: -5 }
-];
-
-export const COURSES_BY_COLLEGE: Record<College, string[]> = {
-  COCIS: ['CS', 'SE', 'IS', 'IT'],
-  CEDAT: ['Architecture', 'CE', 'ME', 'EE'],
-  CHUSS: ['Psychology', 'Philosophy', 'Literature'],
-  CONAS: ['Math', 'Physics', 'Biology'],
-  CHS: ['Medicine', 'Nursing'],
-  CAES: ['Agric', 'Environ'],
-  COBAMS: ['Economics', 'Stats'],
-  CEES: ['Education'],
-  LAW: ['Civil Law', 'Criminal Law']
 };

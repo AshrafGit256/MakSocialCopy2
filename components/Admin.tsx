@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { db, REVENUE_HISTORY } from '../db';
+/* Removed unused REVENUE_HISTORY import to fix module export error */
+import { db } from '../db';
 import { ANALYTICS } from '../constants';
 import { User, Ad, CalendarEvent, Resource, Post, AuthorityRole, PlatformEmail } from '../types';
 import { 
@@ -356,7 +357,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                              <button onClick={() => setSelectedEmail(null)} className="p-2 text-slate-400 hover:text-white transition-all"><ArrowLeft size={20}/></button>
                              <div className="h-4 w-px bg-white/10 mx-2"></div>
                              <button className="p-2 text-slate-500 hover:text-white"><Archive size={18}/></button>
-                             <button className="p-2 text-slate-500 hover:text-white"><Info size={18}/></button>
+                             <button className="p-2 text-slate-500 hover:text-info"><Info size={18}/></button>
                              <button className="p-2 text-slate-500 hover:text-rose-500"><Trash size={18}/></button>
                              <button className="p-2 text-slate-500 hover:text-white ml-2"><Folder size={18}/></button>
                           </div>

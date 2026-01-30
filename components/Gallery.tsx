@@ -67,7 +67,7 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
               <div 
                 key={item.id}
                 onClick={() => onSelectPost(item.postId)}
-                className={`group relative overflow-hidden rounded-[2rem] border border-[var(--border-color)] bg-[var(--bg-secondary)] cursor-pointer transition-all hover:scale-[1.01] hover:shadow-2xl z-10 ${
+                className={`group relative overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] cursor-pointer transition-all hover:scale-[1.01] hover:shadow-2xl z-10 ${
                   isLarge ? 'md:col-span-2 md:row-span-2' : 
                   isTall ? 'md:row-span-2' : 
                   isWide ? 'md:col-span-2' : ''

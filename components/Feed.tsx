@@ -288,7 +288,7 @@ const PostItem: React.FC<{
                 {post.images && post.images.length > 0 && (
                   <div className={`mb-6 grid gap-2 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                     {post.images.map((img, i) => (
-                      <div key={i} className="group/img relative rounded-[4px] border border-[var(--border-color)] overflow-hidden bg-[var(--bg-primary)] aspect-video">
+                      <div key={i} className="group/img relative rounded-xl border border-[var(--border-color)] overflow-hidden bg-[var(--bg-primary)] aspect-video">
                         <img 
                           src={img} 
                           className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105 grayscale-[10%] group-hover/img:grayscale-0" 
@@ -436,6 +436,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
 
+    // FIX: Extract image URLs from the HTML string
+    const imgRegex = /<img[^>]+src="([^">]+)"/g;
+    const foundImages: string[] = [];
+    let match;
+    while ((match = imgRegex.exec(html)) !== null) {
+      foundImages.push(match[1]);
+    }
+
     const newPost: Post = {
       id: `p-${Date.now()}`,
       author: user.name,
@@ -444,6 +452,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       authorAvatar: user.avatar,
       timestamp: 'Just now',
       content: html,
+      images: foundImages, // Newly extracted images
       hashtags: foundTags,
       likes: 0,
       commentsCount: 0,

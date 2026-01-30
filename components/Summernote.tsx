@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { 
   Bold, Italic, List, Image as ImageIcon, Link as LinkIcon, 
@@ -20,7 +21,6 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
   const execCommand = (command: string, value?: string) => {
-    // For headings, we must use 'formatBlock'
     if (command === 'formatBlock') {
       document.execCommand('formatBlock', false, `<${value}>`);
     } else {
@@ -43,18 +43,6 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
     }
   };
 
-  const insertVideo = () => {
-    const url = prompt("Enter Video Asset URL (mp4 link):");
-    if (url) {
-      const videoHtml = `<div class="my-4 rounded overflow-hidden border border-slate-700 bg-black shadow-lg"><video src="${url}" controls class="w-full" /></div><p><br></p>`;
-      if (editorRef.current) {
-        editorRef.current.focus();
-        document.execCommand('insertHTML', false, videoHtml);
-        setContent(editorRef.current.innerHTML);
-      }
-    }
-  };
-
   const insert5x5Table = () => {
     let tableHtml = '<table class="w-full border-collapse border border-slate-700 my-4 text-[10px] uppercase font-mono">';
     for (let i = 0; i < 5; i++) {
@@ -72,20 +60,31 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
     }
   };
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const imgHtml = `<img src="${ev.target?.result}" class="max-w-full rounded border border-slate-700 my-4 shadow-sm" />`;
-        if (editorRef.current) {
-          editorRef.current.focus();
-          document.execCommand('insertHTML', false, imgHtml);
-          setContent(editorRef.current.innerHTML);
-        }
-      };
-      reader.readAsDataURL(file);
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Process all selected files
+    // Explicitly cast Array.from(files) to File[] to avoid unknown type error on iteration
+    for (const file of Array.from(files) as File[]) {
+      await new Promise<void>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          // Cast ev.target.result to string to satisfy template literal expectations
+          const imgHtml = `<img src="${ev.target?.result as string}" class="max-w-full rounded border border-slate-700 my-4 shadow-sm" />`;
+          if (editorRef.current) {
+            editorRef.current.focus();
+            document.execCommand('insertHTML', false, imgHtml);
+            setContent(editorRef.current.innerHTML);
+          }
+          resolve();
+        };
+        // Explicitly ensuring file is treated as a Blob/File
+        reader.readAsDataURL(file);
+      });
     }
+    // Reset file input value to allow selecting same images again if needed
+    e.target.value = '';
   };
 
   const handleSubmit = () => {
@@ -143,9 +142,9 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
           <button onClick={insertLink} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Add Link"><LinkIcon size={14}/></button>
           <button onClick={insert5x5Table} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded" title="Insert Table"><TableIcon size={14}/></button>
           
-          <label className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded cursor-pointer" title="Attach Image">
+          <label className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 rounded cursor-pointer" title="Attach Multiple Images">
             <ImageIcon size={14}/>
-            <input type="file" className="hidden" accept="image/*" onChange={handleImage} />
+            <input type="file" className="hidden" accept="image/*" multiple onChange={handleImage} />
           </label>
           <button onClick={() => setShowPollBuilder(!showPollBuilder)} className={`p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-colors ${showPollBuilder ? 'text-slate-700 bg-slate-500/5' : 'text-slate-500'}`} title="Census Build"><BarChart3 size={14}/></button>
         </div>
@@ -200,7 +199,7 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
            </div>
         </div>
         <div className="flex items-center gap-4">
-           {isExpanded && <button onClick={() => setIsExpanded(false)} className="text-[10px] font-black uppercase text-slate-500 hover:text-rose-500 transition-colors">Abort</button>}
+           {isExpanded && <button onClick={() => setIsExpanded(false)} className="text-10px font-black uppercase text-slate-500 hover:text-rose-500 transition-colors">Abort</button>}
            <button 
              onClick={handleSubmit}
              disabled={!content.trim() || content === '<br>'}

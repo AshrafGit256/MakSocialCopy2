@@ -18,6 +18,54 @@ const DB_KEYS = {
 
 const ADDITIONAL_POSTS: Post[] = [
   {
+    id: 'opp-poster-3',
+    author: 'CHUSS Research Wing',
+    authorId: 'chuss_research',
+    authorRole: 'Humanities Node',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=CHUSS',
+    timestamp: 'Just now',
+    isOpportunity: true,
+    opportunityData: {
+      type: 'Workshop',
+      isAIVerified: true,
+      detectedBenefit: 'Global Certification'
+    },
+    images: ['https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200'],
+    content: `<h1>Humanitarian Data Ethics Workshop</h1>
+<p>Join the CHUSS research nodes for a three-day intensive protocol on data ethics in the global south. Limited slots for 4th-year students.</p>`,
+    hashtags: ['#Ethics', '#Humanities', '#Workshop'],
+    likes: 45,
+    commentsCount: 3,
+    comments: [],
+    views: 1200,
+    flags: [],
+    college: 'CHUSS'
+  },
+  {
+    id: 'opp-poster-4',
+    author: 'Makerere Fintech Lab',
+    authorId: 'fintech_mak',
+    authorRole: 'Innovation Hub',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=FIN',
+    timestamp: '2h ago',
+    isOpportunity: true,
+    opportunityData: {
+      type: 'Internship',
+      isAIVerified: true,
+      detectedBenefit: 'UGX 1.2M Stipend'
+    },
+    images: ['https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200'],
+    content: `<h1>Fintech Analyst Internship</h1>
+<p>Seeking 3 students from COBAMS or COCIS wings to join our mobile money logic strata. Deep knowledge of transaction telemetry required.</p>`,
+    hashtags: ['#Fintech', '#COBAMS', '#Internship'],
+    likes: 210,
+    commentsCount: 15,
+    comments: [],
+    views: 8900,
+    flags: [],
+    college: 'Global'
+  },
+  {
     id: 'gal-1',
     author: 'Ninfa Monaldo',
     authorId: 'u-ninfa',
@@ -353,7 +401,7 @@ export const db = {
   getPosts: (): Post[] => {
     const stored = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
     // Ensure mock visual posts are injected if they don't exist in this version
-    if (!stored.find(p => p.id === 'gal-9')) {
+    if (!stored.find(p => p.id === 'opp-poster-4')) {
        const merged = [...ADDITIONAL_POSTS, ...stored];
        localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(merged));
        return merged;

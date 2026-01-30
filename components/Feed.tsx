@@ -295,11 +295,6 @@ const PostItem: React.FC<{
                           alt={`Asset ${i}`}
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/10 transition-colors pointer-events-none"></div>
-                        <div className="absolute bottom-2 right-2 opacity-0 group-hover/img:opacity-100 transition-opacity">
-                          <div className="px-2 py-1 bg-black/60 backdrop-blur-md rounded text-[7px] font-black text-white uppercase tracking-widest flex items-center gap-1">
-                            <ImageIcon size={10}/> VIEW_ASSET
-                          </div>
-                        </div>
                       </div>
                     ))}
                   </div>

@@ -3,7 +3,7 @@ import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotificati
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v25',
+  POSTS: 'maksocial_posts_v26',
   USERS: 'maksocial_users_v25',
   LOGGED_IN_ID: 'maksocial_current_user_id',
   RESOURCES: 'maksocial_resources_v25',
@@ -15,6 +15,99 @@ const DB_KEYS = {
   EVENTS: 'maksocial_events_v25',
   GROUPS: 'maksocial_groups_v25'
 };
+
+const ADDITIONAL_POSTS: Post[] = [
+  {
+    id: 'gal-1',
+    author: 'Ninfa Monaldo',
+    authorId: 'u-ninfa',
+    authorRole: 'Wildlife Node',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
+    timestamp: '2h ago',
+    content: 'Capturing the local fauna during the field research at the bio-wing. #Nature #Science',
+    images: ['https://images.unsplash.com/photo-1552728089-57bdde30eba3?auto=format&fit=crop&w=800'],
+    hashtags: ['#Nature', '#Science'],
+    likes: 120,
+    commentsCount: 5,
+    comments: [],
+    views: 450,
+    flags: [],
+    isOpportunity: false,
+    college: 'CONAS'
+  },
+  {
+    id: 'gal-2',
+    author: 'Sarah CEDAT',
+    authorId: 'u2',
+    authorRole: 'Visual Architect',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    timestamp: '4h ago',
+    content: 'Cybernetic aesthetics in the design studio today. Future of tech nodes looks bright. #Cyberpunk #Design',
+    images: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800'],
+    hashtags: ['#Cyberpunk', '#Design'],
+    likes: 890,
+    commentsCount: 22,
+    comments: [],
+    views: 2300,
+    flags: [],
+    isOpportunity: false,
+    college: 'CEDAT'
+  },
+  {
+    id: 'gal-3',
+    author: 'John COCIS',
+    authorId: 'u1',
+    authorRole: 'Core Dev',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
+    timestamp: '6h ago',
+    content: 'Spotted this little fellow near the server room. Mascot initialized. #Macro #Nature',
+    images: ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=800'],
+    hashtags: ['#Macro', '#Nature'],
+    likes: 56,
+    commentsCount: 2,
+    comments: [],
+    views: 120,
+    flags: [],
+    isOpportunity: false,
+    college: 'COCIS'
+  },
+  {
+    id: 'gal-4',
+    author: 'Roy Ssemboga',
+    authorId: 'roy_ssemboga',
+    authorRole: 'Student Leader',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
+    timestamp: '1d ago',
+    content: 'A view of the Hill strata from the library peak. #Makerere #View',
+    images: ['https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=800'],
+    hashtags: ['#Makerere', '#View'],
+    likes: 450,
+    commentsCount: 15,
+    comments: [],
+    views: 1800,
+    flags: [],
+    isOpportunity: false,
+    college: 'Global'
+  },
+  {
+    id: 'gal-5',
+    author: 'Ninfa Monaldo',
+    authorId: 'u-ninfa',
+    authorRole: 'Botanist Node',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
+    timestamp: '1d ago',
+    content: 'Macro study of flora in the botanical wing. #Macro #Flowers',
+    images: ['https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800'],
+    hashtags: ['#Macro', '#Flowers'],
+    likes: 320,
+    commentsCount: 10,
+    comments: [],
+    views: 1200,
+    flags: [],
+    isOpportunity: false,
+    college: 'CAES'
+  }
+];
 
 const INITIAL_EMAILS: PlatformEmail[] = [
   {
@@ -114,7 +207,16 @@ export const db = {
     if (index !== -1) users[index] = user; else users.push(user);
     db.saveUsers(users);
   },
-  getPosts: (): Post[] => parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS),
+  getPosts: (): Post[] => {
+    const stored = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
+    // Ensure mock visual posts are injected if they don't exist
+    if (!stored.find(p => p.id === 'gal-1')) {
+       const merged = [...ADDITIONAL_POSTS, ...stored];
+       localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(merged));
+       return merged;
+    }
+    return stored;
+  },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   addPost: (post: Post) => db.savePosts([post, ...db.getPosts()]),
   likePost: (postId: string) => {

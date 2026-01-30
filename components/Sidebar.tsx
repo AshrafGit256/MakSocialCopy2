@@ -4,7 +4,7 @@ import { AppView } from '../types';
 import { 
   Home, Search, MessageCircle, User as UserIcon, Calendar, 
   BookOpen, Bell, Settings, ShieldCheck, LogOut, 
-  Zap, Cpu
+  Zap, Cpu, LayoutPanelTop
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -19,6 +19,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen }) => {
   const navItems = [
     { id: 'home', label: 'Pulse Feed', icon: <Home size={20} /> },
+    { id: 'gallery', label: 'Visual Hub', icon: <LayoutPanelTop size={20} /> },
     { id: 'chats', label: 'Chat Hub', icon: <MessageCircle size={20} /> },
     { id: 'opportunities', label: 'Opportunities', icon: <Zap size={20} /> },
     { id: 'search', label: 'Registry', icon: <Search size={20} /> },

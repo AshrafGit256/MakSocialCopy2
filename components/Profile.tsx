@@ -1,11 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Post } from '../types';
 import { AuthoritySeal } from './Feed'; 
+import Gallery from './Gallery';
 import { 
   MapPin, ArrowLeft, Globe, Zap, Radio, Share2, Database, 
   Terminal, Award, Trophy, Bookmark, Mail, Link as LinkIcon, Edit2, Calendar,
-  GitCommit, Star, MessageCircle, FileVideo, Box, GitFork
+  GitCommit, Star, MessageCircle, FileVideo, Box, GitFork, LayoutGrid
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -13,7 +15,7 @@ const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNavigateToProfile?: (id: string) => void, onMessageUser?: (id: string) => void }> = ({ userId, onNavigateBack, onNavigateToProfile, onMessageUser }) => {
   const [user, setUser] = useState<User | null>(null);
   const [displayedPosts, setDisplayedPosts] = useState<Post[]>([]);
-  const [activeTab, setActiveTab] = useState<'signals' | 'bookmarks' | 'achievements'>('signals');
+  const [activeTab, setActiveTab] = useState<'signals' | 'bookmarks' | 'gallery' | 'achievements'>('signals');
   const currentUser = db.getUser();
   const isOwnProfile = !userId || userId === currentUser.id;
 
@@ -124,13 +126,14 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
 
           {/* 3. Right Activity Column (Manifest Stream & Vault) */}
           <main className="lg:col-span-8 space-y-8">
-            <nav className="flex items-center gap-8 border-b border-[var(--border-color)]">
+            <nav className="flex items-center gap-8 border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
               {[
-                { id: 'signals', label: 'Signal History', icon: <Radio size={14}/>, count: db.getPosts().filter(p => p.authorId === (userId || currentUser.id)).length },
+                { id: 'signals', label: 'Signals', icon: <Radio size={14}/>, count: db.getPosts().filter(p => p.authorId === (userId || currentUser.id)).length },
+                { id: 'gallery', label: 'Visual Vault', icon: <LayoutGrid size={14}/>, count: db.getPosts().filter(p => p.authorId === (userId || currentUser.id)).reduce((acc, p) => acc + (p.images?.length || 0), 0) },
                 { id: 'bookmarks', label: 'Registry Vault', icon: <Bookmark size={14}/>, count: db.getBookmarks().length },
                 { id: 'achievements', label: 'Credentials', icon: <Trophy size={14}/>, count: 12 }
               ].map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? 'text-[var(--text-primary)]' : 'text-slate-400 hover:text-slate-600'}`}>
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all relative whitespace-nowrap ${activeTab === tab.id ? 'text-[var(--text-primary)]' : 'text-slate-400 hover:text-slate-600'}`}>
                   {tab.icon} {tab.label}
                   <span className="bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-500">{tab.count}</span>
                   {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-slate-600 animate-in fade-in zoom-in-x"></div>}
@@ -139,7 +142,11 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
             </nav>
 
             <div className="space-y-12">
-              {displayedPosts.length > 0 ? displayedPosts.map(p => (
+              {activeTab === 'gallery' ? (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                   <Gallery userId={userId || currentUser.id} onSelectPost={(id) => { /* Logic handled by App level normally, but for sub-tab we may need bridge */ }} />
+                </div>
+              ) : displayedPosts.length > 0 ? displayedPosts.map(p => (
                 <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[4px] overflow-hidden hover:border-slate-400 transition-all group">
                    <div className="px-6 py-3 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
                       <div className="flex items-center gap-2">

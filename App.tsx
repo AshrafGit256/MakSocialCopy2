@@ -15,6 +15,7 @@ import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
+import Gallery from './components/Gallery';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Settings, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
@@ -111,6 +112,7 @@ const App: React.FC = () => {
       case 'settings': return <SettingsView />;
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
+      case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };

@@ -284,21 +284,7 @@ const PostItem: React.FC<{
 
                 <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-6" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
-                {/* POST IMAGE GRID - GitHub Like Vibe */}
-                {post.images && post.images.length > 0 && (
-                  <div className={`mb-6 grid gap-2 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                    {post.images.map((img, i) => (
-                      <div key={i} className="group/img relative rounded-xl border border-[var(--border-color)] overflow-hidden bg-[var(--bg-primary)] aspect-video">
-                        <img 
-                          src={img} 
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105 grayscale-[10%] group-hover/img:grayscale-0" 
-                          alt={`Asset ${i}`}
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/10 transition-colors pointer-events-none"></div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {/* Note: Dedicated image grid removed here to prevent duplicates. Images render inline via post.content */}
 
                 {post.pollData && (
                   <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[var(--radius-main)] shadow-inner">
@@ -431,17 +417,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
 
-    // Extract image URLs from the HTML string for the structured images array
+    // We extract image URLs for registry indexing/gallery, but we keep the original HTML 
+    // content (with images) so they render exactly where the user inserted them.
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     const foundImages: string[] = [];
     let match;
     while ((match = imgRegex.exec(html)) !== null) {
       foundImages.push(match[1]);
     }
-
-    // NEW: Rectify double image issue by stripping <img> tags from the html content
-    // We already have them in the foundImages array which renders in the high-fidelity grid.
-    const cleanedHtml = html.replace(/<img[^>]*>/g, '');
 
     const newPost: Post = {
       id: `p-${Date.now()}`,
@@ -450,7 +433,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       authorRole: user.role,
       authorAvatar: user.avatar,
       timestamp: 'Just now',
-      content: cleanedHtml, // Use the version without inline images
+      content: html, // Kept original to preserve images in their user-defined positions
       images: foundImages, 
       hashtags: foundTags,
       likes: 0,

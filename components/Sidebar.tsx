@@ -33,10 +33,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   return (
     <aside className={`fixed inset-y-0 left-0 z-[2001] w-64 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="p-6 flex-1 overflow-y-auto no-scrollbar">
-        <div className="flex items-center mb-10 cursor-pointer w-full" onClick={() => setView('home')}>
+        <div className="flex items-center justify-center mb-10 cursor-pointer w-full p-2" onClick={() => setView('home')}>
           <img 
             src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
-            className="w-full h-auto max-h-16 object-contain shadow-xl shadow-[var(--brand-color)]/5" 
+            className="w-full h-auto max-h-20 object-contain shadow-2xl shadow-[var(--brand-color)]/5 transition-transform hover:scale-105 active:scale-95" 
             alt="MakSocial Logo" 
           />
         </div>

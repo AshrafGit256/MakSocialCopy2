@@ -186,9 +186,7 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
 
 // --- AUTHORITY SEAL COMPONENT (X-STYLE) ---
 export const AuthoritySeal: React.FC<{ role?: string, size?: number, verified?: boolean }> = ({ role, size = 16, verified = true }) => {
-  // If explicitly not verified and no role, don't show
-  if (!verified && !role) return null;
-
+  // Everyone is verified by default as per request
   return (
     <div className="inline-flex items-center ml-1 text-[var(--brand-color)]" title={role ? `Verified ${role}` : 'Verified Node'}>
       <BadgeCheck size={size} fill="currentColor" stroke="white" strokeWidth={1.5} />

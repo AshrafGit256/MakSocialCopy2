@@ -255,3 +255,13 @@ export interface MarketService {
   reviewsCount: number;
   isPromoted: boolean;
 }
+
+// Fixed missing GalleryItem interface export
+export interface GalleryItem {
+  id: string;
+  url: string;
+  postId: string;
+  likes: number;
+  commentsCount: number;
+  author: string;
+}

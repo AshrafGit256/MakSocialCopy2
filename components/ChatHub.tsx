@@ -53,10 +53,8 @@ const ChatHub: React.FC = () => {
 
   return (
     <div className="flex h-full bg-[var(--bg-primary)] overflow-hidden text-[var(--text-primary)] font-sans border-t border-[var(--border-color)]">
-      {/* 1. Sidebar */}
       <aside className="w-80 border-r border-[var(--border-color)] flex flex-col bg-[var(--bg-primary)] shrink-0 z-20">
         <div className="p-6 space-y-6">
-          {/* User Profile Summary */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -71,7 +69,6 @@ const ChatHub: React.FC = () => {
             <button className="p-2 text-slate-500 hover:text-[var(--text-primary)] transition-colors"><Settings size={18}/></button>
           </div>
 
-          {/* Tab Navigation */}
           <div className="flex items-center gap-6 border-b border-[var(--border-color)]">
             {[
               { id: 'Chat', icon: <MessageSquare size={16}/> },
@@ -89,7 +86,6 @@ const ChatHub: React.FC = () => {
             ))}
           </div>
 
-          {/* Toggle Switches */}
           {activeTab === 'Chat' && (
             <div className="flex gap-2 p-1 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-color)]">
               <button 
@@ -108,7 +104,6 @@ const ChatHub: React.FC = () => {
           )}
         </div>
 
-        {/* List of Conversations */}
         <div className="flex-1 overflow-y-auto no-scrollbar">
           {activeTab === 'Chat' ? (
             filteredConversations.map(chat => (
@@ -126,8 +121,8 @@ const ChatHub: React.FC = () => {
                     <h4 className="text-[12px] font-black uppercase tracking-tight text-[var(--text-primary)] truncate">{chat.user.name}</h4>
                     <span className="text-[9px] font-mono text-slate-500 uppercase">{chat.lastTimestamp}</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 truncate italic font-medium">
-                    {chat.unreadCount > 0 ? <span className="text-[var(--brand-color)] not-italic font-bold">typing...</span> : chat.lastMessage}
+                  <p className="text-[11px] text-slate-500 truncate font-medium">
+                    {chat.unreadCount > 0 ? <span className="text-[var(--brand-color)] font-bold">typing...</span> : chat.lastMessage}
                   </p>
                 </div>
                 {chat.unreadCount > 0 && <span className="bg-[var(--brand-color)] text-white px-2 py-0.5 rounded-full text-[8px] font-black">{chat.unreadCount}+</span>}
@@ -162,11 +157,9 @@ const ChatHub: React.FC = () => {
         </button>
       </aside>
 
-      {/* 2. Main Chat Area */}
       <main className="flex-1 flex flex-col min-w-0 h-full relative bg-[var(--bg-primary)]">
         {activeChat ? (
           <>
-            {/* Header */}
             <div className="h-20 border-b border-[var(--border-color)] px-8 flex items-center justify-between bg-[var(--bg-primary)]/80 backdrop-blur-md shrink-0">
               <div className="flex items-center gap-4">
                 <div className="relative">
@@ -187,7 +180,6 @@ const ChatHub: React.FC = () => {
               </div>
             </div>
 
-            {/* Cube-Patterned Background Container */}
             <div 
               ref={scrollRef} 
               className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar relative"
@@ -224,7 +216,6 @@ const ChatHub: React.FC = () => {
               ))}
             </div>
 
-            {/* Input Dashboard */}
             <div className="p-6 bg-[var(--bg-primary)] border-t border-[var(--border-color)]">
               <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-2 flex items-center gap-2 shadow-inner">
                 <button className="p-3 text-slate-500 hover:text-[var(--text-primary)] transition-colors"><Smile size={20}/></button>
@@ -248,7 +239,7 @@ const ChatHub: React.FC = () => {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center opacity-10 space-y-6">
             <MessageSquare size={120} />
-            <h2 className="text-4xl font-black uppercase italic tracking-tighter text-[var(--text-primary)]">Awaiting Node Handshake</h2>
+            <h2 className="text-4xl font-black uppercase tracking-tighter text-[var(--text-primary)]">Awaiting Node Handshake</h2>
           </div>
         )}
       </main>

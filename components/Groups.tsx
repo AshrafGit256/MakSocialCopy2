@@ -31,7 +31,6 @@ const Groups: React.FC = () => {
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [neuralSnapshot, setNeuralSnapshot] = useState<string | null>(null);
   
-  // Mobile view state: 'list' or 'chat'
   const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +60,6 @@ const Groups: React.FC = () => {
     }
   }, [activeGroupId, groups, viewMode, mobileView]);
 
-  // Handle auto-expanding textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
@@ -174,7 +172,6 @@ const Groups: React.FC = () => {
   return (
     <div className="flex h-full bg-[var(--bg-primary)] overflow-hidden font-mono text-[var(--text-primary)]">
       
-      {/* 1. CLUSTER NAVIGATOR (Visible on desktop or when list is active on mobile) */}
       <aside className={`
         ${mobileView === 'chat' && activeGroupId ? 'hidden lg:flex' : 'flex'}
         w-full lg:w-80 border-r border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] shrink-0 z-20 transition-all duration-300
@@ -246,14 +243,12 @@ const Groups: React.FC = () => {
         </div>
       </aside>
 
-      {/* 2. MAIN CLUSTER WORKSPACE */}
       <main className={`
         ${mobileView === 'list' && !activeGroupId ? 'hidden lg:flex' : 'flex'}
         flex-1 flex flex-col bg-[var(--bg-primary)] min-w-0 h-full relative z-10
       `}>
         {activeGroup ? (
           <>
-            {/* WORKSPACE HEADER */}
             <div className="border-b border-[var(--border-color)] bg-white/80 dark:bg-black/80 backdrop-blur-md px-4 py-3 md:px-6 md:py-4 z-10 shrink-0">
               <div className="flex items-center justify-between gap-4">
                  <div className="flex items-center gap-3 overflow-hidden">
@@ -263,7 +258,7 @@ const Groups: React.FC = () => {
                     >
                       <ArrowLeft size={20} />
                     </button>
-                    <div className="flex items-center text-sm md:text-xl font-black gap-2 truncate uppercase italic tracking-tighter">
+                    <div className="flex items-center text-sm md:text-xl font-black gap-2 truncate uppercase tracking-tighter">
                       <Layers size={18} className="text-slate-400 hidden sm:block" />
                       <span className="text-slate-600 hover:underline cursor-pointer lowercase hidden sm:inline">{activeGroup.category}</span>
                       <span className="text-slate-400 hidden sm:inline">/</span>
@@ -286,7 +281,6 @@ const Groups: React.FC = () => {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-              {/* CHAT AREA */}
               <div className="flex-1 flex flex-col relative overflow-hidden bg-slate-50 dark:bg-[#050505]">
                 {viewMode === 'terminal' ? (
                   <>
@@ -298,7 +292,7 @@ const Groups: React.FC = () => {
                            <h3 className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-300 flex items-center gap-2 mb-4">
                               <Cpu size={14} className="animate-pulse" /> Neural_Sync_Protocol
                            </h3>
-                           <div className="text-[11px] italic whitespace-pre-wrap font-medium leading-relaxed border-l-2 border-white/20 pl-4">
+                           <div className="text-[11px] whitespace-pre-wrap font-medium leading-relaxed border-l-2 border-white/20 pl-4">
                               {neuralSnapshot}
                            </div>
                            <button onClick={() => setNeuralSnapshot(null)} className="absolute top-4 right-4 text-white/40 hover:text-white"><X size={14}/></button>
@@ -345,7 +339,6 @@ const Groups: React.FC = () => {
                       })}
                     </div>
 
-                    {/* INPUT TERMINAL */}
                     <div className="fixed lg:relative bottom-16 lg:bottom-0 left-0 right-0 p-4 md:p-6 border-t border-[var(--border-color)] bg-white/95 dark:bg-black/90 backdrop-blur-xl shrink-0 z-50">
                        {isMember ? (
                          <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded shadow-2xl overflow-hidden max-w-5xl mx-auto">
@@ -393,7 +386,6 @@ const Groups: React.FC = () => {
                     </div>
                   </>
                 ) : (
-                  /* ARCHITECTURE VIEW */
                   <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-10 no-scrollbar pb-32">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="bg-white dark:bg-[#0b0b0b] border border-[var(--border-color)] p-8 rounded shadow-2xl space-y-8">
@@ -429,7 +421,6 @@ const Groups: React.FC = () => {
                 )}
               </div>
 
-              {/* DESKTOP TELEMETRY BAR */}
               <aside className="hidden xl:flex w-72 border-l border-[var(--border-color)] flex-col bg-[var(--sidebar-bg)] p-6 space-y-8 z-20 overflow-y-auto no-scrollbar">
                  <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] flex items-center gap-2">
                     <Signal size={14} className="text-slate-600"/> Pulse_Nodes
@@ -454,7 +445,6 @@ const Groups: React.FC = () => {
             </div>
           </>
         ) : (
-          /* 3. LANDING DASHBOARD (EMPTY STATE) */
           <div className="flex-1 flex flex-col p-6 md:p-12 overflow-y-auto no-scrollbar pb-32">
              <div className="flex-1 flex flex-col items-center justify-center text-center space-y-10 py-12">
                 <div className="relative">
@@ -464,7 +454,7 @@ const Groups: React.FC = () => {
                    </div>
                 </div>
                 <div className="space-y-4 max-w-lg">
-                   <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter leading-none">Initialize <span className="text-slate-600">Cluster</span></h2>
+                   <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">Initialize <span className="text-slate-600">Cluster</span></h2>
                    <p className="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-[0.5em] leading-loose">
                       Synchronize with university strata, broadcast sector intelligence, and collaborate within encrypted hub manifests.
                    </p>
@@ -479,7 +469,6 @@ const Groups: React.FC = () => {
                 </div>
              </div>
 
-             {/* Global Metrics Strip */}
              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-auto pt-12 border-t border-[var(--border-color)]">
                 {[
                   { label: 'Active_Clusters', val: groups.length, icon: <Database size={14} fill="currentColor"/> },
@@ -491,7 +480,7 @@ const Groups: React.FC = () => {
                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                         {stat.icon} {stat.label}
                      </p>
-                     <p className="text-sm font-black uppercase italic">{stat.val}</p>
+                     <p className="text-sm font-black uppercase">{stat.val}</p>
                   </div>
                 ))}
              </div>
@@ -499,12 +488,11 @@ const Groups: React.FC = () => {
         )}
       </main>
 
-      {/* CREATE HUB MODAL */}
       {isCreating && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 md:p-6 bg-black/95 backdrop-blur-xl animate-in fade-in">
            <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 md:p-12 rounded shadow-2xl space-y-10 border border-[var(--border-color)] relative max-h-[90vh] overflow-y-auto no-scrollbar">
               <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-8">
-                 <h2 className="text-2xl font-black uppercase tracking-tighter italic text-slate-600">Initialize_Cluster</h2>
+                 <h2 className="text-2xl font-black uppercase tracking-tighter text-slate-600">Initialize_Cluster</h2>
                  <button onClick={() => setIsCreating(false)} className="text-slate-400 hover:text-rose-500"><X size={32}/></button>
               </div>
               <div className="space-y-8">

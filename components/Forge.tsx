@@ -89,7 +89,6 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
 
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 space-y-12 pb-40 animate-in fade-in duration-500">
-      
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -97,7 +96,7 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
                 <GitPullRequest size={32} />
              </div>
              <div>
-                <h1 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none italic">The Forge</h1>
+                <h1 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">The Forge</h1>
                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mt-2">Collaboration Matrix / Active Skill Sync</p>
              </div>
           </div>
@@ -119,7 +118,6 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
         </div>
       </header>
 
-      {/* FILTER STRIP */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-[var(--border-color)]">
          <button 
            onClick={() => setFilter('All')}
@@ -138,7 +136,6 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
          ))}
       </div>
 
-      {/* STATS STRIP */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
          {[
            { label: 'Active Initiatives', val: '124', icon: <Terminal size={18}/> },
@@ -156,10 +153,9 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
          ))}
       </div>
 
-      {/* PROJECT MATRIX */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {filtered.map(project => (
-          <div key={project.id} className="group glass-card bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-600/30 transition-all p-8 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-2xl">
+          <div key={project.id} className="group glass-card bg-[var(--sidebar-bg)] border border-[var(--border-color)] hover:border-indigo-600/30 transition-all p-8 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-2xl">
             <div className="space-y-6">
               <div className="flex justify-between items-start">
                  <div className="flex items-center gap-3">
@@ -182,8 +178,8 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
               </div>
 
               <div className="space-y-2">
-                 <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:text-indigo-600 transition-colors leading-none italic">{project.title}</h3>
-                 <p className="text-xs text-slate-500 font-medium leading-relaxed italic line-clamp-2">"{project.description}"</p>
+                 <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:text-indigo-600 transition-colors leading-none">{project.title}</h3>
+                 <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">"{project.description}"</p>
               </div>
 
               <div className="pt-4 space-y-4">
@@ -223,7 +219,6 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
         ))}
       </div>
 
-      {/* FOOTER ADVISORY */}
       <div className="mt-20 p-8 border border-dashed border-[var(--border-color)] rounded-3xl bg-slate-50 dark:bg-white/5 flex flex-col lg:flex-row items-center justify-between gap-6">
          <div className="flex items-center gap-6">
             <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-[var(--border-color)]">
@@ -231,12 +226,11 @@ const Forge: React.FC<{ onNavigateToProfile: (id: string) => void }> = ({ onNavi
             </div>
             <div>
                <h4 className="text-lg font-black uppercase tracking-tight">Collaboration Integrity</h4>
-               <p className="text-xs text-slate-500 font-medium italic">"All forge synchronizations are logged to your academic profile. Build responsibly."</p>
+               <p className="text-xs text-slate-500 font-medium">"All forge synchronizations are logged to your academic profile. Build responsibly."</p>
             </div>
          </div>
          <button className="px-10 py-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all shadow-sm">View Archive</button>
       </div>
-
     </div>
   );
 };

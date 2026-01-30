@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { db } from '../db';
 import { ChatConversation, User, College } from '../types';
@@ -52,7 +53,6 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
             setActiveChatId(existingChat.id);
             setMobileMode('chat');
           } else {
-            // New interaction start
             console.log("Initializing direct protocol with node...");
           }
         } else if (m.MOCK_CHATS.length > 0 && !activeChatId && window.innerWidth > 768) {
@@ -154,7 +154,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
                   <h4 className="text-[11px] font-black uppercase tracking-tight text-[var(--text-primary)] truncate">{chat.user.name}</h4>
                   <span className="text-[8px] font-mono text-slate-400 opacity-60">ID_{SHA_GEN()}</span>
                 </div>
-                <p className="text-[10px] text-slate-500 truncate italic font-medium">
+                <p className="text-[10px] text-slate-500 truncate font-medium">
                   {chat.lastMessage}
                 </p>
               </div>
@@ -175,7 +175,6 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
       `}>
         {activeChat ? (
           <>
-            {/* Header */}
             <div className="h-16 border-b border-[var(--border-color)] px-4 md:px-6 flex items-center justify-between bg-slate-50/50 dark:bg-white/5 shrink-0">
               <div className="flex items-center gap-4">
                 <button onClick={() => setMobileMode('list')} className="md:hidden p-2 -ml-2 text-slate-500 hover:text-indigo-600 transition-colors">
@@ -194,12 +193,11 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               <button className="p-2 text-slate-400 hover:text-[var(--text-primary)] transition-colors"><MoreVertical size={18} /></button>
             </div>
 
-            {/* Message Stream */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 no-scrollbar bg-[var(--bg-primary)]" style={{ backgroundImage: 'radial-gradient(var(--border-color) 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}>
               <div className="py-10 text-center space-y-2 border-b border-dashed border-[var(--border-color)] mb-10 opacity-60">
                  <Lock size={18} className="mx-auto text-slate-400" />
                  <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Registry Uplink Encrypted</h5>
-                 <p className="text-[7px] text-slate-400 font-mono italic">Handshake successful @ {new Date().toLocaleDateString()}</p>
+                 <p className="text-[7px] text-slate-400 font-mono">Handshake successful @ {new Date().toLocaleDateString()}</p>
               </div>
 
               {activeChat.messages.map(msg => (
@@ -235,7 +233,6 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               ))}
             </div>
 
-            {/* Input Terminal - Flush to Bottom */}
             <div className="border-t border-[var(--border-color)] bg-slate-50/50 dark:bg-[#0d1117] relative shrink-0">
               {showPalette && (
                 <div className="absolute bottom-[calc(100%+12px)] left-4 right-4 md:left-6 md:right-auto mb-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[4px] shadow-2xl p-4 w-auto md:w-72 animate-in slide-in-from-bottom-2 z-[60]">
@@ -271,7 +268,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
                 </div>
                 <div className="flex items-end gap-3 p-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:pb-4">
                   <textarea 
-                    className="flex-1 bg-transparent border-none focus:outline-none text-xs px-2 py-1 resize-none h-10 no-scrollbar text-[var(--text-primary)] font-medium placeholder:text-slate-400 placeholder:italic"
+                    className="flex-1 bg-transparent border-none focus:outline-none text-xs px-2 py-1 resize-none h-10 no-scrollbar text-[var(--text-primary)] font-medium placeholder:text-slate-400"
                     placeholder="Enter commit message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
@@ -300,7 +297,7 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
                 <MessageSquare size={48} className="text-indigo-600/30" />
              </div>
              <div className="space-y-3">
-                <h3 className="text-2xl font-black uppercase tracking-tighter italic text-[var(--text-primary)]">Select a Network Node</h3>
+                <h3 className="text-2xl font-black uppercase tracking-tighter text-[var(--text-primary)]">Select a Network Node</h3>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] max-w-xs leading-loose mx-auto">
                    Establish a secure protocol with university peers. Select a channel to begin synchronization.
                 </p>

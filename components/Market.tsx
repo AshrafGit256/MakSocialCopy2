@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { db } from '../db';
 import { MarketService } from '../types';
@@ -67,7 +68,6 @@ const Market: React.FC = () => {
 
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 space-y-12 pb-40 animate-in fade-in duration-500 font-mono">
-      
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -75,7 +75,7 @@ const Market: React.FC = () => {
                 <ShoppingBag size={32} />
              </div>
              <div>
-                <h1 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none italic">The Bazaar</h1>
+                <h1 className="text-4xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">The Bazaar</h1>
                 <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 mt-2">Transactional Intelligence / Peer-to-Peer Economy</p>
              </div>
           </div>
@@ -145,8 +145,8 @@ const Market: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                 <h3 className="text-xl font-black uppercase tracking-tighter group-hover:text-indigo-600 transition-colors leading-none italic">{service.title}</h3>
-                 <p className="text-xs text-slate-500 font-medium leading-relaxed italic line-clamp-2">"{service.description}"</p>
+                 <h3 className="text-xl font-black uppercase tracking-tighter group-hover:text-indigo-600 transition-colors leading-none">{service.title}</h3>
+                 <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">"{service.description}"</p>
               </div>
 
               <div className="flex items-center gap-4 py-2">
@@ -167,7 +167,7 @@ const Market: React.FC = () => {
                   <button className="p-3 bg-[var(--bg-secondary)] text-slate-500 rounded-xl hover:text-indigo-600 transition-all border border-[var(--border-color)]">
                     <MessageCircle size={16}/>
                   </button>
-                  <button className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20 flex items-center gap-2 hover:bg-indigo-700 active:scale-95 transition-all">
+                  <button className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 flex items-center gap-2 hover:bg-indigo-700 active:scale-95 transition-all">
                     Initiate_Deal <ArrowUpRight size={14}/>
                   </button>
                </div>
@@ -182,8 +182,8 @@ const Market: React.FC = () => {
                <ShieldCheck size={32} className="text-emerald-500" />
             </div>
             <div className="space-y-1">
-               <h4 className="text-lg font-black uppercase tracking-tight italic text-emerald-600">Secure Protocol Escrow</h4>
-               <p className="text-xs text-slate-500 font-medium italic max-w-xl">"Funds are held within the Hill Registry until the service node validates successful delivery. All peer-to-peer exchanges are encrypted and logged."</p>
+               <h4 className="text-lg font-black uppercase tracking-tight text-emerald-600">Secure Protocol Escrow</h4>
+               <p className="text-xs text-slate-500 font-medium max-w-xl">"Funds are held within the Hill Registry until the service node validates successful delivery. All peer-to-peer exchanges are encrypted and logged."</p>
             </div>
          </div>
          <div className="flex gap-4">
@@ -191,7 +191,6 @@ const Market: React.FC = () => {
             <button className="px-8 py-3.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 transition-all">View Analytics</button>
          </div>
       </div>
-
     </div>
   );
 };

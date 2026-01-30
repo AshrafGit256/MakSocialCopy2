@@ -47,9 +47,9 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 pb-40 animate-in fade-in duration-700 font-sans">
       <div className="flex flex-col mb-10">
-        <h1 className="text-3xl font-black text-[var(--text-primary)] uppercase italic tracking-tighter">Visual Registry</h1>
+        <h1 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter">Visual Registry</h1>
         <div className="flex items-center gap-2 text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">
-          <Layers size={14} className="text-[#10918a]"/> <span>Apps</span> <ChevronRight size={10}/> <span>Gallery</span>
+          <Layers size={14} className="text-[var(--brand-color)]"/> <span>Apps</span> <ChevronRight size={10}/> <span>Gallery</span>
         </div>
       </div>
 
@@ -57,7 +57,6 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px]">
           {items.map((item, idx) => {
             // IG Explore style staggered pattern
-            // Every 10th item is large, certain indices are tall or wide
             const pattern = idx % 10;
             const isLarge = pattern === 0;
             const isTall = pattern === 4 || pattern === 8;
@@ -93,7 +92,7 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
                    </div>
                    <div className="absolute bottom-6 flex flex-col items-center gap-1">
                       <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Source Node</span>
-                      <span className="text-[11px] font-black uppercase tracking-tighter italic">{item.author}</span>
+                      <span className="text-[11px] font-black uppercase tracking-tighter">{item.author}</span>
                    </div>
                    <div className="absolute top-6 right-6">
                       <ArrowUpRight size={18} className="text-white/60 group-hover:text-white transition-colors" />

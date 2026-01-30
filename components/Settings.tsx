@@ -14,6 +14,7 @@ const COLORS = [
   { name: 'Tactical Gray', hex: '#475569' },
   { name: 'Deep Indigo', hex: '#4f46e5' },
   { name: 'Ki Teal', hex: '#10918a' },
+  { name: 'Bronze Wood', hex: '#a87532' },
   { name: 'Cyber Sky', hex: '#0ea5e9' },
   { name: 'Toxic Emerald', hex: '#10b981' },
   { name: 'Pulse Rose', hex: '#f43f5e' },
@@ -93,7 +94,7 @@ const Settings: React.FC = () => {
             <SettingsIcon size={32} />
           </div>
           <div>
-            <h1 className="text-4xl font-black uppercase tracking-tighter italic leading-none">OS_Config</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">OS_Config</h1>
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">personalize your node parameters</p>
           </div>
         </div>
@@ -173,7 +174,7 @@ const Settings: React.FC = () => {
 
               <div className="p-8 border border-dashed border-[var(--border-color)] rounded-xl bg-[var(--bg-secondary)] flex items-center justify-between">
                 <div className="space-y-2">
-                  <h4 className="text-lg font-black uppercase tracking-tighter italic">Live_Preview</h4>
+                  <h4 className="text-lg font-black uppercase tracking-tighter">Live_Preview</h4>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Interface synchronization check</p>
                 </div>
                 <div className="flex gap-2">

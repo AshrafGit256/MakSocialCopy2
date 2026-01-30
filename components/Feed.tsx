@@ -118,7 +118,6 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
           </div>
         );
       case 3:
-        // EXPERT DESIGN: One big left, two stacked right
         return (
           <div className="grid grid-cols-2 gap-0.5 rounded-2xl overflow-hidden border border-[var(--border-color)] aspect-[16/9]">
             <div className="h-full border-r border-[var(--border-color)]">
@@ -316,7 +315,6 @@ const PostItem: React.FC<{
 
                 <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
-                {/* EXPERT IMAGE GRID - X STYLE */}
                 {post.images && post.images.length > 0 && <PostImageGrid images={post.images} />}
 
                 {post.pollData && (
@@ -386,7 +384,7 @@ const PostItem: React.FC<{
                               <span className="text-[12px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{comment.author}</span>
                               <span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span>
                            </div>
-                           <p className="text-[13px] font-medium text-[var(--text-primary)] leading-relaxed italic">"{comment.text}"</p>
+                           <p className="text-[13px] font-medium text-[var(--text-primary)] leading-relaxed">"{comment.text}"</p>
                         </div>
                     </div>
                   ))}
@@ -402,7 +400,7 @@ const PostItem: React.FC<{
                 <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4">
                    <div className="flex items-center gap-2">
                       <GitCommit size={14} className="text-slate-500" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">Append contribution to node branch...</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Append contribution to node branch...</span>
                    </div>
                    <textarea 
                      value={newComment}
@@ -481,7 +479,7 @@ const NewsBulletin: React.FC = () => {
         </div>
         
         <div className="p-4 bg-slate-900/50 backdrop-blur-md border-t border-white/5">
-          <h4 className="text-[10px] font-black text-white uppercase tracking-tighter italic">Hill_Daily_Digest / Intelligence Sync</h4>
+          <h4 className="text-[10px] font-black text-white uppercase tracking-tighter">Hill_Daily_Digest / Intelligence Sync</h4>
           <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status: Summarizing Campus Strata Activity</p>
         </div>
       </div>
@@ -502,7 +500,7 @@ const NewsBulletin: React.FC = () => {
               autoPlay
             />
             <div className="absolute bottom-10 left-10 space-y-2 pointer-events-none">
-              <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">Protocol_Journalism / Expanded</h2>
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Protocol_Journalism / Expanded</h2>
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">Node: Central_Journalism_Wing // {new Date().toLocaleDateString()}</p>
             </div>
           </div>
@@ -522,7 +520,7 @@ const NetworkIntensityGraph: React.FC = () => {
                    <Activity size={12} /> Network_Intensity
                 </h4>
                 <div className="flex items-center gap-3">
-                   <span className="text-3xl font-black italic tracking-tighter ticker-text text-slate-700 dark:text-slate-300">74.8</span>
+                   <span className="text-3xl font-black tracking-tighter ticker-text text-slate-700 dark:text-slate-300">74.8</span>
                    <div className="flex flex-col">
                       <span className="text-[9px] font-black uppercase text-emerald-500 flex items-center gap-0.5">
                          <TrendingUp size={10} /> BULLISH
@@ -567,7 +565,7 @@ const TrendingHashtags: React.FC<{ posts: Post[], onTagClick?: (tag: string) => 
                <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">{count} COMMITS</span>
             </div>
           )) : (
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest italic">No signals indexed...</p>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">No signals indexed...</p>
           )}
        </div>
     </div>
@@ -612,7 +610,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
 
-    // EXPERT HANDLING: Extract image URLs but STRIP them from the HTML message to prevent duplicates.
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     const foundImages: string[] = [];
     let match;
@@ -620,8 +617,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       foundImages.push(match[1]);
     }
 
-    // NEW: Remove the actual <img> tags from the text content.
-    // They will instead be rendered by our specialized ImageGrid component.
     const cleanedHtml = html.replace(/<img[^>]*>/g, '');
 
     const newPost: Post = {
@@ -631,7 +626,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       authorRole: user.role,
       authorAvatar: user.avatar,
       timestamp: 'Just now',
-      content: cleanedHtml, // Use text-only content
+      content: cleanedHtml, 
       images: foundImages, 
       hashtags: foundTags,
       likes: 0,
@@ -673,14 +668,14 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                 </button>
                 <div className="flex items-center gap-3">
                    <GitCommit size={14} className="text-slate-500 animate-pulse" />
-                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">Signal_Deep_Scan_Active</h3>
+                   <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Signal_Deep_Scan_Active</h3>
                 </div>
               </div>
             )}
 
             <div className="mb-12 px-4 flex items-center gap-4">
                <div className="h-px flex-1 bg-[var(--border-color)]"></div>
-               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   {threadId ? 'Branch Manifest' : collegeFilter === 'Global' ? 'Universal Pulse Stream' : `${collegeFilter} Wing Manifest`}
                </span>
                <div className="h-px flex-1 bg-[var(--border-color)]"></div>
@@ -721,7 +716,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
                      <ShieldCheck size={24} className="text-slate-400"/>
-                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none italic text-slate-100">Registry Elite</h4>
+                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none text-slate-100">Registry Elite</h4>
                   </div>
                   <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
                     Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.

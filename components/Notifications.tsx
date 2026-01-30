@@ -53,15 +53,13 @@ const Notifications: React.FC = () => {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-mono text-[var(--text-primary)]">
-      
-      {/* 1. Header Cluster */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div className="flex items-center gap-4">
            <div className="p-4 bg-indigo-600 rounded-md text-white shadow-xl shadow-indigo-600/20">
               <Bell size={28} />
            </div>
            <div>
-              <h1 className="text-3xl font-black uppercase tracking-tighter italic leading-none">Signal_Center</h1>
+              <h1 className="text-3xl font-black uppercase tracking-tighter leading-none">Signal_Center</h1>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2 flex items-center gap-2">
                  <Activity size={10} className="text-emerald-500 animate-pulse" /> Uplink: {unreadCount} Pending Signals
               </p>
@@ -75,7 +73,6 @@ const Notifications: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* 2. Side Filters */}
         <aside className="lg:col-span-3 space-y-1">
            <h3 className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-widest mb-3">Signal_Categories</h3>
            {[
@@ -97,7 +94,6 @@ const Notifications: React.FC = () => {
            ))}
         </aside>
 
-        {/* 3. Notifications List */}
         <main className="lg:col-span-9 space-y-0.5 border border-[var(--border-color)] rounded-md overflow-hidden bg-[var(--bg-primary)]">
            <div className="px-4 py-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center justify-between">
               <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
@@ -123,7 +119,7 @@ const Notifications: React.FC = () => {
                              <button onClick={() => deleteNotif(notif.id)} className="text-slate-400 hover:text-rose-500"><Trash2 size={14}/></button>
                           </div>
                        </div>
-                       <p className="text-[11px] text-slate-500 font-medium italic leading-relaxed">
+                       <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
                           "{notif.description}"
                        </p>
                        <div className="flex items-center gap-4 pt-1">
@@ -142,7 +138,7 @@ const Notifications: React.FC = () => {
              <div className="py-40 text-center space-y-6">
                 <Bell size={48} className="mx-auto text-slate-300 opacity-30" />
                 <div className="space-y-2">
-                   <h3 className="text-2xl font-black uppercase tracking-tighter italic text-slate-400">Signal.Nullified</h3>
+                   <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-400">Signal.Nullified</h3>
                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">No active signal broadcasts detected in current strata.</p>
                 </div>
              </div>
@@ -150,17 +146,15 @@ const Notifications: React.FC = () => {
         </main>
       </div>
 
-      {/* 4. Technical Footer */}
       <div className="mt-20 p-6 border border-dashed border-indigo-600/30 rounded-md bg-indigo-600/5 flex items-center gap-6">
          <div className="p-3 bg-white dark:bg-slate-900 rounded border border-[var(--border-color)]">
             <Hash size={24} className="text-indigo-600" />
          </div>
          <div className="flex-1">
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Integrity Advisory</p>
-            <p className="text-[10px] font-medium text-slate-500 italic">"Alphanumeric signal alerts are parsed via local node logic. AI-driven skill matches are computed based on your verified academic profile strata."</p>
+            <p className="text-[10px] font-medium text-slate-500">"Alphanumeric signal alerts are parsed via local node logic. AI-driven skill matches are computed based on your verified academic profile strata."</p>
          </div>
       </div>
-
     </div>
   );
 };

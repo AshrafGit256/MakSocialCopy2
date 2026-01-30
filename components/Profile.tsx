@@ -46,7 +46,6 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
 
   return (
     <div className="max-w-[1440px] mx-auto pb-40 font-mono text-[var(--text-primary)] bg-[var(--bg-primary)]">
-      {/* 1. Profile Dashboard Navigation Header */}
       <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-white/80 dark:bg-black/80 sticky top-0 z-[100] backdrop-blur-md">
          <div className="flex items-center gap-6">
             <button onClick={onNavigateBack} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-all text-slate-500"><ArrowLeft size={20}/></button>
@@ -65,7 +64,6 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* 2. Left Identity Column (Bio/Metadata) */}
           <aside className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
               <div className="relative group">
@@ -124,7 +122,6 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
             </div>
           </aside>
 
-          {/* 3. Right Activity Column (Manifest Stream & Vault) */}
           <main className="lg:col-span-8 space-y-8">
             <nav className="flex items-center gap-8 border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
               {[
@@ -144,7 +141,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
             <div className="space-y-12">
               {activeTab === 'gallery' ? (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                   <Gallery userId={userId || currentUser.id} onSelectPost={(id) => { /* Selection handled at parent level */ }} />
+                   <Gallery userId={userId || currentUser.id} onSelectPost={(id) => { }} />
                 </div>
               ) : displayedPosts.length > 0 ? displayedPosts.map(p => (
                 <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden hover:border-[var(--brand-color)] transition-all group">

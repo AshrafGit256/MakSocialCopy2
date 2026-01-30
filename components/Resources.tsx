@@ -124,11 +124,11 @@ const Resources: React.FC = () => {
       {/* 1. TACTICAL HEADER */}
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-600 rounded-md shadow-lg text-white">
+          <div className="p-3 bg-[var(--brand-color)] rounded-md shadow-lg text-white">
             <Database size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold uppercase tracking-tighter italic leading-none">The.Vault</h1>
+            <h1 className="text-2xl font-bold uppercase tracking-tighter leading-none">The.Vault</h1>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-1">Sector: {currentCollege} Wing / Nodes: {filteredResources.length}</p>
           </div>
         </div>
@@ -140,10 +140,10 @@ const Resources: React.FC = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Query Alphanumeric Manifest..."
-              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2.5 pl-10 pr-4 text-[11px] font-bold text-[var(--text-primary)] outline-none focus:border-indigo-600 shadow-sm"
+              className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md py-2.5 pl-10 pr-4 text-[11px] font-bold text-[var(--text-primary)] outline-none focus:border-[var(--brand-color)] shadow-sm"
             />
           </div>
-          <button onClick={() => setIsAdding(true)} className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-[10px] font-bold uppercase flex items-center gap-2 transition-all shadow-lg active:scale-95">
+          <button onClick={() => setIsAdding(true)} className="px-4 py-2.5 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-md text-[10px] font-bold uppercase flex items-center gap-2 transition-all shadow-lg active:scale-95">
             <Plus size={14} /> New.Log
           </button>
         </div>
@@ -189,7 +189,7 @@ const Resources: React.FC = () => {
         <div className="p-4 flex flex-wrap gap-2 overflow-x-auto no-scrollbar">
           <button 
             onClick={() => { setSelectedCategory('All'); handleScan(); }}
-            className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === 'All' ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-transparent border-[var(--border-color)] text-slate-500 hover:text-[var(--text-primary)]'}`}
+            className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === 'All' ? 'bg-[var(--brand-color)] border-[var(--brand-color)] text-white shadow-md' : 'bg-transparent border-[var(--border-color)] text-slate-500 hover:text-[var(--text-primary)]'}`}
           >
             All Signals
           </button>
@@ -197,7 +197,7 @@ const Resources: React.FC = () => {
             <button 
               key={cat} 
               onClick={() => { setSelectedCategory(cat); handleScan(); }}
-              className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === cat ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-transparent border-[var(--border-color)] text-slate-500 hover:text-[var(--text-primary)]'}`}
+              className={`px-4 py-1.5 rounded-sm text-[9px] font-bold uppercase transition-all border ${selectedCategory === cat ? 'bg-[var(--brand-color)] border-[var(--brand-color)] text-white shadow-md' : 'bg-transparent border-[var(--border-color)] text-slate-500 hover:text-[var(--text-primary)]'}`}
             >
               {cat}
             </button>
@@ -209,7 +209,7 @@ const Resources: React.FC = () => {
       <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md overflow-hidden relative shadow-sm">
         {isScanning && (
           <div className="absolute inset-0 z-10 bg-[var(--bg-primary)]/40 backdrop-blur-[1px] flex items-center justify-center">
-            <div className="flex items-center gap-3 text-indigo-500">
+            <div className="flex items-center gap-3 text-[var(--brand-color)]">
                <Activity size={18} className="animate-pulse" />
                <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Sector Scan Active...</span>
             </div>
@@ -236,12 +236,12 @@ const Resources: React.FC = () => {
                       <div className={`p-2 rounded-sm border ${
                         res.category === 'Past Paper' ? 'border-rose-500/30 text-rose-500 bg-rose-500/5' :
                         res.category === 'Research' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' :
-                        'border-indigo-500/30 text-indigo-500 bg-indigo-500/5'
+                        'border-[var(--brand-color)]/30 text-[var(--brand-color)] bg-[var(--brand-color)]/5'
                       }`}>
                          <FileText size={16} />
                       </div>
                       <div>
-                        <p className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-tight group-hover:text-indigo-600 transition-colors">{res.title}</p>
+                        <p className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-tight group-hover:text-[var(--brand-color)] transition-colors">{res.title}</p>
                         <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{res.course}</p>
                       </div>
                     </div>
@@ -252,11 +252,11 @@ const Resources: React.FC = () => {
                           <Fingerprint size={12} className="text-slate-400" />
                           <span className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-tight">{res.author}</span>
                        </div>
-                       <span className="text-[8px] font-bold text-indigo-600 uppercase ml-5 opacity-70 tracking-widest">{res.authorRole}</span>
+                       <span className="text-[8px] font-bold text-[var(--brand-color)] uppercase ml-5 opacity-70 tracking-widest">{res.authorRole}</span>
                     </div>
                   </td>
                   <td className="px-6 py-5">
-                    <span className="text-[9px] font-bold text-indigo-500 uppercase">{res.college}</span>
+                    <span className="text-[9px] font-bold text-[var(--brand-color)] uppercase">{res.college}</span>
                   </td>
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-2 text-slate-400">
@@ -273,13 +273,13 @@ const Resources: React.FC = () => {
                     <div className="flex items-center justify-end gap-2">
                       <button 
                         onClick={() => setPreviewResource(res)}
-                        className="p-1.5 hover:bg-indigo-500/10 rounded-md text-slate-400 hover:text-indigo-500 transition-colors"
+                        className="p-1.5 hover:bg-[var(--brand-color)]/10 rounded-md text-slate-400 hover:text-[var(--brand-color)] transition-colors"
                       >
                         <Eye size={14}/>
                       </button>
                       <button 
                         onClick={() => handleDownload(res)}
-                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[9px] font-bold uppercase rounded-md transition-all flex items-center gap-2 shadow-sm active:scale-95"
+                        className="px-3 py-1.5 bg-[var(--brand-color)] hover:brightness-110 text-white text-[9px] font-bold uppercase rounded-md transition-all flex items-center gap-2 shadow-sm active:scale-95"
                       >
                         <Download size={12}/> Sync
                       </button>
@@ -307,7 +307,7 @@ const Resources: React.FC = () => {
                     <div className={`p-2 rounded-sm border ${
                         res.category === 'Past Paper' ? 'border-rose-500/30 text-rose-500 bg-rose-500/5' :
                         res.category === 'Research' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' :
-                        'border-indigo-500/30 text-indigo-500 bg-indigo-500/5'
+                        'border-[var(--brand-color)]/30 text-[var(--brand-color)] bg-[var(--brand-color)]/5'
                       }`}>
                          <FileText size={16} />
                     </div>
@@ -327,7 +327,7 @@ const Resources: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                      <button onClick={() => setPreviewResource(res)} className="p-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-slate-500"><Eye size={14}/></button>
-                     <button onClick={() => handleDownload(res)} className="px-4 py-2 bg-indigo-600 text-white text-[9px] font-bold uppercase rounded-md flex items-center gap-2 shadow-md active:scale-95"><Download size={12}/> Sync</button>
+                     <button onClick={() => handleDownload(res)} className="px-4 py-2 bg-[var(--brand-color)] text-white text-[9px] font-bold uppercase rounded-md flex items-center gap-2 shadow-md active:scale-95"><Download size={12}/> Sync</button>
                   </div>
                </div>
             </div>
@@ -346,8 +346,8 @@ const Resources: React.FC = () => {
            <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[var(--border-color)] max-h-[90vh] overflow-y-auto no-scrollbar">
               <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-4">
                  <div className="flex items-center gap-2">
-                    <Database size={16} className="text-indigo-600" />
-                    <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest italic">Asset.Synchronization</h2>
+                    <Database size={16} className="text-[var(--brand-color)]" />
+                    <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-widest">Asset.Synchronization</h2>
                  </div>
                  <button onClick={() => setIsAdding(false)} className="text-slate-500 hover:text-rose-500 transition-colors"><X size={20}/></button>
               </div>
@@ -361,15 +361,15 @@ const Resources: React.FC = () => {
                          onClick={() => fileInputRef.current?.click()}
                          className={`w-full flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-xl p-8 transition-all ${
                             addForm.fileData 
-                            ? 'bg-indigo-600/10 border-indigo-600' 
-                            : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-indigo-600 hover:bg-indigo-600/5'
+                            ? 'bg-[var(--brand-color)]/10 border-[var(--brand-color)]' 
+                            : 'bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[var(--brand-color)] hover:bg-[var(--brand-color)]/5'
                          }`}
                        >
-                          <div className={`p-4 rounded-full ${addForm.fileData ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+                          <div className={`p-4 rounded-full ${addForm.fileData ? 'bg-[var(--brand-color)] text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
                              <Upload size={24} />
                           </div>
                           <div className="text-center">
-                             <p className={`text-[11px] font-black uppercase tracking-widest ${addForm.fileData ? 'text-indigo-600' : 'text-slate-500'}`}>
+                             <p className={`text-[11px] font-black uppercase tracking-widest ${addForm.fileData ? 'text-[var(--brand-color)]' : 'text-slate-500'}`}>
                                 {addForm.fileName || 'Initialize Device Uplink'}
                              </p>
                              <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">PDF, DOCX, PPTX, ZIP (MAX 25MB)</p>
@@ -389,14 +389,14 @@ const Resources: React.FC = () => {
                     <label className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">2. Asset_Metadata</label>
                     <div className="space-y-3">
                        <input 
-                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all" 
+                         className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-[var(--brand-color)] transition-all" 
                          value={addForm.title} 
                          onChange={e => setAddForm({...addForm, title: e.target.value})} 
                          placeholder="Asset Identity (e.g. Distributed Systems Final Notes)" 
                        />
                        <div className="grid grid-cols-2 gap-3">
                           <input 
-                            className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-indigo-500 transition-all" 
+                            className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md p-3 text-xs font-bold text-[var(--text-primary)] outline-none focus:border-[var(--brand-color)] transition-all" 
                             value={addForm.course} 
                             onChange={e => setAddForm({...addForm, course: e.target.value})} 
                             placeholder="Course Code" 
@@ -412,20 +412,20 @@ const Resources: React.FC = () => {
                     </div>
                  </div>
 
-                 <div className="p-4 bg-indigo-600/5 border border-dashed border-indigo-600/20 rounded-md space-y-2">
+                 <div className="p-4 bg-[var(--brand-color)]/5 border border-dashed border-[var(--brand-color)]/20 rounded-md space-y-2">
                     <div className="flex items-center gap-2">
-                       <UserCheck size={14} className="text-indigo-600" />
+                       <UserCheck size={14} className="text-[var(--brand-color)]" />
                        <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest leading-none">Identity Verification</p>
                     </div>
-                    <p className="text-[8px] text-slate-400 font-medium italic leading-relaxed">
-                       Logging contribution as <span className="text-indigo-600 font-black">"{currentUser.name}"</span> with role <span className="text-indigo-600 font-black">[{currentUser.role}]</span>. 
+                    <p className="text-[8px] text-slate-400 font-medium leading-relaxed">
+                       Logging contribution as <span className="text-[var(--brand-color)] font-black">"{currentUser.name}"</span> with role <span className="text-[var(--brand-color)] font-black">[{currentUser.role}]</span>. 
                        Timestamp will be synchronized with central university time.
                     </p>
                  </div>
 
                  <button 
                    onClick={handleAddResource} 
-                   className="w-full bg-indigo-600 hover:bg-indigo-700 py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-indigo-600/20 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale"
+                   className="w-full bg-[var(--brand-color)] hover:brightness-110 py-4 rounded-md text-white font-bold text-[10px] uppercase tracking-[0.3em] shadow-xl shadow-[var(--brand-color)]/20 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale"
                    disabled={!addForm.title || !addForm.fileData}
                  >
                    Commit Protocol to Vault
@@ -441,35 +441,35 @@ const Resources: React.FC = () => {
            <div className="bg-[var(--bg-primary)] w-full max-w-3xl rounded-md shadow-2xl flex flex-col border border-[var(--border-color)] overflow-hidden">
               <div className="px-6 py-4 border-b border-[var(--border-color)] flex flex-col sm:flex-row justify-between items-center bg-[var(--bg-secondary)] gap-4">
                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-indigo-600 rounded-md text-white"><FileText size={20} /></div>
+                    <div className="p-2 bg-[var(--brand-color)] rounded-md text-white"><FileText size={20} /></div>
                     <div>
                       <h2 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest">{previewResource.title}</h2>
                       <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">{previewResource.course} / STRATUM: {previewResource.category}</p>
                     </div>
                  </div>
                  <div className="flex gap-2 w-full sm:w-auto">
-                   <button onClick={() => handleDownload(previewResource)} className="flex-1 sm:flex-none px-5 py-2 bg-indigo-600 text-white rounded-md text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm hover:bg-indigo-700 active:scale-95 transition-all"><Download size={12}/> Sync.Asset</button>
+                   <button onClick={() => handleDownload(previewResource)} className="flex-1 sm:flex-none px-5 py-2 bg-[var(--brand-color)] text-white rounded-md text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-sm hover:brightness-110 active:scale-95 transition-all"><Download size={12}/> Sync.Asset</button>
                    <button onClick={() => setPreviewResource(null)} className="p-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md text-slate-500 hover:text-rose-500 transition-colors"><X size={20}/></button>
                  </div>
               </div>
               <div className="flex-1 p-10 bg-slate-50 dark:bg-[#0d1117] flex flex-col items-center justify-center space-y-8 min-h-[400px]">
                  <div className="relative">
                     <div className="p-12 bg-white dark:bg-black/40 border border-[var(--border-color)] rounded-[3rem] shadow-2xl relative z-10">
-                       <FileText size={100} className="text-indigo-600 opacity-40 animate-pulse" />
+                       <FileText size={100} className="text-[var(--brand-color)] opacity-40 animate-pulse" />
                     </div>
-                    <div className="absolute -top-4 -right-4 w-24 h-24 bg-indigo-600/10 blur-[40px] rounded-full"></div>
+                    <div className="absolute -top-4 -right-4 w-24 h-24 bg-[var(--brand-color)]/10 blur-[40px] rounded-full"></div>
                  </div>
                  
                  <div className="text-center space-y-6 max-w-md">
                     <div className="space-y-2">
-                       <p className="text-sm font-black uppercase text-[var(--text-primary)] tracking-widest italic">{previewResource.title}</p>
+                       <p className="text-sm font-black uppercase text-[var(--text-primary)] tracking-widest">{previewResource.title}</p>
                        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-[0.4em]">Asset_Status: Verified_Stable</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4 py-6 border-y border-dashed border-[var(--border-color)]">
                        <div className="text-center border-r border-[var(--border-color)]">
                           <p className="text-[7px] font-black text-slate-400 uppercase mb-1">Source Node</p>
-                          <p className="text-[10px] font-black text-indigo-600 uppercase">{previewResource.author}</p>
+                          <p className="text-[10px] font-black text-[var(--brand-color)] uppercase">{previewResource.author}</p>
                           <p className="text-[8px] font-bold text-slate-500 uppercase mt-0.5">[{previewResource.authorRole}]</p>
                        </div>
                        <div className="text-center">
@@ -481,7 +481,7 @@ const Resources: React.FC = () => {
 
                     <button 
                       onClick={() => handleDownload(previewResource)}
-                      className="w-full py-4 bg-[var(--bg-primary)] border border-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-xl"
+                      className="w-full py-4 bg-[var(--bg-primary)] border border-[var(--brand-color)] hover:bg-[var(--brand-color)] hover:text-white rounded-xl text-[10px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-xl"
                     >
                        Initialize Decryption <ArrowUpRight size={16}/>
                     </button>

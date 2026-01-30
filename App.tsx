@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppView, User, College, UserStatus } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
@@ -16,6 +16,8 @@ import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Gallery from './components/Gallery';
+import MessageDropdown from './components/MessageDropdown';
+import NotificationDropdown from './components/NotificationDropdown';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Settings, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
@@ -30,6 +32,11 @@ const App: React.FC = () => {
   const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+
+  // Manifest Dropdown States
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isMsgOpen, setIsMsgOpen] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -56,6 +63,18 @@ const App: React.FC = () => {
         setIsDark(true);
       }
     }
+  }, []);
+
+  // Handle click outside for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setIsNotifOpen(false);
+        setIsMsgOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleTheme = () => {
@@ -90,6 +109,8 @@ const App: React.FC = () => {
 
   const handleSetView = (newView: AppView) => {
     setView(newView); setIsSidebarOpen(false);
+    setIsNotifOpen(false);
+    setIsMsgOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -125,7 +146,7 @@ const App: React.FC = () => {
       {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
       <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-6 py-4 flex items-center justify-between shadow-sm">
+        <header ref={headerRef} className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden"><Menu size={22} /></button>
             <div className="relative">
@@ -142,9 +163,33 @@ const App: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative">
             <button onClick={toggleTheme} className="p-2 text-slate-500 hover:text-[var(--text-primary)] transition-colors">{isDark ? <Sun size={20} /> : <Moon size={20} />}</button>
-            <button onClick={() => handleSetView('notifications')} className="p-2 text-slate-500 hover:text-[var(--text-primary)] relative"><Bell size={20} /> <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span></button>
+            
+            {/* Message Trigger */}
+            <div className="relative">
+              <button 
+                onClick={() => { setIsMsgOpen(!isMsgOpen); setIsNotifOpen(false); }} 
+                className={`p-2 transition-colors relative ${isMsgOpen ? 'text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}
+              >
+                <MessageCircle size={20} /> 
+                <span className="absolute top-1 right-1 w-4 h-4 bg-[var(--brand-color)] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[var(--bg-primary)]">3</span>
+              </button>
+              {isMsgOpen && <MessageDropdown onClose={() => setIsMsgOpen(false)} onViewAll={() => handleSetView('chats')} />}
+            </div>
+
+            {/* Notification Trigger */}
+            <div className="relative">
+              <button 
+                onClick={() => { setIsNotifOpen(!isNotifOpen); setIsMsgOpen(false); }} 
+                className={`p-2 transition-colors relative ${isNotifOpen ? 'text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}
+              >
+                <Bell size={20} /> 
+                <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-[var(--bg-primary)] animate-pulse"></span>
+              </button>
+              {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} onViewAll={() => handleSetView('notifications')} />}
+            </div>
+
             {currentUser && <button onClick={() => handleSetView('profile')} className="ml-1 active:scale-95 transition-transform"><img src={currentUser.avatar} className={`w-10 h-10 rounded-full border-2 ${view === 'profile' ? 'border-[var(--brand-color)]' : 'border-[var(--border-color)]'} bg-white object-cover`} alt="Profile" /></button>}
           </div>
         </header>

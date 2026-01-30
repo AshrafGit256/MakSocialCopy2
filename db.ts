@@ -36,6 +36,77 @@ const ADDITIONAL_POSTS: Post[] = [
     college: 'CONAS'
   },
   {
+    id: 'opp-poster-1',
+    author: 'Makerere Innovation Hub',
+    authorId: 'inn_hub',
+    authorRole: 'Tech Incubator',
+    authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
+    timestamp: '1h ago',
+    isOpportunity: true,
+    opportunityData: {
+      type: 'Grant',
+      isAIVerified: true,
+      detectedBenefit: 'UGX 10M Funding'
+    },
+    images: ['https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=1200'],
+    content: `<h1>Innovation Challenge 2026</h1>
+<p>We are looking for student-led startups to solve urban transportation issues. Successful nodes will receive seed funding and residency at the COCIS wing.</p>`,
+    hashtags: ['#Innovation', '#Grant', '#Startup'],
+    likes: 340,
+    commentsCount: 18,
+    comments: [],
+    views: 5600,
+    flags: [],
+    college: 'Global'
+  },
+  {
+    id: 'opp-poster-2',
+    author: 'CEDAT Design Lab',
+    authorId: 'cedat_design',
+    authorRole: 'Creative Center',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    timestamp: '3h ago',
+    isOpportunity: true,
+    opportunityData: {
+      type: 'Gig',
+      isAIVerified: true,
+      detectedBenefit: 'Professional Portfolio'
+    },
+    images: ['https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200'],
+    content: `<h1>Gig: UI/UX Signal Overhaul</h1>
+<p>Seeking 2 final year designers to assist in the rebranding of the University registry interface. Remote synchronization allowed.</p>`,
+    hashtags: ['#DesignGig', '#CEDAT', '#UIUX'],
+    likes: 180,
+    commentsCount: 12,
+    comments: [],
+    views: 3200,
+    flags: [],
+    college: 'CEDAT'
+  },
+  {
+    id: 'opp-3',
+    author: 'School of Law',
+    authorId: 'law_wing',
+    authorRole: 'Academic Hub',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=LAW',
+    timestamp: '5h ago',
+    isOpportunity: true,
+    opportunityData: {
+      type: 'Scholarship',
+      isAIVerified: true,
+      detectedBenefit: 'Full Tuition Waiver'
+    },
+    content: `<h1>Post-Grad Scholarship: Human Rights</h1>
+<p>The Registry is offering 3 full scholarships for the Masters in Human Rights strata. Candidates must have a GPA above 4.0.</p>`,
+    hashtags: ['#Scholarship', '#LAW', '#Academic'],
+    likes: 890,
+    commentsCount: 45,
+    comments: [],
+    views: 12000,
+    flags: [],
+    college: 'LAW'
+  },
+  {
     id: 'gal-2',
     author: 'Sarah CEDAT',
     authorId: 'u2',

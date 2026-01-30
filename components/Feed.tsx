@@ -3,17 +3,416 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
-import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { 
   Star, MessageCircle, Zap, Radio, Activity, Globe, 
   TrendingUp, Terminal, Share2, Bookmark, 
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
-  Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon
+  Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
+
+// --- LIGHTBOX COMPONENT ---
+const Lightbox: React.FC<{ 
+  images: string[], 
+  initialIndex: number, 
+  onClose: () => void 
+}> = ({ images, initialIndex, onClose }) => {
+  const [index, setIndex] = useState(initialIndex);
+
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 z-[5000] bg-black/95 backdrop-blur-xl flex items-center justify-center animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <button 
+        onClick={onClose}
+        className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-rose-600 text-white rounded-full transition-all z-[5001]"
+      >
+        <X size={24} />
+      </button>
+
+      {images.length > 1 && (
+        <>
+          <button onClick={prev} className="absolute left-6 p-4 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all z-[5001]">
+            <ChevronLeft size={32} />
+          </button>
+          <button onClick={next} className="absolute right-6 p-4 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all z-[5001]">
+            <ChevronRight size={32} />
+          </button>
+        </>
+      )}
+
+      <div className="relative w-full h-full p-4 flex flex-col items-center justify-center">
+        <img 
+          src={images[index]} 
+          className="max-w-full max-h-[85vh] object-contain shadow-2xl rounded-sm" 
+          alt="Expanded view"
+          onClick={(e) => e.stopPropagation()}
+        />
+        <div className="mt-6 px-4 py-2 bg-white/5 rounded-full border border-white/10">
+          <p className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Asset {index + 1} of {images.length}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- X-STYLE IMAGE GRID ---
+const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
+  const [lightbox, setLightbox] = useState<{ open: boolean, index: number }>({ open: false, index: 0 });
+
+  if (!images || images.length === 0) return null;
+
+  const count = images.length;
+
+  const renderGrid = () => {
+    switch (count) {
+      case 1:
+        return (
+          <div className="w-full rounded-xl overflow-hidden border border-[var(--border-color)]">
+            <img 
+              src={images[0]} 
+              className="w-full h-auto max-h-[600px] object-cover cursor-pointer hover:brightness-95 transition-all" 
+              onClick={() => setLightbox({ open: true, index: 0 })}
+              alt="Post asset"
+            />
+          </div>
+        );
+      case 2:
+        return (
+          <div className="grid grid-cols-2 gap-0.5 rounded-xl overflow-hidden border border-[var(--border-color)] h-[300px]">
+            {images.map((img, i) => (
+              <img 
+                key={i} src={img} 
+                className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all" 
+                onClick={() => setLightbox({ open: true, index: i })}
+                alt="Post asset"
+              />
+            ))}
+          </div>
+        );
+      case 3:
+        return (
+          <div className="grid grid-cols-2 gap-0.5 rounded-xl overflow-hidden border border-[var(--border-color)] h-[300px]">
+            <img 
+              src={images[0]} 
+              className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all row-span-2" 
+              onClick={() => setLightbox({ open: true, index: 0 })}
+              alt="Post asset"
+            />
+            <div className="grid grid-rows-2 gap-0.5 h-full">
+              <img 
+                src={images[1]} 
+                className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all" 
+                onClick={() => setLightbox({ open: true, index: 1 })}
+                alt="Post asset"
+              />
+              <img 
+                src={images[2]} 
+                className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all" 
+                onClick={() => setLightbox({ open: true, index: 2 })}
+                alt="Post asset"
+              />
+            </div>
+          </div>
+        );
+      default: // 4+
+        return (
+          <div className="grid grid-cols-2 grid-rows-2 gap-0.5 rounded-xl overflow-hidden border border-[var(--border-color)] h-[300px]">
+            {images.slice(0, 4).map((img, i) => (
+              <div key={i} className="relative w-full h-full overflow-hidden group">
+                <img 
+                  src={img} 
+                  className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all" 
+                  onClick={() => setLightbox({ open: true, index: i })}
+                  alt="Post asset"
+                />
+                {i === 3 && count > 4 && (
+                  <div 
+                    className="absolute inset-0 bg-black/50 flex items-center justify-center cursor-pointer pointer-events-none"
+                    onClick={() => setLightbox({ open: true, index: 3 })}
+                  >
+                    <span className="text-2xl font-black text-white">+{count - 4}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="my-4">
+      {renderGrid()}
+      {lightbox.open && (
+        <Lightbox 
+          images={images} 
+          initialIndex={lightbox.index} 
+          onClose={() => setLightbox({ open: false, index: 0 })} 
+        />
+      )}
+    </div>
+  );
+};
+
+// --- AUTHORITY SEAL COMPONENT ---
+// Fixed missing AuthoritySeal component that was causing build errors across multiple files
+export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
+  if (!role) return null;
+
+  const getSealColor = () => {
+    switch (role) {
+      case 'Administrator':
+      case 'Super Admin':
+        return 'text-rose-500';
+      case 'Official':
+      case 'Staff':
+        return 'text-indigo-500';
+      case 'Lecturer':
+      case 'Academic Council':
+        return 'text-emerald-500';
+      case 'Student Leader':
+      case 'GRC':
+      case 'Chairperson':
+        return 'text-amber-500';
+      case 'Corporate':
+        return 'text-slate-500';
+      default:
+        return 'text-slate-400';
+    }
+  };
+
+  return (
+    <div className={`inline-flex items-center ml-1.5 ${getSealColor()}`} title={`Verified ${role}`}>
+      <ShieldCheck size={size} fill="currentColor" fillOpacity={0.1} />
+    </div>
+  );
+};
+
+const PostItem: React.FC<{ 
+  post: Post, 
+  currentUser: User, 
+  onOpenThread: (id: string) => void, 
+  onNavigateToProfile: (id: string) => void, 
+  bookmarks: string[], 
+  onBookmark: (id: string) => void, 
+  onUpdate: () => void,
+  isThreadView?: boolean,
+  isLiked?: boolean,
+  onLike: (id: string) => void
+}> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike }) => {
+  const [newComment, setNewComment] = useState('');
+  
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLike(post.id);
+  };
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    const comment: Comment = {
+      id: `c-${Date.now()}`,
+      author: currentUser.name,
+      authorAvatar: currentUser.avatar,
+      text: newComment,
+      timestamp: 'Just now'
+    };
+    db.addComment(post.id, comment);
+    setNewComment('');
+    onUpdate();
+  };
+
+  return (
+    <article 
+      onClick={() => !isThreadView && onOpenThread(post.id)}
+      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
+    >
+      <div className="flex">
+          {/* Identity Rail */}
+          <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
+            <img 
+                src={post.authorAvatar} 
+                onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all" 
+                alt="Author avatar"
+            />
+            <div className="mt-4 flex flex-col items-center gap-3 flex-1 h-full">
+                <div className="w-px flex-1 bg-gradient-to-b from-[var(--border-color)] via-[var(--border-color)] to-transparent"></div>
+                <GitCommit size={14} className="text-slate-300 mb-6" />
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            {/* Post Header */}
+            <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <div 
+                    onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
+                    className="flex flex-col cursor-pointer group/name"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-[14px] font-black text-slate-800 dark:text-slate-200 group-hover/name:underline uppercase tracking-tight">{post.author}</span>
+                      <AuthoritySeal role={post.authorAuthority} size={14} />
+                    </div>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">{post.authorRole || 'Member'}</span>
+                  </div>
+                  <div className="hidden sm:block h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
+                  <span className="hidden sm:inline px-1.5 py-0.5 border border-slate-500/20 bg-slate-500/5 rounded-sm text-[8px] font-black uppercase text-slate-500 tracking-widest">{post.college} HUB</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[9px] font-mono text-slate-400 uppercase">{post.timestamp}</span>
+                  <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
+                      <Bookmark size={16} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
+                  </button>
+                </div>
+            </div>
+
+            <div className="p-6">
+                {post.isEventBroadcast && (
+                   <div className="mb-8 rounded-[4px] border border-slate-500/20 overflow-hidden bg-slate-500/5">
+                      <div className="h-48 relative overflow-hidden border-b border-slate-500/20">
+                         <img src={post.eventFlyer} className="w-full h-full object-cover transition-all duration-700" alt="Event flyer" />
+                         <div className="absolute top-4 right-4 px-2 py-1 bg-slate-800 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-xl">Event_Broadcasting</div>
+                      </div>
+                      <div className="p-6 space-y-3">
+                         <h3 className="text-xl font-black uppercase tracking-tighter text-slate-700 dark:text-slate-300 leading-tight">{post.eventTitle}</h3>
+                         <div className="grid grid-cols-2 gap-6">
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter"><Calendar size={12}/> {post.eventDate}</div>
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter"><MapPin size={12}/> {post.eventLocation}</div>
+                         </div>
+                      </div>
+                   </div>
+                )}
+
+                <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-6" dangerouslySetInnerHTML={{ __html: post.content }} />
+                
+                {/* EXPERT IMAGE GRID - X STYLE */}
+                {post.images && post.images.length > 0 && <PostImageGrid images={post.images} />}
+
+                {post.pollData && (
+                  <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[var(--radius-main)] shadow-inner">
+                      <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
+                      {post.pollData.options.map(opt => {
+                        const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
+                        return (
+                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
+                              <div className="absolute inset-y-0 left-0 bg-slate-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                              <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
+                              <span className="relative z-10 text-[10px] font-black text-slate-400">{percentage}%</span>
+                            </div>
+                        );
+                      })}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2 mt-4">
+                   {(post.hashtags || []).map(tag => (
+                      <span key={tag} className="text-[9px] font-bold text-indigo-500 hover:underline cursor-pointer tracking-wider">#{tag.replace('#', '')}</span>
+                   ))}
+                </div>
+            </div>
+
+            {/* Post Interaction Footer */}
+            <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
+                <div className="flex items-center gap-8">
+                  <button onClick={handleLike} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}>
+                      <Star size={16} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()} Stars</span>
+                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                      <MessageCircle size={16} /> <span className="ticker-text">{post.commentsCount.toLocaleString()} Commits</span>
+                  </button>
+                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                    <GitFork size={14}/> {Math.floor(post.likes / 4)} Forks
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-slate-500/10 text-slate-500 border border-slate-500/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest">
+                      <Terminal size={10}/> SHA_{SHA_GEN().slice(0,6)}
+                  </div>
+                  <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><ExternalLink size={16}/></button>
+                </div>
+            </div>
+          </div>
+      </div>
+
+      {isThreadView && (
+        <div className="border-t border-[var(--border-color)] bg-slate-50/20 dark:bg-black/10">
+          <div className="px-6 py-3 bg-slate-100 dark:bg-white/5 border-b border-[var(--border-color)] flex items-center gap-2">
+             <MessageSquare size={12} className="text-slate-400" />
+             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Signal_Deep_Scan / Manifest History</span>
+          </div>
+
+          <div className="space-y-0 relative">
+             {post.comments && post.comments.length > 0 ? (
+               <div className="divide-y divide-[var(--border-color)]">
+                  {post.comments.map((comment, idx) => (
+                    <div key={comment.id} className="flex gap-4 p-6 hover:bg-slate-100/30 dark:hover:bg-white/5 transition-colors">
+                        <div className="w-10 shrink-0 flex flex-col items-center">
+                           <img src={comment.authorAvatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" alt="Comment author" />
+                           {idx !== post.comments.length - 1 && <div className="w-px flex-1 bg-slate-200 dark:bg-slate-800 mt-2"></div>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                           <div className="flex items-center justify-between mb-1">
+                              <span className="text-[12px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{comment.author}</span>
+                              <span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span>
+                           </div>
+                           <p className="text-[13px] font-medium text-[var(--text-primary)] leading-relaxed italic">"{comment.text}"</p>
+                        </div>
+                    </div>
+                  ))}
+               </div>
+             ) : (
+               <div className="py-12 text-center space-y-2 opacity-40">
+                  <MessageSquare size={32} className="mx-auto text-slate-500" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No peer comments detected in current branch.</p>
+               </div>
+             )}
+
+             <div className="p-6 border-t border-[var(--border-color)] bg-white/50 dark:bg-black/30">
+                <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4">
+                   <div className="flex items-center gap-2">
+                      <GitCommit size={14} className="text-slate-500" />
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">Append contribution to node branch...</span>
+                   </div>
+                   <textarea 
+                     value={newComment}
+                     onChange={e => setNewComment(e.target.value)}
+                     placeholder="Type your peer contribution (feedback, report, or inquiry)..."
+                     className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md p-4 text-[13px] font-medium min-h-[120px] focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 outline-none transition-all placeholder:text-slate-400"
+                   />
+                   <div className="flex justify-end">
+                      <button 
+                        type="submit" 
+                        disabled={!newComment.trim()}
+                        className="px-6 py-2.5 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 shadow-md"
+                      >
+                         Submit Commit <Send size={12}/>
+                      </button>
+                   </div>
+                </form>
+             </div>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+};
 
 const NewsBulletin: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -73,7 +472,6 @@ const NewsBulletin: React.FC = () => {
         </div>
       </div>
 
-      {/* Expanded Modal */}
       {isExpanded && (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 md:p-10 bg-black/95 backdrop-blur-lg animate-in fade-in">
           <div className="relative w-full max-w-5xl aspect-video bg-black rounded-[var(--radius-main)] overflow-hidden border border-white/10 shadow-2xl shadow-indigo-600/20">
@@ -178,223 +576,6 @@ const Watchlist: React.FC = () => (
   </div>
 );
 
-export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
-  if (!role) return null;
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} className="inline-block align-text-bottom text-slate-500 ml-1">
-      <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81c-.67-1.31-1.91-2.19-3.34-2.19s-2.67.88-3.33 2.19c-1.4-.46-2.91-.2-3.92.81s-1.26 2.52-.8 3.91c-1.31.67-2.2 1.91-2.2 3.34s.89 2.67 2.2 3.34c-.46 1.39-.21 2.9.8 3.91s2.52 1.26 3.91.81c.67 1.31 1.91 2.19 3.34-2.19s2.67-.88 3.34-2.19c1.39.45 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2l-3.53-3.53 1.41-1.41 2.12 2.12 4.96-4.96 1.41 1.41-6.37 6.37z" fill="currentColor"/>
-    </svg>
-  );
-};
-
-const PostItem: React.FC<{ 
-  post: Post, 
-  currentUser: User, 
-  onOpenThread: (id: string) => void, 
-  onNavigateToProfile: (id: string) => void, 
-  bookmarks: string[], 
-  onBookmark: (id: string) => void, 
-  onUpdate: () => void,
-  isThreadView?: boolean,
-  isLiked?: boolean,
-  onLike: (id: string) => void
-}> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike }) => {
-  const [newComment, setNewComment] = useState('');
-  
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onLike(post.id);
-  };
-
-  const handleCommentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    const comment: Comment = {
-      id: `c-${Date.now()}`,
-      author: currentUser.name,
-      authorAvatar: currentUser.avatar,
-      text: newComment,
-      timestamp: 'Just now'
-    };
-    db.addComment(post.id, comment);
-    setNewComment('');
-    onUpdate();
-  };
-
-  return (
-    <article 
-      onClick={() => !isThreadView && onOpenThread(post.id)}
-      className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
-    >
-      <div className="flex">
-          {/* Identity Rail */}
-          <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
-            <img 
-                src={post.authorAvatar} 
-                onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all" 
-            />
-            <div className="mt-4 flex flex-col items-center gap-3 flex-1 h-full">
-                <div className="w-px flex-1 bg-gradient-to-b from-[var(--border-color)] via-[var(--border-color)] to-transparent"></div>
-                <GitCommit size={14} className="text-slate-300 mb-6" />
-            </div>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            {/* Post Header */}
-            <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div 
-                    onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
-                    className="flex flex-col cursor-pointer group/name"
-                  >
-                    <div className="flex items-center">
-                      <span className="text-[14px] font-black text-slate-800 dark:text-slate-200 group-hover/name:underline uppercase tracking-tight">{post.author}</span>
-                      <AuthoritySeal role={post.authorAuthority} size={14} />
-                    </div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">{post.authorRole || 'Member'}</span>
-                  </div>
-                  <div className="hidden sm:block h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
-                  <span className="hidden sm:inline px-1.5 py-0.5 border border-slate-500/20 bg-slate-500/5 rounded-sm text-[8px] font-black uppercase text-slate-500 tracking-widest">{post.college} HUB</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[9px] font-mono text-slate-400 uppercase">{post.timestamp}</span>
-                  <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded ${bookmarks.includes(post.id) ? 'text-orange-500' : 'text-slate-400'}`}>
-                      <Bookmark size={16} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} />
-                  </button>
-                </div>
-            </div>
-
-            <div className="p-6">
-                {post.isEventBroadcast && (
-                   <div className="mb-8 rounded-[4px] border border-slate-500/20 overflow-hidden bg-slate-500/5">
-                      <div className="h-48 relative overflow-hidden border-b border-slate-500/20">
-                         <img src={post.eventFlyer} className="w-full h-full object-cover transition-all duration-700" />
-                         <div className="absolute top-4 right-4 px-2 py-1 bg-slate-800 text-white rounded text-[8px] font-black uppercase tracking-widest shadow-xl">Event_Broadcasting</div>
-                      </div>
-                      <div className="p-6 space-y-3">
-                         <h3 className="text-xl font-black uppercase tracking-tighter text-slate-700 dark:text-slate-300 leading-tight">{post.eventTitle}</h3>
-                         <div className="grid grid-cols-2 gap-6">
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter"><Calendar size={12}/> {post.eventDate}</div>
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter"><MapPin size={12}/> {post.eventLocation}</div>
-                         </div>
-                      </div>
-                   </div>
-                )}
-
-                <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-6" dangerouslySetInnerHTML={{ __html: post.content }} />
-                
-                {/* Note: Dedicated image grid removed here to prevent duplicates. Images render inline via post.content */}
-
-                {post.pollData && (
-                  <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[var(--radius-main)] shadow-inner">
-                      <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>
-                      {post.pollData.options.map(opt => {
-                        const percentage = post.pollData?.totalVotes ? Math.round((opt.votes / post.pollData.totalVotes) * 100) : 0;
-                        return (
-                            <div key={opt.id} className="relative h-10 border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden flex items-center px-4 group/opt cursor-pointer hover:border-slate-500 transition-all mb-2">
-                              <div className="absolute inset-y-0 left-0 bg-slate-500/10 transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
-                              <span className="relative z-10 text-[11px] font-bold flex-1">{opt.text}</span>
-                              <span className="relative z-10 text-[10px] font-black text-slate-400">{percentage}%</span>
-                            </div>
-                        );
-                      })}
-                  </div>
-                )}
-
-                <div className="flex flex-wrap gap-2 mt-4">
-                   {(post.hashtags || []).map(tag => (
-                      <span key={tag} className="text-[9px] font-bold text-indigo-500 hover:underline cursor-pointer tracking-wider">#{tag.replace('#', '')}</span>
-                   ))}
-                </div>
-            </div>
-
-            {/* Post Interaction Footer */}
-            <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
-                <div className="flex items-center gap-8">
-                  <button onClick={handleLike} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}>
-                      <Star size={16} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()} Stars</span>
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-                      <MessageCircle size={16} /> <span className="ticker-text">{post.commentsCount.toLocaleString()} Commits</span>
-                  </button>
-                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                    <GitFork size={14}/> {Math.floor(post.likes / 4)} Forks
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-slate-500/10 text-slate-500 border border-slate-500/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest">
-                      <Terminal size={10}/> SHA_{SHA_GEN().slice(0,6)}
-                  </div>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"><ExternalLink size={16}/></button>
-                </div>
-            </div>
-          </div>
-      </div>
-
-      {isThreadView && (
-        <div className="border-t border-[var(--border-color)] bg-slate-50/20 dark:bg-black/10">
-          <div className="px-6 py-3 bg-slate-100 dark:bg-white/5 border-b border-[var(--border-color)] flex items-center gap-2">
-             <MessageSquare size={12} className="text-slate-400" />
-             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Signal_Deep_Scan / Manifest History</span>
-          </div>
-
-          <div className="space-y-0 relative">
-             {post.comments && post.comments.length > 0 ? (
-               <div className="divide-y divide-[var(--border-color)]">
-                  {post.comments.map((comment, idx) => (
-                    <div key={comment.id} className="flex gap-4 p-6 hover:bg-slate-100/30 dark:hover:bg-white/5 transition-colors">
-                        <div className="w-10 shrink-0 flex flex-col items-center">
-                           <img src={comment.authorAvatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" />
-                           {idx !== post.comments.length - 1 && <div className="w-px flex-1 bg-slate-200 dark:bg-slate-800 mt-2"></div>}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                           <div className="flex items-center justify-between mb-1">
-                              <span className="text-[12px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{comment.author}</span>
-                              <span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span>
-                           </div>
-                           <p className="text-[13px] font-medium text-[var(--text-primary)] leading-relaxed italic">"{comment.text}"</p>
-                        </div>
-                    </div>
-                  ))}
-               </div>
-             ) : (
-               <div className="py-12 text-center space-y-2 opacity-40">
-                  <MessageSquare size={32} className="mx-auto text-slate-500" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No peer comments detected in current branch.</p>
-               </div>
-             )}
-
-             <div className="p-6 border-t border-[var(--border-color)] bg-white/50 dark:bg-black/30">
-                <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4">
-                   <div className="flex items-center gap-2">
-                      <GitCommit size={14} className="text-slate-500" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">Append contribution to node branch...</span>
-                   </div>
-                   <textarea 
-                     value={newComment}
-                     onChange={e => setNewComment(e.target.value)}
-                     placeholder="Type your peer contribution (feedback, report, or inquiry)..."
-                     className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md p-4 text-[13px] font-medium min-h-[120px] focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 outline-none transition-all placeholder:text-slate-400"
-                   />
-                   <div className="flex justify-end">
-                      <button 
-                        type="submit" 
-                        disabled={!newComment.trim()}
-                        className="px-6 py-2.5 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white rounded-[4px] text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 shadow-md"
-                      >
-                         Submit Commit <Send size={12}/>
-                      </button>
-                   </div>
-                </form>
-             </div>
-          </div>
-        </div>
-      )}
-    </article>
-  );
-};
-
 const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void, onHashtagClick?: (tag: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError, onHashtagClick }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
@@ -417,14 +598,17 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
 
-    // We extract image URLs for registry indexing/gallery, but we keep the original HTML 
-    // content (with images) so they render exactly where the user inserted them.
+    // EXPERT HANDLING: Extract image URLs but STRIP them from the HTML message to prevent duplicates.
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     const foundImages: string[] = [];
     let match;
     while ((match = imgRegex.exec(html)) !== null) {
       foundImages.push(match[1]);
     }
+
+    // NEW: Remove the actual <img> tags from the text content.
+    // They will instead be rendered by our specialized ImageGrid component.
+    const cleanedHtml = html.replace(/<img[^>]*>/g, '');
 
     const newPost: Post = {
       id: `p-${Date.now()}`,
@@ -433,7 +617,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       authorRole: user.role,
       authorAvatar: user.avatar,
       timestamp: 'Just now',
-      content: html, // Kept original to preserve images in their user-defined positions
+      content: cleanedHtml, // Use text-only (with basic HTML like h1/p) content
       images: foundImages, 
       hashtags: foundTags,
       likes: 0,

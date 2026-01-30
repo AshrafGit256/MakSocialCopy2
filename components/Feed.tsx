@@ -431,13 +431,17 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
 
-    // FIX: Extract image URLs from the HTML string
+    // Extract image URLs from the HTML string for the structured images array
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     const foundImages: string[] = [];
     let match;
     while ((match = imgRegex.exec(html)) !== null) {
       foundImages.push(match[1]);
     }
+
+    // NEW: Rectify double image issue by stripping <img> tags from the html content
+    // We already have them in the foundImages array which renders in the high-fidelity grid.
+    const cleanedHtml = html.replace(/<img[^>]*>/g, '');
 
     const newPost: Post = {
       id: `p-${Date.now()}`,
@@ -446,8 +450,8 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       authorRole: user.role,
       authorAvatar: user.avatar,
       timestamp: 'Just now',
-      content: html,
-      images: foundImages, // Newly extracted images
+      content: cleanedHtml, // Use the version without inline images
+      images: foundImages, 
       hashtags: foundTags,
       likes: 0,
       commentsCount: 0,

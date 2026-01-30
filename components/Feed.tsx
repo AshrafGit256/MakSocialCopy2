@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
@@ -9,7 +10,7 @@ import {
   BarChart3, MoreHorizontal, ShieldCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
-  Maximize2, Volume2, Play, Pause, X
+  Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -281,8 +282,29 @@ const PostItem: React.FC<{
                    </div>
                 )}
 
-                <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
+                <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-6" dangerouslySetInnerHTML={{ __html: post.content }} />
                 
+                {/* POST IMAGE GRID - GitHub Like Vibe */}
+                {post.images && post.images.length > 0 && (
+                  <div className={`mb-6 grid gap-2 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                    {post.images.map((img, i) => (
+                      <div key={i} className="group/img relative rounded-[4px] border border-[var(--border-color)] overflow-hidden bg-[var(--bg-primary)] aspect-video">
+                        <img 
+                          src={img} 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105 grayscale-[10%] group-hover/img:grayscale-0" 
+                          alt={`Asset ${i}`}
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/10 transition-colors pointer-events-none"></div>
+                        <div className="absolute bottom-2 right-2 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                          <div className="px-2 py-1 bg-black/60 backdrop-blur-md rounded text-[7px] font-black text-white uppercase tracking-widest flex items-center gap-1">
+                            <ImageIcon size={10}/> VIEW_ASSET
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {post.pollData && (
                   <div className="my-8 space-y-3 bg-[var(--bg-primary)] border border-[var(--border-color)] p-6 rounded-[var(--radius-main)] shadow-inner">
                       <p className="text-[10px] font-black uppercase text-slate-500 mb-4 flex items-center gap-2 tracking-widest"><BarChart3 size={12}/> ACTIVE_NODE_CENSUS</p>

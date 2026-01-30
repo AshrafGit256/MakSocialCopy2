@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { Post } from '../types';
-import { ChevronRight, LayoutGrid, Search, Layers, Heart, MessageCircle } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Search, Layers, Heart, MessageCircle, ArrowUpRight } from 'lucide-react';
 
 interface GalleryProps {
   onSelectPost: (postId: string) => void;
@@ -15,6 +15,7 @@ interface GalleryItem {
   postId: string;
   likes: number;
   commentsCount: number;
+  author: string;
 }
 
 const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
@@ -33,7 +34,8 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
             url: img,
             postId: p.id,
             likes: p.likes,
-            commentsCount: p.commentsCount
+            commentsCount: p.commentsCount,
+            author: p.author
           });
         });
       }
@@ -52,18 +54,20 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
       </div>
 
       {items.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px]">
           {items.map((item, idx) => {
-            // Logic to create staggered effect like the screenshot
-            const isLarge = idx % 10 === 0;
-            const isTall = idx % 10 === 4 || idx % 10 === 8;
-            const isWide = idx % 10 === 2;
+            // IG Explore style staggered pattern
+            // Every 10th item is large, certain indices are tall or wide
+            const pattern = idx % 10;
+            const isLarge = pattern === 0;
+            const isTall = pattern === 4 || pattern === 8;
+            const isWide = pattern === 2;
 
             return (
               <div 
                 key={item.id}
                 onClick={() => onSelectPost(item.postId)}
-                className={`group relative overflow-hidden rounded-[2rem] border border-[var(--border-color)] bg-[var(--bg-secondary)] cursor-pointer transition-all hover:scale-[1.02] hover:shadow-2xl z-10 ${
+                className={`group relative overflow-hidden rounded-[2rem] border border-[var(--border-color)] bg-[var(--bg-secondary)] cursor-pointer transition-all hover:scale-[1.01] hover:shadow-2xl z-10 ${
                   isLarge ? 'md:col-span-2 md:row-span-2' : 
                   isTall ? 'md:row-span-2' : 
                   isWide ? 'md:col-span-2' : ''
@@ -71,17 +75,28 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
               >
                 <img 
                   src={item.url} 
-                  className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700" 
+                  className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000" 
                   alt="Gallery Asset"
                 />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6 text-white backdrop-blur-[2px]">
-                   <div className="flex items-center gap-2">
-                      <Heart size={20} fill="white" />
-                      <span className="text-sm font-black">{item.likes}</span>
+                
+                {/* Meta Overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-6 text-white backdrop-blur-[1px]">
+                   <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                         <Heart size={20} fill="white" />
+                         <span className="text-sm font-black">{item.likes}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                         <MessageCircle size={20} fill="white" />
+                         <span className="text-sm font-black">{item.commentsCount}</span>
+                      </div>
                    </div>
-                   <div className="flex items-center gap-2">
-                      <MessageCircle size={20} fill="white" />
-                      <span className="text-sm font-black">{item.commentsCount}</span>
+                   <div className="absolute bottom-6 flex flex-col items-center gap-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Source Node</span>
+                      <span className="text-[11px] font-black uppercase tracking-tighter italic">{item.author}</span>
+                   </div>
+                   <div className="absolute top-6 right-6">
+                      <ArrowUpRight size={18} className="text-white/60 group-hover:text-white transition-colors" />
                    </div>
                 </div>
               </div>

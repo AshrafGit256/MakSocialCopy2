@@ -3,17 +3,17 @@ import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotificati
 import { MOCK_POSTS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v26',
-  USERS: 'maksocial_users_v25',
+  POSTS: 'maksocial_posts_v27',
+  USERS: 'maksocial_users_v26',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  RESOURCES: 'maksocial_resources_v25',
-  CALENDAR: 'maksocial_calendar_v25',
-  BOOKMARKS: 'maksocial_bookmarks_v25',
+  RESOURCES: 'maksocial_resources_v26',
+  CALENDAR: 'maksocial_calendar_v26',
+  BOOKMARKS: 'maksocial_bookmarks_v26',
   CHATS: 'maksocial_chats_hub_v1',
-  EMAILS: 'maksocial_emails_v25',
-  NOTIFICATIONS: 'maksocial_notifications_v25',
-  EVENTS: 'maksocial_events_v25',
-  GROUPS: 'maksocial_groups_v25'
+  EMAILS: 'maksocial_emails_v26',
+  NOTIFICATIONS: 'maksocial_notifications_v26',
+  EVENTS: 'maksocial_events_v26',
+  GROUPS: 'maksocial_groups_v26'
 };
 
 const ADDITIONAL_POSTS: Post[] = [
@@ -24,7 +24,7 @@ const ADDITIONAL_POSTS: Post[] = [
     authorRole: 'Wildlife Node',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
     timestamp: '2h ago',
-    content: 'Capturing the local fauna during the field research at the bio-wing. #Nature #Science',
+    content: '<h1>Fauna Catalog_01</h1><p>Capturing the local fauna during the field research at the bio-wing. The biodiversity levels in the northern strata are peaking. #Nature #Science</p>',
     images: ['https://images.unsplash.com/photo-1552728089-57bdde30eba3?auto=format&fit=crop&w=800'],
     hashtags: ['#Nature', '#Science'],
     likes: 120,
@@ -42,7 +42,7 @@ const ADDITIONAL_POSTS: Post[] = [
     authorRole: 'Visual Architect',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     timestamp: '4h ago',
-    content: 'Cybernetic aesthetics in the design studio today. Future of tech nodes looks bright. #Cyberpunk #Design',
+    content: '<h1>Design Strata_v4</h1><p>Cybernetic aesthetics in the design studio today. Future of tech nodes looks bright. Initializing new lighting protocols for the end-of-year showcase. #Cyberpunk #Design</p>',
     images: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800'],
     hashtags: ['#Cyberpunk', '#Design'],
     likes: 890,
@@ -60,7 +60,7 @@ const ADDITIONAL_POSTS: Post[] = [
     authorRole: 'Core Dev',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
     timestamp: '6h ago',
-    content: 'Spotted this little fellow near the server room. Mascot initialized. #Macro #Nature',
+    content: '<h1>Macro System Check</h1><p>Spotted this little fellow near the server room. Mascot initialized and assigned to monitoring bandwidth logs. #Macro #Nature</p>',
     images: ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=800'],
     hashtags: ['#Macro', '#Nature'],
     likes: 56,
@@ -78,7 +78,7 @@ const ADDITIONAL_POSTS: Post[] = [
     authorRole: 'Student Leader',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
     timestamp: '1d ago',
-    content: 'A view of the Hill strata from the library peak. #Makerere #View',
+    content: '<h1>Hill Strata View</h1><p>A panoramic view of the Makerere Hill strata from the library peak. The synchronization of the campus architecture remains a masterpiece. #Makerere #View</p>',
     images: ['https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=800'],
     hashtags: ['#Makerere', '#View'],
     likes: 450,
@@ -96,7 +96,7 @@ const ADDITIONAL_POSTS: Post[] = [
     authorRole: 'Botanist Node',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
     timestamp: '1d ago',
-    content: 'Macro study of flora in the botanical wing. #Macro #Flowers',
+    content: '<h1>Flora Intelligence</h1><p>Macro study of flora in the botanical wing. Genetic markers are appearing consistent with the Alpha-V strain. #Macro #Flowers</p>',
     images: ['https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800'],
     hashtags: ['#Macro', '#Flowers'],
     likes: 320,
@@ -106,6 +106,78 @@ const ADDITIONAL_POSTS: Post[] = [
     flags: [],
     isOpportunity: false,
     college: 'CAES'
+  },
+  {
+    id: 'gal-6',
+    author: 'Alpha Node',
+    authorId: 'u-alpha',
+    authorRole: 'Protocol Scout',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alpha',
+    timestamp: '2d ago',
+    content: '<h1>Night Strata</h1><p>The main wing during the nocturnal cycle. Energy logs are efficient. #Night #Hill</p>',
+    images: ['https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800'],
+    hashtags: ['#Night', '#Hill'],
+    likes: 670,
+    commentsCount: 30,
+    comments: [],
+    views: 3400,
+    flags: [],
+    isOpportunity: false,
+    college: 'Global'
+  },
+  {
+    id: 'gal-7',
+    author: 'Sarah CEDAT',
+    authorId: 'u2',
+    authorRole: 'Visual Architect',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    timestamp: '2d ago',
+    content: '<h1>Mountain Sync</h1><p>Field research at the mountain base. Environmental nodes established. #Research #Mountain</p>',
+    images: ['https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800'],
+    hashtags: ['#Research', '#Mountain'],
+    likes: 1200,
+    commentsCount: 45,
+    comments: [],
+    views: 8900,
+    flags: [],
+    isOpportunity: false,
+    college: 'CEDAT'
+  },
+  {
+    id: 'gal-8',
+    author: 'Bette Hagenes',
+    authorId: 'u-bette',
+    authorRole: 'Registry Admin',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bette',
+    timestamp: '3d ago',
+    content: '<h1>Architecture Logs</h1><p>Documentation of the structural integrity of the old wing. Preservation protocols active. #History #Arch</p>',
+    images: ['https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800'],
+    hashtags: ['#History', '#Arch'],
+    likes: 89,
+    commentsCount: 4,
+    comments: [],
+    views: 500,
+    flags: [],
+    isOpportunity: false,
+    college: 'CEDAT'
+  },
+  {
+    id: 'gal-9',
+    author: 'Ninfa Monaldo',
+    authorId: 'u-ninfa',
+    authorRole: 'Wildlife Node',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
+    timestamp: '4d ago',
+    content: '<h1>Avian Intel</h1><p>Synchronizing the latest avian tracking data. #Birds #Bio</p>',
+    images: ['https://images.unsplash.com/photo-1444464666168-49d633b867ad?auto=format&fit=crop&w=800'],
+    hashtags: ['#Birds', '#Bio'],
+    likes: 210,
+    commentsCount: 12,
+    comments: [],
+    views: 1100,
+    flags: [],
+    isOpportunity: false,
+    college: 'CONAS'
   }
 ];
 
@@ -209,8 +281,8 @@ export const db = {
   },
   getPosts: (): Post[] => {
     const stored = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
-    // Ensure mock visual posts are injected if they don't exist
-    if (!stored.find(p => p.id === 'gal-1')) {
+    // Ensure mock visual posts are injected if they don't exist in this version
+    if (!stored.find(p => p.id === 'gal-9')) {
        const merged = [...ADDITIONAL_POSTS, ...stored];
        localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(merged));
        return merged;

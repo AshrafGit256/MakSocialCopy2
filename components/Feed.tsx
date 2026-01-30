@@ -6,7 +6,7 @@ import RichEditor from './Summernote';
 import { 
   Star, MessageCircle, Zap, Radio, Activity, Globe, 
   TrendingUp, Terminal, Share2, Bookmark, 
-  BarChart3, MoreHorizontal, ShieldCheck, 
+  BarChart3, MoreHorizontal, BadgeCheck, 
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
   Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon,
@@ -184,35 +184,14 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
   );
 };
 
-// --- AUTHORITY SEAL COMPONENT ---
-export const AuthoritySeal: React.FC<{ role?: AuthorityRole, size?: number }> = ({ role, size = 16 }) => {
-  if (!role) return null;
-
-  const getSealColor = () => {
-    switch (role) {
-      case 'Administrator':
-      case 'Super Admin':
-        return 'text-rose-500';
-      case 'Official':
-      case 'Staff':
-        return 'text-indigo-500';
-      case 'Lecturer':
-      case 'Academic Council':
-        return 'text-emerald-500';
-      case 'Student Leader':
-      case 'GRC':
-      case 'Chairperson':
-        return 'text-amber-500';
-      case 'Corporate':
-        return 'text-slate-500';
-      default:
-        return 'text-slate-400';
-    }
-  };
+// --- AUTHORITY SEAL COMPONENT (X-STYLE) ---
+export const AuthoritySeal: React.FC<{ role?: string, size?: number, verified?: boolean }> = ({ role, size = 16, verified = true }) => {
+  // If explicitly not verified and no role, don't show
+  if (!verified && !role) return null;
 
   return (
-    <div className={`inline-flex items-center ml-1.5 ${getSealColor()}`} title={`Verified ${role}`}>
-      <ShieldCheck size={size} fill="currentColor" fillOpacity={0.1} />
+    <div className="inline-flex items-center ml-1 text-[var(--brand-color)]" title={role ? `Verified ${role}` : 'Verified Node'}>
+      <BadgeCheck size={size} fill="currentColor" stroke="white" strokeWidth={1.5} />
     </div>
   );
 };
@@ -281,9 +260,9 @@ const PostItem: React.FC<{
                   >
                     <div className="flex items-center">
                       <span className="text-[14px] font-black text-slate-800 dark:text-slate-200 group-hover/name:underline uppercase tracking-tight">{post.author}</span>
-                      <AuthoritySeal role={post.authorAuthority} size={14} />
+                      <AuthoritySeal role={post.authorAuthority} size={15} />
                     </div>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">{post.authorRole || 'Member'}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">{post.authorRole || 'Verified Node'}</span>
                   </div>
                   <div className="hidden sm:block h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
                   <span className="hidden sm:inline px-1.5 py-0.5 border border-slate-500/20 bg-slate-500/5 rounded-sm text-[8px] font-black uppercase text-slate-500 tracking-widest">{post.college} HUB</span>
@@ -715,7 +694,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
                <div className="relative z-10 space-y-6">
                   <div className="flex items-center gap-3">
-                     <ShieldCheck size={24} className="text-slate-400"/>
+                     <BadgeCheck size={24} className="text-slate-400" fill="currentColor" stroke="white" strokeWidth={1.5}/>
                      <h4 className="text-[16px] font-black uppercase tracking-widest leading-none text-slate-100">Registry Elite</h4>
                   </div>
                   <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">

@@ -158,7 +158,7 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
           className={`w-full min-h-[120px] max-h-[600px] overflow-y-auto p-6 outline-none text-[13px] font-mono text-[var(--text-primary)] leading-relaxed post-editor-surface ${isExpanded ? 'min-h-[260px]' : ''}`}
         ></div>
-        {!content && <div className="absolute top-6 left-6 pointer-events-none text-slate-400 text-[11px] italic font-mono flex items-center gap-2">
+        {!content && <div className="absolute top-6 left-6 pointer-events-none text-slate-400 text-[11px] font-mono flex items-center gap-2">
            <Terminal size={12}/> Initializing contribution buffer...
         </div>}
       </div>

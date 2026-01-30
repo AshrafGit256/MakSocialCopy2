@@ -167,9 +167,9 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               </div>
             </div>
 
-            <div className="text-[14px] font-black text-[var(--text-primary)] uppercase mb-6 px-1 italic flex items-center justify-between">
+            <div className="text-[14px] font-black text-[var(--text-primary)] uppercase mb-6 px-1 flex items-center justify-between">
               {currentMonth.toLocaleString('default', { month: 'long' })} {currentMonth.getFullYear()}
-              <span className="text-[8px] font-bold text-slate-400 not-italic">V4.2.0</span>
+              <span className="text-[8px] font-bold text-slate-400">V4.2.0</span>
             </div>
 
             <div className="grid grid-cols-7 gap-1.5 mb-2 text-center text-[8px] font-black text-slate-400 uppercase tracking-widest">
@@ -289,7 +289,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
                              </button>
                           </div>
                           
-                          <p className="text-[11px] text-slate-500 leading-relaxed font-medium italic opacity-90 line-clamp-2">
+                          <p className="text-[11px] text-slate-500 leading-relaxed font-medium opacity-90 line-clamp-2">
                             "{event.description}"
                           </p>
 
@@ -344,7 +344,7 @@ const Calendar: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-6">
                  <div className="flex items-center gap-3">
                     <Zap size={20} className="text-indigo-600" />
-                    <h2 className="text-xl font-black uppercase tracking-tighter italic">Log.Signal</h2>
+                    <h2 className="text-xl font-black uppercase tracking-tighter">Log.Signal</h2>
                  </div>
                  <button onClick={() => setIsAdding(false)} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={24}/></button>
               </div>

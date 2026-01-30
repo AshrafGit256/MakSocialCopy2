@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { User, Post, AuthorityRole, College } from '../types';
@@ -156,13 +157,14 @@ const Search: React.FC<SearchProps> = ({ initialQuery = '', onNavigateToProfile,
                        <h4 onClick={() => onNavigateToPost(post.id)} className="text-base font-black text-indigo-600 hover:underline cursor-pointer tracking-tight">
                          {post.author.toLowerCase()} / signal_{post.id.slice(-4)}
                        </h4>
+                       <AuthoritySeal size={14} />
                        <span className="px-2 py-0.5 border border-[var(--border-color)] rounded-full text-[9px] text-slate-500 font-bold uppercase">Public</span>
                     </div>
                   </div>
                   
                   <div className="flex gap-4">
                     <div className="flex-1 space-y-3">
-                      <p className="text-xs text-slate-500 leading-relaxed font-sans line-clamp-2 italic">
+                      <p className="text-xs text-slate-500 leading-relaxed font-sans line-clamp-2">
                         "{post.content.replace(/<[^>]*>/g, '')}"
                       </p>
                       
@@ -196,8 +198,7 @@ const Search: React.FC<SearchProps> = ({ initialQuery = '', onNavigateToProfile,
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
+              )) : (
               filteredUsers.map(user => (
                 <div key={user.id} className="py-6 flex items-center justify-between group">
                   <div className="flex items-center gap-4">
@@ -206,9 +207,9 @@ const Search: React.FC<SearchProps> = ({ initialQuery = '', onNavigateToProfile,
                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[var(--bg-primary)] rounded-full"></div>
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <h4 onClick={() => onNavigateToProfile(user.id)} className="text-sm font-black text-[var(--text-primary)] hover:text-indigo-600 transition-colors cursor-pointer uppercase">{user.name}</h4>
-                        <AuthoritySeal role={user.badges?.includes('Official') ? 'Official' : undefined} size={14} />
+                        <AuthoritySeal size={14} />
                       </div>
                       <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mt-1">{user.role} • {user.college} HUB</p>
                     </div>
@@ -228,7 +229,7 @@ const Search: React.FC<SearchProps> = ({ initialQuery = '', onNavigateToProfile,
               <div className="py-40 text-center space-y-6">
                 <Terminal size={48} className="mx-auto text-slate-300" />
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter italic">Registry Error: 404</h3>
+                  <h3 className="text-2xl font-black uppercase tracking-tighter">Registry Error: 404</h3>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em]">No alphanumeric signals detected for current query parameters.</p>
                 </div>
                 <button onClick={() => setQuery('')} className="px-8 py-3 bg-indigo-600 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Clear Protocol</button>

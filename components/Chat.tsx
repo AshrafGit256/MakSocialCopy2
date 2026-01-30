@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { db } from '../db';
 import { ChatConversation, User, College } from '../types';
+import { AuthoritySeal } from './Feed';
 import { 
   Send, Paperclip, Smile, Search, Edit3, 
   Terminal, ShieldCheck, Box, MoreVertical,
@@ -151,7 +152,10 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                  <h4 className="text-[11px] font-black uppercase tracking-tight text-[var(--text-primary)] truncate">{chat.user.name}</h4>
+                  <div className="flex items-center gap-1 truncate">
+                    <h4 className="text-[11px] font-black uppercase tracking-tight text-[var(--text-primary)] truncate">{chat.user.name}</h4>
+                    <AuthoritySeal size={10} />
+                  </div>
                   <span className="text-[8px] font-mono text-slate-400 opacity-60">ID_{SHA_GEN()}</span>
                 </div>
                 <p className="text-[10px] text-slate-500 truncate font-medium">
@@ -184,7 +188,10 @@ const Chat: React.FC<ChatProps> = ({ initialTargetUserId }) => {
                   <Box size={14} className="text-slate-400 hidden sm:block" />
                   <span className="text-indigo-600 hover:underline cursor-pointer hidden sm:inline">{currentUser?.name}</span>
                   <span className="text-slate-400 hidden sm:inline">/</span>
-                  <span className="text-[var(--text-primary)] truncate">{activeChat.user.name.toLowerCase()}-sync</span>
+                  <div className="flex items-center gap-1.5 truncate">
+                    <span className="text-[var(--text-primary)] truncate">{activeChat.user.name.toLowerCase()}-sync</span>
+                    <AuthoritySeal size={12} />
+                  </div>
                 </div>
                 <div className="px-2 py-0.5 border border-emerald-500/30 bg-emerald-500/5 text-emerald-500 text-[8px] font-black uppercase rounded-full flex items-center gap-1.5 whitespace-nowrap">
                    <Activity size={10} className="animate-pulse" /> Stable_Link

@@ -375,6 +375,11 @@ const Resources: React.FC = () => {
                              <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">PDF, DOCX, PPTX, ZIP (MAX 25MB)</p>
                           </div>
                        </button>
+                       <button 
+                         type="button"
+                         onClick={() => fileInputRef.current?.click()}
+                         className="hidden"
+                       />
                        <input 
                          type="file" 
                          ref={fileInputRef} 

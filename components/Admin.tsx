@@ -9,7 +9,7 @@ import { ANALYTICS } from '../constants';
 import { 
   Users, Activity, Trash2, Plus, 
   Calendar as CalendarIcon, Zap, X, FileText, 
-  ShieldCheck, LayoutDashboard, Menu, Bell, 
+  BadgeCheck, LayoutDashboard, Menu, Bell, 
   LogOut, TrendingUp, ChevronRight, ChevronLeft,
   Database, Search, Filter, Shield, Cpu,
   ArrowLeft, Layers, Lock, Inbox, Send, Archive, 
@@ -119,7 +119,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         <aside className={`transition-all duration-300 flex flex-col shrink-0 z-[100] ${isSidebarOpen ? 'w-64' : 'w-20'} bg-[#343a40] border-r border-white/5`}>
           <div className="h-16 flex items-center px-6 border-b border-white/10 shrink-0 gap-3">
             <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-xl">
-              <ShieldCheck size={18} className="text-[#343a40]" />
+              <BadgeCheck size={18} className="text-[var(--brand-color)]" fill="currentColor" stroke="white" strokeWidth={1.5} />
             </div>
             {isSidebarOpen && <span className="font-black text-xs uppercase tracking-widest text-white">Admin Terminal</span>}
           </div>
@@ -268,7 +268,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                                 {selectedEmail?.body}
                               </div>
                               <div className="pt-8">
-                                 <p className="text-sm text-slate-500 font-bold italic">Thanks,</p>
+                                 <p className="text-sm text-slate-500 font-bold">Thanks,</p>
                                  <p className="text-sm font-black text-slate-800 dark:text-white mt-1 uppercase tracking-tight">{selectedEmail?.fromName}</p>
                               </div>
                            </div>
@@ -335,7 +335,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                                  <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Redo2 className="rotate-180" size={14}/></button>
                                  <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Bold size={14}/></button>
                                  <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500"><Italic size={14}/></button>
-                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500 font-serif font-black italic underline">U</button>
+                                 <button className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-[2px] text-slate-500 font-serif font-black underline">U</button>
                                  <div className="w-px h-5 bg-[#e2e8f0] dark:bg-[#30363d] mx-1"></div>
                                  <select className="bg-white dark:bg-black/20 border border-[#e2e8f0] dark:border-[#30363d] rounded-[2px] text-[10px] px-2 py-1 outline-none text-slate-500 font-bold uppercase">
                                     <option>Source Sans Pro</option>
@@ -359,7 +359,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                            </div>
 
                            <div className="space-y-4">
-                              <button className="flex items-center gap-2 px-4 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"><Paperclip size={14}/> Attachment</button>
+                              <button className="flex items-center gap-2 px-4 py-2 border border-[#e2e8f0] dark:border-[#30363d] bg-[#f8fafc] dark:bg-[#161b22] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all"><Paperclip size={14}/></button>
                               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Max. 32MB</p>
                            </div>
 
@@ -389,7 +389,7 @@ const Admin: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                             </div>
                             <span className={`text-[10px] font-black uppercase ${s.trend.startsWith('+') ? 'text-emerald-500' : 'text-rose-500'}`}>{s.trend}</span>
                          </div>
-                         <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1 italic tracking-tighter ticker-text">{s.value}</h3>
+                         <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-tighter ticker-text">{s.value}</h3>
                          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1">{s.label}</p>
                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#007bff] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       </div>

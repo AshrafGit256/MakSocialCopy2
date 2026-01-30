@@ -370,6 +370,7 @@ const INITIAL_USERS: User[] = [
     followingCount: 150,
     totalLikesCount: 3400,
     badges: ['Verified'],
+    verified: true,
     appliedTo: [],
     bio: 'Building the next generation of academic strata.'
   }
@@ -385,7 +386,11 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
 };
 
 export const db = {
-  getUsers: (): User[] => parseArray<User>(DB_KEYS.USERS, INITIAL_USERS),
+  getUsers: (): User[] => {
+    const users = parseArray<User>(DB_KEYS.USERS, INITIAL_USERS);
+    // Universal verification injection
+    return users.map(u => ({ ...u, verified: true }));
+  },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
   getUser: (id?: string): User => {
     const users = db.getUsers();

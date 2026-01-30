@@ -238,7 +238,7 @@ const Events: React.FC<EventsProps> = ({ isAdmin }) => {
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-400 font-medium italic line-clamp-3 mb-8 border-l-2 border-indigo-600/30 pl-4">
+                  <p className="text-xs text-slate-400 font-medium line-clamp-3 mb-8 border-l-2 border-indigo-600/30 pl-4">
                     "{event.description}"
                   </p>
 

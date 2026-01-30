@@ -50,7 +50,10 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
          <div className="flex items-center gap-6">
             <button onClick={onNavigateBack} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-all text-slate-500"><ArrowLeft size={20}/></button>
             <div className="flex flex-col">
-               <h2 className="text-[14px] font-black uppercase tracking-tighter leading-none">{user.name.toLowerCase()}</h2>
+               <div className="flex items-center gap-1.5">
+                  <h2 className="text-[14px] font-black uppercase tracking-tighter leading-none">{user.name.toLowerCase()}</h2>
+                  <AuthoritySeal size={14} />
+               </div>
                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Registry_ID: {SHA_GEN()}</span>
             </div>
          </div>
@@ -74,7 +77,10 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
               </div>
 
               <div className="space-y-2 pt-2">
-                <h1 className="text-3xl font-black uppercase tracking-tighter leading-tight">{user.name}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-3xl font-black uppercase tracking-tighter leading-tight">{user.name}</h1>
+                  <AuthoritySeal size={28} />
+                </div>
                 <p className="text-lg text-slate-400 font-bold tracking-tight">@{user.name.toLowerCase().replace(/\s/g, '')}</p>
               </div>
 

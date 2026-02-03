@@ -26,7 +26,7 @@ const Settings: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     return saved ? JSON.parse(saved) : {
-      primaryColor: '#10918a',
+      primaryColor: '#475569',
       fontFamily: '"JetBrains Mono", monospace',
       fontSize: 'md',
       borderRadius: '6px',
@@ -42,7 +42,6 @@ const Settings: React.FC = () => {
     root.style.setProperty('--font-main', settings.fontFamily);
     root.style.setProperty('--radius-main', settings.borderRadius);
 
-    // Apply Preset Specific variables
     if (settings.themePreset === 'oled') {
       root.style.setProperty('--bg-primary', '#000000');
       root.style.setProperty('--bg-secondary', '#0a0a0a');
@@ -65,7 +64,6 @@ const Settings: React.FC = () => {
       root.style.setProperty('--border-color', '#2a2a3a');
       document.documentElement.classList.add('dark');
     } else {
-      // standard
       root.style.setProperty('--bg-primary', '#111827');
       root.style.setProperty('--bg-secondary', '#1f2937');
       root.style.setProperty('--bg-sidebar', '#1f2937');
@@ -77,7 +75,7 @@ const Settings: React.FC = () => {
 
   const handleReset = () => {
     setSettings({
-      primaryColor: '#10918a',
+      primaryColor: '#475569',
       fontFamily: '"JetBrains Mono", monospace',
       fontSize: 'md',
       borderRadius: '6px',
@@ -124,7 +122,6 @@ const Settings: React.FC = () => {
         <main className="lg:col-span-9 space-y-10">
           {activeTab === 'visuals' && (
             <div className="space-y-10 animate-in fade-in slide-in-from-right-2">
-              
               <div className="space-y-4">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">Environment_Strata</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -171,18 +168,6 @@ const Settings: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="p-8 border border-dashed border-[var(--border-color)] rounded-xl bg-[var(--bg-secondary)] flex items-center justify-between">
-                <div className="space-y-2">
-                  <h4 className="text-lg font-black uppercase tracking-tighter">Live_Preview</h4>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Interface synchronization check</p>
-                </div>
-                <div className="flex gap-2">
-                   <div className="w-8 h-8 rounded bg-[var(--brand-color)] shadow-lg"></div>
-                   <div className="w-8 h-8 rounded border border-[var(--border-color)]"></div>
-                </div>
-              </div>
-
             </div>
           )}
         </main>

@@ -48,20 +48,25 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
-    if (saved) {
-      const settings = JSON.parse(saved);
-      const root = document.documentElement;
-      root.style.setProperty('--brand-color', settings.primaryColor);
-      root.style.setProperty('--font-main', settings.fontFamily);
-      root.style.setProperty('--radius-main', settings.borderRadius);
-      
-      if (settings.themePreset === 'paper') {
-        document.documentElement.classList.remove('dark');
-        setIsDark(false);
-      } else {
-        document.documentElement.classList.add('dark');
-        setIsDark(true);
-      }
+    const defaultSettings = {
+      primaryColor: '#475569',
+      fontFamily: '"JetBrains Mono", monospace',
+      borderRadius: '2px',
+      themePreset: 'tactical'
+    };
+    
+    const settings = saved ? JSON.parse(saved) : defaultSettings;
+    const root = document.documentElement;
+    root.style.setProperty('--brand-color', settings.primaryColor || '#475569');
+    root.style.setProperty('--font-main', settings.fontFamily);
+    root.style.setProperty('--radius-main', settings.borderRadius);
+    
+    if (settings.themePreset === 'paper') {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
     }
   }, []);
 

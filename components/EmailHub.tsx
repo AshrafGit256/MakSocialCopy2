@@ -72,13 +72,11 @@ const EmailHub: React.FC = () => {
     const files = e.target.files;
     if (!files) return;
 
-    // Added explicit type cast to File[] for Array.from(files) to resolve unknown type errors
     const newAttachments: EmailAttachment[] = (Array.from(files) as File[]).map(file => ({
       id: `att-${Date.now()}-${Math.random()}`,
       name: file.name,
       size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
       type: file.type.includes('image') ? 'image' : 'file',
-      // In a real app, we'd store a URL.createObjectURL or base64 here
       img: file.type.includes('image') ? URL.createObjectURL(file) : undefined
     }));
 
@@ -89,8 +87,37 @@ const EmailHub: React.FC = () => {
     setComposeAttachments(prev => prev.filter(a => a.id !== id));
   };
 
+  const handleSaveDraft = () => {
+    const newDraft: PlatformEmail = {
+      id: `draft-${Date.now()}`,
+      from: currentUser.email || 'node@mak.ac.ug',
+      fromName: currentUser.name,
+      fromAvatar: currentUser.avatar,
+      to: composeTo ? [composeTo] : [],
+      subject: composeSubject || '[NO SUBJECT]',
+      body: composeBody,
+      timestamp: 'Just now',
+      fullDate: new Date().toLocaleString(),
+      isRead: true,
+      isStarred: false,
+      folder: 'draft',
+      attachments: composeAttachments.length > 0 ? composeAttachments : undefined
+    };
+
+    const updated = [newDraft, ...emails];
+    setEmails(updated);
+    db.saveEmails(updated);
+    
+    setView('list');
+    setFolder('draft');
+    resetCompose();
+  };
+
   const handleSendEmail = () => {
-    if (!composeTo.trim() || !composeSubject.trim()) return;
+    if (!composeTo.trim()) {
+      alert("Diagnostic Error: Recipient Node Required.");
+      return;
+    }
 
     const recipients = composeTo.split(/[,\s]+/).filter(e => e.includes('@'));
     
@@ -105,7 +132,7 @@ const EmailHub: React.FC = () => {
       fromName: currentUser.name,
       fromAvatar: currentUser.avatar,
       to: recipients,
-      subject: composeSubject,
+      subject: composeSubject || '[NO SUBJECT]',
       body: composeBody,
       timestamp: 'Just now',
       fullDate: new Date().toLocaleString(),
@@ -119,13 +146,17 @@ const EmailHub: React.FC = () => {
     setEmails(updated);
     db.saveEmails(updated);
     
+    setFolder('sent');
+    setActiveLabel(null);
+    setView('list');
+    resetCompose();
+  };
+
+  const resetCompose = () => {
     setComposeTo('');
     setComposeSubject('');
     setComposeBody('');
     setComposeAttachments([]);
-    setFolder('sent');
-    setActiveLabel(null);
-    setView('list');
   };
 
   const filteredEmails = useMemo(() => {
@@ -145,7 +176,7 @@ const EmailHub: React.FC = () => {
   const sidebarItems = [
     { id: 'inbox', label: 'Inbox', icon: <Inbox size={18}/>, count: emails.filter(e => e.folder === 'inbox' && !e.isRead).length },
     { id: 'sent', label: 'Sent', icon: <Send size={18}/> },
-    { id: 'draft', label: 'Draft', icon: <FileText size={18}/> },
+    { id: 'draft', label: 'Draft', icon: <FileText size={18}/>, count: emails.filter(e => e.folder === 'draft').length },
     { id: 'starred', label: 'Starred', icon: <Star size={18}/> },
     { id: 'spam', label: 'Spam', icon: <AlertCircle size={18}/> },
     { id: 'trash', label: 'Trash', icon: <Trash size={18}/> },
@@ -446,6 +477,7 @@ const EmailHub: React.FC = () => {
                   <div className="border border-[var(--border-color)] rounded-[2px] overflow-hidden flex flex-col min-h-[500px] shadow-2xl">
                      {/* RICH TEXT TACTICAL TOOLBAR */}
                      <div className="flex flex-wrap items-center gap-1 p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
+                        <button onClick={handleSendEmail} disabled={!composeTo.trim()} className="p-2.5 bg-[var(--brand-color)] text-white rounded-[2px] shadow-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mr-4 hover:brightness-110 disabled:opacity-50"><Send size={14}/> Transmit</button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Redo2 className="rotate-180" size={16}/></button>
                         <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-black">B</button>
@@ -486,10 +518,10 @@ const EmailHub: React.FC = () => {
                      </div>
                      <div className="flex gap-4 w-full sm:w-auto">
                         <button onClick={() => setView('list')} className="flex-1 sm:flex-none px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-rose-500 transition-colors flex items-center justify-center gap-2"><X size={18}/> Discard</button>
-                        <button className="flex-1 sm:flex-none px-10 py-3 border border-[var(--border-color)] rounded-[2px] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:bg-white/5 transition-all flex items-center justify-center gap-2"><FileText size={18}/> Save_Draft</button>
+                        <button onClick={handleSaveDraft} className="flex-1 sm:flex-none px-10 py-3 border border-[var(--border-color)] rounded-[2px] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:bg-white/5 transition-all flex items-center justify-center gap-2"><FileText size={18}/> Save_Draft</button>
                         <button 
                           onClick={handleSendEmail}
-                          disabled={!composeTo.trim() || !composeSubject.trim()}
+                          disabled={!composeTo.trim()}
                           className="flex-1 sm:flex-none px-12 py-4 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[2px] text-[10px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all disabled:opacity-50"
                         >
                            Transmit <Send size={20}/>

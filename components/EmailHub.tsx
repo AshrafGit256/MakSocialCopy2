@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db } from '../db';
-import { PlatformEmail, User } from '../types';
+import { PlatformEmail, User, EmailAttachment } from '../types';
 import { 
   Inbox, Send, FileText, Trash, Star, 
   ChevronRight, ChevronLeft, Search, Plus, 
@@ -9,7 +9,7 @@ import {
   MoreHorizontal, Download, Image as ImageIcon, 
   File, Printer, ChevronDown, RotateCw, Filter,
   Tag, AlignLeft, AlignCenter, AlignRight, Bold,
-  Italic, List, Code, Redo2, Terminal, AlertCircle
+  Italic, List, Code, Redo2, Terminal, AlertCircle, FilePlus
 } from 'lucide-react';
 
 const PAGE_SIZE = 10;
@@ -28,6 +28,9 @@ const EmailHub: React.FC = () => {
   const [composeTo, setComposeTo] = useState('');
   const [composeSubject, setComposeSubject] = useState('');
   const [composeBody, setComposeBody] = useState('');
+  const [composeAttachments, setComposeAttachments] = useState<EmailAttachment[]>([]);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setEmails(db.getEmails());
@@ -50,10 +53,45 @@ const EmailHub: React.FC = () => {
     db.saveEmails(updated);
   };
 
+  const handleForward = (email: PlatformEmail) => {
+    setComposeTo('');
+    setComposeSubject(`Fwd: ${email.subject}`);
+    setComposeBody(`\n\n---------- Forwarded message ---------\nFrom: ${email.fromName} <${email.from}>\nDate: ${email.fullDate}\nSubject: ${email.subject}\nTo: ${email.to.join(', ')}\n\n${email.body}`);
+    setComposeAttachments(email.attachments || []);
+    setView('compose');
+  };
+
+  const handleReply = (email: PlatformEmail) => {
+    setComposeTo(email.from);
+    setComposeSubject(`Re: ${email.subject}`);
+    setComposeBody(`\n\nOn ${email.fullDate}, ${email.fromName} wrote:\n> ${email.body.replace(/\n/g, '\n> ')}`);
+    setView('compose');
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    // Added explicit type cast to File[] for Array.from(files) to resolve unknown type errors
+    const newAttachments: EmailAttachment[] = (Array.from(files) as File[]).map(file => ({
+      id: `att-${Date.now()}-${Math.random()}`,
+      name: file.name,
+      size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
+      type: file.type.includes('image') ? 'image' : 'file',
+      // In a real app, we'd store a URL.createObjectURL or base64 here
+      img: file.type.includes('image') ? URL.createObjectURL(file) : undefined
+    }));
+
+    setComposeAttachments(prev => [...prev, ...newAttachments]);
+  };
+
+  const removeAttachment = (id: string) => {
+    setComposeAttachments(prev => prev.filter(a => a.id !== id));
+  };
+
   const handleSendEmail = () => {
     if (!composeTo.trim() || !composeSubject.trim()) return;
 
-    // Parse multiple emails split by comma or space
     const recipients = composeTo.split(/[,\s]+/).filter(e => e.includes('@'));
     
     if (recipients.length === 0) {
@@ -73,17 +111,18 @@ const EmailHub: React.FC = () => {
       fullDate: new Date().toLocaleString(),
       isRead: true,
       isStarred: false,
-      folder: 'sent'
+      folder: 'sent',
+      attachments: composeAttachments.length > 0 ? composeAttachments : undefined
     };
 
     const updated = [newEmail, ...emails];
     setEmails(updated);
     db.saveEmails(updated);
     
-    // Reset and return to list
     setComposeTo('');
     setComposeSubject('');
     setComposeBody('');
+    setComposeAttachments([]);
     setFolder('sent');
     setActiveLabel(null);
     setView('list');
@@ -93,14 +132,9 @@ const EmailHub: React.FC = () => {
     return emails.filter(e => {
       const matchesSearch = e.subject.toLowerCase().includes(search.toLowerCase()) || 
                            e.fromName.toLowerCase().includes(search.toLowerCase());
-      
-      if (activeLabel) {
-        return e.label === activeLabel && matchesSearch;
-      }
-
+      if (activeLabel) return e.label === activeLabel && matchesSearch;
       if (folder === 'all') return matchesSearch;
       if (folder === 'starred') return e.isStarred && matchesSearch;
-      
       return e.folder === folder && matchesSearch;
     });
   }, [emails, folder, activeLabel, search]);
@@ -134,7 +168,6 @@ const EmailHub: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* SIDEBAR NAVIGATION */}
         <aside className="lg:col-span-3 space-y-6">
           <button 
             onClick={() => setView('compose')}
@@ -182,16 +215,10 @@ const EmailHub: React.FC = () => {
                 >
                    <Tag size={14} className="opacity-40" /> All Mail
                 </button>
-                {['Primary', 'Promotions', 'Social Updates'].map(extra => (
-                   <button key={extra} className="w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all uppercase tracking-tighter">
-                      <Tag size={14} className="opacity-40" /> {extra}
-                   </button>
-                ))}
              </div>
           </div>
         </aside>
 
-        {/* MAIN EMAIL WORKSPACE */}
         <main className="lg:col-span-9 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] shadow-2xl flex flex-col relative min-h-[800px] overflow-hidden">
           
           {view === 'list' && (
@@ -358,28 +385,12 @@ const EmailHub: React.FC = () => {
 
                  <div className="pt-12 border-t border-[var(--border-color)] space-y-8">
                     <div className="flex gap-4">
-                       <button className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
+                       <button onClick={() => handleReply(selectedEmail)} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
                           <Reply size={16} className="rotate-180"/> Reply
                        </button>
-                       <button className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
-                          <Reply size={16} className="rotate-180"/> Reply All
-                       </button>
-                       <button className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
+                       <button onClick={() => handleForward(selectedEmail)} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
                           Forward <Forward size={16}/>
                        </button>
-                    </div>
-
-                    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] p-6 shadow-inner space-y-4">
-                       <div className="flex items-center gap-3 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
-                          <Terminal size={14} className="text-[var(--brand-color)]" /> Quick_Uplink
-                       </div>
-                       <textarea 
-                         className="w-full bg-transparent border-none outline-none text-sm font-medium leading-relaxed resize-none h-32 no-scrollbar text-[var(--text-primary)] placeholder:text-slate-600" 
-                         placeholder="Type signal message..."
-                       />
-                       <div className="flex justify-end pt-4 border-t border-[var(--border-color)]">
-                          <button className="px-12 py-3 bg-[var(--brand-color)] text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-[2px] shadow-2xl shadow-[var(--brand-color)]/30 active:scale-95 transition-all">Transmit_Commit</button>
-                       </div>
                     </div>
                  </div>
               </div>
@@ -399,7 +410,7 @@ const EmailHub: React.FC = () => {
                   <div className="grid grid-cols-1 gap-6">
                      <div className="relative group">
                         <input 
-                          className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] uppercase tracking-tighter" 
+                          className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] tracking-tighter" 
                           placeholder="TO_NODES (Comma separated):" 
                           value={composeTo}
                           onChange={e => setComposeTo(e.target.value)}
@@ -419,6 +430,19 @@ const EmailHub: React.FC = () => {
                      </div>
                   </div>
 
+                  {/* Attachment Previews */}
+                  {composeAttachments.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                       {composeAttachments.map(att => (
+                         <div key={att.id} className="px-3 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-sm flex items-center gap-3 group">
+                            {att.type === 'image' ? <ImageIcon size={12}/> : <FileText size={12}/>}
+                            <span className="text-[9px] font-black uppercase truncate max-w-[120px]">{att.name}</span>
+                            <button onClick={() => removeAttachment(att.id)} className="text-slate-400 hover:text-rose-500"><X size={12}/></button>
+                         </div>
+                       ))}
+                    </div>
+                  )}
+
                   <div className="border border-[var(--border-color)] rounded-[2px] overflow-hidden flex flex-col min-h-[500px] shadow-2xl">
                      {/* RICH TEXT TACTICAL TOOLBAR */}
                      <div className="flex flex-wrap items-center gap-1 p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
@@ -432,7 +456,7 @@ const EmailHub: React.FC = () => {
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignCenter size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignRight size={16}/></button>
                         <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><ImageIcon size={16}/></button>
+                        <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><ImageIcon size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Code size={16}/></button>
                      </div>
                      <textarea 
@@ -445,9 +469,19 @@ const EmailHub: React.FC = () => {
 
                   <div className="flex flex-col sm:flex-row items-center justify-between pt-10 border-t border-[var(--border-color)] gap-8">
                      <div className="flex items-center gap-6">
-                        <button className="flex items-center gap-3 px-6 py-2.5 border border-[var(--border-color)] bg-[var(--bg-secondary)] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[var(--brand-color)] hover:border-[var(--brand-color)] transition-all shadow-sm">
+                        <button 
+                          onClick={() => fileInputRef.current?.click()} 
+                          className="flex items-center gap-3 px-6 py-2.5 border border-[var(--border-color)] bg-[var(--bg-secondary)] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[var(--brand-color)] hover:border-[var(--brand-color)] transition-all shadow-sm"
+                        >
                            <Paperclip size={18}/> Attach_Asset
                         </button>
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          className="hidden" 
+                          multiple 
+                          onChange={handleFileChange} 
+                        />
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Max_Payload: 32MB</p>
                      </div>
                      <div className="flex gap-4 w-full sm:w-auto">

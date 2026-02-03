@@ -45,7 +45,7 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
       </div>
 
       {items.length > 0 ? (
-        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0.5 sm:gap-4 auto-rows-auto sm:auto-rows-[250px]">
+        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0.5 sm:gap-4 auto-rows-[100px] sm:auto-rows-[250px]">
           {items.map((item, idx) => {
             const pattern = idx % 10;
             const isLarge = pattern === 0;

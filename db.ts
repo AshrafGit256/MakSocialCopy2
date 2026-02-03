@@ -16,57 +16,6 @@ const DB_KEYS = {
   GROUPS: 'maksocial_groups_v26'
 };
 
-const ADDITIONAL_POSTS: Post[] = [
-  {
-    id: 'opp-poster-3',
-    author: 'CHUSS Research Wing',
-    authorId: 'chuss_research',
-    authorRole: 'Humanities Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=CHUSS',
-    timestamp: 'Just now',
-    isOpportunity: true,
-    opportunityData: {
-      type: 'Workshop',
-      isAIVerified: true,
-      detectedBenefit: 'Global Certification'
-    },
-    images: ['https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200'],
-    content: `<h1>Humanitarian Data Ethics Workshop</h1>
-<p>Join the CHUSS research nodes for a three-day intensive protocol on data ethics in the global south. Limited slots for 4th-year students.</p>`,
-    hashtags: ['#Ethics', '#Humanities', '#Workshop'],
-    likes: 45,
-    commentsCount: 3,
-    comments: [],
-    views: 1200,
-    flags: [],
-    college: 'CHUSS'
-  },
-  {
-    id: 'opp-poster-4',
-    author: 'Makerere Fintech Lab',
-    authorId: 'fintech_mak',
-    authorRole: 'Innovation Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=FIN',
-    timestamp: '2h ago',
-    isOpportunity: true,
-    opportunityData: {
-      type: 'Internship',
-      isAIVerified: true,
-      detectedBenefit: 'UGX 1.2M Stipend'
-    },
-    images: ['https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200'],
-    content: `<h1>Fintech Analyst Internship</h1>
-<p>Seeking 3 students from COBAMS or COCIS wings to join our mobile money logic strata. Deep knowledge of transaction telemetry required.</p>`,
-    hashtags: ['#Fintech', '#COBAMS', '#Internship'],
-    likes: 210,
-    commentsCount: 15,
-    comments: [],
-    views: 8900,
-    flags: [],
-    college: 'Global'
-  }
-];
-
 const INITIAL_USERS: User[] = [
   {
     id: 'u-ninfa',
@@ -87,6 +36,87 @@ const INITIAL_USERS: User[] = [
     verified: true,
     appliedTo: [],
     bio: 'Building the next generation of academic strata.'
+  },
+  {
+    id: 'u-sarah',
+    name: 'Sarah CEDAT',
+    role: 'Visual Architect',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    connections: 840,
+    email: 'sarah.c@mak.ac.ug',
+    college: 'CEDAT',
+    // Fixed: 'Year 3' is not a valid UserStatus. Changed to 'Finalist'.
+    status: 'Finalist',
+    subscriptionTier: 'Free',
+    joinedColleges: ['CEDAT'],
+    postsCount: 22,
+    followersCount: 450,
+    followingCount: 200,
+    totalLikesCount: 1200,
+    badges: ['Verified'],
+    verified: true,
+    appliedTo: [],
+    bio: 'Pushing pixel-perfect designs in the engineering wing.'
+  },
+  {
+    id: 'u-roy',
+    name: 'Roy Ssemboga',
+    role: 'Student Leader',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
+    connections: 4500,
+    email: 'roy.s@mak.ac.ug',
+    college: 'CHS',
+    status: 'Graduate',
+    subscriptionTier: 'Enterprise',
+    joinedColleges: ['CHS', 'Global'],
+    postsCount: 156,
+    followersCount: 12000,
+    followingCount: 300,
+    totalLikesCount: 45000,
+    badges: ['Verified', 'Leader'],
+    verified: true,
+    appliedTo: [],
+    bio: 'Former Guild President. Committed to student welfare protocols.'
+  },
+  {
+    id: 'u-john',
+    name: 'Dr. John S.',
+    role: 'Senior Lecturer',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
+    connections: 2300,
+    email: 'john.s@mak.ac.ug',
+    college: 'COCIS',
+    status: 'Masters',
+    subscriptionTier: 'Pro',
+    joinedColleges: ['COCIS', 'Global'],
+    postsCount: 89,
+    followersCount: 2100,
+    followingCount: 100,
+    totalLikesCount: 5600,
+    badges: ['Verified', 'Academic'],
+    verified: true,
+    appliedTo: [],
+    bio: 'Lead researcher in distributed intelligence matrices.'
+  },
+  {
+    id: 'u-nawangwe',
+    name: 'Prof. Barnabas Nawangwe',
+    role: 'Administrator',
+    avatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
+    connections: 10000,
+    email: 'vc@mak.ac.ug',
+    college: 'Global',
+    status: 'Graduate',
+    subscriptionTier: 'Enterprise',
+    joinedColleges: ['Global'],
+    postsCount: 300,
+    followersCount: 85000,
+    followingCount: 50,
+    totalLikesCount: 99000,
+    badges: ['Verified', 'Admin'],
+    verified: true,
+    appliedTo: [],
+    bio: 'Vice Chancellor. Orchestrating the Hill’s academic strata.'
   }
 ];
 
@@ -119,13 +149,7 @@ export const db = {
     db.saveUsers(users);
   },
   getPosts: (): Post[] => {
-    const stored = parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
-    if (!stored.find(p => p.id === 'opp-poster-4')) {
-       const merged = [...ADDITIONAL_POSTS, ...stored];
-       localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(merged));
-       return merged;
-    }
-    return stored;
+    return parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
   addPost: (post: Post) => db.savePosts([post, ...db.getPosts()]),

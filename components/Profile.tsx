@@ -7,7 +7,8 @@ import Gallery from './Gallery';
 import { 
   MapPin, ArrowLeft, Globe, Zap, Radio, Share2, Database, 
   Terminal, Award, Trophy, Bookmark, Mail, Link as LinkIcon, Edit2, Calendar,
-  GitCommit, Star, MessageCircle, FileVideo, Box, GitFork, LayoutGrid
+  GitCommit, Star, MessageCircle, FileVideo, Box, GitFork, LayoutGrid,
+  UserPlus, CheckCircle2
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -16,6 +17,8 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
   const [user, setUser] = useState<User | null>(null);
   const [displayedPosts, setDisplayedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState<'signals' | 'bookmarks' | 'gallery' | 'achievements'>('signals');
+  const [isFollowing, setIsFollowing] = useState(false);
+  
   const currentUser = db.getUser();
   const isOwnProfile = !userId || userId === currentUser.id;
 
@@ -37,6 +40,12 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
       }
     }
   }, [userId, currentUser.id, isOwnProfile, activeTab]);
+
+  const handleEmail = () => {
+    if (user?.email) {
+      window.location.href = `mailto:${user.email}`;
+    }
+  };
 
   if (!user) return (
     <div className="flex items-center justify-center h-screen font-mono text-slate-400 uppercase tracking-[0.5em] animate-pulse">
@@ -85,11 +94,23 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
               </div>
 
               {isOwnProfile ? (
-                 <button className="w-full py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all">Edit Parameters</button>
+                 <button className="w-full py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all">Edit Parameters</button>
               ) : (
-                 <div className="flex gap-2">
-                   <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-2 bg-[var(--brand-color)] text-white rounded-[var(--radius-main)] font-black text-[11px] uppercase tracking-widest hover:brightness-110 transition-all active:scale-95 shadow-sm">Sync Protocol</button>
-                   <button className="px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] text-slate-400 hover:text-[var(--brand-color)] transition-all"><Zap size={14}/></button>
+                 <div className="flex flex-col gap-3">
+                    <button 
+                      onClick={() => setIsFollowing(!isFollowing)}
+                      className={`w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 ${isFollowing ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-[var(--brand-color)] text-white hover:brightness-110'}`}
+                    >
+                      {isFollowing ? <><CheckCircle2 size={14}/> Linked</> : <><UserPlus size={14}/> Initialize Link</>}
+                    </button>
+                    <div className="flex gap-2">
+                      <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <MessageCircle size={14}/> Message
+                      </button>
+                      <button onClick={handleEmail} className="flex-1 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <Mail size={14}/> Email
+                      </button>
+                    </div>
                  </div>
               )}
 
@@ -117,11 +138,11 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                  <div className="flex flex-wrap gap-4">
                     <div className="flex items-center gap-1.5 text-xs font-bold hover:text-[var(--brand-color)] cursor-pointer transition-colors">
                        <Database size={14} className="text-slate-400"/>
-                       <span>{user.followersCount}</span> <span className="text-slate-400 font-medium lowercase">links</span>
+                       <span>{user.followersCount.toLocaleString()}</span> <span className="text-slate-400 font-medium lowercase">links</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-bold hover:text-amber-500 cursor-pointer transition-colors">
                        <Star size={14} className="text-slate-400"/>
-                       <span>{user.totalLikesCount}</span> <span className="text-slate-400 font-medium lowercase">stars</span>
+                       <span>{user.totalLikesCount.toLocaleString()}</span> <span className="text-slate-400 font-medium lowercase">stars</span>
                     </div>
                  </div>
               </div>

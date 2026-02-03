@@ -10,11 +10,93 @@ const DB_KEYS = {
   CALENDAR: 'maksocial_calendar_v26',
   BOOKMARKS: 'maksocial_bookmarks_v26',
   CHATS: 'maksocial_chats_hub_v1',
-  EMAILS: 'maksocial_emails_v26',
+  EMAILS: 'maksocial_emails_v26_prod',
   NOTIFICATIONS: 'maksocial_notifications_v26',
   EVENTS: 'maksocial_events_v26',
   GROUPS: 'maksocial_groups_v26'
 };
+
+const MOCK_EMAILS: PlatformEmail[] = [
+  {
+    id: 'e1',
+    from: 'vc@mak.ac.ug',
+    fromName: 'Prof. Barnabas Nawangwe',
+    fromAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
+    to: ['student@mak.ac.ug'],
+    subject: 'Academic Excellence Protocol 2026',
+    body: 'Greetings Node,\n\nI am writing to formally synchronize our objectives regarding the upcoming research strata. Your contributions to the university matrix have been noted by the council. Please ensure your research assets are committed to the vault before the semester blackout.\n\nBest regards,\nBarnabas.',
+    timestamp: '2h',
+    fullDate: 'Feb 15, 2026 10:00 AM',
+    isRead: false,
+    isStarred: true,
+    folder: 'inbox',
+    label: 'Important'
+  },
+  {
+    id: 'e2',
+    from: 'fintech@hub.ug',
+    fromName: 'Neil Fisher',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Neil',
+    to: ['student@mak.ac.ug'],
+    subject: 'Internship Logic Synchronization',
+    body: 'Hello,\n\nOur fintech lab is seeking new nodes for the mobile money strata. We enabled users to easily send and receive documents and we need someone to optimize the transaction telemetry.\n\nRegards,\nNeil.',
+    timestamp: 'Oct 23',
+    fullDate: 'Oct 23, 2025 4:00 PM',
+    isRead: true,
+    isStarred: true,
+    folder: 'inbox',
+    label: 'Company'
+  },
+  {
+    id: 'e3',
+    from: 'simon.young@mak.ac.ug',
+    fromName: 'Simon Young',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Simon',
+    to: ['student@mak.ac.ug'],
+    subject: 'Social Strata Update',
+    body: 'Hey,\n\nCompanies can use email to convey information to a large number of nodes. We are organizing a peer-to-peer logic exchange at the Freedom Square. You should synchronize with us.\n\nSimon.',
+    timestamp: 'Dec 22',
+    fullDate: 'Dec 22, 2025 11:30 AM',
+    isRead: true,
+    isStarred: false,
+    folder: 'inbox',
+    label: 'Social'
+  },
+  {
+    id: 'e4',
+    from: 'gene.hart@cocis.mak.ac.ug',
+    fromName: 'Gene Hart',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Gene',
+    to: ['student@mak.ac.ug'],
+    subject: 'System Software Stratification',
+    body: 'This is the content of the email. It may contain anything the user needs. System Software is closer to the computer system and we need to discuss the low-level logic implementation.',
+    timestamp: 'Sep 23',
+    fullDate: 'Sep 23, 2025 2:15 PM',
+    isRead: false,
+    isStarred: false,
+    folder: 'inbox',
+    label: 'Important'
+  },
+  {
+    id: 'e5',
+    from: 'bette.h@gmail.com',
+    fromName: 'Bette Haganes',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bette',
+    to: ['student@mak.ac.ug'],
+    subject: 'One-on-one Meeting Protocol',
+    body: 'Hello Bette,\n\nI hope you\'re doing well. I would like to schedule a one-on-one meeting with you to discussing a new project. I\'ll send over the agenda in advance. The meeting will be in my office, will you be available one-on-one 10 Oct, 2024 at 10PM ? It\'s important that we have this meeting so that we can continue to work effectively together.\n\nI hope you can make it!\n\nBest,\nAR team',
+    timestamp: 'Sep 29',
+    fullDate: 'Sep 29, 2024 4:00 PM',
+    isRead: true,
+    isStarred: false,
+    folder: 'inbox',
+    label: 'Company',
+    attachments: [
+      { id: 'att1', name: 'Meeting Paper.pdf', size: '1MB', type: 'pdf' },
+      { id: 'att2', name: 'Project Details', size: '18 Files', type: 'folder' }
+    ]
+  }
+];
 
 const INITIAL_USERS: User[] = [
   {
@@ -45,7 +127,6 @@ const INITIAL_USERS: User[] = [
     connections: 840,
     email: 'sarah.c@mak.ac.ug',
     college: 'CEDAT',
-    // Fixed: 'Year 3' is not a valid UserStatus. Changed to 'Finalist'.
     status: 'Finalist',
     subscriptionTier: 'Free',
     joinedColleges: ['CEDAT'],
@@ -178,7 +259,7 @@ export const db = {
     const updated = events.map(ev => ev.id === eventId ? { ...ev, attendeeIds: Array.from(new Set([...(ev.attendeeIds || []), userId])) } : ev);
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
-  getEmails: (): PlatformEmail[] => parseArray<PlatformEmail>(DB_KEYS.EMAILS, []),
+  getEmails: (): PlatformEmail[] => parseArray<PlatformEmail>(DB_KEYS.EMAILS, MOCK_EMAILS),
   saveEmails: (emails: PlatformEmail[]) => localStorage.setItem(DB_KEYS.EMAILS, JSON.stringify(emails)),
   sendEmail: (email: PlatformEmail) => {
     const emails = db.getEmails();

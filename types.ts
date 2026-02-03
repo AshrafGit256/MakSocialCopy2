@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications' | 'gallery';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'email';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -13,7 +13,8 @@ export interface EmailAttachment {
   id: string;
   name: string;
   size: string;
-  type: 'file' | 'folder';
+  type: 'file' | 'folder' | 'image' | 'pdf' | 'docx';
+  img?: string;
 }
 
 export interface PlatformEmail {
@@ -30,7 +31,7 @@ export interface PlatformEmail {
   fullDate: string;
   isRead: boolean;
   isStarred: boolean;
-  folder: 'inbox' | 'sent' | 'draft' | 'trash' | 'spam';
+  folder: 'inbox' | 'sent' | 'draft' | 'trash' | 'spam' | 'junk';
   label?: 'Social' | 'Company' | 'Important' | 'Private';
   attachments?: EmailAttachment[];
 }

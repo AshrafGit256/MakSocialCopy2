@@ -15,6 +15,7 @@ import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Gallery from './components/Gallery';
+import EmailHub from './components/EmailHub';
 import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
@@ -123,6 +124,7 @@ const App: React.FC = () => {
       case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'chats': return <ChatHub />;
+      case 'email': return <EmailHub />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'resources': return <Resources />;

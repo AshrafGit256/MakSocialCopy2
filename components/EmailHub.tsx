@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../db';
 import { PlatformEmail, User } from '../types';
 import { 
@@ -9,16 +9,25 @@ import {
   MoreHorizontal, Download, Image as ImageIcon, 
   File, Printer, ChevronDown, RotateCw, Filter,
   Tag, AlignLeft, AlignCenter, AlignRight, Bold,
-  Italic, List, Code, Redo2, Terminal
+  Italic, List, Code, Redo2, Terminal, AlertCircle
 } from 'lucide-react';
+
+const PAGE_SIZE = 10;
 
 const EmailHub: React.FC = () => {
   const [view, setView] = useState<'list' | 'read' | 'compose'>('list');
-  const [folder, setFolder] = useState<PlatformEmail['folder']>('inbox');
+  const [folder, setFolder] = useState<PlatformEmail['folder'] | 'all'>('inbox');
+  const [activeLabel, setActiveLabel] = useState<PlatformEmail['label'] | null>(null);
   const [emails, setEmails] = useState<PlatformEmail[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<PlatformEmail | null>(null);
   const [currentUser] = useState<User>(db.getUser());
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Compose State
+  const [composeTo, setComposeTo] = useState('');
+  const [composeSubject, setComposeSubject] = useState('');
+  const [composeBody, setComposeBody] = useState('');
 
   useEffect(() => {
     setEmails(db.getEmails());
@@ -34,19 +43,77 @@ const EmailHub: React.FC = () => {
     }
   };
 
-  const filteredEmails = emails.filter(e => {
-    const inFolder = e.folder === folder;
-    const matchesSearch = e.subject.toLowerCase().includes(search.toLowerCase()) || 
-                         e.fromName.toLowerCase().includes(search.toLowerCase());
-    return inFolder && matchesSearch;
-  });
+  const handleToggleStar = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const updated = emails.map(email => email.id === id ? { ...email, isStarred: !email.isStarred } : email);
+    setEmails(updated);
+    db.saveEmails(updated);
+  };
+
+  const handleSendEmail = () => {
+    if (!composeTo.trim() || !composeSubject.trim()) return;
+
+    // Parse multiple emails split by comma or space
+    const recipients = composeTo.split(/[,\s]+/).filter(e => e.includes('@'));
+    
+    if (recipients.length === 0) {
+      alert("Diagnostic Error: No valid node addresses detected.");
+      return;
+    }
+
+    const newEmail: PlatformEmail = {
+      id: `sent-${Date.now()}`,
+      from: currentUser.email || 'node@mak.ac.ug',
+      fromName: currentUser.name,
+      fromAvatar: currentUser.avatar,
+      to: recipients,
+      subject: composeSubject,
+      body: composeBody,
+      timestamp: 'Just now',
+      fullDate: new Date().toLocaleString(),
+      isRead: true,
+      isStarred: false,
+      folder: 'sent'
+    };
+
+    const updated = [newEmail, ...emails];
+    setEmails(updated);
+    db.saveEmails(updated);
+    
+    // Reset and return to list
+    setComposeTo('');
+    setComposeSubject('');
+    setComposeBody('');
+    setFolder('sent');
+    setActiveLabel(null);
+    setView('list');
+  };
+
+  const filteredEmails = useMemo(() => {
+    return emails.filter(e => {
+      const matchesSearch = e.subject.toLowerCase().includes(search.toLowerCase()) || 
+                           e.fromName.toLowerCase().includes(search.toLowerCase());
+      
+      if (activeLabel) {
+        return e.label === activeLabel && matchesSearch;
+      }
+
+      if (folder === 'all') return matchesSearch;
+      if (folder === 'starred') return e.isStarred && matchesSearch;
+      
+      return e.folder === folder && matchesSearch;
+    });
+  }, [emails, folder, activeLabel, search]);
+
+  const totalPages = Math.ceil(filteredEmails.length / PAGE_SIZE);
+  const paginatedEmails = filteredEmails.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const sidebarItems = [
     { id: 'inbox', label: 'Inbox', icon: <Inbox size={18}/>, count: emails.filter(e => e.folder === 'inbox' && !e.isRead).length },
     { id: 'sent', label: 'Sent', icon: <Send size={18}/> },
     { id: 'draft', label: 'Draft', icon: <FileText size={18}/> },
-    { id: 'starred', label: 'Starred', icon: <Star size={18}/>, count: emails.filter(e => e.isStarred).length },
-    { id: 'spam', label: 'Spam', icon: <Filter size={18}/> },
+    { id: 'starred', label: 'Starred', icon: <Star size={18}/> },
+    { id: 'spam', label: 'Spam', icon: <AlertCircle size={18}/> },
     { id: 'trash', label: 'Trash', icon: <Trash size={18}/> },
   ];
 
@@ -81,11 +148,11 @@ const EmailHub: React.FC = () => {
               {sidebarItems.map(item => (
                 <button 
                   key={item.id} 
-                  onClick={() => {setFolder(item.id as any); setView('list');}}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-[2px] text-[11px] font-bold uppercase tracking-widest transition-all ${folder === item.id ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-500 hover:bg-white/5'}`}
+                  onClick={() => {setFolder(item.id as any); setActiveLabel(null); setView('list'); setCurrentPage(1);}}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-[2px] text-[11px] font-bold uppercase tracking-widest transition-all ${!activeLabel && folder === item.id ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-500 hover:bg-white/5'}`}
                 >
                   <div className="flex items-center gap-4">{item.icon} <span>{item.label}</span></div>
-                  {item.count ? <span className={`px-2 py-0.5 rounded-[2px] text-[9px] font-black ${folder === item.id ? 'bg-white text-[var(--brand-color)]' : 'bg-[var(--brand-color)]/20 text-[var(--brand-color)]'}`}>{item.count}+</span> : null}
+                  {item.count ? <span className={`px-2 py-0.5 rounded-[2px] text-[9px] font-black ${!activeLabel && folder === item.id ? 'bg-white text-[var(--brand-color)]' : 'bg-[var(--brand-color)]/20 text-[var(--brand-color)]'}`}>{item.count}+</span> : null}
                 </button>
               ))}
             </div>
@@ -95,7 +162,11 @@ const EmailHub: React.FC = () => {
              <h3 className="px-4 text-[10px] font-black uppercase text-slate-500 tracking-[0.3em]">Labels</h3>
              <div className="space-y-1">
                 {labels.map(label => (
-                  <button key={label.id} className="w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold text-slate-500 hover:bg-[var(--bg-secondary)] transition-all rounded-[2px]">
+                  <button 
+                    key={label.id} 
+                    onClick={() => {setActiveLabel(label.id as any); setView('list'); setCurrentPage(1);}}
+                    className={`w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold uppercase tracking-tighter transition-all rounded-[2px] ${activeLabel === label.id ? 'bg-white/10 text-[var(--text-primary)] border-l-4 border-current' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'}`}
+                  >
                     <div className={`w-3 h-3 rounded-full ${label.color} shadow-sm`}></div>
                     <span>{label.id}</span>
                   </button>
@@ -105,7 +176,13 @@ const EmailHub: React.FC = () => {
           
           <div className="pt-4 border-t border-[var(--border-color)]">
              <div className="space-y-1">
-                {['All Mail', 'Primary', 'Promotions', 'Social'].map(extra => (
+                <button 
+                  onClick={() => {setFolder('all'); setActiveLabel(null); setView('list'); setCurrentPage(1);}}
+                  className={`w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold transition-all uppercase tracking-tighter ${folder === 'all' && !activeLabel ? 'text-[var(--brand-color)]' : 'text-slate-400 hover:text-[var(--text-primary)]'}`}
+                >
+                   <Tag size={14} className="opacity-40" /> All Mail
+                </button>
+                {['Primary', 'Promotions', 'Social Updates'].map(extra => (
                    <button key={extra} className="w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold text-slate-400 hover:text-[var(--text-primary)] transition-all uppercase tracking-tighter">
                       <Tag size={14} className="opacity-40" /> {extra}
                    </button>
@@ -124,20 +201,34 @@ const EmailHub: React.FC = () => {
                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[var(--brand-color)] transition-colors" size={16} />
                    <input 
                      value={search}
-                     onChange={e => setSearch(e.target.value)}
+                     onChange={e => {setSearch(e.target.value); setCurrentPage(1);}}
                      className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] py-2.5 pl-12 pr-4 text-xs font-bold outline-none focus:border-[var(--brand-color)] shadow-inner" 
                      placeholder="Search signals in registry..." 
                    />
                 </div>
-                <div className="flex items-center gap-2">
-                   <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500 hover:text-rose-500 transition-all"><Trash size={16}/></button>
-                   <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500 hover:text-[var(--brand-color)] transition-all"><RotateCw size={16}/></button>
-                   <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500"><MoreHorizontal size={16}/></button>
+                <div className="flex items-center gap-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                    <span>{Math.min(filteredEmails.length, (currentPage-1)*PAGE_SIZE + 1)} TO {Math.min(filteredEmails.length, currentPage*PAGE_SIZE)} OF {filteredEmails.length}</span>
+                    <div className="flex gap-1">
+                       <button 
+                         disabled={currentPage === 1}
+                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                         className="p-1.5 border border-[var(--border-color)] rounded-[2px] hover:bg-white/5 disabled:opacity-30"
+                       >
+                         <ChevronLeft size={16}/>
+                       </button>
+                       <button 
+                         disabled={currentPage === totalPages || totalPages === 0}
+                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                         className="p-1.5 border border-[var(--border-color)] rounded-[2px] hover:bg-white/5 disabled:opacity-30"
+                       >
+                         <ChevronRight size={16}/>
+                       </button>
+                    </div>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto no-scrollbar bg-white dark:bg-[#050505]">
-                {filteredEmails.length > 0 ? filteredEmails.map((email) => (
+                {paginatedEmails.length > 0 ? paginatedEmails.map((email) => (
                   <div 
                     key={email.id} 
                     onClick={() => handleReadEmail(email)}
@@ -145,7 +236,7 @@ const EmailHub: React.FC = () => {
                   >
                     <div className="flex items-center gap-5 shrink-0">
                        <input type="checkbox" className="w-4 h-4 rounded-[2px] bg-transparent border-[var(--border-color)] text-[var(--brand-color)] focus:ring-0" onClick={e => e.stopPropagation()}/>
-                       <button className={`transition-all hover:scale-125 ${email.isStarred ? 'text-amber-500' : 'text-slate-700'}`} onClick={e => { e.stopPropagation(); /* logic to toggle star */ }}>
+                       <button className={`transition-all hover:scale-125 ${email.isStarred ? 'text-amber-500' : 'text-slate-700'}`} onClick={e => handleToggleStar(e, email.id)}>
                           <Star size={18} fill={email.isStarred ? "currentColor" : "none"}/>
                        </button>
                     </div>
@@ -158,6 +249,7 @@ const EmailHub: React.FC = () => {
                           <p className={`text-[12px] truncate uppercase tracking-tighter ${!email.isRead ? 'font-black text-[var(--text-primary)]' : 'font-bold text-slate-400'}`}>
                              {email.subject}
                           </p>
+                          {email.attachments && email.attachments.some(a => a.type === 'image') && <ImageIcon size={14} className="text-slate-600" />}
                           {!email.isRead && <div className="w-1.5 h-1.5 rounded-full bg-[var(--brand-color)] animate-pulse"></div>}
                        </div>
                        <p className="text-[11px] text-slate-500 truncate font-medium lowercase">
@@ -180,7 +272,7 @@ const EmailHub: React.FC = () => {
                 )) : (
                   <div className="py-40 text-center space-y-6 opacity-30">
                      <Inbox size={64} className="mx-auto" />
-                     <p className="text-[10px] font-black uppercase tracking-[0.4em]">No active signals in this folder</p>
+                     <p className="text-[10px] font-black uppercase tracking-[0.4em]">No active signals in this strata</p>
                   </div>
                 )}
               </div>
@@ -193,11 +285,10 @@ const EmailHub: React.FC = () => {
                  <div className="flex items-center gap-1">
                     <button onClick={() => setView('list')} className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500 hover:text-[var(--brand-color)] transition-all"><ArrowLeft size={18}/></button>
                     <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500 hover:text-rose-500"><Trash size={18}/></button>
-                    <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500"><Star size={18}/></button>
+                    <button className={`p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] ${selectedEmail.isStarred ? 'text-amber-500' : 'text-slate-500'}`} onClick={(e) => handleToggleStar(e, selectedEmail.id)}><Star size={18} fill={selectedEmail.isStarred ? "currentColor" : "none"}/></button>
                     <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500"><Tag size={18}/></button>
                  </div>
                  <div className="flex items-center gap-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
-                    <span>2 TO 10</span>
                     <div className="flex gap-1">
                        <button className="p-1 border border-[var(--border-color)] rounded-[2px] hover:bg-white/5"><ChevronLeft size={16}/></button>
                        <button className="p-1 border border-[var(--border-color)] rounded-[2px] hover:bg-white/5"><ChevronRight size={16}/></button>
@@ -216,7 +307,7 @@ const EmailHub: React.FC = () => {
                                 <h3 className="text-sm font-black text-[var(--brand-color)] lowercase">{selectedEmail.from}</h3>
                                 <ChevronDown size={14} className="text-slate-500 cursor-pointer" />
                              </div>
-                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">TO: ME &lt;{currentUser.email}&gt;</p>
+                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">TO: {selectedEmail.to.join(', ')}</p>
                           </div>
                        </div>
                     </div>
@@ -243,7 +334,7 @@ const EmailHub: React.FC = () => {
                           {selectedEmail.attachments.map((att, i) => (
                             <div key={i} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] overflow-hidden group shadow-sm hover:shadow-xl transition-all">
                                <div className="h-32 bg-[var(--bg-primary)] flex items-center justify-center relative overflow-hidden">
-                                  {att.img ? (
+                                  {att.type === 'image' ? (
                                     <img src={att.img} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all" />
                                   ) : (
                                     <File size={48} className="text-slate-700 opacity-20 group-hover:opacity-40 transition-all" />
@@ -307,14 +398,24 @@ const EmailHub: React.FC = () => {
                <div className="flex-1 overflow-y-auto p-12 space-y-8 no-scrollbar bg-white dark:bg-[#050505]">
                   <div className="grid grid-cols-1 gap-6">
                      <div className="relative group">
-                        <input className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] uppercase tracking-tighter" placeholder="TO_NODE:" />
+                        <input 
+                          className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] uppercase tracking-tighter" 
+                          placeholder="TO_NODES (Comma separated):" 
+                          value={composeTo}
+                          onChange={e => setComposeTo(e.target.value)}
+                        />
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 flex gap-3 text-[10px] font-black text-slate-500">
                            <button className="hover:text-[var(--brand-color)]">CC</button>
                            <button className="hover:text-[var(--brand-color)]">BCC</button>
                         </div>
                      </div>
                      <div className="relative group">
-                        <input className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] uppercase tracking-tighter" placeholder="SUBJECT_MANIFEST:" />
+                        <input 
+                          className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] uppercase tracking-tighter" 
+                          placeholder="SUBJECT_MANIFEST:" 
+                          value={composeSubject}
+                          onChange={e => setComposeSubject(e.target.value)}
+                        />
                      </div>
                   </div>
 
@@ -323,25 +424,23 @@ const EmailHub: React.FC = () => {
                      <div className="flex flex-wrap items-center gap-1 p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Redo2 className="rotate-180" size={16}/></button>
                         <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Bold size={16}/></button>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Italic size={16}/></button>
+                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-black">B</button>
+                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-serif italic">I</button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-serif font-black underline underline-offset-4">U</button>
-                        <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
-                        <select className="bg-transparent border border-[var(--border-color)] rounded-[2px] text-[10px] px-3 py-1.5 outline-none text-slate-500 font-black uppercase tracking-widest">
-                           <option>JetBrains Mono</option>
-                           <option>Source Sans Pro</option>
-                        </select>
                         <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignLeft size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignCenter size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignRight size={16}/></button>
                         <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><List size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><ImageIcon size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Code size={16}/></button>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><MoreHorizontal size={16}/></button>
                      </div>
-                     <textarea className="flex-1 p-10 bg-transparent outline-none text-[15px] dark:text-white font-medium leading-relaxed resize-none font-sans" placeholder="TYPE MESSAGE PROTOCOL..."></textarea>
+                     <textarea 
+                        className="flex-1 p-10 bg-transparent outline-none text-[15px] dark:text-white font-medium leading-relaxed resize-none font-sans" 
+                        placeholder="TYPE MESSAGE PROTOCOL..."
+                        value={composeBody}
+                        onChange={e => setComposeBody(e.target.value)}
+                     ></textarea>
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center justify-between pt-10 border-t border-[var(--border-color)] gap-8">
@@ -352,9 +451,13 @@ const EmailHub: React.FC = () => {
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Max_Payload: 32MB</p>
                      </div>
                      <div className="flex gap-4 w-full sm:w-auto">
-                        <button className="flex-1 sm:flex-none px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-rose-500 transition-colors flex items-center justify-center gap-2"><X size={18}/> Discard</button>
+                        <button onClick={() => setView('list')} className="flex-1 sm:flex-none px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-rose-500 transition-colors flex items-center justify-center gap-2"><X size={18}/> Discard</button>
                         <button className="flex-1 sm:flex-none px-10 py-3 border border-[var(--border-color)] rounded-[2px] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:bg-white/5 transition-all flex items-center justify-center gap-2"><FileText size={18}/> Save_Draft</button>
-                        <button className="flex-1 sm:flex-none px-12 py-4 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[2px] text-[10px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
+                        <button 
+                          onClick={handleSendEmail}
+                          disabled={!composeTo.trim() || !composeSubject.trim()}
+                          className="flex-1 sm:flex-none px-12 py-4 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[2px] text-[10px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all disabled:opacity-50"
+                        >
                            Transmit <Send size={20}/>
                         </button>
                      </div>

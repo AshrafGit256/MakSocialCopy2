@@ -10,13 +10,14 @@ const DB_KEYS = {
   CALENDAR: 'maksocial_calendar_v26',
   BOOKMARKS: 'maksocial_bookmarks_v26',
   CHATS: 'maksocial_chats_hub_v1',
-  EMAILS: 'maksocial_emails_v26_prod',
+  EMAILS: 'maksocial_emails_v26_prod_v2',
   NOTIFICATIONS: 'maksocial_notifications_v26',
   EVENTS: 'maksocial_events_v26',
   GROUPS: 'maksocial_groups_v26'
 };
 
 const MOCK_EMAILS: PlatformEmail[] = [
+  // INBOX
   {
     id: 'e1',
     from: 'vc@mak.ac.ug',
@@ -24,7 +25,7 @@ const MOCK_EMAILS: PlatformEmail[] = [
     fromAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
     to: ['student@mak.ac.ug'],
     subject: 'Academic Excellence Protocol 2026',
-    body: 'Greetings Node,\n\nI am writing to formally synchronize our objectives regarding the upcoming research strata. Your contributions to the university matrix have been noted by the council. Please ensure your research assets are committed to the vault before the semester blackout.\n\nBest regards,\nBarnabas.',
+    body: 'Greetings Node,\n\nI am writing to formally synchronize our objectives regarding the upcoming research strata. Your contributions to the university matrix have been noted by the council.\n\nBest regards,\nBarnabas.',
     timestamp: '2h',
     fullDate: 'Feb 15, 2026 10:00 AM',
     isRead: false,
@@ -48,43 +49,13 @@ const MOCK_EMAILS: PlatformEmail[] = [
     label: 'Company'
   },
   {
-    id: 'e3',
-    from: 'simon.young@mak.ac.ug',
-    fromName: 'Simon Young',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Simon',
-    to: ['student@mak.ac.ug'],
-    subject: 'Social Strata Update',
-    body: 'Hey,\n\nCompanies can use email to convey information to a large number of nodes. We are organizing a peer-to-peer logic exchange at the Freedom Square. You should synchronize with us.\n\nSimon.',
-    timestamp: 'Dec 22',
-    fullDate: 'Dec 22, 2025 11:30 AM',
-    isRead: true,
-    isStarred: false,
-    folder: 'inbox',
-    label: 'Social'
-  },
-  {
-    id: 'e4',
-    from: 'gene.hart@cocis.mak.ac.ug',
-    fromName: 'Gene Hart',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Gene',
-    to: ['student@mak.ac.ug'],
-    subject: 'System Software Stratification',
-    body: 'This is the content of the email. It may contain anything the user needs. System Software is closer to the computer system and we need to discuss the low-level logic implementation.',
-    timestamp: 'Sep 23',
-    fullDate: 'Sep 23, 2025 2:15 PM',
-    isRead: false,
-    isStarred: false,
-    folder: 'inbox',
-    label: 'Important'
-  },
-  {
     id: 'e5',
     from: 'bette.h@gmail.com',
     fromName: 'Bette Haganes',
     fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bette',
     to: ['student@mak.ac.ug'],
     subject: 'One-on-one Meeting Protocol',
-    body: 'Hello Bette,\n\nI hope you\'re doing well. I would like to schedule a one-on-one meeting with you to discussing a new project. I\'ll send over the agenda in advance. The meeting will be in my office, will you be available one-on-one 10 Oct, 2024 at 10PM ? It\'s important that we have this meeting so that we can continue to work effectively together.\n\nI hope you can make it!\n\nBest,\nAR team',
+    body: 'Hello Bette,\n\nI hope you\'re doing well. I would like to schedule a one-on-one meeting with you to discussing a new project. I\'ll send over the agenda in advance.\n\nBest,\nAR team',
     timestamp: 'Sep 29',
     fullDate: 'Sep 29, 2024 4:00 PM',
     isRead: true,
@@ -92,10 +63,90 @@ const MOCK_EMAILS: PlatformEmail[] = [
     folder: 'inbox',
     label: 'Company',
     attachments: [
-      { id: 'att1', name: 'Meeting Paper.pdf', size: '1MB', type: 'pdf' },
-      { id: 'att2', name: 'Project Details', size: '18 Files', type: 'folder' }
+      { id: 'att1', name: 'Design Draft.png', size: '2.4MB', type: 'image', img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600' },
+      { id: 'att2', name: 'Project Overview', size: '18 Files', type: 'folder' }
     ]
-  }
+  },
+  // SENT
+  {
+    id: 's1',
+    from: 'student@mak.ac.ug',
+    fromName: 'Me',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Student',
+    to: ['dean@cocis.mak.ac.ug', 'admin@mak.ac.ug'],
+    subject: 'Research Grant Application [COCIS-2026-ALPHA]',
+    body: 'Dear Dean,\n\nPlease find attached my proposal for the distributed logic synchronization grant. I have outlined the telemetry requirements for the Hill registry strata.\n\nBest regards.',
+    timestamp: '1d',
+    fullDate: 'Feb 14, 2026 2:30 PM',
+    isRead: true,
+    isStarred: false,
+    folder: 'sent',
+    label: 'Important',
+    attachments: [
+      { id: 'att3', name: 'Proposal_v1.pdf', size: '1.2MB', type: 'pdf' }
+    ]
+  },
+  // DRAFTS
+  {
+    id: 'd1',
+    from: 'student@mak.ac.ug',
+    fromName: 'Me',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Student',
+    to: ['colleague@mak.ac.ug'],
+    subject: '[DRAFT] Feedback on the Visual Registry component',
+    body: 'Hey,\n\nI was looking at the grid layout for the gallery and I think we can optimize the row-span logic for mobile nodes...',
+    timestamp: '3h',
+    fullDate: 'Feb 15, 2026 8:00 AM',
+    isRead: true,
+    isStarred: false,
+    folder: 'draft'
+  },
+  // SPAM
+  {
+    id: 'sp1',
+    from: 'no-reply@win-registry.net',
+    fromName: 'Protocol Winner',
+    fromAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=SpamBot',
+    to: ['student@mak.ac.ug'],
+    subject: 'You have been selected for a 1BTC Node Airdrop!',
+    body: 'Click here to synchronize your wallet node and receive your airdrop instantly. This is a limited strata offer.',
+    timestamp: '5h',
+    fullDate: 'Feb 15, 2026 6:00 AM',
+    isRead: false,
+    isStarred: false,
+    folder: 'spam'
+  },
+  // TRASH
+  {
+    id: 't1',
+    from: 'notifications@social.net',
+    fromName: 'Legacy Social Node',
+    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Legacy',
+    to: ['student@mak.ac.ug'],
+    subject: 'Your account will be deprecated',
+    body: 'We are moving all nodes to the new MakSocial registry. Please migrate your assets immediately.',
+    timestamp: '1w',
+    fullDate: 'Feb 8, 2026 12:00 PM',
+    isRead: true,
+    isStarred: false,
+    folder: 'trash'
+  },
+  // Extra for Pagination test
+  ...Array.from({ length: 15 }).map((_, i) => ({
+    id: `ext-${i}`,
+    from: `peer-${i}@mak.ac.ug`,
+    fromName: `Peer Node ${i + 10}`,
+    fromAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=Peer${i}`,
+    to: ['student@mak.ac.ug'],
+    subject: `Sync Request Sequence ${100 + i}`,
+    body: 'Requesting permission to link nodes for the semester assessment...',
+    timestamp: 'Feb 10',
+    fullDate: 'Feb 10, 2026 9:00 AM',
+    isRead: true,
+    isStarred: false,
+    folder: 'inbox' as const,
+    label: i % 3 === 0 ? 'Social' as const : undefined
+  }))
 ];
 
 const INITIAL_USERS: User[] = [
@@ -118,86 +169,6 @@ const INITIAL_USERS: User[] = [
     verified: true,
     appliedTo: [],
     bio: 'Building the next generation of academic strata.'
-  },
-  {
-    id: 'u-sarah',
-    name: 'Sarah CEDAT',
-    role: 'Visual Architect',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-    connections: 840,
-    email: 'sarah.c@mak.ac.ug',
-    college: 'CEDAT',
-    status: 'Finalist',
-    subscriptionTier: 'Free',
-    joinedColleges: ['CEDAT'],
-    postsCount: 22,
-    followersCount: 450,
-    followingCount: 200,
-    totalLikesCount: 1200,
-    badges: ['Verified'],
-    verified: true,
-    appliedTo: [],
-    bio: 'Pushing pixel-perfect designs in the engineering wing.'
-  },
-  {
-    id: 'u-roy',
-    name: 'Roy Ssemboga',
-    role: 'Student Leader',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Roy',
-    connections: 4500,
-    email: 'roy.s@mak.ac.ug',
-    college: 'CHS',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    joinedColleges: ['CHS', 'Global'],
-    postsCount: 156,
-    followersCount: 12000,
-    followingCount: 300,
-    totalLikesCount: 45000,
-    badges: ['Verified', 'Leader'],
-    verified: true,
-    appliedTo: [],
-    bio: 'Former Guild President. Committed to student welfare protocols.'
-  },
-  {
-    id: 'u-john',
-    name: 'Dr. John S.',
-    role: 'Senior Lecturer',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-    connections: 2300,
-    email: 'john.s@mak.ac.ug',
-    college: 'COCIS',
-    status: 'Masters',
-    subscriptionTier: 'Pro',
-    joinedColleges: ['COCIS', 'Global'],
-    postsCount: 89,
-    followersCount: 2100,
-    followingCount: 100,
-    totalLikesCount: 5600,
-    badges: ['Verified', 'Academic'],
-    verified: true,
-    appliedTo: [],
-    bio: 'Lead researcher in distributed intelligence matrices.'
-  },
-  {
-    id: 'u-nawangwe',
-    name: 'Prof. Barnabas Nawangwe',
-    role: 'Administrator',
-    avatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
-    connections: 10000,
-    email: 'vc@mak.ac.ug',
-    college: 'Global',
-    status: 'Graduate',
-    subscriptionTier: 'Enterprise',
-    joinedColleges: ['Global'],
-    postsCount: 300,
-    followersCount: 85000,
-    followingCount: 50,
-    totalLikesCount: 99000,
-    badges: ['Verified', 'Admin'],
-    verified: true,
-    appliedTo: [],
-    bio: 'Vice Chancellor. Orchestrating the Hill’s academic strata.'
   }
 ];
 

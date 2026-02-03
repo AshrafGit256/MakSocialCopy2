@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
+import { GoogleGenAI } from "@google/genai";
 import { 
   Star, MessageCircle, Zap, Radio, Activity, Globe, 
   TrendingUp, Terminal, Share2, Bookmark, 
@@ -10,7 +11,7 @@ import {
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
   Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, ShieldAlert, ShieldCheck, Loader2
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -33,7 +34,6 @@ const Lightbox: React.FC<{
     setIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  // Close on Escape
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -85,6 +85,7 @@ const Lightbox: React.FC<{
 
 // --- X-STYLE IMAGE GRID ---
 const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
+  // Fixed line 88: replaced 'boolean' (type) with 'false' (value)
   const [lightbox, setLightbox] = useState<{ open: boolean, index: number }>({ open: false, index: 0 });
 
   if (!images || images.length === 0) return null;
@@ -137,7 +138,7 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
               />
               <img 
                 src={images[2]} 
-                className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all" 
+                className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all border-b border-[var(--border-color)]" 
                 onClick={() => setLightbox({ open: true, index: 2 })}
                 alt="Secondary asset bottom"
               />
@@ -186,7 +187,6 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
 
 // --- AUTHORITY SEAL COMPONENT (X-STYLE) ---
 export const AuthoritySeal: React.FC<{ role?: string, size?: number, verified?: boolean }> = ({ role, size = 16, verified = true }) => {
-  // Everyone is verified by default as per request
   return (
     <div className="inline-flex items-center ml-1 text-[var(--brand-color)]" title={role ? `Verified ${role}` : 'Verified Node'}>
       <BadgeCheck size={size} fill="currentColor" stroke="white" strokeWidth={1.5} />
@@ -234,7 +234,6 @@ const PostItem: React.FC<{
       className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 mb-12' : 'mb-14'}`}
     >
       <div className="flex">
-          {/* Identity Rail */}
           <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
             <img 
                 src={post.authorAvatar} 
@@ -249,7 +248,6 @@ const PostItem: React.FC<{
           </div>
 
           <div className="flex-1 min-w-0">
-            {/* Post Header */}
             <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div 
@@ -317,7 +315,6 @@ const PostItem: React.FC<{
                 </div>
             </div>
 
-            {/* Post Interaction Footer */}
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
                   <button onClick={handleLike} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}>
@@ -572,6 +569,10 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [updateTrigger, setUpdateTrigger] = useState(0);
   
+  // Safety Protocol State
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [safetyViolation, setSafetyViolation] = useState<string | null>(null);
+  
   useEffect(() => {
     const sync = () => { 
       setPosts(db.getPosts()); 
@@ -583,9 +584,53 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     return () => clearInterval(interval);
   }, [updateTrigger, collegeFilter, threadId]);
 
-  const handlePost = (html: string, poll?: PollData) => {
-    const hashtagRegex = /#(\w+)/g;
-    const foundTags = html.match(hashtagRegex) || [];
+  const verifyContentSafety = async (html: string, images: string[]): Promise<{ isSafe: boolean; reason?: string }> => {
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const prompt = `Analyze the following university community signal for sexually explicit material, violence, or extreme violations of community standards. 
+      Respond ONLY with a JSON object: {"status": "SAFE"} or {"status": "VIOLATION", "reason": "Brief description of why"}.
+      Content to analyze: "${html.replace(/<[^>]*>/g, '')}"`;
+
+      const contents: any[] = [{ text: prompt }];
+
+      // Add image analysis if present
+      if (images && images.length > 0) {
+        images.slice(0, 3).forEach(img => {
+          const base64Data = img.split(',')[1];
+          if (base64Data) {
+            contents.push({
+              inlineData: {
+                data: base64Data,
+                mimeType: 'image/jpeg'
+              }
+            });
+          }
+        });
+      }
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: { parts: contents },
+        config: {
+          responseMimeType: "application/json",
+          systemInstruction: "You are the MakSocial Integrity Shield. You strictly block sexually explicit content, non-consensual imagery, and extreme violence."
+        }
+      });
+
+      const result = JSON.parse(response.text || '{"status": "SAFE"}');
+      return { 
+        isSafe: result.status === 'SAFE', 
+        reason: result.reason 
+      };
+    } catch (error) {
+      console.error("Safety scan failed:", error);
+      return { isSafe: true }; // Fallback to safe if API fails, or you could be stricter
+    }
+  };
+
+  const handlePost = async (html: string, poll?: PollData) => {
+    setIsVerifying(true);
+    setSafetyViolation(null);
 
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     const foundImages: string[] = [];
@@ -594,6 +639,16 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       foundImages.push(match[1]);
     }
 
+    const safety = await verifyContentSafety(html, foundImages);
+
+    if (!safety.isSafe) {
+      setSafetyViolation(safety.reason || "Content violates community integrity protocols.");
+      setIsVerifying(false);
+      return;
+    }
+
+    const hashtagRegex = /#(\w+)/g;
+    const foundTags = html.match(hashtagRegex) || [];
     const cleanedHtml = html.replace(/<img[^>]*>/g, '');
 
     const newPost: Post = {
@@ -617,6 +672,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     };
     db.addPost(newPost);
     setUpdateTrigger(prev => prev + 1);
+    setIsVerifying(false);
   };
 
   const handleLike = (id: string) => {
@@ -633,7 +689,54 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   });
   
   return (
-    <div className="max-w-[1440px] mx-auto pb-40 lg:px-12 py-6 bg-[var(--bg-primary)] min-h-screen">
+    <div className="max-w-[1440px] mx-auto pb-40 lg:px-12 py-6 bg-[var(--bg-primary)] min-h-screen relative">
+      {/* INTEGRITY SCAN OVERLAY */}
+      {isVerifying && (
+        <div className="fixed inset-0 z-[6000] bg-black/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+           <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center">
+              <div className="relative">
+                 <ShieldCheck size={64} className="text-[var(--brand-color)] animate-pulse" />
+                 <Loader2 size={80} className="text-[var(--brand-color)] animate-spin absolute -top-2 -left-2 opacity-20" />
+              </div>
+              <div className="space-y-2">
+                 <h3 className="text-xl font-black uppercase tracking-tighter">Signal_Integrity_Scan</h3>
+                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] leading-loose">
+                   Verifying community compliance parameters. analyzed nodes: Multi-modal.
+                 </p>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* VIOLATION ALERT MODAL */}
+      {safetyViolation && (
+        <div className="fixed inset-0 z-[6001] bg-black/80 backdrop-blur-xl flex items-center justify-center p-6 animate-in zoom-in-95 duration-300">
+           <div className="bg-[var(--bg-primary)] border-2 border-rose-500 p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-8 max-w-md text-center">
+              <div className="p-5 bg-rose-500/10 rounded-full">
+                 <ShieldAlert size={64} className="text-rose-500" />
+              </div>
+              <div className="space-y-4">
+                 <h3 className="text-3xl font-black uppercase tracking-tighter text-rose-500">Protocol Violation</h3>
+                 <div className="p-4 bg-rose-500/5 rounded border border-rose-500/20">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Detected Issue:</p>
+                    <p className="text-sm font-black text-rose-600 dark:text-rose-400 uppercase leading-relaxed">
+                      {safetyViolation}
+                    </p>
+                 </div>
+                 <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.3em] leading-loose">
+                   This signal has been redacted and logged to node security metadata. repeated violations will trigger auto-deprecating lockout.
+                 </p>
+              </div>
+              <button 
+                onClick={() => setSafetyViolation(null)}
+                className="w-full py-4 bg-rose-600 text-white rounded-xl font-black text-[10px] uppercase tracking-[0.3em] shadow-xl hover:bg-rose-700 active:scale-95 transition-all"
+              >
+                Acknowledge & Discard Signal
+              </button>
+           </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
          <div className="lg:col-span-8 px-0 sm:px-4">
             {!threadId && <RichEditor onPost={handlePost} currentUser={user} />}

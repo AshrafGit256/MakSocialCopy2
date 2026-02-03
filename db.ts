@@ -102,7 +102,6 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
 export const db = {
   getUsers: (): User[] => {
     const users = parseArray<User>(DB_KEYS.USERS, INITIAL_USERS);
-    // Universal verification injection: force everyone to be verified
     return users.map(u => ({ ...u, verified: true }));
   },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),

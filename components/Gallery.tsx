@@ -10,7 +10,6 @@ interface GalleryProps {
 }
 
 const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
-  // Use GalleryItem interface for improved type safety in the state
   const [items, setItems] = useState<GalleryItem[]>([]);
 
   useEffect(() => {
@@ -46,9 +45,8 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
       </div>
 
       {items.length > 0 ? (
-        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0.5 sm:gap-4 auto-rows-[120px] sm:auto-rows-[250px]">
+        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0.5 sm:gap-4 auto-rows-auto sm:auto-rows-[250px]">
           {items.map((item, idx) => {
-            // Complex staggered pattern only for non-mobile (sm+)
             const pattern = idx % 10;
             const isLarge = pattern === 0;
             const isTall = pattern === 4 || pattern === 8;
@@ -58,8 +56,7 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
               <div 
                 key={item.id}
                 onClick={() => onSelectPost(item.postId)}
-                className={`group relative overflow-hidden bg-[var(--bg-secondary)] cursor-pointer transition-all hover:scale-[1.01] hover:shadow-2xl z-10 border border-[var(--border-color)] sm:rounded-xl ${
-                  // Staggered layout logic applied only from sm up
+                className={`group relative overflow-hidden bg-[var(--bg-secondary)] cursor-pointer transition-all hover:scale-[1.01] hover:shadow-2xl z-10 border border-[var(--border-color)] sm:rounded-xl aspect-square sm:aspect-auto ${
                   `sm:${isLarge ? 'md:col-span-2 md:row-span-2' : 
                   isTall ? 'md:row-span-2' : 
                   isWide ? 'md:col-span-2' : ''}`
@@ -71,7 +68,6 @@ const Gallery: React.FC<GalleryProps> = ({ onSelectPost, userId }) => {
                   alt="Gallery Asset"
                 />
                 
-                {/* Meta Overlay - Simplified for mobile, Rich for desktop */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 sm:gap-6 text-white backdrop-blur-[1px]">
                    <div className="flex items-center gap-3 sm:gap-6">
                       <div className="flex items-center gap-1 sm:gap-2">

@@ -10,7 +10,6 @@ import ChatHub from './components/ChatHub';
 import Profile from './components/Profile';
 import Admin from './components/Admin';
 import CalendarView from './components/Calendar';
-import Search from './components/Search';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
@@ -18,6 +17,7 @@ import NotificationsView from './components/Notifications';
 import Gallery from './components/Gallery';
 import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
+import SearchDrawer from './components/SearchDrawer';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Settings, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
@@ -27,6 +27,7 @@ const App: React.FC = () => {
   const [userRole, setuserRole] = useState<'student' | 'admin'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const [activeSector, setActiveSector] = useState<College | 'Global'>('Global');
   const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState(false);
@@ -44,7 +45,6 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
-  // Load and apply theme settings on mount
   useEffect(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) {
@@ -54,7 +54,6 @@ const App: React.FC = () => {
       root.style.setProperty('--font-main', settings.fontFamily);
       root.style.setProperty('--radius-main', settings.borderRadius);
       
-      // Apply dark/light class
       if (settings.themePreset === 'paper') {
         document.documentElement.classList.remove('dark');
         setIsDark(false);
@@ -65,7 +64,6 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Handle click outside for dropdowns
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
@@ -83,7 +81,6 @@ const App: React.FC = () => {
     if (newTheme) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
     
-    // Update local storage so settings stay synced
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) {
       const settings = JSON.parse(saved);
@@ -101,7 +98,7 @@ const App: React.FC = () => {
 
   const handleRegister = (email: string, college: College, status: UserStatus) => {
     setIsLoggedIn(true); setuserRole('student'); setView('home');
-    const newUser: User = { id: Date.now().toString(), name: email.split('@')[0], role: 'University Student', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, connections: 0, email, college, status, subscriptionTier: 'Free', joinedColleges: [college], postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: [] };
+    const newUser: User = { id: Date.now().toString(), name: email.split('@')[0], role: 'University Student', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, connections: 0, email, college, status, subscriptionTier: 'Free', joinedColleges: [college], postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: [], verified: true };
     db.saveUsers([...db.getUsers(), newUser]);
     localStorage.setItem('maksocial_current_user_id', newUser.id);
     setCurrentUser(newUser);
@@ -128,7 +125,6 @@ const App: React.FC = () => {
       case 'chats': return <ChatHub />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
-      case 'search': return <Search onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'resources': return <Resources />;
       case 'settings': return <SettingsView />;
       case 'opportunities': return <Opportunities />;
@@ -144,7 +140,26 @@ const App: React.FC = () => {
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
       {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
-      <Sidebar activeView={view} setView={handleSetView} isAdmin={userRole === 'admin'} onLogout={() => {setIsLoggedIn(false); setView('landing');}} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
+      <Sidebar 
+        activeView={view} 
+        setView={handleSetView} 
+        isAdmin={userRole === 'admin'} 
+        onLogout={() => {setIsLoggedIn(false); setView('landing');}} 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)}
+        onSearchToggle={() => setIsSearchOpen(!isSearchOpen)}
+      />
+
+      <SearchDrawer 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+        onSelectUser={(id) => {
+          setSelectedUserId(id);
+          setView('profile');
+        }}
+      />
+
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header ref={headerRef} className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">
@@ -166,7 +181,6 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4 relative">
             <button onClick={toggleTheme} className="p-2 text-slate-500 hover:text-[var(--text-primary)] transition-colors">{isDark ? <Sun size={20} /> : <Moon size={20} />}</button>
             
-            {/* Message Trigger */}
             <div className="relative">
               <button 
                 onClick={() => { setIsMsgOpen(!isMsgOpen); setIsNotifOpen(false); }} 
@@ -178,7 +192,6 @@ const App: React.FC = () => {
               {isMsgOpen && <MessageDropdown onClose={() => setIsMsgOpen(false)} onViewAll={() => handleSetView('chats')} />}
             </div>
 
-            {/* Notification Trigger */}
             <div className="relative">
               <button 
                 onClick={() => { setIsNotifOpen(!isNotifOpen); setIsMsgOpen(false); }} 

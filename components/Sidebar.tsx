@@ -14,15 +14,16 @@ interface SidebarProps {
   onLogout: () => void;
   isOpen?: boolean;
   onClose?: () => void;
+  onSearchToggle: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onSearchToggle }) => {
   const navItems = [
     { id: 'home', label: 'Pulse Feed', icon: <Home size={20} /> },
     { id: 'gallery', label: 'Visual Hub', icon: <LayoutPanelTop size={20} /> },
     { id: 'chats', label: 'Chat Hub', icon: <MessageSquare size={20} /> },
+    { id: 'search-widget', label: 'Search', icon: <Search size={20} /> },
     { id: 'opportunities', label: 'Opportunities', icon: <Briefcase size={20} /> },
-    { id: 'search', label: 'Registry', icon: <Search size={20} /> },
     { id: 'calendar', label: 'Schedule', icon: <Calendar size={20} /> },
     { id: 'resources', label: 'The Vault', icon: <BookOpen size={20} /> },
     { id: 'notifications', label: 'Signals', icon: <Bell size={20} /> },
@@ -45,7 +46,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setView(item.id as AppView)}
+              onClick={() => {
+                if (item.id === 'search-widget') {
+                  onSearchToggle();
+                } else {
+                  setView(item.id as AppView);
+                }
+              }}
               className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeView === item.id ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]'}`}
             >
               {item.icon}

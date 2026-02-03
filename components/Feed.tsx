@@ -38,7 +38,7 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
   const c = config[toast.type];
 
   return (
-    <div className={`flex items-start gap-4 p-4 bg-white dark:bg-white/[0.02] border ${c.border} rounded-[2px] shadow-lg min-w-[320px] max-w-[450px] animate-in slide-in-from-right-4 duration-300 font-mono`}>
+    <div className={`flex items-start gap-4 p-4 bg-white dark:bg-white/[0.02] border ${c.border} rounded-[2px] shadow-lg min-w-[320px] max-w-[450px] animate-in slide-in-from-right-4 duration-300 font-mono relative group`}>
        <div className="shrink-0 pt-0.5">
           {toast.type === 'error' ? (
             <div className={`${c.iconBg} rounded-full w-6 h-6 flex items-center justify-center border-2 border-white dark:border-black shadow-sm`}>
@@ -53,6 +53,169 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
     </div>
   );
 };
+
+// --- SIDEBAR SUB-COMPONENTS ---
+const NewsBulletin: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoUrl = "https://github.com/AshrafGit256/MakSocialImages/raw/main/Public/journalism2.mp4";
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (isPlaying) videoRef.current.pause();
+      else videoRef.current.play();
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <>
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl overflow-hidden mb-6 group relative shadow-2xl">
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-2 pointer-events-none">
+          <div className="px-2 py-1 bg-rose-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow-lg animate-pulse flex items-center gap-1">
+             <div className="w-1 h-1 bg-white rounded-full"></div> LIVE_BULLETIN
+          </div>
+        </div>
+        
+        <div className="aspect-video relative bg-black">
+          <video 
+            ref={videoRef}
+            src={videoUrl}
+            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+            loop
+            muted
+            playsInline
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={togglePlay} className="p-3 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/40 transition-all">
+              {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
+            </button>
+          </div>
+
+          <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            <button 
+              onClick={() => setIsExpanded(true)}
+              className="p-1.5 bg-black/40 backdrop-blur-md text-white rounded hover:bg-indigo-600 transition-all"
+              title="Expand Scan"
+            >
+              <Maximize2 size={14} />
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-4 bg-slate-900/50 backdrop-blur-md border-t border-white/5">
+          <h4 className="text-[10px] font-black text-white uppercase tracking-tighter">Hill_Daily_Digest / Intelligence Sync</h4>
+          <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status: Summarizing Campus Strata Activity</p>
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 md:p-10 bg-black/95 backdrop-blur-lg animate-in fade-in">
+          <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-indigo-600/20">
+            <button 
+              onClick={() => setIsExpanded(false)}
+              className="absolute top-6 right-6 z-50 p-2 bg-white/10 hover:bg-rose-600 text-white rounded-full transition-all"
+            >
+              <X size={24} />
+            </button>
+            <video 
+              src={videoUrl}
+              className="w-full h-full object-contain"
+              controls
+              autoPlay
+            />
+            <div className="absolute bottom-10 left-10 space-y-2 pointer-events-none">
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Protocol_Journalism / Expanded</h2>
+              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em]">Node: Central_Journalism_Wing // {new Date().toLocaleDateString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+const NetworkIntensityGraph: React.FC = () => {
+  return (
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-5 mb-4 relative overflow-hidden group rounded-2xl shadow-sm">
+       <div className="relative z-10 space-y-4">
+          <div className="flex justify-between items-start">
+             <div className="space-y-1">
+                <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                   <Activity size={12} /> Network_Intensity
+                </h4>
+                <div className="flex items-center gap-3">
+                   <span className="text-3xl font-black tracking-tighter ticker-text text-slate-700 dark:text-slate-300">74.8</span>
+                   <div className="flex flex-col">
+                      <span className="text-[9px] font-black uppercase text-emerald-500 flex items-center gap-0.5">
+                         <TrendingUp size={10} /> BULLISH
+                      </span>
+                      <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">v4.2_STABLE</span>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+  );
+};
+
+const TrendingHashtags: React.FC<{ posts: Post[], onTagClick?: (tag: string) => void }> = ({ posts, onTagClick }) => {
+  const topTags = useMemo(() => {
+    const counts: Record<string, number> = {};
+    posts.forEach(p => {
+      (p.hashtags || []).forEach(tag => {
+        const cleanTag = tag.startsWith('#') ? tag : `#${tag}`;
+        counts[cleanTag] = (counts[cleanTag] || 0) + 1;
+      });
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  }, [posts]);
+
+  return (
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-5 mb-4 shadow-sm">
+       <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+          <Hash size={12} className="text-slate-400" /> Hot_Signals
+       </h4>
+       <div className="space-y-4">
+          {topTags.length > 0 ? topTags.map(([tag, count], i) => (
+            <div 
+              key={i} 
+              onClick={() => onTagClick?.(tag)}
+              className="flex justify-between items-center group cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 p-2 rounded transition-all border border-transparent hover:border-indigo-500/20"
+            >
+               <span className="text-[11px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-tight group-hover:underline">#{tag.replace('#','')}</span>
+               <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">{count} COMMITS</span>
+            </div>
+          )) : (
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">No signals indexed...</p>
+          )}
+       </div>
+    </div>
+  );
+};
+
+const Watchlist: React.FC = () => (
+  <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-5 shadow-sm">
+     <h4 className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+        <Radio size={12} className="text-slate-400" /> Sector_Watchlist
+     </h4>
+     <div className="space-y-5">
+        {[{ t: '#COCIS', v: '+12.4%', c: 'text-emerald-500' }, { t: '#CEDAT', v: '-2.1%', c: 'text-rose-500' }, { t: '#LAW', v: '+45.8%', c: 'text-emerald-500' }].map((item, i) => (
+          <div key={i} className="flex justify-between items-center group">
+             <span className="text-[10px] font-black uppercase text-slate-500 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{item.t}</span>
+             <span className={`text-[10px] font-mono font-bold ticker-text ${item.c}`}>{item.v}</span>
+          </div>
+        ))}
+     </div>
+  </div>
+);
 
 // --- LIGHTBOX COMPONENT ---
 const Lightbox: React.FC<{ 
@@ -255,9 +418,23 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </div>
          </div>
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-8 rounded-2xl shadow-sm">
-               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2"><Globe size={14}/> Global Sync Status</h4>
-               <p className="text-[11px] font-medium text-slate-500 leading-relaxed uppercase">Signal integrity scanner is active. All multi-modal uploads are verified against university strata protocols.</p>
+            <NewsBulletin />
+            <NetworkIntensityGraph />
+            <TrendingHashtags posts={posts} onTagClick={onHashtagClick} />
+            <Watchlist />
+            
+            <div className="bg-slate-900 dark:bg-black p-8 text-white relative overflow-hidden group border border-slate-800 rounded-2xl shadow-xl">
+               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-1000"><Globe size={120} fill="white"/></div>
+               <div className="relative z-10 space-y-6">
+                  <div className="flex items-center gap-3">
+                     <BadgeCheck size={24} className="text-slate-400" fill="currentColor" stroke="white" strokeWidth={1.5}/>
+                     <h4 className="text-[16px] font-black uppercase tracking-widest leading-none text-slate-100">Registry Elite</h4>
+                  </div>
+                  <p className="text-[10px] font-medium opacity-60 uppercase leading-relaxed tracking-tight">
+                    Synchronize with high-frequency research nodes. Access unrestricted scholarly assets and prioritized wing indexing.
+                  </p>
+                  <button className="w-full py-3 bg-slate-100 text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white transition-all active:scale-95">Commit_Credentials</button>
+               </div>
             </div>
          </aside>
       </div>

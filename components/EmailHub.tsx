@@ -9,7 +9,7 @@ import {
   MoreHorizontal, Download, Image as ImageIcon, 
   File, Printer, ChevronDown, RotateCw, Filter,
   Tag, AlignLeft, AlignCenter, AlignRight, Bold,
-  Italic, List, Code, Redo2, Terminal, AlertCircle, FilePlus
+  Italic, List, Code, Redo2, Terminal, AlertCircle, FilePlus, Menu
 } from 'lucide-react';
 
 const PAGE_SIZE = 10;
@@ -23,6 +23,7 @@ const EmailHub: React.FC = () => {
   const [currentUser] = useState<User>(db.getUser());
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
 
   // Compose State
   const [composeTo, setComposeTo] = useState('');
@@ -93,7 +94,7 @@ const EmailHub: React.FC = () => {
       from: currentUser.email || 'node@mak.ac.ug',
       fromName: currentUser.name,
       fromAvatar: currentUser.avatar,
-      to: composeTo ? [composeTo] : [],
+      to: composeTo ? composeTo.split(/[,\s]+/).filter(e => e.includes('@')) : [],
       subject: composeSubject || '[NO SUBJECT]',
       body: composeBody,
       timestamp: 'Just now',
@@ -111,6 +112,7 @@ const EmailHub: React.FC = () => {
     setView('list');
     setFolder('draft');
     resetCompose();
+    setIsSidebarMobileOpen(false);
   };
 
   const handleSendEmail = () => {
@@ -150,6 +152,7 @@ const EmailHub: React.FC = () => {
     setActiveLabel(null);
     setView('list');
     resetCompose();
+    setIsSidebarMobileOpen(false);
   };
 
   const resetCompose = () => {
@@ -191,17 +194,38 @@ const EmailHub: React.FC = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto px-4 lg:px-8 py-6 pb-40 font-mono text-[var(--text-primary)]">
-      <div className="flex flex-col mb-10">
-        <h1 className="text-3xl font-black uppercase tracking-tighter">Email_Registry</h1>
-        <div className="flex items-center gap-2 text-[10px] text-slate-500 font-black uppercase tracking-widest mt-2">
-          <Terminal size={14} className="text-[var(--brand-color)]"/> <span>Apps</span> <ChevronRight size={10}/> <span>Email</span>
+      {/* HEADER */}
+      <div className="flex flex-col mb-6 md:mb-10">
+        <div className="flex items-center justify-between">
+           <div>
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">Email_Registry</h1>
+              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1 md:mt-2">
+                <Terminal size={14} className="text-[var(--brand-color)]"/> <span>Apps</span> <ChevronRight size={10}/> <span>Email</span>
+              </div>
+           </div>
+           <button 
+             onClick={() => setIsSidebarMobileOpen(!isSidebarMobileOpen)}
+             className="lg:hidden p-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded text-[var(--brand-color)]"
+           >
+              <Menu size={20} />
+           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <aside className="lg:col-span-3 space-y-6">
+        {/* SIDEBAR NAVIGATION - DESKTOP & MOBILE DRAWER */}
+        <aside className={`
+          ${isSidebarMobileOpen ? 'fixed inset-0 z-[200] bg-black/90 backdrop-blur-md p-8 overflow-y-auto block' : 'hidden lg:block lg:col-span-3'}
+          space-y-6
+        `}>
+          {isSidebarMobileOpen && (
+            <div className="flex justify-end mb-4">
+              <button onClick={() => setIsSidebarMobileOpen(false)} className="text-white p-2"><X size={28}/></button>
+            </div>
+          )}
+
           <button 
-            onClick={() => setView('compose')}
+            onClick={() => {setView('compose'); setIsSidebarMobileOpen(false);}}
             className="w-full py-4 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[2px] font-black text-[12px] uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
           >
             <Plus size={18}/> Compose_Signal
@@ -212,7 +236,7 @@ const EmailHub: React.FC = () => {
               {sidebarItems.map(item => (
                 <button 
                   key={item.id} 
-                  onClick={() => {setFolder(item.id as any); setActiveLabel(null); setView('list'); setCurrentPage(1);}}
+                  onClick={() => {setFolder(item.id as any); setActiveLabel(null); setView('list'); setCurrentPage(1); setIsSidebarMobileOpen(false);}}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-[2px] text-[11px] font-bold uppercase tracking-widest transition-all ${!activeLabel && folder === item.id ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-500 hover:bg-white/5'}`}
                 >
                   <div className="flex items-center gap-4">{item.icon} <span>{item.label}</span></div>
@@ -228,7 +252,7 @@ const EmailHub: React.FC = () => {
                 {labels.map(label => (
                   <button 
                     key={label.id} 
-                    onClick={() => {setActiveLabel(label.id as any); setView('list'); setCurrentPage(1);}}
+                    onClick={() => {setActiveLabel(label.id as any); setView('list'); setCurrentPage(1); setIsSidebarMobileOpen(false);}}
                     className={`w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold uppercase tracking-tighter transition-all rounded-[2px] ${activeLabel === label.id ? 'bg-white/10 text-[var(--text-primary)] border-l-4 border-current' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'}`}
                   >
                     <div className={`w-3 h-3 rounded-full ${label.color} shadow-sm`}></div>
@@ -241,7 +265,7 @@ const EmailHub: React.FC = () => {
           <div className="pt-4 border-t border-[var(--border-color)]">
              <div className="space-y-1">
                 <button 
-                  onClick={() => {setFolder('all'); setActiveLabel(null); setView('list'); setCurrentPage(1);}}
+                  onClick={() => {setFolder('all'); setActiveLabel(null); setView('list'); setCurrentPage(1); setIsSidebarMobileOpen(false);}}
                   className={`w-full flex items-center gap-4 px-4 py-2.5 text-[11px] font-bold transition-all uppercase tracking-tighter ${folder === 'all' && !activeLabel ? 'text-[var(--brand-color)]' : 'text-slate-400 hover:text-[var(--text-primary)]'}`}
                 >
                    <Tag size={14} className="opacity-40" /> All Mail
@@ -250,7 +274,8 @@ const EmailHub: React.FC = () => {
           </div>
         </aside>
 
-        <main className="lg:col-span-9 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] shadow-2xl flex flex-col relative min-h-[800px] overflow-hidden">
+        {/* MAIN EMAIL WORKSPACE */}
+        <main className="lg:col-span-9 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2px] shadow-2xl flex flex-col relative min-h-[600px] md:min-h-[800px] overflow-hidden">
           
           {view === 'list' && (
             <>
@@ -264,8 +289,8 @@ const EmailHub: React.FC = () => {
                      placeholder="Search signals in registry..." 
                    />
                 </div>
-                <div className="flex items-center gap-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
-                    <span>{Math.min(filteredEmails.length, (currentPage-1)*PAGE_SIZE + 1)} TO {Math.min(filteredEmails.length, currentPage*PAGE_SIZE)} OF {filteredEmails.length}</span>
+                <div className="flex items-center gap-5 text-[11px] font-black text-slate-500 uppercase tracking-widest w-full md:w-auto justify-between md:justify-end">
+                    <span>{Math.min(filteredEmails.length, (currentPage-1)*PAGE_SIZE + 1)}-{Math.min(filteredEmails.length, currentPage*PAGE_SIZE)} OF {filteredEmails.length}</span>
                     <div className="flex gap-1">
                        <button 
                          disabled={currentPage === 1}
@@ -290,19 +315,32 @@ const EmailHub: React.FC = () => {
                   <div 
                     key={email.id} 
                     onClick={() => handleReadEmail(email)}
-                    className={`px-6 py-4 border-b border-[var(--border-color)] flex items-center gap-8 hover:bg-[var(--brand-color)]/5 cursor-pointer group transition-all ${!email.isRead ? 'bg-white dark:bg-white/[0.02]' : ''}`}
+                    className={`px-4 md:px-6 py-4 border-b border-[var(--border-color)] flex flex-col md:flex-row md:items-center gap-3 md:gap-8 hover:bg-[var(--brand-color)]/5 cursor-pointer group transition-all ${!email.isRead ? 'bg-white dark:bg-white/[0.02]' : ''}`}
                   >
-                    <div className="flex items-center gap-5 shrink-0">
-                       <input type="checkbox" className="w-4 h-4 rounded-[2px] bg-transparent border-[var(--border-color)] text-[var(--brand-color)] focus:ring-0" onClick={e => e.stopPropagation()}/>
-                       <button className={`transition-all hover:scale-125 ${email.isStarred ? 'text-amber-500' : 'text-slate-700'}`} onClick={e => handleToggleStar(e, email.id)}>
-                          <Star size={18} fill={email.isStarred ? "currentColor" : "none"}/>
-                       </button>
+                    <div className="flex items-center justify-between md:justify-start gap-5 shrink-0">
+                       <div className="flex items-center gap-3">
+                          <input type="checkbox" className="w-4 h-4 rounded-[2px] bg-transparent border-[var(--border-color)] text-[var(--brand-color)] focus:ring-0" onClick={e => e.stopPropagation()}/>
+                          <button className={`transition-all hover:scale-125 ${email.isStarred ? 'text-amber-500' : 'text-slate-700'}`} onClick={e => handleToggleStar(e, email.id)}>
+                             <Star size={18} fill={email.isStarred ? "currentColor" : "none"}/>
+                          </button>
+                       </div>
+                       <div className="md:hidden text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">{email.timestamp}</div>
                     </div>
-                    <div className="w-52 shrink-0 flex items-center gap-4 overflow-hidden">
-                       <img src={email.fromAvatar} className="w-9 h-9 rounded-full border border-[var(--border-color)] bg-white object-cover grayscale group-hover:grayscale-0 transition-all" />
-                       <span className={`text-[12px] uppercase tracking-tight truncate ${!email.isRead ? 'font-black text-[var(--text-primary)]' : 'font-bold text-slate-500'}`}>{email.fromName}</span>
+
+                    <div className="flex items-center gap-4 min-w-0 overflow-hidden">
+                       <img src={email.fromAvatar} className="w-9 h-9 rounded-full border border-[var(--border-color)] bg-white object-cover grayscale group-hover:grayscale-0 transition-all shrink-0" />
+                       <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between md:justify-start gap-3">
+                             <span className={`text-[12px] uppercase tracking-tight truncate ${!email.isRead ? 'font-black text-[var(--text-primary)]' : 'font-bold text-slate-500'}`}>{email.fromName}</span>
+                             {!email.isRead && <div className="md:hidden w-1.5 h-1.5 rounded-full bg-[var(--brand-color)] animate-pulse"></div>}
+                          </div>
+                          <p className={`text-[12px] truncate uppercase tracking-tighter md:hidden ${!email.isRead ? 'font-black text-[var(--text-primary)]' : 'font-bold text-slate-400'}`}>
+                             {email.subject}
+                          </p>
+                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
+
+                    <div className="hidden md:block flex-1 min-w-0">
                        <div className="flex items-center gap-3 mb-0.5">
                           <p className={`text-[12px] truncate uppercase tracking-tighter ${!email.isRead ? 'font-black text-[var(--text-primary)]' : 'font-bold text-slate-400'}`}>
                              {email.subject}
@@ -314,7 +352,8 @@ const EmailHub: React.FC = () => {
                           {email.body.split('\n')[0].slice(0, 100)}...
                        </p>
                     </div>
-                    <div className="flex items-center gap-6 shrink-0">
+
+                    <div className="flex items-center gap-6 shrink-0 justify-between md:justify-end">
                        {email.label && (
                          <span className={`px-2 py-0.5 rounded-[1px] text-[8px] font-black uppercase tracking-widest border border-current opacity-60 ${
                            email.label === 'Important' ? 'text-emerald-500' :
@@ -324,11 +363,11 @@ const EmailHub: React.FC = () => {
                            {email.label}
                          </span>
                        )}
-                       <span className="text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">{email.timestamp}</span>
+                       <span className="hidden md:block text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest">{email.timestamp}</span>
                     </div>
                   </div>
                 )) : (
-                  <div className="py-40 text-center space-y-6 opacity-30">
+                  <div className="py-40 text-center space-y-6 opacity-30 px-6">
                      <Inbox size={64} className="mx-auto" />
                      <p className="text-[10px] font-black uppercase tracking-[0.4em]">No active signals in this strata</p>
                   </div>
@@ -344,7 +383,6 @@ const EmailHub: React.FC = () => {
                     <button onClick={() => setView('list')} className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500 hover:text-[var(--brand-color)] transition-all"><ArrowLeft size={18}/></button>
                     <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500 hover:text-rose-500"><Trash size={18}/></button>
                     <button className={`p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] ${selectedEmail.isStarred ? 'text-amber-500' : 'text-slate-500'}`} onClick={(e) => handleToggleStar(e, selectedEmail.id)}><Star size={18} fill={selectedEmail.isStarred ? "currentColor" : "none"}/></button>
-                    <button className="p-2.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-[2px] text-slate-500"><Tag size={18}/></button>
                  </div>
                  <div className="flex items-center gap-5 text-[11px] font-black text-slate-500 uppercase tracking-widest">
                     <div className="flex gap-1">
@@ -354,22 +392,22 @@ const EmailHub: React.FC = () => {
                  </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-12 no-scrollbar space-y-12 bg-white dark:bg-[#050505]">
+              <div className="flex-1 overflow-y-auto p-6 md:p-12 no-scrollbar space-y-8 md:space-y-12 bg-white dark:bg-[#050505]">
                  <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-                    <div className="space-y-6 flex-1">
-                       <h2 className="text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">{selectedEmail.subject}</h2>
+                    <div className="space-y-6 flex-1 w-full">
+                       <h2 className="text-xl md:text-3xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-tight">{selectedEmail.subject}</h2>
                        <div className="flex items-center gap-4">
-                          <img src={selectedEmail.fromAvatar} className="w-14 h-14 rounded-full border-2 border-[var(--border-color)] bg-white object-cover shadow-xl" />
-                          <div>
+                          <img src={selectedEmail.fromAvatar} className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-[var(--border-color)] bg-white object-cover shadow-xl" />
+                          <div className="min-w-0 flex-1">
                              <div className="flex items-center gap-2">
-                                <h3 className="text-sm font-black text-[var(--brand-color)] lowercase">{selectedEmail.from}</h3>
-                                <ChevronDown size={14} className="text-slate-500 cursor-pointer" />
+                                <h3 className="text-sm font-black text-[var(--brand-color)] lowercase truncate">{selectedEmail.from}</h3>
+                                <ChevronDown size={14} className="text-slate-500 cursor-pointer shrink-0" />
                              </div>
-                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">TO: {selectedEmail.to.join(', ')}</p>
+                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1 truncate">TO: {selectedEmail.to.join(', ')}</p>
                           </div>
                        </div>
                     </div>
-                    <div className="text-right shrink-0">
+                    <div className="text-left md:text-right shrink-0 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 border-[var(--border-color)]">
                        <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">{selectedEmail.fullDate}</p>
                        <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-[var(--brand-color)]/10 text-[var(--brand-color)] rounded-sm border border-[var(--brand-color)]/20 text-[8px] font-black uppercase tracking-widest">
                           {selectedEmail.label || 'PROD'}
@@ -397,14 +435,14 @@ const EmailHub: React.FC = () => {
                                   ) : (
                                     <File size={48} className="text-slate-700 opacity-20 group-hover:opacity-40 transition-all" />
                                   )}
-                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                                      <button className="p-3 bg-white text-black rounded-full shadow-2xl scale-75 group-hover:scale-100 transition-all duration-300"><Download size={20}/></button>
                                   </div>
                                </div>
                                <div className="p-4 space-y-3">
                                   <p className="text-[11px] font-black text-slate-800 dark:text-slate-300 truncate uppercase">{att.name}</p>
                                   <div className="flex items-center justify-between">
-                                     <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{att.size}</span>
+                                     <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{att.size}</span>
                                      <span className="text-[8px] font-black text-[var(--brand-color)] uppercase tracking-widest bg-[var(--brand-color)]/10 px-1.5 py-0.5 rounded-sm">{att.type}</span>
                                   </div>
                                </div>
@@ -414,15 +452,13 @@ const EmailHub: React.FC = () => {
                     </div>
                  )}
 
-                 <div className="pt-12 border-t border-[var(--border-color)] space-y-8">
-                    <div className="flex gap-4">
-                       <button onClick={() => handleReply(selectedEmail)} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
-                          <Reply size={16} className="rotate-180"/> Reply
-                       </button>
-                       <button onClick={() => handleForward(selectedEmail)} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
-                          Forward <Forward size={16}/>
-                       </button>
-                    </div>
+                 <div className="pt-12 border-t border-[var(--border-color)] flex flex-wrap gap-4">
+                    <button onClick={() => handleReply(selectedEmail)} className="flex-1 md:flex-none px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
+                       <Reply size={16} className="rotate-180"/> Reply
+                    </button>
+                    <button onClick={() => handleForward(selectedEmail)} className="flex-1 md:flex-none px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-95 shadow-sm">
+                       Forward <Forward size={16}/>
+                    </button>
                  </div>
               </div>
             </div>
@@ -430,15 +466,15 @@ const EmailHub: React.FC = () => {
 
           {view === 'compose' && (
             <div className="flex-1 flex flex-col overflow-hidden animate-in slide-in-from-bottom-2 duration-400">
-               <div className="px-8 py-5 border-b border-[var(--border-color)] flex items-center justify-between bg-white/5 backdrop-blur-sm">
-                  <h2 className="text-sm font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-3">
-                     <Plus size={18} className="text-[var(--brand-color)]" /> Initializing_New_Signal
+               <div className="px-6 md:px-8 py-5 border-b border-[var(--border-color)] flex items-center justify-between bg-white/5 backdrop-blur-sm">
+                  <h2 className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] text-slate-500 flex items-center gap-3">
+                     <Plus size={18} className="text-[var(--brand-color)]" /> Initializing_Signal
                   </h2>
                   <button onClick={() => setView('list')} className="p-2 text-slate-400 hover:text-rose-500 transition-colors"><X size={24}/></button>
                </div>
                
-               <div className="flex-1 overflow-y-auto p-12 space-y-8 no-scrollbar bg-white dark:bg-[#050505]">
-                  <div className="grid grid-cols-1 gap-6">
+               <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-6 md:space-y-8 no-scrollbar bg-white dark:bg-[#050505]">
+                  <div className="grid grid-cols-1 gap-4 md:gap-6">
                      <div className="relative group">
                         <input 
                           className="w-full bg-transparent border-b border-[var(--border-color)] py-4 text-sm font-black dark:text-white outline-none focus:border-[var(--brand-color)] tracking-tighter" 
@@ -474,25 +510,21 @@ const EmailHub: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="border border-[var(--border-color)] rounded-[2px] overflow-hidden flex flex-col min-h-[500px] shadow-2xl">
+                  <div className="border border-[var(--border-color)] rounded-[2px] overflow-hidden flex flex-col min-h-[400px] md:min-h-[500px] shadow-2xl">
                      {/* RICH TEXT TACTICAL TOOLBAR */}
-                     <div className="flex flex-wrap items-center gap-1 p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
-                        <button onClick={handleSendEmail} disabled={!composeTo.trim()} className="p-2.5 bg-[var(--brand-color)] text-white rounded-[2px] shadow-lg flex items-center gap-2 text-[10px] font-black uppercase tracking-widest mr-4 hover:brightness-110 disabled:opacity-50"><Send size={14}/> Transmit</button>
+                     <div className="flex flex-wrap items-center gap-1 p-2 md:p-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
+                        <button onClick={handleSendEmail} disabled={!composeTo.trim()} className="px-4 py-2 bg-[var(--brand-color)] text-white rounded-[2px] shadow-lg flex items-center gap-2 text-[9px] font-black uppercase tracking-widest mr-4 hover:brightness-110 disabled:opacity-50 shrink-0"><Send size={14}/> Transmit</button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Redo2 className="rotate-180" size={16}/></button>
-                        <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
+                        <div className="w-px h-6 bg-[var(--border-color)] mx-2 shrink-0"></div>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-black">B</button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-serif italic">I</button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500 font-serif font-black underline underline-offset-4">U</button>
-                        <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignLeft size={16}/></button>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignCenter size={16}/></button>
-                        <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><AlignRight size={16}/></button>
-                        <div className="w-px h-6 bg-[var(--border-color)] mx-2"></div>
+                        <div className="w-px h-6 bg-[var(--border-color)] mx-2 shrink-0"></div>
                         <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><ImageIcon size={16}/></button>
                         <button className="p-2 hover:bg-white/10 rounded-[2px] text-slate-500"><Code size={16}/></button>
                      </div>
                      <textarea 
-                        className="flex-1 p-10 bg-transparent outline-none text-[15px] dark:text-white font-medium leading-relaxed resize-none font-sans" 
+                        className="flex-1 p-6 md:p-10 bg-transparent outline-none text-[14px] md:text-[15px] dark:text-white font-medium leading-relaxed resize-none font-sans" 
                         placeholder="TYPE MESSAGE PROTOCOL..."
                         value={composeBody}
                         onChange={e => setComposeBody(e.target.value)}
@@ -500,10 +532,10 @@ const EmailHub: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-center justify-between pt-10 border-t border-[var(--border-color)] gap-8">
-                     <div className="flex items-center gap-6">
+                     <div className="flex items-center gap-6 w-full sm:w-auto">
                         <button 
                           onClick={() => fileInputRef.current?.click()} 
-                          className="flex items-center gap-3 px-6 py-2.5 border border-[var(--border-color)] bg-[var(--bg-secondary)] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[var(--brand-color)] hover:border-[var(--brand-color)] transition-all shadow-sm"
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-2.5 border border-[var(--border-color)] bg-[var(--bg-secondary)] rounded-[2px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-[var(--brand-color)] hover:border-[var(--brand-color)] transition-all shadow-sm"
                         >
                            <Paperclip size={18}/> Attach_Asset
                         </button>
@@ -514,17 +546,19 @@ const EmailHub: React.FC = () => {
                           multiple 
                           onChange={handleFileChange} 
                         />
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Max_Payload: 32MB</p>
+                        <p className="hidden md:block text-[9px] font-black text-slate-400 uppercase tracking-widest">Max_Payload: 32MB</p>
                      </div>
-                     <div className="flex gap-4 w-full sm:w-auto">
-                        <button onClick={() => setView('list')} className="flex-1 sm:flex-none px-8 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-rose-500 transition-colors flex items-center justify-center gap-2"><X size={18}/> Discard</button>
-                        <button onClick={handleSaveDraft} className="flex-1 sm:flex-none px-10 py-3 border border-[var(--border-color)] rounded-[2px] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:bg-white/5 transition-all flex items-center justify-center gap-2"><FileText size={18}/> Save_Draft</button>
+                     <div className="flex flex-col md:flex-row gap-4 w-full sm:w-auto">
+                        <div className="flex gap-4">
+                           <button onClick={() => setView('list')} className="flex-1 md:flex-none px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-rose-500 transition-colors flex items-center justify-center gap-2"><X size={18}/> Discard</button>
+                           <button onClick={handleSaveDraft} className="flex-1 md:flex-none px-8 py-3 border border-[var(--border-color)] rounded-[2px] text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:bg-white/5 transition-all flex items-center justify-center gap-2"><FileText size={18}/> Save_Draft</button>
+                        </div>
                         <button 
                           onClick={handleSendEmail}
                           disabled={!composeTo.trim()}
-                          className="flex-1 sm:flex-none px-12 py-4 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[2px] text-[10px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all disabled:opacity-50"
+                          className="w-full md:w-auto px-12 py-4 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[2px] text-[10px] font-black uppercase tracking-[0.4em] flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all disabled:opacity-50"
                         >
-                           Transmit <Send size={20}/>
+                           Transmit_Signal <Send size={20}/>
                         </button>
                      </div>
                   </div>
@@ -533,6 +567,16 @@ const EmailHub: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* MOBILE FLOATING ACTION BUTTON */}
+      {view === 'list' && (
+        <button 
+          onClick={() => setView('compose')}
+          className="lg:hidden fixed bottom-24 right-6 w-14 h-14 bg-[var(--brand-color)] text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-transform z-[150]"
+        >
+          <Plus size={28} />
+        </button>
+      )}
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

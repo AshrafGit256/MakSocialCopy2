@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment, CalendarEvent } from '../types';
 import { db } from '../db';
@@ -10,12 +11,12 @@ import {
   Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
   Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
   Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon,
-  ChevronLeft, ChevronRight, ShieldAlert, ShieldCheck, Loader2, CheckCircle2, AlertCircle
+  ChevronLeft, ChevronRight, ShieldAlert, ShieldCheck, Loader2, CheckCircle2, AlertCircle, ArrowUp
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
-// --- TOAST COMPONENT (Matches user images) ---
+// --- TOAST COMPONENT ---
 interface ToastMsg {
   id: string;
   type: 'success' | 'error' | 'warning';
@@ -28,7 +29,6 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
     return () => clearTimeout(timer);
   }, [toast, onDismiss]);
 
-  // Added iconBg: '' to success and warning to prevent TS error when accessing c.iconBg
   const config = {
     success: { icon: <CheckCircle2 size={24} className="text-[#10b981]" fill="#d1fae5" />, border: 'border-[#e2e8f0]', iconBg: '' },
     error: { icon: <X size={18} className="text-white" />, iconBg: 'bg-[#ef4444]', border: 'border-[#e2e8f0]' },
@@ -55,11 +55,7 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
 };
 
 // --- LIGHTBOX COMPONENT ---
-const Lightbox: React.FC<{ 
-  images: string[], 
-  initialIndex: number, 
-  onClose: () => void 
-}> = ({ images, initialIndex, onClose }) => {
+const Lightbox: React.FC<{ images: string[], initialIndex: number, onClose: () => void }> = ({ images, initialIndex, onClose }) => {
   const [index, setIndex] = useState(initialIndex);
   const next = (e: React.MouseEvent) => { e.stopPropagation(); setIndex((prev) => (prev + 1) % images.length); };
   const prev = (e: React.MouseEvent) => { e.stopPropagation(); setIndex((prev) => (prev - 1 + images.length) % images.length); };
@@ -77,7 +73,7 @@ const Lightbox: React.FC<{
   );
 };
 
-// --- X-STYLE IMAGE GRID ---
+// --- IMAGE GRID ---
 const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
   const [lightbox, setLightbox] = useState<{ open: boolean, index: number }>({ open: false, index: 0 });
   if (!images || images.length === 0) return null;
@@ -96,7 +92,6 @@ export const AuthoritySeal: React.FC<{ role?: string, size?: number, verified?: 
 
 const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void, onUpdate: () => void, isThreadView?: boolean, isLiked?: boolean, onLike: (id: string) => void, onAddToast: (type: ToastMsg['type'], text: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike, onAddToast }) => {
   const [newComment, setNewComment] = useState('');
-  const handleLike = (e: React.MouseEvent) => { e.stopPropagation(); onLike(post.id); };
   
   const handleAddToCalendar = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -150,7 +145,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
             </div>
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
-                  <button onClick={handleLike} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
+                  <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
                   <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-600 transition-all active:scale-110" title="Add to Registry Roadmap"><Calendar size={18} /> <span className="hidden sm:inline uppercase tracking-widest text-[8px]">Sync roadmap</span></button>
                 </div>
@@ -183,20 +178,49 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
   );
 };
 
-const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void, onHashtagClick?: (tag: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError, onHashtagClick }) => {
+const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [user, setUser] = useState<User>(db.getUser());
   const [bookmarks, setBookmarks] = useState<string[]>(db.getBookmarks());
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [newPostsAvailable, setNewPostsAvailable] = useState(0);
   const [updateTrigger, setUpdateTrigger] = useState(0);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
   
+  const lastSyncCount = useRef(0);
+
   useEffect(() => {
-    const sync = () => { setPosts(db.getPosts()); setUser(db.getUser()); setBookmarks(db.getBookmarks()); };
+    const sync = () => { 
+      const currentPosts = db.getPosts();
+      const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
+      
+      if (lastSyncCount.current > 0 && filteredCurrent.length > lastSyncCount.current && !threadId) {
+        setNewPostsAvailable(filteredCurrent.length - lastSyncCount.current);
+      }
+      
+      if (lastSyncCount.current === 0 || updateTrigger > 0) {
+        setPosts(currentPosts);
+        lastSyncCount.current = filteredCurrent.length;
+        setNewPostsAvailable(0);
+      }
+      
+      setUser(db.getUser()); 
+      setBookmarks(db.getBookmarks()); 
+    };
+
     sync();
-    const interval = setInterval(sync, 15000);
+    const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
-  }, [updateTrigger]);
+  }, [updateTrigger, collegeFilter, threadId]);
+
+  const refreshFeed = () => {
+    const currentPosts = db.getPosts();
+    const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
+    setPosts(currentPosts);
+    lastSyncCount.current = filteredCurrent.length;
+    setNewPostsAvailable(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const addToast = (type: ToastMsg['type'], text: string) => {
     const id = Date.now().toString();
@@ -205,44 +229,37 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
 
   const removeToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
 
-  const verifyContentSafety = async (html: string, images: string[]): Promise<{ isSafe: boolean; reason?: string }> => {
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Analyze the following signal for sexually explicit content, non-consensual imagery, or severe community violations. Respond ONLY with JSON: {"status": "SAFE"} or {"status": "VIOLATION", "reason": "Short reason"}. Content: "${html.replace(/<[^>]*>/g, '')}"`;
-      const contents: any[] = [{ text: prompt }];
-      if (images && images.length > 0) {
-        images.slice(0, 2).forEach(img => {
-          const base64Data = img.split(',')[1];
-          if (base64Data) contents.push({ inlineData: { data: base64Data, mimeType: 'image/jpeg' } });
-        });
-      }
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: { parts: contents },
-        config: { responseMimeType: "application/json", systemInstruction: "You are the MakSocial Integrity Guard. Strictly block explicit sexual content." }
-      });
-      return JSON.parse(response.text || '{"status": "SAFE"}').status === 'SAFE' ? { isSafe: true } : { isSafe: false, reason: JSON.parse(response.text).reason };
-    } catch (error) { return { isSafe: true }; }
-  };
-
   const handlePost = async (html: string, poll?: PollData) => {
     const imgRegex = /<img[^+]+src="([^">]+)"/g;
     const foundImages: string[] = [];
     let match;
     while ((match = imgRegex.exec(html)) !== null) foundImages.push(match[1]);
 
-    const safety = await verifyContentSafety(html, foundImages);
-
-    if (!safety.isSafe) {
-      addToast('error', safety.reason || "Content violates community integrity protocols and has been redacted.");
-      return;
-    }
-
     const hashtagRegex = /#(\w+)/g;
     const foundTags = html.match(hashtagRegex) || [];
     const cleanedHtml = html.replace(/<img[^>]*>/g, '');
 
-    db.addPost({ id: `p-${Date.now()}`, author: user.name, authorId: user.id, authorRole: user.role, authorAvatar: user.avatar, timestamp: 'Just now', content: cleanedHtml, images: foundImages, hashtags: foundTags, likes: 0, commentsCount: 0, comments: [], views: 1, flags: [], isOpportunity: false, college: collegeFilter === 'Global' ? user.college : collegeFilter, pollData: poll });
+    const newPost: Post = { 
+      id: `p-${Date.now()}`, 
+      author: user.name, 
+      authorId: user.id, 
+      authorRole: user.role, 
+      authorAvatar: user.avatar, 
+      timestamp: 'Just now', 
+      content: cleanedHtml, 
+      images: foundImages, 
+      hashtags: foundTags, 
+      likes: 0, 
+      commentsCount: 0, 
+      comments: [], 
+      views: 1, 
+      flags: [], 
+      isOpportunity: false, 
+      college: collegeFilter === 'Global' ? user.college : collegeFilter, 
+      pollData: poll 
+    };
+
+    db.addPost(newPost);
     setUpdateTrigger(prev => prev + 1);
     addToast('success', "Signal synchronized successfully with the universal hub strata.");
   };
@@ -251,7 +268,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   
   return (
     <div className="max-w-[1440px] mx-auto pb-40 lg:px-12 py-6 bg-[var(--bg-primary)] min-h-screen relative">
-      {/* TOAST SYSTEM CONTAINER */}
+      {/* TOAST SYSTEM */}
       <div className="fixed bottom-10 right-10 z-[7000] flex flex-col gap-4 pointer-events-none">
         {toasts.map(toast => (
           <div key={toast.id} className="pointer-events-auto">
@@ -259,6 +276,18 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
           </div>
         ))}
       </div>
+
+      {/* NEW POSTS PILL */}
+      {!threadId && newPostsAvailable > 0 && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-4 fade-in duration-300">
+           <button 
+             onClick={refreshFeed}
+             className="px-6 py-2.5 bg-[var(--brand-color)] text-white rounded-full font-black text-[11px] uppercase tracking-widest flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+           >
+             <ArrowUp size={16}/> See {newPostsAvailable} new signals
+           </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
          <div className="lg:col-span-8 px-0 sm:px-4">
@@ -270,7 +299,26 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             )}
             <div className="space-y-0">
                {filteredPosts.length > 0 ? filteredPosts.map((post) => (
-                 <PostItem key={post.id} post={post} currentUser={user} onOpenThread={onOpenThread} onNavigateToProfile={onNavigateToProfile} bookmarks={bookmarks} onBookmark={(id) => setBookmarks(db.toggleBookmark(id))} onUpdate={() => setUpdateTrigger(prev => prev + 1)} isThreadView={!!threadId} isLiked={likedPosts.has(post.id)} onLike={(id) => { if(!likedPosts.has(id)){ db.likePost(id); setLikedPosts(new Set([...likedPosts, id])); setUpdateTrigger(p=>p+1); } }} onAddToast={addToast} />
+                 <PostItem 
+                   key={post.id} 
+                   post={post} 
+                   currentUser={user} 
+                   onOpenThread={onOpenThread} 
+                   onNavigateToProfile={onNavigateToProfile} 
+                   bookmarks={bookmarks} 
+                   onBookmark={(id) => setBookmarks(db.toggleBookmark(id))} 
+                   onUpdate={() => setUpdateTrigger(prev => prev + 1)} 
+                   isThreadView={!!threadId} 
+                   isLiked={likedPosts.has(post.id)} 
+                   onLike={(id) => { 
+                     if(!likedPosts.has(id)){ 
+                       db.likePost(id); 
+                       setLikedPosts(new Set([...likedPosts, id])); 
+                       setUpdateTrigger(p=>p+1); 
+                     } 
+                   }} 
+                   onAddToast={addToast} 
+                 />
                )) : <div className="py-40 text-center opacity-30 uppercase text-[10px] font-black">Registry_Empty</div>}
             </div>
          </div>

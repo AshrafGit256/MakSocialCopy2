@@ -45,8 +45,22 @@ const App: React.FC = () => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const savedUserId = localStorage.getItem('maksocial_current_user_id');
+    if (savedUserId) {
+      const user = db.getUser(savedUserId);
+      if (user) {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+        setuserRole(user.email?.endsWith('@admin.mak.ac.ug') ? 'admin' : 'student');
+        setView('home');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (isLoggedIn) {
-      setCurrentUser(db.getUser());
+      const user = db.getUser();
+      setCurrentUser(user);
       setUnreadMsgs(db.getChats().reduce((acc, c) => acc + c.unreadCount, 0));
       setUnreadNotifs(db.getNotifications().filter(n => !n.isRead).length);
     }
@@ -104,28 +118,65 @@ const App: React.FC = () => {
 
   const handleLogin = (email: string) => {
     const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
+    const users = db.getUsers();
+    const existingUser = users.find(u => u.email === email);
+    
+    if (existingUser) {
+      localStorage.setItem('maksocial_current_user_id', existingUser.id);
+      setCurrentUser(existingUser);
+    }
+    
     setIsLoggedIn(true);
     setuserRole(isAdmin ? 'admin' : 'student');
     setView(isAdmin ? 'admin' : 'home');
   };
 
   const handleRegister = (email: string, college: College, status: UserStatus) => {
-    setIsLoggedIn(true); setuserRole('student'); setView('home');
-    const newUser: User = { id: Date.now().toString(), name: email.split('@')[0], role: 'University Student', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, connections: 0, email, college, status, subscriptionTier: 'Free', joinedColleges: [college], postsCount: 0, followersCount: 0, followingCount: 0, totalLikesCount: 0, badges: [], appliedTo: [], verified: true };
+    const newUser: User = { 
+      id: Date.now().toString(), 
+      name: email.split('@')[0], 
+      role: 'University Student', 
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, 
+      connections: 0, 
+      email, 
+      college, 
+      status, 
+      subscriptionTier: 'Free', 
+      joinedColleges: [college], 
+      postsCount: 0, 
+      followersCount: 0, 
+      followingCount: 0, 
+      totalLikesCount: 0, 
+      badges: [], 
+      appliedTo: [], 
+      verified: true 
+    };
+    
     db.saveUsers([...db.getUsers(), newUser]);
     localStorage.setItem('maksocial_current_user_id', newUser.id);
     setCurrentUser(newUser);
+    setIsLoggedIn(true); 
+    setuserRole('student'); 
+    setView('home');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('maksocial_current_user_id');
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setView('landing');
   };
 
   const handleSetView = (newView: AppView) => {
-    setView(newView); setIsSidebarOpen(false);
+    setView(newView); 
+    setIsSidebarOpen(false);
     setIsNotifOpen(false);
     setIsMsgOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (isLoggedIn && userRole === 'admin') {
-    return <Admin onLogout={() => {setIsLoggedIn(false); setView('landing');}} />;
+    return <Admin onLogout={handleLogout} />;
   }
 
   const renderContent = () => {
@@ -160,7 +211,7 @@ const App: React.FC = () => {
         activeView={view} 
         setView={handleSetView} 
         isAdmin={userRole === 'admin'} 
-        onLogout={() => {setIsLoggedIn(false); setView('landing');}} 
+        onLogout={handleLogout} 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)}
         onSearchToggle={() => setIsSearchOpen(!isSearchOpen)}

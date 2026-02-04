@@ -43,56 +43,10 @@ const MOCK_NOTIFICATIONS: MakNotification[] = [
     timestamp: '1h ago',
     isRead: false,
     meta: { hash: 'EVT9', nodeAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg' }
-  },
-  {
-    id: 'n-em-1',
-    type: 'system',
-    title: 'Encrypted Uplink Received',
-    description: 'You have a new priority email from "Neil Fisher" regarding "Internship Logic Synchronization".',
-    timestamp: '2h ago',
-    isRead: false,
-    meta: { hash: 'MAIL', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Neil' }
-  },
-  {
-    id: 'n-res-1',
-    type: 'engagement',
-    title: 'Vault Asset Uploaded',
-    description: 'Sarah CEDAT committed a new "Structural Analysis" Test Paper to the CEDAT Wing Vault.',
-    timestamp: '3h ago',
-    isRead: true,
-    meta: { hash: 'VLT4', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' }
-  },
-  {
-    id: 'n-opp-1',
-    type: 'skill_match',
-    title: 'New Opportunity Beacon',
-    description: 'A new "Neural Network Assistant" internship has been broadcast to the COCIS Hub.',
-    timestamp: '5h ago',
-    isRead: true,
-    meta: { hash: 'OPP1', nodeAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AI' }
-  },
-  {
-    id: 'n-fol-2',
-    type: 'follow',
-    title: 'Connection Initialized',
-    description: 'Dr. John S. (COCIS Dean) started following your research signals.',
-    timestamp: '1d ago',
-    isRead: true,
-    meta: { hash: 'U112', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John', reason: 'Following' }
-  },
-  {
-    id: 'n-sys-4',
-    type: 'system',
-    title: 'Protocol Upgrade v4.2',
-    description: 'Registry integrity scan complete. Your node security status is now: ELITE.',
-    timestamp: '1d ago',
-    isRead: true,
-    meta: { hash: 'SYS1' }
   }
 ];
 
 const MOCK_EMAILS: PlatformEmail[] = [
-  // INBOX
   {
     id: 'e1',
     from: 'vc@mak.ac.ug',
@@ -107,21 +61,6 @@ const MOCK_EMAILS: PlatformEmail[] = [
     isStarred: true,
     folder: 'inbox',
     label: 'Important'
-  },
-  {
-    id: 'e2',
-    from: 'fintech@hub.ug',
-    fromName: 'Neil Fisher',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Neil',
-    to: ['student@mak.ac.ug'],
-    subject: 'Internship Logic Synchronization',
-    body: 'Hello,\n\nOur fintech lab is seeking new nodes for the mobile money strata. We enabled users to easily send and receive documents and we need someone to optimize the transaction telemetry.\n\nRegards,\nNeil.',
-    timestamp: 'Oct 23',
-    fullDate: 'Oct 23, 2025 4:00 PM',
-    isRead: true,
-    isStarred: true,
-    folder: 'inbox',
-    label: 'Company'
   }
 ];
 
@@ -159,28 +98,30 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
 
 export const db = {
   getUsers: (): User[] => {
-    const users = parseArray<User>(DB_KEYS.USERS, INITIAL_USERS);
-    return users.map(u => ({ ...u, verified: true }));
+    return parseArray<User>(DB_KEYS.USERS, INITIAL_USERS);
   },
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID);
     const user = users.find(u => u.id === currentId) || users[0];
-    return { ...user, verified: true };
+    return user;
   },
   saveUser: (user: User) => {
     const users = db.getUsers();
     const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) users[index] = { ...user, verified: true }; 
-    else users.push({ ...user, verified: true });
+    if (index !== -1) users[index] = user; 
+    else users.push(user);
     db.saveUsers(users);
   },
   getPosts: (): Post[] => {
     return parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
   },
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
-  addPost: (post: Post) => db.savePosts([post, ...db.getPosts()]),
+  addPost: (post: Post) => {
+    const posts = db.getPosts();
+    db.savePosts([post, ...posts]);
+  },
   likePost: (postId: string) => {
     const posts = db.getPosts();
     db.savePosts(posts.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p));
@@ -198,7 +139,22 @@ export const db = {
   },
   getBookmarks: (): string[] => parseArray<string>(DB_KEYS.BOOKMARKS, []),
   getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
-  saveResource: (resource: Resource) => localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...db.getResources()])),
+  saveResource: (resource: Resource) => {
+    const current = db.getResources();
+    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...current]));
+    
+    // Auto-generate notification for all users
+    const notif: MakNotification = {
+      id: `n-res-${Date.now()}`,
+      type: 'system',
+      title: 'New Vault Asset',
+      description: `${resource.author} committed "${resource.title}" to the ${resource.college} vault wing.`,
+      timestamp: 'Just now',
+      isRead: false,
+      meta: { hash: 'VLT_UP', reason: 'Resource Sync' }
+    };
+    db.saveNotifications([notif, ...db.getNotifications()]);
+  },
   getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, []),
   saveCalendarEvent: (event: CalendarEvent) => localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...db.getCalendarEvents()])),
   registerForEvent: (eventId: string, userId: string) => {
@@ -208,10 +164,6 @@ export const db = {
   },
   getEmails: (): PlatformEmail[] => parseArray<PlatformEmail>(DB_KEYS.EMAILS, MOCK_EMAILS),
   saveEmails: (emails: PlatformEmail[]) => localStorage.setItem(DB_KEYS.EMAILS, JSON.stringify(emails)),
-  sendEmail: (email: PlatformEmail) => {
-    const emails = db.getEmails();
-    db.saveEmails([email, ...emails]);
-  },
   getChats: (): ChatConversation[] => parseArray<ChatConversation>(DB_KEYS.CHATS, MOCK_CHATS),
   saveChats: (chats: ChatConversation[]) => localStorage.setItem(DB_KEYS.CHATS, JSON.stringify(chats)),
   getNotifications: (): MakNotification[] => parseArray<MakNotification>(DB_KEYS.NOTIFICATIONS, MOCK_NOTIFICATIONS),

@@ -197,8 +197,8 @@ const AdminCalendar: React.FC = () => {
     }
     
     return (
-      <div className="flex flex-col border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] overflow-x-auto rounded-none animate-in slide-in-from-right-4 duration-300 shadow-inner">
-        <div className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[60px_1fr]'} min-w-[700px] md:min-w-0 border-b border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 sticky top-0 z-20`}>
+      <div className="flex flex-col border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] overflow-x-auto rounded-none animate-in slide-in-from-right-4 duration-300 shadow-inner no-scrollbar">
+        <div className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[60px_1fr]'} min-w-[900px] md:min-w-0 border-b border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 sticky top-0 z-20`}>
           <div className="w-[60px] md:w-20 py-4 border-r border-slate-200 dark:border-white/10 shrink-0 flex items-center justify-center">
             <Clock size={14} className="text-slate-400" />
           </div>
@@ -209,7 +209,7 @@ const AdminCalendar: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="relative min-w-[700px] md:min-w-0">
+        <div className="relative min-w-[900px] md:min-w-0">
           {hours.map(h => (
             <div key={h} className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[60px_1fr]'} border-b border-slate-200 dark:border-white/5 group`}>
               <div className="w-[60px] md:w-20 h-16 md:h-24 px-1 md:px-3 flex items-start justify-end text-[9px] md:text-[12px] text-slate-500 font-black uppercase tracking-tighter border-r border-slate-200 dark:border-white/5 pt-3">
@@ -239,7 +239,7 @@ const AdminCalendar: React.FC = () => {
                         style={{ backgroundColor: e.backgroundColor }} 
                         className="absolute inset-x-1 top-1 bottom-1 p-2 md:p-4 z-10 border-l-4 border-black/20 shadow-xl flex flex-col justify-center overflow-hidden cursor-pointer active:scale-[0.98] transition-all group/ev"
                       >
-                         <h4 className="text-[11px] md:text-[14px] font-black text-white uppercase tracking-tight leading-tight line-clamp-2 md:line-clamp-none">{e.title}</h4>
+                         <h4 className="text-[10px] md:text-[14px] font-black text-white uppercase tracking-tight leading-tight line-clamp-2 md:line-clamp-none">{e.title}</h4>
                          <span className="text-[7px] md:text-[10px] font-black text-white/70 uppercase tracking-widest mt-1 hidden sm:block">ID_{e.id.slice(-4)}</span>
                       </div>
                     ))}
@@ -324,7 +324,7 @@ const AdminCalendar: React.FC = () => {
                 { title: 'Handshake_Sync', color: ADMIN_COLORS[0] },
                 { title: 'Data_Harvest', color: ADMIN_COLORS[2] },
                 { title: 'Security_Audit', color: ADMIN_COLORS[3] },
-                { title: 'Network_Maintenance', color: ADMIN_COLORS[4] },
+                { title: 'Maintenance', color: ADMIN_COLORS[4] },
               ].map((ev, i) => (
                 <div 
                   key={i}

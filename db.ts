@@ -16,6 +16,74 @@ const DB_KEYS = {
   GROUPS: 'maksocial_groups_v26'
 };
 
+const MOCK_RESOURCES: Resource[] = [
+  {
+    id: 'res-1',
+    title: 'Advanced Computer Architecture - Final Prep',
+    category: 'Notes/Books',
+    college: 'COCIS',
+    course: 'Computer Science',
+    year: 'Year 3',
+    author: 'Dr. Julianne O.',
+    authorRole: 'Lecturer',
+    downloads: 142,
+    fileType: 'PDF',
+    timestamp: '12 May 2025'
+  },
+  {
+    id: 'res-2',
+    title: 'Structural Mechanics II - Past Paper 2024',
+    category: 'Past Paper',
+    college: 'CEDAT',
+    course: 'Civil Engineering',
+    year: 'Year 2',
+    author: 'Eng. Mugisha P.',
+    authorRole: 'GRC CEDAT',
+    downloads: 89,
+    fileType: 'PDF',
+    timestamp: '15 May 2025'
+  },
+  {
+    id: 'res-3',
+    title: 'Constitutional Law - Case Study Registry',
+    category: 'Research',
+    college: 'LAW',
+    course: 'Bachelor of Laws',
+    year: 'Finalist',
+    author: 'Counsel Peter',
+    authorRole: 'Official',
+    downloads: 210,
+    fileType: 'PDF',
+    timestamp: '10 May 2025'
+  },
+  {
+    id: 'res-4',
+    title: 'Microeconomics Theory - Test Blueprint',
+    category: 'Test',
+    college: 'COBAMS',
+    course: 'Economics',
+    year: 'Year 1',
+    author: 'Prof. Wandera',
+    authorRole: 'Staff',
+    downloads: 56,
+    fileType: 'PDF',
+    timestamp: '18 May 2025'
+  },
+  {
+    id: 'res-5',
+    title: 'Human Anatomy - Dissection Guide v4',
+    category: 'Notes/Books',
+    college: 'CHS',
+    course: 'Medicine',
+    year: 'Year 2',
+    author: 'Dr. Nalule',
+    authorRole: 'Academic Council',
+    downloads: 320,
+    fileType: 'PDF',
+    timestamp: '20 May 2025'
+  }
+];
+
 const MOCK_NOTIFICATIONS: MakNotification[] = [
   {
     id: 'n1',
@@ -138,7 +206,7 @@ export const db = {
     return bookmarks;
   },
   getBookmarks: (): string[] => parseArray<string>(DB_KEYS.BOOKMARKS, []),
-  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
+  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, MOCK_RESOURCES),
   saveResource: (resource: Resource) => {
     const current = db.getResources();
     const updated = [resource, ...current];

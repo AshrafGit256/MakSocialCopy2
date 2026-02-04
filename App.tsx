@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { AppView, User, College, UserStatus } from './types';
+import { AppView, User, College, UserStatus, AppSettings } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -66,25 +66,58 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
+  // Unified Appearance and System Theme Detection Logic
   useEffect(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
-    const defaultSettings = {
-      primaryColor: '#475569',
-      fontFamily: '"JetBrains Mono", monospace',
-      borderRadius: '2px',
-      themePreset: 'tactical'
-    };
+    let settings: AppSettings;
     
-    const settings = saved ? JSON.parse(saved) : defaultSettings;
+    if (saved) {
+      settings = JSON.parse(saved);
+    } else {
+      // If no saved settings, detect device preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      settings = {
+        primaryColor: '#475569',
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: 'md',
+        borderRadius: '2px',
+        themePreset: prefersDark ? 'tactical' : 'paper',
+        backgroundPattern: 'none'
+      };
+    }
+    
     const root = document.documentElement;
     root.style.setProperty('--brand-color', settings.primaryColor || '#475569');
     root.style.setProperty('--font-main', settings.fontFamily);
     root.style.setProperty('--radius-main', settings.borderRadius);
     
-    if (settings.themePreset === 'paper') {
+    // Apply Preset Specific Variables (Matching Settings.tsx logic)
+    if (settings.themePreset === 'oled') {
+      root.style.setProperty('--bg-primary', '#000000');
+      root.style.setProperty('--bg-secondary', '#0a0a0a');
+      root.style.setProperty('--text-primary', '#ffffff');
+      root.style.setProperty('--border-color', '#111111');
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else if (settings.themePreset === 'paper') {
+      root.style.setProperty('--bg-primary', '#ffffff');
+      root.style.setProperty('--bg-secondary', '#f8fafc');
+      root.style.setProperty('--text-primary', '#1e293b');
+      root.style.setProperty('--border-color', '#e2e8f0');
       document.documentElement.classList.remove('dark');
       setIsDark(false);
+    } else if (settings.themePreset === 'tactical') {
+      root.style.setProperty('--bg-primary', '#0d1117');
+      root.style.setProperty('--bg-secondary', '#1e1e2d');
+      root.style.setProperty('--text-primary', '#c9d1d9');
+      root.style.setProperty('--border-color', '#2a2a3a');
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
     } else {
+      root.style.setProperty('--bg-primary', '#111827');
+      root.style.setProperty('--bg-secondary', '#1f2937');
+      root.style.setProperty('--text-primary', '#f9fafb');
+      root.style.setProperty('--border-color', '#374151');
       document.documentElement.classList.add('dark');
       setIsDark(true);
     }
@@ -103,15 +136,31 @@ const App: React.FC = () => {
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    if (newTheme) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
+    const newThemeDark = !isDark;
+    setIsDark(newThemeDark);
+    const root = document.documentElement;
+    
+    // Quick toggle between paper (light) and tactical (dark)
+    const preset = newThemeDark ? 'tactical' : 'paper';
+    
+    if (newThemeDark) {
+      document.documentElement.classList.add('dark');
+      root.style.setProperty('--bg-primary', '#0d1117');
+      root.style.setProperty('--bg-secondary', '#1e1e2d');
+      root.style.setProperty('--text-primary', '#c9d1d9');
+      root.style.setProperty('--border-color', '#2a2a3a');
+    } else {
+      document.documentElement.classList.remove('dark');
+      root.style.setProperty('--bg-primary', '#ffffff');
+      root.style.setProperty('--bg-secondary', '#f8fafc');
+      root.style.setProperty('--text-primary', '#1e293b');
+      root.style.setProperty('--border-color', '#e2e8f0');
+    }
     
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) {
       const settings = JSON.parse(saved);
-      settings.themePreset = newTheme ? 'tactical' : 'paper';
+      settings.themePreset = preset;
       localStorage.setItem('maksocial_appearance_v3', JSON.stringify(settings));
     }
   };
@@ -124,7 +173,6 @@ const App: React.FC = () => {
       localStorage.setItem('maksocial_current_user_id', existingUser.id);
       setCurrentUser(existingUser);
     } else {
-      // Fallback for mock environment if no matching user found, create one or use mock
       const mockId = 'u-ninfa';
       localStorage.setItem('maksocial_current_user_id', mockId);
       setCurrentUser(db.getUser(mockId));
@@ -273,7 +321,7 @@ const App: React.FC = () => {
               >
                 <Bell size={18} /> 
                 {unreadNotifs > 0 && (
-                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border border-[var(--bg-primary)] animate-pulse shadow-sm"></span>
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border border-[var(--brand-color)] animate-pulse shadow-sm"></span>
                 )}
               </button>
               {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} onViewAll={() => handleSetView('notifications')} />}

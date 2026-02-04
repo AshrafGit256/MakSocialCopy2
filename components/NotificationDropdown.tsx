@@ -2,7 +2,7 @@
 import React from 'react';
 import { db } from '../db';
 import { MakNotification } from '../types';
-import { Bell, Trash2, ShieldCheck, Zap, Star, Activity, X, ChevronRight, Terminal } from 'lucide-react';
+import { Bell, Trash2, ShieldCheck, Zap, Star, Activity, X, ChevronRight, Terminal, UserPlus, Mail, FileText, Calendar } from 'lucide-react';
 
 interface NotificationDropdownProps {
   onClose: () => void;
@@ -20,20 +20,25 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose, on
     e.stopPropagation();
     const updated = notifications.filter(n => n.id !== id);
     setNotifications(updated);
-    // In a real app, you'd call db.saveNotifications here too
   };
 
-  const getIcon = (type: MakNotification['type']) => {
+  const getIcon = (type: MakNotification['type'], title: string) => {
+    if (title.includes('Email')) return <Mail size={14} className="text-indigo-500" />;
+    if (title.includes('Vault')) return <FileText size={14} className="text-emerald-500" />;
+    if (title.includes('Opportunity')) return <Zap size={14} className="text-amber-500" />;
+    
     switch (type) {
       case 'skill_match': return <Zap size={14} className="text-amber-500" />;
       case 'engagement': return <Star size={14} className="text-[var(--brand-color)]" />;
-      case 'system': return <ShieldCheck size={14} className="text-emerald-500" />;
+      case 'follow': return <UserPlus size={14} className="text-emerald-500" />;
+      case 'event': return <Calendar size={14} className="text-rose-500" />;
+      case 'system': return <ShieldCheck size={14} className="text-slate-400" />;
       default: return <Activity size={14} className="text-slate-400" />;
     }
   };
 
   return (
-    <div className="absolute top-full right-0 mt-3 w-[360px] bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md shadow-2xl z-[1000] overflow-hidden animate-in slide-in-from-top-2 duration-200">
+    <div className="absolute top-full right-0 mt-3 w-[380px] bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md shadow-2xl z-[1000] overflow-hidden animate-in slide-in-from-top-2 duration-200">
       <div className="px-5 py-4 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Terminal size={14} className="text-[var(--brand-color)]" />
@@ -42,26 +47,37 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose, on
         <button onClick={onClose} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={16}/></button>
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto no-scrollbar bg-[var(--bg-primary)] divide-y divide-[var(--border-color)]">
+      <div className="max-h-[450px] overflow-y-auto no-scrollbar bg-[var(--bg-primary)] divide-y divide-[var(--border-color)]">
         {notifications.length > 0 ? notifications.map((notif) => (
-          <div key={notif.id} className="p-4 hover:bg-[var(--bg-secondary)] transition-all group cursor-pointer relative">
+          <div key={notif.id} className={`p-4 hover:bg-[var(--bg-secondary)] transition-all group cursor-pointer relative ${!notif.isRead ? 'bg-indigo-500/5' : ''}`}>
             <div className="flex gap-4">
-              <div className="mt-0.5 shrink-0 p-2 bg-slate-50 dark:bg-white/5 rounded border border-[var(--border-color)]">
-                {getIcon(notif.type)}
+              <div className="mt-0.5 shrink-0 relative">
+                {notif.meta?.nodeAvatar ? (
+                  <img src={notif.meta.nodeAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-slate-50 flex items-center justify-center">
+                    {getIcon(notif.type, notif.title)}
+                  </div>
+                )}
+                <div className="absolute -bottom-1 -right-1 bg-white dark:bg-black rounded-full p-0.5 border border-[var(--border-color)] shadow-sm">
+                   {getIcon(notif.type, notif.title)}
+                </div>
               </div>
               <div className="flex-1 min-w-0 pr-6">
-                <h5 className="text-[11px] font-black text-[var(--text-primary)] uppercase tracking-tight leading-tight mb-1">
-                   {notif.title}
-                </h5>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                   <h5 className="text-[11px] font-black text-[var(--text-primary)] uppercase tracking-tight truncate">
+                      {notif.title}
+                   </h5>
+                   <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{notif.timestamp}</span>
+                </div>
                 <p className="text-[10px] text-slate-500 font-medium leading-relaxed line-clamp-2">
                   {notif.description}
                 </p>
-                <div className="flex items-center justify-between mt-2">
-                   <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{notif.timestamp}</span>
-                   {notif.type === 'skill_match' && (
-                     <span className="text-[8px] font-black text-emerald-500 uppercase">Match_Active</span>
-                   )}
-                </div>
+                {notif.type === 'follow' && (
+                  <div className="mt-2">
+                    <button className="px-3 py-1 bg-indigo-600 text-white rounded-[1px] text-[8px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">Follow Back</button>
+                  </div>
+                )}
               </div>
             </div>
             <button 

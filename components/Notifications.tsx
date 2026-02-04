@@ -5,7 +5,8 @@ import { MakNotification } from '../types';
 import { 
   Bell, Star, UserPlus, Zap, Clock, ShieldCheck, 
   Trash2, CheckCircle2, Terminal, Filter, MoreHorizontal,
-  ChevronRight, Circle, Activity, Database, Hash
+  ChevronRight, Circle, Activity, Database, Hash,
+  Mail, FileText, Briefcase, ExternalLink, Calendar
 } from 'lucide-react';
 
 const Notifications: React.FC = () => {
@@ -43,7 +44,7 @@ const Notifications: React.FC = () => {
       case 'skill_match': return <Zap size={16} className="text-amber-500" />;
       case 'engagement': return <Star size={16} className="text-indigo-500" />;
       case 'follow': return <UserPlus size={16} className="text-emerald-500" />;
-      case 'event': return <Clock size={16} className="text-rose-500" />;
+      case 'event': return <Calendar size={16} className="text-rose-500" />;
       case 'system': return <ShieldCheck size={16} className="text-slate-400" />;
       default: return <Bell size={16} />;
     }
@@ -105,29 +106,68 @@ const Notifications: React.FC = () => {
            {filteredNotifs.length > 0 ? (
              <div className="divide-y divide-[var(--border-color)]">
                 {filteredNotifs.map(notif => (
-                  <div key={notif.id} className={`group relative p-5 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.isRead ? 'border-l-4 border-indigo-600' : ''}`}>
-                    <div className="mt-1 shrink-0">
-                       {getIcon(notif.type)}
+                  <div key={notif.id} className={`group relative p-5 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.isRead ? 'border-l-4 border-indigo-600 bg-indigo-500/5' : ''}`}>
+                    <div className="mt-1 shrink-0 relative">
+                       {notif.meta?.nodeAvatar ? (
+                         <img src={notif.meta.nodeAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover" />
+                       ) : (
+                         <div className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-slate-100 flex items-center justify-center">
+                            {getIcon(notif.type)}
+                         </div>
+                       )}
+                       <div className="absolute -bottom-1 -right-1 bg-white dark:bg-black rounded-full p-0.5 border border-[var(--border-color)]">
+                          {getIcon(notif.type)}
+                       </div>
                     </div>
-                    <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex-1 min-w-0 space-y-2">
                        <div className="flex items-center justify-between">
-                          <h4 className="text-xs font-black uppercase text-[var(--text-primary)] tracking-tight">
+                          <h4 className="text-[13px] font-black uppercase text-[var(--text-primary)] tracking-tight">
                              {notif.title}
                           </h4>
                           <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                              <span className="text-[8px] font-mono text-slate-400 uppercase tracking-widest">ID_{notif.meta?.hash || '??'}</span>
-                             <button onClick={() => deleteNotif(notif.id)} className="text-slate-400 hover:text-rose-500"><Trash2 size={14}/></button>
+                             <button onClick={() => deleteNotif(notif.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={14}/></button>
                           </div>
                        </div>
-                       <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                       <p className="text-[12px] text-slate-500 font-medium leading-relaxed">
                           "{notif.description}"
                        </p>
+
+                       {/* Actionable Notification Sections */}
+                       <div className="pt-2 flex flex-wrap gap-2">
+                          {notif.type === 'follow' && (
+                            <button className="px-4 py-1.5 bg-indigo-600 text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest shadow-lg hover:bg-indigo-700 transition-all flex items-center gap-2 active:scale-95">
+                               <UserPlus size={12}/> Follow Back
+                            </button>
+                          )}
+                          {notif.title.includes('Email') && (
+                            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-indigo-600 transition-all flex items-center gap-2">
+                               <Mail size={12}/> Open Uplink
+                            </button>
+                          )}
+                          {notif.title.includes('Vault') && (
+                            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-emerald-600 transition-all flex items-center gap-2">
+                               <FileText size={12}/> Sync Asset
+                            </button>
+                          )}
+                          {notif.type === 'skill_match' && (
+                            <button className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all flex items-center gap-2">
+                               <Zap size={12}/> View Match
+                            </button>
+                          )}
+                          {notif.type === 'event' && (
+                            <button className="px-4 py-1.5 bg-rose-600 text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2">
+                               <ExternalLink size={12}/> Access Broadcast
+                            </button>
+                          )}
+                       </div>
+
                        <div className="flex items-center gap-4 pt-1">
                           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                              <Clock size={10}/> {notif.timestamp}
                           </span>
                           <span className="text-[8px] font-black text-indigo-600/60 uppercase tracking-[0.2em]">
-                             STRATA: {notif.meta?.reason || 'GENERAL'}
+                             STRATA: {notif.meta?.reason || 'LOGGED'}
                           </span>
                        </div>
                     </div>

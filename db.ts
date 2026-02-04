@@ -19,39 +19,75 @@ const DB_KEYS = {
 const MOCK_NOTIFICATIONS: MakNotification[] = [
   {
     id: 'n1',
+    type: 'follow',
+    title: 'New Node Link',
+    description: 'Shamim Nambassa (Guild President) initialized a permanent link with your terminal.',
+    timestamp: '2m ago',
+    isRead: false,
+    meta: { hash: 'U882', nodeId: 'u-shamim', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', reason: 'Following' }
+  },
+  {
+    id: 'n2',
     type: 'skill_match',
     title: 'Neural Sync Detected',
     description: 'A node in CEDAT requires your Logic_Strata skills for project "Smart-Grid".',
-    timestamp: '2m ago',
+    timestamp: '15m ago',
     isRead: false,
     meta: { hash: 'A4F2', reason: 'High Compatibility' }
   },
   {
-    id: 'n2',
-    type: 'engagement',
-    title: 'Signal Multiplied',
-    description: 'Prof. Barnabas and 12 others starred your "Distributed Systems" manifest.',
-    timestamp: '15m ago',
+    id: 'n3',
+    type: 'event',
+    title: 'New Protocol: Research Week',
+    description: 'Prof. Barnabas uploaded a new event: "89th Research & Innovation Week". Access the coordination nodes now.',
+    timestamp: '1h ago',
     isRead: false,
-    meta: { hash: '7E91' }
+    meta: { hash: 'EVT9', nodeAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg' }
   },
   {
-    id: 'n3',
+    id: 'n-em-1',
+    type: 'system',
+    title: 'Encrypted Uplink Received',
+    description: 'You have a new priority email from "Neil Fisher" regarding "Internship Logic Synchronization".',
+    timestamp: '2h ago',
+    isRead: false,
+    meta: { hash: 'MAIL', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Neil' }
+  },
+  {
+    id: 'n-res-1',
+    type: 'engagement',
+    title: 'Vault Asset Uploaded',
+    description: 'Sarah CEDAT committed a new "Structural Analysis" Test Paper to the CEDAT Wing Vault.',
+    timestamp: '3h ago',
+    isRead: true,
+    meta: { hash: 'VLT4', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' }
+  },
+  {
+    id: 'n-opp-1',
+    type: 'skill_match',
+    title: 'New Opportunity Beacon',
+    description: 'A new "Neural Network Assistant" internship has been broadcast to the COCIS Hub.',
+    timestamp: '5h ago',
+    isRead: true,
+    meta: { hash: 'OPP1', nodeAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=AI' }
+  },
+  {
+    id: 'n-fol-2',
+    type: 'follow',
+    title: 'Connection Initialized',
+    description: 'Dr. John S. (COCIS Dean) started following your research signals.',
+    timestamp: '1d ago',
+    isRead: true,
+    meta: { hash: 'U112', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John', reason: 'Following' }
+  },
+  {
+    id: 'n-sys-4',
     type: 'system',
     title: 'Protocol Upgrade v4.2',
     description: 'Registry integrity scan complete. Your node security status is now: ELITE.',
-    timestamp: '1h ago',
+    timestamp: '1d ago',
     isRead: true,
     meta: { hash: 'SYS1' }
-  },
-  {
-    id: 'n4',
-    type: 'follow',
-    title: 'New Node Link',
-    description: 'Shamim Nambassa initialized a permanent link with your terminal.',
-    timestamp: '2h ago',
-    isRead: true,
-    meta: { hash: 'U882' }
   }
 ];
 
@@ -86,106 +122,7 @@ const MOCK_EMAILS: PlatformEmail[] = [
     isStarred: true,
     folder: 'inbox',
     label: 'Company'
-  },
-  {
-    id: 'e5',
-    from: 'bette.h@gmail.com',
-    fromName: 'Bette Haganes',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bette',
-    to: ['student@mak.ac.ug'],
-    subject: 'One-on-one Meeting Protocol',
-    body: 'Hello Bette,\n\nI hope you\'re doing well. I would like to schedule a one-on-one meeting with you to discussing a new project. I\'ll send over the agenda in advance.\n\nBest,\nAR team',
-    timestamp: 'Sep 29',
-    fullDate: 'Sep 29, 2024 4:00 PM',
-    isRead: true,
-    isStarred: false,
-    folder: 'inbox',
-    label: 'Company',
-    attachments: [
-      { id: 'att1', name: 'Design Draft.png', size: '2.4MB', type: 'image', img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600' },
-      { id: 'att2', name: 'Project Overview', size: '18 Files', type: 'folder' }
-    ]
-  },
-  // SENT
-  {
-    id: 's1',
-    from: 'student@mak.ac.ug',
-    fromName: 'Me',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Student',
-    to: ['dean@cocis.mak.ac.ug', 'admin@mak.ac.ug'],
-    subject: 'Research Grant Application [COCIS-2026-ALPHA]',
-    body: 'Dear Dean,\n\nPlease find attached my proposal for the distributed logic synchronization grant. I have outlined the telemetry requirements for the Hill registry strata.\n\nBest regards.',
-    timestamp: '1d',
-    fullDate: 'Feb 14, 2026 2:30 PM',
-    isRead: true,
-    isStarred: false,
-    folder: 'sent',
-    label: 'Important',
-    attachments: [
-      { id: 'att3', name: 'Proposal_v1.pdf', size: '1.2MB', type: 'pdf' }
-    ]
-  },
-  // DRAFTS
-  {
-    id: 'd1',
-    from: 'student@mak.ac.ug',
-    fromName: 'Me',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Student',
-    to: ['colleague@mak.ac.ug'],
-    subject: '[DRAFT] Feedback on the Visual Registry component',
-    body: 'Hey,\n\nI was looking at the grid layout for the gallery and I think we can optimize the row-span logic for mobile nodes...',
-    timestamp: '3h',
-    fullDate: 'Feb 15, 2026 8:00 AM',
-    isRead: true,
-    isStarred: false,
-    folder: 'draft'
-  },
-  // SPAM
-  {
-    id: 'sp1',
-    from: 'no-reply@win-registry.net',
-    fromName: 'Protocol Winner',
-    fromAvatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=SpamBot',
-    to: ['student@mak.ac.ug'],
-    subject: 'You have been selected for a 1BTC Node Airdrop!',
-    body: 'Click here to synchronize your wallet node and receive your airdrop instantly. This is a limited strata offer.',
-    timestamp: '5h',
-    fullDate: 'Feb 15, 2026 6:00 AM',
-    isRead: false,
-    isStarred: false,
-    folder: 'spam'
-  },
-  // TRASH
-  {
-    id: 't1',
-    from: 'notifications@social.net',
-    fromName: 'Legacy Social Node',
-    fromAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Legacy',
-    to: ['student@mak.ac.ug'],
-    subject: 'Your account will be deprecated',
-    body: 'We are moving all nodes to the new MakSocial registry. Please migrate your assets immediately.',
-    timestamp: '1w',
-    fullDate: 'Feb 8, 2026 12:00 PM',
-    isRead: true,
-    isStarred: false,
-    folder: 'trash'
-  },
-  // Extra for Pagination test
-  ...Array.from({ length: 15 }).map((_, i) => ({
-    id: `ext-${i}`,
-    from: `peer-${i}@mak.ac.ug`,
-    fromName: `Peer Node ${i + 10}`,
-    fromAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=Peer${i}`,
-    to: ['student@mak.ac.ug'],
-    subject: `Sync Request Sequence ${100 + i}`,
-    body: 'Requesting permission to link nodes for the semester assessment...',
-    timestamp: 'Feb 10',
-    fullDate: 'Feb 10, 2026 9:00 AM',
-    isRead: true,
-    isStarred: false,
-    folder: 'inbox' as const,
-    label: i % 3 === 0 ? 'Social' as const : undefined
-  }))
+  }
 ];
 
 const INITIAL_USERS: User[] = [

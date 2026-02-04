@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db } from '../db';
 import { PlatformEmail, User, EmailAttachment } from '../types';
@@ -16,7 +15,8 @@ const PAGE_SIZE = 10;
 
 const EmailHub: React.FC = () => {
   const [view, setView] = useState<'list' | 'read' | 'compose'>('list');
-  const [folder, setFolder] = useState<PlatformEmail['folder'] | 'all'>('inbox');
+  // Updated folder state type to include 'all' and 'starred' to resolve comparison errors
+  const [folder, setFolder] = useState<PlatformEmail['folder'] | 'all' | 'starred'>('inbox');
   const [activeLabel, setActiveLabel] = useState<PlatformEmail['label'] | null>(null);
   const [emails, setEmails] = useState<PlatformEmail[]>([]);
   const [selectedEmail, setSelectedEmail] = useState<PlatformEmail | null>(null);

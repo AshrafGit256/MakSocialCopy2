@@ -81,6 +81,7 @@ const App: React.FC = () => {
       if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
         setIsNotifOpen(false);
         setIsMsgOpen(false);
+        setIsSectorDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -176,9 +177,9 @@ const App: React.FC = () => {
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header ref={headerRef} className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-visible">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden shrink-0"><Menu size={22} /></button>
-            <div className="relative overflow-hidden">
+            <div className="relative">
               <button onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl transition-all group max-w-[150px] sm:max-w-none">
                 <div className="shrink-0 text-[var(--brand-color)]">{activeSector === 'Global' ? <Globe size={16} /> : <LayoutGrid size={16} />}</div>
                 <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[var(--brand-color)] truncate">{activeSector} HUB</span>
@@ -225,11 +226,11 @@ const App: React.FC = () => {
               <button 
                 onClick={() => handleSetView('profile')} 
                 className="ml-1 shrink-0 active:scale-95 transition-transform flex items-center justify-center"
-                style={{ minWidth: '40px', minHeight: '40px' }}
+                style={{ width: '40px', height: '40px' }}
               >
                 <img 
                   src={currentUser.avatar} 
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 aspect-square object-cover flex-shrink-0 ${view === 'profile' ? 'border-[var(--brand-color)]' : 'border-[var(--border-color)]'} bg-white`} 
+                  className={`w-10 h-10 rounded-full border-2 aspect-square object-cover flex-shrink-0 ${view === 'profile' ? 'border-[var(--brand-color)]' : 'border-[var(--border-color)]'} bg-white`} 
                   alt="Profile" 
                 />
               </button>

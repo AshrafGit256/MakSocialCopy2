@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment, CalendarEvent } from '../types';
 import { db } from '../db';
@@ -29,10 +28,11 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
     return () => clearTimeout(timer);
   }, [toast, onDismiss]);
 
+  // Added iconBg: '' to success and warning to prevent TS error when accessing c.iconBg
   const config = {
-    success: { icon: <CheckCircle2 size={24} className="text-[#10b981]" fill="#d1fae5" />, border: 'border-[#e2e8f0]' },
+    success: { icon: <CheckCircle2 size={24} className="text-[#10b981]" fill="#d1fae5" />, border: 'border-[#e2e8f0]', iconBg: '' },
     error: { icon: <X size={18} className="text-white" />, iconBg: 'bg-[#ef4444]', border: 'border-[#e2e8f0]' },
-    warning: { icon: <AlertCircle size={24} className="text-[#f59e0b]" />, border: 'border-[#e2e8f0]' }
+    warning: { icon: <AlertCircle size={24} className="text-[#f59e0b]" />, border: 'border-[#e2e8f0]', iconBg: '' }
   };
 
   const c = config[toast.type];

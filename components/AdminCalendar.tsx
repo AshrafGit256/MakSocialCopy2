@@ -171,7 +171,7 @@ const AdminCalendar: React.FC = () => {
       <div className="flex flex-col border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] rounded-none overflow-hidden shadow-xl animate-in fade-in zoom-in-95 duration-300">
         <div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
           {weekDays.map((wd, i) => (
-            <div key={`${wd}-${i}`} className="py-2 md:py-4 text-center text-[10px] md:text-[12px] font-black uppercase tracking-widest text-slate-500 border-r border-slate-200 dark:border-white/10 last:border-r-0">
+            <div key={`header-${i}`} className="py-2 md:py-4 text-center text-[10px] md:text-[12px] font-black uppercase tracking-widest text-slate-500 border-r border-slate-200 dark:border-white/10 last:border-r-0">
               {wd}
             </div>
           ))}

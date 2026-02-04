@@ -141,19 +141,21 @@ export const db = {
   getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
   saveResource: (resource: Resource) => {
     const current = db.getResources();
-    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...current]));
+    const updated = [resource, ...current];
+    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(updated));
     
-    // Auto-generate notification for all users
+    // Auto-generate notification for all nodes in the registry
     const notif: MakNotification = {
       id: `n-res-${Date.now()}`,
       type: 'system',
-      title: 'New Vault Asset',
-      description: `${resource.author} committed "${resource.title}" to the ${resource.college} vault wing.`,
+      title: 'Vault Asset Logged',
+      description: `${resource.author} committed "${resource.title}" to the ${resource.college} vault Wing.`,
       timestamp: 'Just now',
       isRead: false,
-      meta: { hash: 'VLT_UP', reason: 'Resource Sync' }
+      meta: { hash: 'VLT_SYNC', reason: 'Shared Asset' }
     };
-    db.saveNotifications([notif, ...db.getNotifications()]);
+    const notifications = db.getNotifications();
+    db.saveNotifications([notif, ...notifications]);
   },
   getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, []),
   saveCalendarEvent: (event: CalendarEvent) => localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...db.getCalendarEvents()])),

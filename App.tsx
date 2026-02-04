@@ -47,7 +47,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const savedUserId = localStorage.getItem('maksocial_current_user_id');
     if (savedUserId) {
-      const user = db.getUser(savedUserId);
+      const user = db.getUsers().find(u => u.id === savedUserId);
       if (user) {
         setCurrentUser(user);
         setIsLoggedIn(true);
@@ -117,23 +117,29 @@ const App: React.FC = () => {
   };
 
   const handleLogin = (email: string) => {
-    const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
     const users = db.getUsers();
     const existingUser = users.find(u => u.email === email);
     
     if (existingUser) {
       localStorage.setItem('maksocial_current_user_id', existingUser.id);
       setCurrentUser(existingUser);
+    } else {
+      // Fallback for mock environment if no matching user found, create one or use mock
+      const mockId = 'u-ninfa';
+      localStorage.setItem('maksocial_current_user_id', mockId);
+      setCurrentUser(db.getUser(mockId));
     }
-    
+
+    const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
     setIsLoggedIn(true);
     setuserRole(isAdmin ? 'admin' : 'student');
     setView(isAdmin ? 'admin' : 'home');
   };
 
   const handleRegister = (email: string, college: College, status: UserStatus) => {
+    const userId = Date.now().toString();
     const newUser: User = { 
-      id: Date.now().toString(), 
+      id: userId, 
       name: email.split('@')[0], 
       role: 'University Student', 
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, 
@@ -153,7 +159,7 @@ const App: React.FC = () => {
     };
     
     db.saveUsers([...db.getUsers(), newUser]);
-    localStorage.setItem('maksocial_current_user_id', newUser.id);
+    localStorage.setItem('maksocial_current_user_id', userId);
     setCurrentUser(newUser);
     setIsLoggedIn(true); 
     setuserRole('student'); 
@@ -188,7 +194,7 @@ const App: React.FC = () => {
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'chats': return <ChatHub />;
       case 'email': return <EmailHub />;
-      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} />;
+      case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} onUpdateCurrentUser={(u) => setCurrentUser(u)} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'admin-calendar': return <AdminCalendar />;
       case 'resources': return <Resources />;

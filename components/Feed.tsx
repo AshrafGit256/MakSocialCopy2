@@ -187,20 +187,22 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   const [updateTrigger, setUpdateTrigger] = useState(0);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
   
-  const lastSyncCount = useRef(0);
+  const lastKnownPostCount = useRef(0);
 
   useEffect(() => {
     const sync = () => { 
       const currentPosts = db.getPosts();
       const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
       
-      if (lastSyncCount.current > 0 && filteredCurrent.length > lastSyncCount.current && !threadId) {
-        setNewPostsAvailable(filteredCurrent.length - lastSyncCount.current);
+      // If we already have posts and the new count in DB is higher, notify user
+      if (lastKnownPostCount.current > 0 && filteredCurrent.length > lastKnownPostCount.current && !threadId) {
+        setNewPostsAvailable(filteredCurrent.length - lastKnownPostCount.current);
       }
       
-      if (lastSyncCount.current === 0 || updateTrigger > 0) {
+      // On initial load or manual refresh, set the feed
+      if (lastKnownPostCount.current === 0 || updateTrigger > 0) {
         setPosts(currentPosts);
-        lastSyncCount.current = filteredCurrent.length;
+        lastKnownPostCount.current = filteredCurrent.length;
         setNewPostsAvailable(0);
       }
       
@@ -209,6 +211,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     };
 
     sync();
+    // Simulate real-time polling to detect new posts from friends
     const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
   }, [updateTrigger, collegeFilter, threadId]);
@@ -217,7 +220,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     const currentPosts = db.getPosts();
     const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
     setPosts(currentPosts);
-    lastSyncCount.current = filteredCurrent.length;
+    lastKnownPostCount.current = filteredCurrent.length;
     setNewPostsAvailable(0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -277,7 +280,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
         ))}
       </div>
 
-      {/* NEW POSTS PILL */}
+      {/* NEW POSTS PILL - X STYLE */}
       {!threadId && newPostsAvailable > 0 && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-4 fade-in duration-300">
            <button 

@@ -29,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     { id: 'resources', label: 'The Vault', icon: <BookOpen size={20} /> },
     { id: 'notifications', label: 'Signals', icon: <Bell size={20} /> },
     { id: 'settings', label: 'UI Config', icon: <Settings size={20} /> },
-    { id: 'profile', label: 'Terminal', icon: <UserIcon size={20} /> },
+    { id: 'profile', label: 'Profile', icon: <UserIcon size={20} /> },
   ];
 
   return (

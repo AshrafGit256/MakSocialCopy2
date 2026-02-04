@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { User, Post } from '../types';
 import { AuthoritySeal } from './Feed'; 
@@ -8,17 +8,25 @@ import {
   MapPin, ArrowLeft, Globe, Zap, Radio, Share2, Database, 
   Terminal, Award, Trophy, Bookmark, Mail, Link as LinkIcon, Edit2, Calendar,
   GitCommit, Star, MessageCircle, FileVideo, Box, GitFork, LayoutGrid,
-  UserPlus, CheckCircle2
+  UserPlus, CheckCircle2, Camera, Upload, Loader2, X
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
 
-const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNavigateToProfile?: (id: string) => void, onMessageUser?: (id: string) => void }> = ({ userId, onNavigateBack, onNavigateToProfile, onMessageUser }) => {
+const Profile: React.FC<{ 
+  userId?: string, 
+  onNavigateBack?: () => void, 
+  onNavigateToProfile?: (id: string) => void, 
+  onMessageUser?: (id: string) => void,
+  onUpdateCurrentUser?: (user: User) => void
+}> = ({ userId, onNavigateBack, onNavigateToProfile, onMessageUser, onUpdateCurrentUser }) => {
   const [user, setUser] = useState<User | null>(null);
   const [displayedPosts, setDisplayedPosts] = useState<Post[]>([]);
   const [activeTab, setActiveTab] = useState<'signals' | 'bookmarks' | 'gallery' | 'achievements'>('signals');
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentUser = db.getUser();
   const isOwnProfile = !userId || userId === currentUser.id;
 
@@ -44,6 +52,24 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
   const handleEmail = () => {
     if (user?.email) {
       window.location.href = `mailto:${user.email}`;
+    }
+  };
+
+  const handleAvatarUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && user && isOwnProfile) {
+      setIsUpdatingAvatar(true);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        const updatedUser = { ...user, avatar: base64 };
+        setUser(updatedUser);
+        db.saveUser(updatedUser);
+        onUpdateCurrentUser?.(updatedUser);
+        setIsUpdatingAvatar(false);
+        alert("Signal Integrity Check: Identity asset updated in central registry.");
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -78,9 +104,20 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
           
           <aside className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
-              <div className="relative group">
-                <img src={user.avatar} className="w-full aspect-square rounded-full border border-[var(--border-color)] bg-white object-cover shadow-sm transition-all duration-500" />
-                <div className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-black rounded-full border border-[var(--border-color)] shadow-xl">
+              <div className="relative group overflow-hidden rounded-full aspect-square">
+                <img src={user.avatar} className="w-full h-full rounded-full border border-[var(--border-color)] bg-white object-cover shadow-sm transition-all duration-500" />
+                {isOwnProfile && (
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-all backdrop-blur-sm cursor-pointer"
+                  >
+                    {isUpdatingAvatar ? <Loader2 size={32} className="animate-spin"/> : <Camera size={32} />}
+                    <span className="text-[8px] font-black uppercase mt-2">Update Asset</span>
+                  </button>
+                )}
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarUpdate} />
+                
+                <div className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-black rounded-full border border-[var(--border-color)] shadow-xl z-10">
                    <AuthoritySeal role="Official" size={24} />
                 </div>
               </div>

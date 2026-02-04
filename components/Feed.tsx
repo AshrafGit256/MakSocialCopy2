@@ -7,7 +7,6 @@ import {
   Star, MessageCircle, Zap, Activity, Globe, 
   Terminal, Share2, Bookmark, 
   BadgeCheck, ArrowLeft, GitCommit,
-  // Added Send to lucide-react imports to fix compilation error on line 168
   Calendar, MapPin, X, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ArrowUp, Send
 } from 'lucide-react';
 

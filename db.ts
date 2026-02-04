@@ -97,29 +97,29 @@ const MOCK_RESOURCES: Resource[] = [
   },
   {
     id: 'res-7',
-    title: 'Psychology of Learning - Lecture Summary',
+    title: 'Operating Systems - Process Scheduling Blueprint',
     category: 'Notes/Books',
-    college: 'CHUSS',
-    course: 'Psychology',
+    college: 'COCIS',
+    course: 'Software Engineering',
     year: 'Year 2',
-    author: 'Ms. Atwine',
-    authorRole: 'Student Leader',
-    downloads: 112,
+    author: 'Prof. Kizito',
+    authorRole: 'Academic Council',
+    downloads: 512,
     fileType: 'PDF',
-    timestamp: '24 May 2025'
+    timestamp: '01 June 2025'
   },
   {
     id: 'res-8',
-    title: 'Quantum Physics - Supplementary Problems',
+    title: 'History of Philosophy - CHUSS Comprehensive Guide',
     category: 'Notes/Books',
-    college: 'CONAS',
-    course: 'Physics',
-    year: 'Year 3',
-    author: 'Prof. Katumba',
-    authorRole: 'Academic Council',
-    downloads: 78,
+    college: 'CHUSS',
+    course: 'Philosophy',
+    year: 'Year 1',
+    author: 'Dr. Mukasa',
+    authorRole: 'Lecturer',
+    downloads: 88,
     fileType: 'PDF',
-    timestamp: '25 May 2025'
+    timestamp: '05 June 2025'
   }
 ];
 

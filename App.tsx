@@ -221,7 +221,19 @@ const App: React.FC = () => {
               {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} onViewAll={() => handleSetView('notifications')} />}
             </div>
 
-            {currentUser && <button onClick={() => handleSetView('profile')} className="ml-1 shrink-0 active:scale-95 transition-transform"><img src={currentUser.avatar} className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${view === 'profile' ? 'border-[var(--brand-color)]' : 'border-[var(--border-color)]'} bg-white object-cover shrink-0`} alt="Profile" /></button>}
+            {currentUser && (
+              <button 
+                onClick={() => handleSetView('profile')} 
+                className="ml-1 shrink-0 active:scale-95 transition-transform flex items-center justify-center"
+                style={{ minWidth: '40px', minHeight: '40px' }}
+              >
+                <img 
+                  src={currentUser.avatar} 
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 aspect-square object-cover flex-shrink-0 ${view === 'profile' ? 'border-[var(--brand-color)]' : 'border-[var(--border-color)]'} bg-white`} 
+                  alt="Profile" 
+                />
+              </button>
+            )}
           </div>
         </header>
         <main className="flex-1 overflow-y-auto no-scrollbar">{renderContent()}</main>

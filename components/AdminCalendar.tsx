@@ -23,7 +23,7 @@ const INITIAL_EVENTS: AdminCalendarEvent[] = [
   { id: '5', title: 'System_Audit', start: new Date(2026, 1, 1), allDay: true, backgroundColor: '#f56954', borderColor: '#f56954' },
   { id: '6', title: 'Peace_Day', start: new Date(2026, 8, 21), allDay: true, backgroundColor: '#6c757d', borderColor: '#6c757d' },
   { id: '7', title: 'Women_Day', start: new Date(2026, 2, 8), allDay: true, backgroundColor: '#6c757d', borderColor: '#6c757d' },
-  { id: '8', title: 'Book_Day', start: new Date(2026, 3, 23), allDay: true, backgroundColor: '#17a2b8', borderColor: '#17a2b8' },
+  { id: '8', title: 'Book_Day', start: new Date(2026, 3, 23), allDay: true, backgroundColor: 'var(--brand-color)', borderColor: 'var(--brand-color)' },
 ];
 
 const AdminCalendar: React.FC = () => {
@@ -353,7 +353,7 @@ const AdminCalendar: React.FC = () => {
             <div className="flex items-center gap-1 order-2 sm:order-1 justify-center sm:justify-start">
               <button onClick={handlePrev} className="p-3 bg-[var(--brand-color)] text-white rounded-none hover:brightness-110 transition-all active:scale-95"><ChevronLeft size={20}/></button>
               <button onClick={handleNext} className="p-3 bg-[var(--brand-color)] text-white rounded-none hover:brightness-110 transition-all active:scale-95 border-l border-white/10"><ChevronRight size={20}/></button>
-              <button onClick={handleToday} className="ml-2 md:ml-4 px-4 md:px-6 py-3 bg-[#17a2b8] text-white rounded-none text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:bg-[#138496] transition-all shadow-lg active:scale-95">Today</button>
+              <button onClick={handleToday} className="ml-2 md:ml-4 px-4 md:px-6 py-3 bg-[var(--brand-color)]/20 text-[var(--brand-color)] border border-[var(--brand-color)]/30 rounded-none text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:bg-[var(--brand-color)] hover:text-white transition-all shadow-lg active:scale-95">Today</button>
             </div>
 
             <div className="text-center order-1 sm:order-2">

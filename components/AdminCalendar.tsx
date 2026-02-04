@@ -1,9 +1,8 @@
-
 import React, { useState, useMemo, useRef } from 'react';
 import { 
   ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, 
-  Clock, Globe, Activity, MoreVertical, Terminal, 
-  ShieldCheck, Info, X, MapPin, Target, Command
+  Globe, Activity, Terminal, 
+  ShieldCheck, Info, MapPin, Target, Command, Clock
 } from 'lucide-react';
 import { AdminCalendarEvent } from '../types';
 
@@ -107,7 +106,7 @@ const AdminCalendar: React.FC = () => {
     const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
     for (let i = 0; i < offset; i++) {
-      cells.push(<div key={`offset-${i}`} className="min-h-[60px] md:min-h-[120px] bg-slate-50/20 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 opacity-30"></div>);
+      cells.push(<div key={`offset-${i}`} className="min-h-[50px] md:min-h-[120px] bg-slate-50/20 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 opacity-30"></div>);
     }
 
     for (let d = 1; d <= totalDays; d++) {
@@ -125,19 +124,17 @@ const AdminCalendar: React.FC = () => {
           onClick={() => { setCurrentDate(date); setView('day'); }}
           onDragOver={(e) => e.preventDefault()}
           onDrop={() => onDrop(date)}
-          className={`min-h-[60px] md:min-h-[120px] p-1 border border-slate-200 dark:border-white/10 relative group hover:bg-[var(--brand-color)]/5 cursor-pointer transition-all ${isToday ? 'bg-[var(--brand-color)]/5' : ''}`}
+          className={`min-h-[50px] md:min-h-[120px] p-1 border border-slate-200 dark:border-white/10 relative group hover:bg-[var(--brand-color)]/5 cursor-pointer transition-all ${isToday ? 'bg-[var(--brand-color)]/5' : ''}`}
         >
-          <span className={`text-[10px] md:text-[12px] font-black absolute top-1 left-2 ${isToday ? 'text-[var(--brand-color)]' : 'text-slate-400'}`}>{d}</span>
+          <span className={`text-[9px] md:text-[12px] font-black absolute top-1 left-1 md:top-1 md:right-2 ${isToday ? 'text-[var(--brand-color)]' : 'text-slate-400'}`}>{d}</span>
           
-          <div className="mt-6 flex flex-col gap-0.5 overflow-hidden">
-            {/* Mobile View Indicators: Dots for clean matrix */}
+          <div className="mt-4 md:mt-6 flex flex-col gap-0.5 overflow-hidden">
             <div className="flex flex-wrap gap-0.5 md:hidden px-0.5 justify-center">
               {dayEvents.map(e => (
-                <div key={e.id} style={{ backgroundColor: e.backgroundColor }} className="w-1.5 h-1.5 rounded-full shadow-sm" />
+                <div key={e.id} style={{ backgroundColor: e.backgroundColor }} className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full shadow-sm" />
               ))}
             </div>
             
-            {/* Desktop View: Readable Labels */}
             <div className="hidden md:block space-y-0.5">
               {dayEvents.slice(0, 3).map(e => (
                 <div 
@@ -162,7 +159,7 @@ const AdminCalendar: React.FC = () => {
 
     if (cells.length > 0) {
       while (cells.length < 7) {
-        cells.push(<div key={`end-${cells.length}`} className="min-h-[60px] md:min-h-[120px] bg-slate-50/20 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 opacity-30"></div>);
+        cells.push(<div key={`end-${cells.length}`} className="min-h-[50px] md:min-h-[120px] bg-slate-50/20 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 opacity-30"></div>);
       }
       rows.push(<div key={`row-last`} className="grid grid-cols-7">{cells}</div>);
     }
@@ -171,7 +168,7 @@ const AdminCalendar: React.FC = () => {
       <div className="flex flex-col border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] rounded-none overflow-hidden shadow-xl animate-in fade-in zoom-in-95 duration-300">
         <div className="grid grid-cols-7 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
           {weekDays.map(wd => (
-            <div key={wd} className="py-3 md:py-4 text-center text-[9px] md:text-[12px] font-black uppercase tracking-widest text-slate-500 border-r border-slate-200 dark:border-white/10 last:border-r-0">
+            <div key={wd} className="py-2 md:py-4 text-center text-[9px] md:text-[12px] font-black uppercase tracking-widest text-slate-500 border-r border-slate-200 dark:border-white/10 last:border-r-0">
               {wd}
             </div>
           ))}
@@ -197,20 +194,23 @@ const AdminCalendar: React.FC = () => {
     }
     
     return (
-      <div className="flex flex-col border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] overflow-x-auto no-scrollbar rounded-none animate-in slide-in-from-right-4 duration-300">
-        <div className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[80px_1fr]'} border-b border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 sticky top-0 z-20`}>
-          <div className="w-20 py-4 border-r border-slate-200 dark:border-white/10 shrink-0"></div>
+      <div className="flex flex-col border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] overflow-x-auto rounded-none animate-in slide-in-from-right-4 duration-300 shadow-inner">
+        <div className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[60px_1fr]'} min-w-[800px] md:min-w-0 border-b border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 sticky top-0 z-20`}>
+          <div className="w-[60px] md:w-20 py-4 border-r border-slate-200 dark:border-white/10 shrink-0 flex items-center justify-center">
+            {/* Added missing Clock import from lucide-react */}
+            <Clock size={14} className="text-slate-400" />
+          </div>
           {weekDays.map((wd, i) => (
             <div key={i} className="py-4 text-center flex-1 border-r border-slate-200 dark:border-white/10 last:border-r-0 px-2">
-               <span className="block text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest mb-1">{wd.toLocaleString('default', { weekday: 'short' })}</span>
-               <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-base font-black ${wd.toDateString() === new Date().toDateString() ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-700 dark:text-slate-200'}`}>{wd.getDate()}</span>
+               <span className="block text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{wd.toLocaleString('default', { weekday: 'short' })}</span>
+               <span className={`inline-flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full text-[12px] md:text-base font-black ${wd.toDateString() === new Date().toDateString() ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-700 dark:text-slate-200'}`}>{wd.getDate()}</span>
             </div>
           ))}
         </div>
-        <div className="relative">
+        <div className="relative min-w-[800px] md:min-w-0">
           {hours.map(h => (
-            <div key={h} className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[80px_1fr]'} border-b border-slate-200 dark:border-white/5 group`}>
-              <div className="w-20 h-16 md:h-24 px-3 flex items-start justify-end text-[10px] md:text-[12px] text-slate-500 font-black uppercase tracking-tighter border-r border-slate-200 dark:border-white/5 pt-3">
+            <div key={h} className={`grid ${isWeek ? 'grid-cols-8' : 'grid-cols-[60px_1fr]'} border-b border-slate-200 dark:border-white/5 group`}>
+              <div className="w-[60px] md:w-20 h-16 md:h-24 px-1 md:px-3 flex items-start justify-end text-[9px] md:text-[12px] text-slate-500 font-black uppercase tracking-tighter border-r border-slate-200 dark:border-white/5 pt-3">
                 {h % 12 || 12}{h >= 12 ? 'pm' : 'am'}
               </div>
               {weekDays.map((wd, i) => {
@@ -235,13 +235,13 @@ const AdminCalendar: React.FC = () => {
                       <div 
                         key={e.id} 
                         style={{ backgroundColor: e.backgroundColor }} 
-                        className="absolute inset-x-1 top-1 bottom-1 p-2 md:p-4 z-10 border-l-4 border-black/20 shadow-xl flex flex-col justify-between overflow-hidden cursor-pointer active:scale-[0.98] transition-all group/ev"
+                        className="absolute inset-x-1 top-1 bottom-1 p-1.5 md:p-4 z-10 border-l-4 border-black/20 shadow-xl flex flex-col justify-between overflow-hidden cursor-pointer active:scale-[0.98] transition-all group/ev"
                       >
                          <div className="flex items-center justify-between gap-1 mb-1">
-                            <span className="text-[8px] md:text-[10px] font-black text-white/80 uppercase truncate">{e.start.getHours() % 12 || 12}:00</span>
-                            <Target size={10} className="text-white/40 group-hover/ev:text-white transition-colors" />
+                            <span className="text-[7px] md:text-[10px] font-black text-white/80 uppercase truncate">{e.start.getHours() % 12 || 12}:00</span>
+                            <Target size={10} className="text-white/40 group-hover/ev:text-white transition-colors shrink-0" />
                          </div>
-                         <h4 className="text-[10px] md:text-[13px] font-black text-white uppercase tracking-tight leading-tight line-clamp-2">{e.title}</h4>
+                         <h4 className="text-[9px] md:text-[13px] font-black text-white uppercase tracking-tight leading-tight line-clamp-2">{e.title}</h4>
                       </div>
                     ))}
                   </div>
@@ -258,17 +258,17 @@ const AdminCalendar: React.FC = () => {
     <div className="p-4 md:p-10 font-sans bg-[#f8fafc] dark:bg-[#080808] min-h-full font-mono text-[var(--text-primary)]">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
         <div className="flex items-center gap-5">
-           <div className="p-4 bg-[var(--brand-color)] rounded-none shadow-2xl text-white">
-              <CalendarIcon size={32} />
+           <div className="p-3 md:p-4 bg-[var(--brand-color)] rounded-none shadow-2xl text-white">
+              <CalendarIcon size={24} className="md:w-8 md:h-8" />
            </div>
            <div>
-              <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter leading-none">Registry.Calendar</h1>
-              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2 flex items-center gap-2">
+              <h1 className="text-xl md:text-3xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter leading-none">Registry.Calendar</h1>
+              <p className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2 flex items-center gap-2">
                  <Activity size={12} className="text-emerald-500 animate-pulse"/> Temporal Synchronizer Protocol
               </p>
            </div>
         </div>
-        <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-[var(--brand-color)]">
+        <div className="hidden md:flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-[var(--brand-color)]">
            <span className="opacity-60 cursor-default">Home</span> 
            <ChevronRight size={12} className="opacity-40" /> 
            <span>Calendar</span>
@@ -351,18 +351,18 @@ const AdminCalendar: React.FC = () => {
         <main className="lg:col-span-9 bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#222] rounded-none shadow-2xl p-4 md:p-10 flex flex-col min-w-0 order-1 lg:order-2">
           
           {/* Header Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 mb-10">
-            <div className="flex items-center gap-1 order-2 sm:order-1">
+          <div className="flex flex-col md:flex-row sm:items-center justify-between gap-6 mb-10">
+            <div className="flex items-center gap-1 order-2 sm:order-1 justify-center sm:justify-start">
               <button onClick={handlePrev} className="p-3 bg-[var(--brand-color)] text-white rounded-none hover:brightness-110 transition-all active:scale-95"><ChevronLeft size={20}/></button>
               <button onClick={handleNext} className="p-3 bg-[var(--brand-color)] text-white rounded-none hover:brightness-110 transition-all active:scale-95 border-l border-white/10"><ChevronRight size={20}/></button>
-              <button onClick={handleToday} className="ml-4 px-6 py-3 bg-[#17a2b8] text-white rounded-none text-[11px] font-black uppercase tracking-widest hover:bg-[#138496] transition-all shadow-lg active:scale-95">Jump_Today</button>
+              <button onClick={handleToday} className="ml-2 md:ml-4 px-4 md:px-6 py-3 bg-[#17a2b8] text-white rounded-none text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:bg-[#138496] transition-all shadow-lg active:scale-95">Today</button>
             </div>
 
             <div className="text-center order-1 sm:order-2">
-              <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-slate-100 tracking-tighter uppercase leading-none">{monthYearLabel}</h2>
+              <h2 className="text-2xl md:text-5xl font-black text-slate-800 dark:text-slate-100 tracking-tighter uppercase leading-none">{monthYearLabel}</h2>
             </div>
 
-            <div className="flex items-center order-3 w-full sm:w-auto overflow-hidden">
+            <div className="flex items-center order-3 w-full sm:w-auto overflow-hidden shadow-sm">
               {[
                 { id: 'month', label: 'Month' },
                 { id: 'week', label: 'Week' },
@@ -371,7 +371,7 @@ const AdminCalendar: React.FC = () => {
                 <button 
                   key={v.id}
                   onClick={() => setView(v.id as any)} 
-                  className={`flex-1 sm:flex-none px-5 py-3 border border-[var(--brand-color)] text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`flex-1 sm:flex-none px-4 md:px-5 py-3 border border-[var(--brand-color)] text-[10px] font-black uppercase tracking-widest transition-all ${
                     view === v.id ? 'bg-[var(--brand-color)] text-white shadow-lg scale-105 z-10' : 'text-[var(--brand-color)] hover:bg-[var(--brand-color)]/5'
                   } ${i === 0 ? '' : 'border-l-0'}`}
                 >
@@ -382,31 +382,33 @@ const AdminCalendar: React.FC = () => {
           </div>
 
           {/* Calendar Display Area */}
-          <div className="flex-1 overflow-hidden min-h-[450px]">
+          <div className="flex-1 overflow-hidden min-h-[400px] md:min-h-[450px]">
             {view === 'month' ? renderMonth() : renderTimeGrid(view === 'week')}
           </div>
           
-          {/* Mobile Drill-Down Hint */}
-          <div className="lg:hidden mt-8 p-6 bg-slate-900 text-white border border-slate-800 flex items-start gap-4">
-             <Info size={24} className="text-[var(--brand-color)] shrink-0 mt-1"/>
+          {/* Mobile Navigation Hint */}
+          <div className="lg:hidden mt-6 p-4 md:p-6 bg-slate-900 text-white border border-slate-800 flex items-start gap-4">
+             <Info size={20} className="text-[var(--brand-color)] shrink-0 mt-1"/>
              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--brand-color)] mb-1">Matrix Protocol</p>
-                <p className="text-[10px] font-medium leading-relaxed opacity-80">Tap any day coordinate to initialize a dedicated high-density temporal view for that specific node.</p>
+                <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[var(--brand-color)] mb-1">Matrix Protocol</p>
+                <p className="text-[9px] md:text-[10px] font-medium leading-relaxed opacity-80">
+                  {view === 'week' ? 'Swipe horizontally on the calendar grid to view the full week strata.' : 'Tap any day coordinate to initialize a dedicated high-density temporal view.'}
+                </p>
              </div>
           </div>
 
-          <div className="mt-10 pt-10 border-t border-slate-100 dark:border-[#222] flex flex-wrap gap-10 items-center">
+          <div className="mt-8 md:mt-10 pt-10 border-t border-slate-100 dark:border-[#222] flex flex-wrap gap-6 md:gap-10 items-center">
              <div className="flex items-center gap-4">
                 <div className="w-3 h-3 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] animate-pulse"></div>
-                <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Nodes_Synced: {events.length}</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest">Nodes_Synced: {events.length}</span>
              </div>
              <div className="hidden sm:flex items-center gap-4">
                 <div className="w-3 h-3 bg-[var(--brand-color)]"></div>
                 <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Protocol Priority: Alpha</span>
              </div>
              <div className="ml-auto flex items-center gap-4 text-slate-300 dark:text-slate-800">
-                <ShieldCheck size={24} className="opacity-40" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em]">Access Validated</span>
+                <ShieldCheck size={20} className="md:w-6 md:h-6 opacity-40" />
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Registry Access Valid</span>
              </div>
           </div>
         </main>

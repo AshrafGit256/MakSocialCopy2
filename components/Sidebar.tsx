@@ -34,16 +34,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
 
   return (
     <aside className={`fixed inset-y-0 left-0 z-[2001] w-64 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-      <div className="p-6 flex-1 overflow-y-auto no-scrollbar">
-        <div className="flex items-center justify-center mb-10 cursor-pointer w-full p-2" onClick={() => setView('home')}>
-          <img 
-            src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
-            className="w-full h-auto max-h-20 object-contain shadow-2xl shadow-[var(--brand-color)]/5 transition-transform hover:scale-105 active:scale-95" 
-            alt="MakSocial Logo" 
-          />
+      <div className="flex-1 overflow-y-auto no-scrollbar">
+        {/* LOGO CONTAINER - Fixed for blending */}
+        <div className="px-6 py-10 flex items-center justify-center">
+          <div 
+            className="cursor-pointer w-full flex justify-center group" 
+            onClick={() => setView('home')}
+          >
+            <img 
+              src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
+              className="w-full h-auto max-h-16 object-contain filter dark:brightness-100 brightness-90 transition-all group-hover:scale-[1.02] group-active:scale-95" 
+              alt="MakSocial Logo" 
+            />
+          </div>
         </div>
 
-        <nav className="space-y-1">
+        <nav className="px-3 space-y-1">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -54,27 +60,29 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
                   setView(item.id as AppView);
                 }
               }}
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeView === item.id ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-500 hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]'}`}
+              className={`w-full flex items-center gap-4 px-5 py-3 rounded-md transition-all ${activeView === item.id ? 'bg-[var(--brand-color)] text-white shadow-md' : 'text-slate-500 hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)]'}`}
             >
-              {item.icon}
-              <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
+              <div className={activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-[var(--brand-color)]'}>
+                {item.icon}
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
             </button>
           ))}
         </nav>
 
         {isAdmin && (
-          <div className="mt-8 pt-8 border-t border-[var(--border-color)]">
-            <button onClick={() => setView('admin')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeView === 'admin' ? 'bg-[var(--brand-color)]/20 text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}>
+          <div className="mt-8 pt-8 px-3 border-t border-[var(--border-color)]">
+            <button onClick={() => setView('admin')} className={`w-full flex items-center gap-4 px-5 py-3 rounded-md transition-all ${activeView === 'admin' ? 'bg-[var(--brand-color)]/20 text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}>
               <Cpu size={20} />
-              <span className="text-[11px] font-black uppercase tracking-widest">Admin Terminal</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Admin Terminal</span>
             </button>
           </div>
         )}
       </div>
 
-      <div className="p-6 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
-        <button onClick={onLogout} className="w-full py-4 bg-rose-600/10 text-rose-500 rounded-xl hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-xl">
-          <LogOut size={18} /> Terminate
+      <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]">
+        <button onClick={onLogout} className="w-full py-3 bg-rose-600/10 text-rose-500 rounded-md hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2 font-black text-[9px] uppercase tracking-widest">
+          <LogOut size={16} /> Terminate_Session
         </button>
       </div>
     </aside>

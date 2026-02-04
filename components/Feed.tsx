@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Post, User, College, AuthorityRole, PollData, Comment } from '../types';
+import { Post, User, College, AuthorityRole, PollData, Comment, CalendarEvent } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
 import { GoogleGenAI } from "@google/genai";
@@ -94,9 +94,27 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
 
 export const AuthoritySeal: React.FC<{ role?: string, size?: number, verified?: boolean }> = ({ role, size = 16, verified = true }) => (<div className="inline-flex items-center ml-1 text-[var(--brand-color)]" title={role ? `Verified ${role}` : 'Verified Node'}><BadgeCheck size={size} fill="currentColor" stroke="white" strokeWidth={1.5} /></div>);
 
-const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void, onUpdate: () => void, isThreadView?: boolean, isLiked?: boolean, onLike: (id: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike }) => {
+const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void, onUpdate: () => void, isThreadView?: boolean, isLiked?: boolean, onLike: (id: string) => void, onAddToast: (type: ToastMsg['type'], text: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike, onAddToast }) => {
   const [newComment, setNewComment] = useState('');
   const handleLike = (e: React.MouseEvent) => { e.stopPropagation(); onLike(post.id); };
+  
+  const handleAddToCalendar = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const eventData: CalendarEvent = {
+      id: `ev-post-${post.id}-${Date.now()}`,
+      title: post.isEventBroadcast ? (post.eventTitle || 'University Protocol') : `Signal Ref: ${post.author}`,
+      description: post.content.replace(/<[^>]*>/g, '').slice(0, 100) + '...',
+      date: post.eventDate || new Date().toISOString().split('T')[0],
+      time: post.eventTime || '09:00',
+      location: post.eventLocation || 'Universal Wing',
+      category: 'Academic',
+      createdBy: post.authorId,
+      attendeeIds: [currentUser.id]
+    };
+    db.saveCalendarEvent(eventData);
+    onAddToast('success', "Signal logged to personal roadmap registry.");
+  };
+
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -104,6 +122,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
     setNewComment('');
     onUpdate();
   };
+
   return (
     <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 mb-12' : 'mb-14'}`}>
       <div className="flex">
@@ -133,6 +152,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 <div className="flex items-center gap-8">
                   <button onClick={handleLike} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
+                  <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-600 transition-all active:scale-110" title="Add to Registry Roadmap"><Calendar size={18} /> <span className="hidden sm:inline uppercase tracking-widest text-[8px]">Sync roadmap</span></button>
                 </div>
                 <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-slate-500/10 text-slate-500 border border-slate-500/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest"><Terminal size={10}/> SHA_{SHA_GEN().slice(0,6)}</div>
             </div>
@@ -206,7 +226,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   };
 
   const handlePost = async (html: string, poll?: PollData) => {
-    const imgRegex = /<img[^>]+src="([^">]+)"/g;
+    const imgRegex = /<img[^+]+src="([^">]+)"/g;
     const foundImages: string[] = [];
     let match;
     while ((match = imgRegex.exec(html)) !== null) foundImages.push(match[1]);
@@ -250,7 +270,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             )}
             <div className="space-y-0">
                {filteredPosts.length > 0 ? filteredPosts.map((post) => (
-                 <PostItem key={post.id} post={post} currentUser={user} onOpenThread={onOpenThread} onNavigateToProfile={onNavigateToProfile} bookmarks={bookmarks} onBookmark={(id) => setBookmarks(db.toggleBookmark(id))} onUpdate={() => setUpdateTrigger(prev => prev + 1)} isThreadView={!!threadId} isLiked={likedPosts.has(post.id)} onLike={(id) => { if(!likedPosts.has(id)){ db.likePost(id); setLikedPosts(new Set([...likedPosts, id])); setUpdateTrigger(p=>p+1); } }} />
+                 <PostItem key={post.id} post={post} currentUser={user} onOpenThread={onOpenThread} onNavigateToProfile={onNavigateToProfile} bookmarks={bookmarks} onBookmark={(id) => setBookmarks(db.toggleBookmark(id))} onUpdate={() => setUpdateTrigger(prev => prev + 1)} isThreadView={!!threadId} isLiked={likedPosts.has(post.id)} onLike={(id) => { if(!likedPosts.has(id)){ db.likePost(id); setLikedPosts(new Set([...likedPosts, id])); setUpdateTrigger(p=>p+1); } }} onAddToast={addToast} />
                )) : <div className="py-40 text-center opacity-30 uppercase text-[10px] font-black">Registry_Empty</div>}
             </div>
          </div>

@@ -67,7 +67,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
             </div>
          </div>
          <div className="flex items-center gap-3">
-            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all flex items-center gap-2 rounded-[var(--radius-main)]">
+            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all flex items-center gap-2 rounded-none">
                <Share2 size={12}/> Signal_Identity
             </button>
          </div>
@@ -94,20 +94,20 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
               </div>
 
               {isOwnProfile ? (
-                 <button className="w-full py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all">Edit Parameters</button>
+                 <button className="w-full py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all">Edit Parameters</button>
               ) : (
                  <div className="flex flex-col gap-3">
                     <button 
                       onClick={() => setIsFollowing(!isFollowing)}
-                      className={`w-full py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 ${isFollowing ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-[var(--brand-color)] text-white hover:brightness-110'}`}
+                      className={`w-full py-3 rounded-none font-black text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 ${isFollowing ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-[var(--brand-color)] text-white hover:brightness-110'}`}
                     >
                       {isFollowing ? <><CheckCircle2 size={14}/> Linked</> : <><UserPlus size={14}/> Initialize Link</>}
                     </button>
                     <div className="flex gap-2">
-                      <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all active:scale-95 flex items-center justify-center gap-2">
+                      <button onClick={() => onMessageUser?.(user.id)} className="flex-1 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-none font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all active:scale-95 flex items-center justify-center gap-2">
                         <MessageCircle size={14}/> Message
                       </button>
-                      <button onClick={handleEmail} className="flex-1 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all active:scale-95 flex items-center justify-center gap-2">
+                      <button onClick={handleEmail} className="flex-1 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-none font-black text-[11px] uppercase tracking-widest hover:border-[var(--brand-color)] transition-all active:scale-95 flex items-center justify-center gap-2">
                         <Mail size={14}/> Email
                       </button>
                     </div>
@@ -171,7 +171,7 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                    <Gallery userId={userId || currentUser.id} onSelectPost={(id) => { }} />
                 </div>
               ) : displayedPosts.length > 0 ? displayedPosts.map(p => (
-                <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] overflow-hidden hover:border-[var(--brand-color)] transition-all group">
+                <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none overflow-hidden hover:border-[var(--brand-color)] transition-all group">
                    <div className="px-6 py-3 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
                       <div className="flex items-center gap-2">
                         <Box size={14} className="text-slate-400" />
@@ -199,13 +199,13 @@ const Profile: React.FC<{ userId?: string, onNavigateBack?: () => void, onNaviga
                    </div>
                 </div>
               )) : (
-                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-[var(--radius-main)] bg-slate-50/50 dark:bg-black/5">
+                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-none bg-slate-50/50 dark:bg-black/5">
                    <Database size={48} className="mx-auto text-slate-200" />
                    <div className="space-y-1">
                       <h3 className="text-xl font-black uppercase tracking-tighter">Manifest_Empty</h3>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No matching signals found in this stratum.</p>
                    </div>
-                   <button onClick={() => setActiveTab('signals')} className="px-8 py-2 bg-[var(--brand-color)] text-white rounded-[var(--radius-main)] text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Reset Sequence</button>
+                   <button onClick={() => setActiveTab('signals')} className="px-8 py-2 bg-[var(--brand-color)] text-white rounded-none text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">Reset Sequence</button>
                 </div>
               )}
             </div>

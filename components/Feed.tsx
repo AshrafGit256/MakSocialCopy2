@@ -38,7 +38,7 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
   const c = config[toast.type];
 
   return (
-    <div className={`flex items-start gap-4 p-4 bg-white dark:bg-white/[0.02] border ${c.border} rounded-[2px] shadow-lg min-w-[320px] max-w-[450px] animate-in slide-in-from-right-4 duration-300 font-mono`}>
+    <div className={`flex items-start gap-4 p-4 bg-white dark:bg-white/[0.02] border ${c.border} rounded-none shadow-lg min-w-[320px] max-w-[450px] animate-in slide-in-from-right-4 duration-300 font-mono`}>
        <div className="shrink-0 pt-0.5">
           {toast.type === 'error' ? (
             <div className={`${c.iconBg} rounded-full w-6 h-6 flex items-center justify-center border-2 border-white dark:border-black shadow-sm`}>
@@ -71,7 +71,7 @@ const Lightbox: React.FC<{
           <button onClick={next} className="absolute right-6 p-5 bg-white/5 hover:bg-white/10 text-white rounded-full transition-all z-[5001] backdrop-blur-md"><ChevronRight size={32} /></button></>
       )}
       <div className="relative w-full h-full p-4 flex flex-col items-center justify-center pointer-events-none">
-        <img src={images[index]} className="max-w-[95vw] max-h-[85vh] object-contain shadow-2xl rounded-sm pointer-events-auto transition-transform duration-300" alt="Expanded view" onClick={(e) => e.stopPropagation()} />
+        <img src={images[index]} className="max-w-[95vw] max-h-[85vh] object-contain shadow-2xl rounded-none pointer-events-auto transition-transform duration-300" alt="Expanded view" onClick={(e) => e.stopPropagation()} />
       </div>
     </div>
   );
@@ -84,9 +84,9 @@ const PostImageGrid: React.FC<{ images: string[] }> = ({ images }) => {
   const count = images.length;
   const renderGrid = () => {
     switch (count) {
-      case 1: return (<div className="w-full rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-secondary)]"><img src={images[0]} className="w-full h-auto max-h-[700px] object-cover cursor-pointer hover:brightness-95 transition-all" onClick={() => setLightbox({ open: true, index: 0 })} /></div>);
-      case 2: return (<div className="grid grid-cols-2 gap-0.5 rounded-2xl overflow-hidden border border-[var(--border-color)] aspect-[16/9] sm:aspect-[2/1]">{images.map((img, i) => (<img key={i} src={img} className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all border-r border-[var(--border-color)] last:border-r-0" onClick={() => setLightbox({ open: true, index: i })} />))}</div>);
-      default: return (<div className="grid grid-cols-2 grid-rows-2 gap-0.5 rounded-2xl overflow-hidden border border-[var(--border-color)] aspect-[16/9]">{images.slice(0, 4).map((img, i) => (<div key={i} className="relative w-full h-full overflow-hidden group"><img src={img} className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all border-r border-b border-[var(--border-color)]" onClick={() => setLightbox({ open: true, index: i })} />{i === 3 && count > 4 && (<div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer group-hover:bg-black/40 transition-all" onClick={() => setLightbox({ open: true, index: 3 })}><span className="text-3xl font-black text-white drop-shadow-lg">+{count - 4}</span></div>)}</div>))}</div>);
+      case 1: return (<div className="w-full rounded-none overflow-hidden border border-[var(--border-color)] bg-[var(--bg-secondary)]"><img src={images[0]} className="w-full h-auto max-h-[700px] object-cover cursor-pointer hover:brightness-95 transition-all" onClick={() => setLightbox({ open: true, index: 0 })} /></div>);
+      case 2: return (<div className="grid grid-cols-2 gap-0.5 rounded-none overflow-hidden border border-[var(--border-color)] aspect-[16/9] sm:aspect-[2/1]">{images.map((img, i) => (<img key={i} src={img} className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all border-r border-[var(--border-color)] last:border-r-0" onClick={() => setLightbox({ open: true, index: i })} />))}</div>);
+      default: return (<div className="grid grid-cols-2 grid-rows-2 gap-0.5 rounded-none overflow-hidden border border-[var(--border-color)] aspect-[16/9]">{images.slice(0, 4).map((img, i) => (<div key={i} className="relative w-full h-full overflow-hidden group"><img src={img} className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all border-r border-b border-[var(--border-color)]" onClick={() => setLightbox({ open: true, index: i })} />{i === 3 && count > 4 && (<div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer group-hover:bg-black/40 transition-all" onClick={() => setLightbox({ open: true, index: 3 })}><span className="text-3xl font-black text-white drop-shadow-lg">+{count - 4}</span></div>)}</div>))}</div>);
     }
   };
   return (<div className="my-5 select-none">{renderGrid()}{lightbox.open && (<Lightbox images={images} initialIndex={lightbox.index} onClose={() => setLightbox({ open: false, index: 0 })} />)}</div>);
@@ -105,7 +105,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
     onUpdate();
   };
   return (
-    <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 mb-12' : 'mb-14'}`}>
+    <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 mb-12' : 'mb-14'}`}>
       <div className="flex">
           <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
             <img src={post.authorAvatar} onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all hover:scale-105" />
@@ -153,8 +153,8 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
            </div>
            <div className="p-6 border-t border-[var(--border-color)] bg-white/50">
               <form onSubmit={handleCommentSubmit} className="flex flex-col gap-4">
-                 <textarea value={newComment} onChange={e => setNewComment(e.target.value)} placeholder="Type contribution..." className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md p-4 text-[13px] font-medium min-h-[100px] outline-none transition-all" />
-                 <div className="flex justify-end"><button type="submit" disabled={!newComment.trim()} className="px-6 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-md text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md">Submit Commit <Send size={12}/></button></div>
+                 <textarea value={newComment} onChange={e => setNewComment(e.target.value)} placeholder="Type contribution..." className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-none p-4 text-[13px] font-medium min-h-[100px] outline-none transition-all" />
+                 <div className="flex justify-end"><button type="submit" disabled={!newComment.trim()} className="px-6 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-none text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md">Submit Commit <Send size={12}/></button></div>
               </form>
            </div>
         </div>
@@ -245,7 +245,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             {!threadId && <RichEditor onPost={handlePost} currentUser={user} />}
             {threadId && (
               <div className="mb-10 flex items-center justify-between px-4">
-                <button onClick={onBack} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center gap-3"><ArrowLeft size={14}/> Back</button>
+                <button onClick={onBack} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none text-[9px] font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center gap-3"><ArrowLeft size={14}/> Back</button>
               </div>
             )}
             <div className="space-y-0">
@@ -255,7 +255,7 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
             </div>
          </div>
          <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-8 rounded-2xl shadow-sm">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-8 rounded-none shadow-sm">
                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2"><Globe size={14}/> Global Sync Status</h4>
                <p className="text-[11px] font-medium text-slate-500 leading-relaxed uppercase">Signal integrity scanner is active. All multi-modal uploads are verified against university strata protocols.</p>
             </div>

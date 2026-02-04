@@ -26,7 +26,7 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
   const hasPoster = opp.images && opp.images.length > 0;
 
   return (
-    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] hover:border-[var(--brand-color)] transition-all flex flex-col shadow-sm overflow-hidden group">
+    <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none hover:border-[var(--brand-color)] transition-all flex flex-col shadow-sm overflow-hidden group">
       {/* 1. ASSET PREVIEW */}
       {hasPoster && (
         <div className="h-52 relative overflow-hidden border-b border-[var(--border-color)]">
@@ -37,7 +37,7 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
           <div className="absolute top-4 left-4">
-             <span className={`px-3 py-1 rounded-[var(--radius-main)] text-[8px] font-black uppercase border shadow-2xl backdrop-blur-md ${typeColors[type]}`}>{type}</span>
+             <span className={`px-3 py-1 rounded-none text-[8px] font-black uppercase border shadow-2xl backdrop-blur-md ${typeColors[type]}`}>{type}</span>
           </div>
           <div className="absolute bottom-4 right-4">
              <div className="flex items-center gap-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded border border-white/10">
@@ -91,7 +91,7 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
           <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">STRATA_BENEFIT</span>
           <span className="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-tighter">{opp.opportunityData?.detectedBenefit || 'Verified Participation'}</span>
         </div>
-        <button className="flex items-center gap-2 px-6 py-2.5 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-[var(--radius-main)] text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95">
+        <button className="flex items-center gap-2 px-6 py-2.5 bg-[var(--brand-color)] hover:brightness-110 text-white rounded-none text-[9px] font-black uppercase tracking-[0.2em] transition-all shadow-lg active:scale-95">
           Commit_Node <ArrowUpRight size={14}/>
         </button>
       </div>
@@ -119,12 +119,12 @@ const Opportunities: React.FC = () => {
       {/* TACTICAL HEADER */}
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-16">
         <div className="flex items-center gap-6">
-          <div className="p-5 bg-[var(--brand-color)] rounded-[var(--radius-main)] shadow-2xl shadow-[var(--brand-color)]/20 text-white">
+          <div className="p-5 bg-[var(--brand-color)] rounded-none shadow-2xl shadow-[var(--brand-color)]/20 text-white">
             <Zap size={36} fill="white" />
           </div>
           <div>
             <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">Opportunities_Manifest</h1>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.5em] mt-3 flex items-center gap-2">
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.5em] mt-3 flex items-gap-2">
                <Activity size={10} className="text-[var(--brand-color)] animate-pulse" /> Global_Signal_Registry // {opps.length} NODES_ACTIVE
             </p>
           </div>
@@ -133,7 +133,7 @@ const Opportunities: React.FC = () => {
         <div className="relative w-full lg:w-96 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[var(--brand-color)] transition-colors" size={18} />
           <input 
-            className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 pl-12 pr-4 text-[11px] font-bold uppercase outline-none focus:border-[var(--brand-color)] shadow-inner transition-all" 
+            className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none py-4 pl-12 pr-4 text-[11px] font-bold uppercase outline-none focus:border-[var(--brand-color)] shadow-inner transition-all" 
             placeholder="Query Registry Stratum..." 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
@@ -154,11 +154,10 @@ const Opportunities: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="py-48 text-center space-y-8 bg-[var(--bg-secondary)]/50 border border-dashed border-[var(--border-color)] rounded-[var(--radius-main)] animate-in zoom-in-95 duration-500">
+        <div className="py-48 text-center space-y-8 bg-[var(--bg-secondary)]/50 border border-dashed border-[var(--border-color)] rounded-none animate-in zoom-in-95 duration-500">
            <div className="relative inline-block">
               <Database size={64} className="mx-auto text-slate-300 opacity-20" />
               <div className="absolute inset-0 flex items-center justify-center">
-                 {/* Added ShieldAlert component from lucide-react */}
                  <ShieldAlert size={24} className="text-rose-500 animate-pulse" />
               </div>
            </div>
@@ -168,14 +167,14 @@ const Opportunities: React.FC = () => {
                 No matching alphanumeric opportunities detected in the current academic strata. Reset protocol filters to retry.
               </p>
            </div>
-           <button onClick={() => setSearch('')} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[var(--brand-color)] text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 rounded-sm">
+           <button onClick={() => setSearch('')} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[var(--brand-color)] text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 rounded-none">
               Re-initialize Search
            </button>
         </div>
       )}
 
       {/* SYSTEM ADVISORY */}
-      <footer className="mt-20 p-8 bg-[var(--brand-color)]/5 border border-dashed border-[var(--brand-color)]/20 rounded-[var(--radius-main)] flex flex-col md:flex-row items-center justify-between gap-8">
+      <footer className="mt-20 p-8 bg-[var(--brand-color)]/5 border border-dashed border-[var(--brand-color)]/20 rounded-none flex flex-col md:flex-row items-center justify-between gap-8">
          <div className="flex items-center gap-6">
             <div className="p-3 bg-white dark:bg-black/40 rounded border border-[var(--border-color)] shadow-sm">
                <Terminal size={24} className="text-[var(--brand-color)]" />

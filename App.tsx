@@ -10,6 +10,7 @@ import ChatHub from './components/ChatHub';
 import Profile from './components/Profile';
 import Admin from './components/Admin';
 import CalendarView from './components/Calendar';
+import AdminCalendar from './components/AdminCalendar';
 import Resources from './components/Resources';
 import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
@@ -137,6 +138,7 @@ const App: React.FC = () => {
       case 'email': return <EmailHub />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
+      case 'admin-calendar': return <AdminCalendar />;
       case 'resources': return <Resources />;
       case 'settings': return <SettingsView />;
       case 'opportunities': return <Opportunities />;

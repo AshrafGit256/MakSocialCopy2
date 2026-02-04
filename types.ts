@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'email';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'settings' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'email' | 'admin-calendar';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -207,6 +207,16 @@ export interface CalendarEvent {
   createdBy: string;
   attendeeIds?: string[]; 
   registrationLink?: string;
+}
+
+export interface AdminCalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end?: Date;
+  allDay: boolean;
+  backgroundColor: string;
+  borderColor: string;
 }
 
 export interface LiveEvent {

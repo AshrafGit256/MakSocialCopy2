@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { User } from '../types';
@@ -40,9 +39,9 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onSelectUs
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 left-0 w-64 z-[3005] flex">
-      {/* Search Drawer content - Sized to match Sidebar exactly */}
-      <aside className="relative w-full h-full bg-[var(--bg-primary)] border-r border-[var(--border-color)] shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 font-mono">
+    <div className="fixed inset-y-0 left-0 w-64 z-[3005] flex pointer-events-none">
+      {/* Search Drawer content - Sized to match Sidebar exactly, only clickable part */}
+      <aside className="relative w-full h-full bg-[var(--bg-primary)] border-r border-[var(--border-color)] shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 font-mono pointer-events-auto">
         <div className="p-6 border-b border-[var(--border-color)] space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

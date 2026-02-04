@@ -1,197 +1,31 @@
-
 import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage } from './types';
 import { MOCK_POSTS, MOCK_CHATS } from './constants';
 
 const DB_KEYS = {
-  POSTS: 'maksocial_posts_v27',
-  USERS: 'maksocial_users_v26',
+  POSTS: 'maksocial_posts_v27_populated',
+  USERS: 'maksocial_users_v26_registry',
   LOGGED_IN_ID: 'maksocial_current_user_id',
-  RESOURCES: 'maksocial_resources_v26',
-  CALENDAR: 'maksocial_calendar_v26',
-  BOOKMARKS: 'maksocial_bookmarks_v26',
-  CHATS: 'maksocial_chats_hub_v1',
-  EMAILS: 'maksocial_emails_v26_prod_v2',
-  NOTIFICATIONS: 'maksocial_notifications_v26',
-  EVENTS: 'maksocial_events_v26',
-  GROUPS: 'maksocial_groups_v26'
+  RESOURCES: 'maksocial_resources_v26_vault',
+  CALENDAR: 'maksocial_calendar_v26_ roadmap',
+  BOOKMARKS: 'maksocial_bookmarks_v26_favs',
+  CHATS: 'maksocial_chats_hub_v1_sync',
+  EMAILS: 'maksocial_emails_v26_prod_v2_mail',
+  NOTIFICATIONS: 'maksocial_notifications_v26_signals',
+  EVENTS: 'maksocial_events_v26_live',
+  GROUPS: 'maksocial_groups_v26_clusters'
 };
 
-const MOCK_RESOURCES: Resource[] = [
-  {
-    id: 'res-1',
-    title: 'Advanced Computer Architecture - Final Prep Notes',
-    category: 'Notes/Books',
-    college: 'COCIS',
-    course: 'Computer Science',
-    year: 'Year 3',
-    author: 'Dr. Julianne O.',
-    authorRole: 'Lecturer',
-    downloads: 142,
-    fileType: 'PDF',
-    timestamp: '12 May 2025'
-  },
-  {
-    id: 'res-2',
-    title: 'Structural Mechanics II - 2024 Exam Blueprint',
-    category: 'Past Paper',
-    college: 'CEDAT',
-    course: 'Civil Engineering',
-    year: 'Year 2',
-    author: 'Eng. Mugisha P.',
-    authorRole: 'GRC CEDAT',
-    downloads: 89,
-    fileType: 'PDF',
-    timestamp: '15 May 2025'
-  },
-  {
-    id: 'res-3',
-    title: 'Constitutional Law - Landmark Case Study Registry',
-    category: 'Research',
-    college: 'LAW',
-    course: 'Bachelor of Laws',
-    year: 'Finalist',
-    author: 'Counsel Peter',
-    authorRole: 'Official',
-    downloads: 210,
-    fileType: 'PDF',
-    timestamp: '10 May 2025'
-  },
-  {
-    id: 'res-4',
-    title: 'Macroeconomics Theory - Mid-Semester Test Paper',
-    category: 'Test',
-    college: 'COBAMS',
-    course: 'Economics',
-    year: 'Year 1',
-    author: 'Prof. Wandera',
-    authorRole: 'Staff',
-    downloads: 56,
-    fileType: 'PDF',
-    timestamp: '18 May 2025'
-  },
-  {
-    id: 'res-5',
-    title: 'Human Anatomy - Practical Dissection Guide v4',
-    category: 'Notes/Books',
-    college: 'CHS',
-    course: 'Medicine',
-    year: 'Year 2',
-    author: 'Dr. Nalule',
-    authorRole: 'Academic Council',
-    downloads: 320,
-    fileType: 'PDF',
-    timestamp: '20 May 2025'
-  },
-  {
-    id: 'res-6',
-    title: 'Agribusiness Marketing - Field Research Report',
-    category: 'Research',
-    college: 'CAES',
-    course: 'Agriculture',
-    year: 'Masters',
-    author: 'M. Okello',
-    authorRole: 'Graduate',
-    downloads: 45,
-    fileType: 'PDF',
-    timestamp: '22 May 2025'
-  },
-  {
-    id: 'res-7',
-    title: 'Operating Systems - Process Scheduling Blueprint',
-    category: 'Notes/Books',
-    college: 'COCIS',
-    course: 'Software Engineering',
-    year: 'Year 2',
-    author: 'Prof. Kizito',
-    authorRole: 'Academic Council',
-    downloads: 512,
-    fileType: 'PDF',
-    timestamp: '01 June 2025'
-  },
-  {
-    id: 'res-8',
-    title: 'History of Philosophy - CHUSS Comprehensive Guide',
-    category: 'Notes/Books',
-    college: 'CHUSS',
-    course: 'Philosophy',
-    year: 'Year 1',
-    author: 'Dr. Mukasa',
-    authorRole: 'Lecturer',
-    downloads: 88,
-    fileType: 'PDF',
-    timestamp: '05 June 2025'
-  }
-];
-
-const MOCK_NOTIFICATIONS: MakNotification[] = [
-  {
-    id: 'n1',
-    type: 'follow',
-    title: 'New Node Link',
-    description: 'Shamim Nambassa (Guild President) initialized a permanent link with your terminal.',
-    timestamp: '2m ago',
-    isRead: false,
-    meta: { hash: 'U882', nodeId: 'u-shamim', nodeAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Shamim', reason: 'Following' }
-  },
-  {
-    id: 'n2',
-    type: 'skill_match',
-    title: 'Neural Sync Detected',
-    description: 'A node in CEDAT requires your Logic_Strata skills for project "Smart-Grid".',
-    timestamp: '15m ago',
-    isRead: false,
-    meta: { hash: 'A4F2', reason: 'High Compatibility' }
-  },
-  {
-    id: 'n3',
-    type: 'event',
-    title: 'New Protocol: Research Week',
-    description: 'Prof. Barnabas uploaded a new event: "89th Research & Innovation Week". Access the coordination nodes now.',
-    timestamp: '1h ago',
-    isRead: false,
-    meta: { hash: 'EVT9', nodeAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg' }
-  }
-];
-
-const MOCK_EMAILS: PlatformEmail[] = [
-  {
-    id: 'e1',
-    from: 'vc@mak.ac.ug',
-    fromName: 'Prof. Barnabas Nawangwe',
-    fromAvatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg',
-    to: ['student@mak.ac.ug'],
-    subject: 'Academic Excellence Protocol 2026',
-    body: 'Greetings Node,\n\nI am writing to formally synchronize our objectives regarding the upcoming research strata. Your contributions to the university matrix have been noted by the council.\n\nBest regards,\nBarnabas.',
-    timestamp: '2h',
-    fullDate: 'Feb 15, 2026 10:00 AM',
-    isRead: false,
-    isStarred: true,
-    folder: 'inbox',
-    label: 'Important'
-  }
-];
-
 const INITIAL_USERS: User[] = [
-  {
-    id: 'u-ninfa',
-    name: 'Ninfa Monaldo',
-    role: 'Web Developer',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
-    connections: 1200,
-    email: 'ninfa.m@mak.ac.ug',
-    college: 'COCIS',
-    status: 'Finalist',
-    subscriptionTier: 'Pro',
-    joinedColleges: ['COCIS'],
-    postsCount: 45,
-    followersCount: 890,
-    followingCount: 150,
-    totalLikesCount: 3400,
-    badges: ['Verified'],
-    verified: true,
-    appliedTo: [],
-    bio: 'Building the next generation of academic strata.'
-  }
+  { id: 'vc_office', name: 'Prof. Barnabas Nawangwe', role: 'Vice Chancellor', avatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg', connections: 45000, college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 124, followersCount: 42000, followingCount: 89, totalLikesCount: 156000, badges: ['Verified', 'Admin'], verified: true, appliedTo: [] },
+  { id: 'u-ninfa', name: 'Ninfa Monaldo', role: 'Web Architect', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa', connections: 1200, email: 'ninfa.m@mak.ac.ug', college: 'COCIS', status: 'Finalist', subscriptionTier: 'Pro', joinedColleges: ['COCIS'], postsCount: 45, followersCount: 890, followingCount: 150, totalLikesCount: 3400, badges: ['Verified'], verified: true, appliedTo: [], bio: 'Building the next generation of academic strata.' },
+  { id: 'mak_library', name: 'Main Library Node', role: 'Information Hub', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Library', connections: 45000, college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 560, followersCount: 45000, followingCount: 0, totalLikesCount: 89000, badges: ['Official'], verified: true, appliedTo: [] },
+  { id: 'mak_unipod', name: 'Mak UniPod', role: 'Innovation Forge', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=UniPod', connections: 8000, college: 'CEDAT', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['CEDAT'], postsCount: 89, followersCount: 7800, followingCount: 12, totalLikesCount: 12000, badges: ['Verified'], verified: true, appliedTo: [] },
+  { id: 'guild_office', name: 'Guild Presidential Office', role: 'Student Leadership', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guild', connections: 25000, college: 'Global', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['Global'], postsCount: 230, followersCount: 28000, followingCount: 450, totalLikesCount: 92000, badges: ['Verified'], verified: true, appliedTo: [] },
+  { id: 'mtn_partner', name: 'MTN Uganda', role: 'Corporate Node', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=MTN', connections: 50000, college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 12, followersCount: 50000, followingCount: 0, totalLikesCount: 450000, badges: ['Partner'], verified: true, appliedTo: [] },
+  { id: 'u-julianne', name: 'Dr. Julianne O.', role: 'Senior Lecturer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Julianne', connections: 800, college: 'COCIS', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['COCIS'], postsCount: 64, followersCount: 1200, followingCount: 80, totalLikesCount: 5600, badges: ['Verified', 'Faculty'], verified: true, appliedTo: [] },
+  { id: 'airtel_partner', name: 'Airtel Uganda', role: 'Corporate Partner', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Airtel', connections: 48000, college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 8, followersCount: 48000, followingCount: 0, totalLikesCount: 320000, badges: ['Partner'], verified: true, appliedTo: [] },
+  { id: 'mak_security', name: 'Security Registry', role: 'Official Channel', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Security', connections: 45000, college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 320, followersCount: 45000, followingCount: 0, totalLikesCount: 12000, badges: ['Official'], verified: true, appliedTo: [] },
+  { id: 'u-peter', name: 'Counsel Peter', role: 'Legal Advisor', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Peter', connections: 1200, college: 'LAW', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['LAW'], postsCount: 145, followersCount: 2300, followingCount: 120, totalLikesCount: 8900, badges: ['Verified'], verified: true, appliedTo: [] }
 ];
 
 const parseArray = <T>(key: string, fallback: T[]): T[] => {
@@ -204,39 +38,24 @@ const parseArray = <T>(key: string, fallback: T[]): T[] => {
 };
 
 export const db = {
-  getUsers: (): User[] => {
-    return parseArray<User>(DB_KEYS.USERS, INITIAL_USERS);
-  },
+  getUsers: (): User[] => parseArray<User>(DB_KEYS.USERS, INITIAL_USERS),
   saveUsers: (users: User[]) => localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)),
   getUser: (id?: string): User => {
     const users = db.getUsers();
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID);
-    const user = users.find(u => u.id === currentId) || users[0];
-    return user;
+    return users.find(u => u.id === currentId) || users[1]; // default to Ninfa
   },
   saveUser: (user: User) => {
     const users = db.getUsers();
     const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) users[index] = user; 
-    else users.push(user);
+    if (index !== -1) users[index] = user; else users.push(user);
     db.saveUsers(users);
   },
-  getPosts: (): Post[] => {
-    return parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS);
-  },
+  getPosts: (): Post[] => parseArray<Post>(DB_KEYS.POSTS, MOCK_POSTS),
   savePosts: (posts: Post[]) => localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(posts)),
-  addPost: (post: Post) => {
-    const posts = db.getPosts();
-    db.savePosts([post, ...posts]);
-  },
-  likePost: (postId: string) => {
-    const posts = db.getPosts();
-    db.savePosts(posts.map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p));
-  },
-  addComment: (postId: string, comment: any) => {
-    const posts = db.getPosts();
-    db.savePosts(posts.map(p => p.id === postId ? { ...p, comments: [...(p.comments || []), comment], commentsCount: (p.commentsCount || 0) + 1 } : p));
-  },
+  addPost: (post: Post) => db.savePosts([post, ...db.getPosts()]),
+  likePost: (postId: string) => db.savePosts(db.getPosts().map(p => p.id === postId ? { ...p, likes: p.likes + 1 } : p)),
+  addComment: (postId: string, comment: any) => db.savePosts(db.getPosts().map(p => p.id === postId ? { ...p, comments: [...(p.comments || []), comment], commentsCount: (p.commentsCount || 0) + 1 } : p)),
   toggleBookmark: (postId: string) => {
     const bookmarks = parseArray<string>(DB_KEYS.BOOKMARKS, []);
     const idx = bookmarks.indexOf(postId);
@@ -245,25 +64,8 @@ export const db = {
     return bookmarks;
   },
   getBookmarks: (): string[] => parseArray<string>(DB_KEYS.BOOKMARKS, []),
-  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, MOCK_RESOURCES),
-  saveResource: (resource: Resource) => {
-    const current = db.getResources();
-    const updated = [resource, ...current];
-    localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify(updated));
-    
-    // Auto-generate notification for all nodes in the registry
-    const notif: MakNotification = {
-      id: `n-res-${Date.now()}`,
-      type: 'system',
-      title: 'Vault Asset Logged',
-      description: `${resource.author} committed "${resource.title}" to the ${resource.college} vault Wing.`,
-      timestamp: 'Just now',
-      isRead: false,
-      meta: { hash: 'VLT_SYNC', reason: 'Shared Asset' }
-    };
-    const notifications = db.getNotifications();
-    db.saveNotifications([notif, ...notifications]);
-  },
+  getResources: (): Resource[] => parseArray<Resource>(DB_KEYS.RESOURCES, []),
+  saveResource: (resource: Resource) => localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([resource, ...db.getResources()])),
   getCalendarEvents: (): CalendarEvent[] => parseArray<CalendarEvent>(DB_KEYS.CALENDAR, []),
   saveCalendarEvent: (event: CalendarEvent) => localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...db.getCalendarEvents()])),
   registerForEvent: (eventId: string, userId: string) => {
@@ -271,11 +73,11 @@ export const db = {
     const updated = events.map(ev => ev.id === eventId ? { ...ev, attendeeIds: Array.from(new Set([...(ev.attendeeIds || []), userId])) } : ev);
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
-  getEmails: (): PlatformEmail[] => parseArray<PlatformEmail>(DB_KEYS.EMAILS, MOCK_EMAILS),
+  getEmails: (): PlatformEmail[] => parseArray<PlatformEmail>(DB_KEYS.EMAILS, []),
   saveEmails: (emails: PlatformEmail[]) => localStorage.setItem(DB_KEYS.EMAILS, JSON.stringify(emails)),
   getChats: (): ChatConversation[] => parseArray<ChatConversation>(DB_KEYS.CHATS, MOCK_CHATS),
   saveChats: (chats: ChatConversation[]) => localStorage.setItem(DB_KEYS.CHATS, JSON.stringify(chats)),
-  getNotifications: (): MakNotification[] => parseArray<MakNotification>(DB_KEYS.NOTIFICATIONS, MOCK_NOTIFICATIONS),
+  getNotifications: (): MakNotification[] => parseArray<MakNotification>(DB_KEYS.NOTIFICATIONS, []),
   saveNotifications: (notifications: MakNotification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifications)),
   deletePost: (id: string) => db.savePosts(db.getPosts().filter(p => p.id !== id)),
   getEvents: (): LiveEvent[] => parseArray<LiveEvent>(DB_KEYS.EVENTS, []),

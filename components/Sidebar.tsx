@@ -4,7 +4,7 @@ import { AppView } from '../types';
 import { 
   Home, Search, MessageSquare, User as UserIcon, Calendar, 
   BookOpen, Bell, Settings, LogOut, 
-  Briefcase, Cpu, LayoutPanelTop, Mail, LayoutDashboard
+  Briefcase, Cpu, LayoutPanelTop, Mail
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,15 +35,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
   return (
     <aside className={`fixed inset-y-0 left-0 z-[2001] w-64 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col transition-transform duration-300 lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        {/* LOGO CONTAINER - Fixed for blending */}
-        <div className="px-6 py-10 flex items-center justify-center">
+        {/* LOGO CONTAINER - Optimized for perfect blending */}
+        <div className="px-6 py-10 flex items-center justify-center bg-transparent">
           <div 
-            className="cursor-pointer w-full flex justify-center group" 
+            className="cursor-pointer w-full flex justify-center group outline-none" 
             onClick={() => setView('home')}
           >
             <img 
               src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
-              className="w-full h-auto max-h-16 object-contain filter dark:brightness-100 brightness-90 transition-all group-hover:scale-[1.02] group-active:scale-95" 
+              className="w-full h-auto max-h-16 object-contain filter dark:brightness-100 brightness-95 transition-all group-hover:scale-[1.01] group-active:scale-98" 
+              style={{ boxShadow: 'none' }}
               alt="MakSocial Logo" 
             />
           </div>

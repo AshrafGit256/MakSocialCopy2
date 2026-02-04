@@ -4,9 +4,9 @@ import { db } from '../db';
 import { MakNotification } from '../types';
 import { 
   Bell, Star, UserPlus, Zap, Clock, ShieldCheck, 
-  Trash2, CheckCircle2, Terminal, Filter, MoreHorizontal,
-  ChevronRight, Circle, Activity, Database, Hash,
-  Mail, FileText, Briefcase, ExternalLink, Calendar
+  Trash2, CheckCircle2, Terminal, Filter,
+  Circle, Activity, Database, Hash,
+  Mail, FileText, ExternalLink, Calendar
 } from 'lucide-react';
 
 const Notifications: React.FC = () => {
@@ -42,7 +42,7 @@ const Notifications: React.FC = () => {
   const getIcon = (type: MakNotification['type']) => {
     switch (type) {
       case 'skill_match': return <Zap size={16} className="text-amber-500" />;
-      case 'engagement': return <Star size={16} className="text-indigo-500" />;
+      case 'engagement': return <Star size={16} className="text-[var(--brand-color)]" />;
       case 'follow': return <UserPlus size={16} className="text-emerald-500" />;
       case 'event': return <Calendar size={16} className="text-rose-500" />;
       case 'system': return <ShieldCheck size={16} className="text-slate-400" />;
@@ -56,7 +56,7 @@ const Notifications: React.FC = () => {
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-mono text-[var(--text-primary)]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div className="flex items-center gap-4">
-           <div className="p-4 bg-indigo-600 rounded-md text-white shadow-xl shadow-indigo-600/20">
+           <div className="p-4 bg-[var(--brand-color)] rounded-md text-white shadow-xl shadow-[var(--brand-color)]/20">
               <Bell size={28} />
            </div>
            <div>
@@ -67,7 +67,7 @@ const Notifications: React.FC = () => {
            </div>
         </div>
         <div className="flex gap-2">
-           <button onClick={markAllAsRead} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-indigo-600 transition-all flex items-center gap-2">
+           <button onClick={markAllAsRead} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-[var(--brand-color)] transition-all flex items-center gap-2">
               <CheckCircle2 size={12}/> Mark_All_Synced
            </button>
         </div>
@@ -86,11 +86,11 @@ const Notifications: React.FC = () => {
                key={item.id}
                onClick={() => setFilter(item.id as any)}
                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[11px] font-bold uppercase tracking-wide transition-all ${
-                 filter === item.id ? 'bg-[var(--bg-secondary)] border-l-4 border-indigo-600 text-indigo-600' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'
+                 filter === item.id ? 'bg-[var(--bg-secondary)] border-l-4 border-[var(--brand-color)] text-[var(--brand-color)]' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'
                }`}
              >
                <span className="flex items-center gap-3">{item.icon} {item.label}</span>
-               {item.count !== undefined && <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[8px]">{item.count}</span>}
+               {item.count !== undefined && <span className="bg-[var(--brand-color)] text-white px-2 py-0.5 rounded-full text-[8px]">{item.count}</span>}
              </button>
            ))}
         </aside>
@@ -100,13 +100,13 @@ const Notifications: React.FC = () => {
               <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                  <Terminal size={14}/> Registry_Output / {filter}
               </div>
-              <button className="text-slate-400 hover:text-indigo-600 transition-colors"><Filter size={14}/></button>
+              <button className="text-slate-400 hover:text-[var(--brand-color)] transition-colors"><Filter size={14}/></button>
            </div>
 
            {filteredNotifs.length > 0 ? (
              <div className="divide-y divide-[var(--border-color)]">
                 {filteredNotifs.map(notif => (
-                  <div key={notif.id} className={`group relative p-5 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.isRead ? 'border-l-4 border-indigo-600 bg-indigo-500/5' : ''}`}>
+                  <div key={notif.id} className={`group relative p-5 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.isRead ? 'border-l-4 border-[var(--brand-color)] bg-[var(--brand-color)]/5' : ''}`}>
                     <div className="mt-1 shrink-0 relative">
                        {notif.meta?.nodeAvatar ? (
                          <img src={notif.meta.nodeAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover" />
@@ -115,7 +115,7 @@ const Notifications: React.FC = () => {
                             {getIcon(notif.type)}
                          </div>
                        )}
-                       <div className="absolute -bottom-1 -right-1 bg-white dark:bg-black rounded-full p-0.5 border border-[var(--border-color)]">
+                       <div className="absolute -bottom-1 -right-1 bg-white dark:bg-black rounded-full p-0.5 border border-[var(--border-color)] shadow-sm">
                           {getIcon(notif.type)}
                        </div>
                     </div>
@@ -133,15 +133,14 @@ const Notifications: React.FC = () => {
                           "{notif.description}"
                        </p>
 
-                       {/* Actionable Notification Sections */}
                        <div className="pt-2 flex flex-wrap gap-2">
                           {notif.type === 'follow' && (
-                            <button className="px-4 py-1.5 bg-indigo-600 text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest shadow-lg hover:bg-indigo-700 transition-all flex items-center gap-2 active:scale-95">
+                            <button className="px-4 py-1.5 bg-[var(--brand-color)] text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest shadow-lg hover:brightness-110 transition-all flex items-center gap-2 active:scale-95">
                                <UserPlus size={12}/> Follow Back
                             </button>
                           )}
                           {notif.title.includes('Email') && (
-                            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-indigo-600 transition-all flex items-center gap-2">
+                            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all flex items-center gap-2">
                                <Mail size={12}/> Open Uplink
                             </button>
                           )}
@@ -166,7 +165,7 @@ const Notifications: React.FC = () => {
                           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                              <Clock size={10}/> {notif.timestamp}
                           </span>
-                          <span className="text-[8px] font-black text-indigo-600/60 uppercase tracking-[0.2em]">
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
                              STRATA: {notif.meta?.reason || 'LOGGED'}
                           </span>
                        </div>
@@ -186,9 +185,9 @@ const Notifications: React.FC = () => {
         </main>
       </div>
 
-      <div className="mt-20 p-6 border border-dashed border-indigo-600/30 rounded-md bg-indigo-600/5 flex items-center gap-6">
+      <div className="mt-20 p-6 border border-dashed border-slate-500/30 rounded-md bg-slate-500/5 flex items-center gap-6">
          <div className="p-3 bg-white dark:bg-slate-900 rounded border border-[var(--border-color)]">
-            <Hash size={24} className="text-indigo-600" />
+            <Hash size={24} className="text-slate-500" />
          </div>
          <div className="flex-1">
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Integrity Advisory</p>

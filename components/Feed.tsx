@@ -3,15 +3,12 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment, CalendarEvent } from '../types';
 import { db } from '../db';
 import RichEditor from './Summernote';
-import { GoogleGenAI } from "@google/genai";
 import { 
-  Star, MessageCircle, Zap, Radio, Activity, Globe, 
-  TrendingUp, Terminal, Share2, Bookmark, 
-  BarChart3, MoreHorizontal, BadgeCheck, 
-  Database, ArrowLeft, GitCommit, GitFork, Box, Link as LinkIcon,
-  Video as VideoIcon, Send, MessageSquare, ExternalLink, Calendar, MapPin, Hash,
-  Maximize2, Volume2, Play, Pause, X, LayoutGrid, Image as ImageIcon,
-  ChevronLeft, ChevronRight, ShieldAlert, ShieldCheck, Loader2, CheckCircle2, AlertCircle, ArrowUp
+  Star, MessageCircle, Zap, Activity, Globe, 
+  Terminal, Share2, Bookmark, 
+  BadgeCheck, ArrowLeft, GitCommit,
+  // Added Send to lucide-react imports to fix compilation error on line 168
+  Calendar, MapPin, X, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ArrowUp, Send
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
@@ -141,13 +138,13 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
             <div className="p-6">
                 <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
                 {post.images && post.images.length > 0 && <PostImageGrid images={post.images} />}
-                <div className="flex flex-wrap gap-2 mt-4">{(post.hashtags || []).map(tag => (<span key={tag} className="text-[9px] font-bold text-indigo-500 tracking-wider">#{tag.replace('#', '')}</span>))}</div>
+                <div className="flex flex-wrap gap-2 mt-4">{(post.hashtags || []).map(tag => (<span key={tag} className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-wider">#{tag.replace('#', '')}</span>))}</div>
             </div>
             <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
                 <div className="flex items-center gap-8">
                   <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
-                  <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-indigo-600 transition-all active:scale-110" title="Add to Registry Roadmap"><Calendar size={18} /> <span className="hidden sm:inline uppercase tracking-widest text-[8px]">Sync roadmap</span></button>
+                  <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-[var(--brand-color)] transition-all active:scale-110" title="Add to Registry Roadmap"><Calendar size={18} /> <span className="hidden sm:inline uppercase tracking-widest text-[8px]">Sync roadmap</span></button>
                 </div>
                 <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-slate-500/10 text-slate-500 border border-slate-500/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest"><Terminal size={10}/> SHA_{SHA_GEN().slice(0,6)}</div>
             </div>
@@ -194,12 +191,10 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
       const currentPosts = db.getPosts();
       const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
       
-      // If we already have posts and the new count in DB is higher, notify user
       if (lastKnownPostCount.current > 0 && filteredCurrent.length > lastKnownPostCount.current && !threadId) {
         setNewPostsAvailable(filteredCurrent.length - lastKnownPostCount.current);
       }
       
-      // On initial load or manual refresh, set the feed
       if (lastKnownPostCount.current === 0 || updateTrigger > 0) {
         setPosts(currentPosts);
         lastKnownPostCount.current = filteredCurrent.length;
@@ -211,7 +206,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
     };
 
     sync();
-    // Simulate real-time polling to detect new posts from friends
     const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
   }, [updateTrigger, collegeFilter, threadId]);
@@ -271,7 +265,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
   
   return (
     <div className="max-w-[1440px] mx-auto pb-40 lg:px-12 py-6 bg-[var(--bg-primary)] min-h-screen relative">
-      {/* TOAST SYSTEM */}
       <div className="fixed bottom-10 right-10 z-[7000] flex flex-col gap-4 pointer-events-none">
         {toasts.map(toast => (
           <div key={toast.id} className="pointer-events-auto">
@@ -280,7 +273,6 @@ const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, on
         ))}
       </div>
 
-      {/* NEW POSTS PILL - X STYLE */}
       {!threadId && newPostsAvailable > 0 && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-4 fade-in duration-300">
            <button 

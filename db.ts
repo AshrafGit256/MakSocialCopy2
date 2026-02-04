@@ -19,7 +19,7 @@ const DB_KEYS = {
 const MOCK_RESOURCES: Resource[] = [
   {
     id: 'res-1',
-    title: 'Advanced Computer Architecture - Final Prep',
+    title: 'Advanced Computer Architecture - Final Prep Notes',
     category: 'Notes/Books',
     college: 'COCIS',
     course: 'Computer Science',
@@ -32,7 +32,7 @@ const MOCK_RESOURCES: Resource[] = [
   },
   {
     id: 'res-2',
-    title: 'Structural Mechanics II - Past Paper 2024',
+    title: 'Structural Mechanics II - 2024 Exam Blueprint',
     category: 'Past Paper',
     college: 'CEDAT',
     course: 'Civil Engineering',
@@ -45,7 +45,7 @@ const MOCK_RESOURCES: Resource[] = [
   },
   {
     id: 'res-3',
-    title: 'Constitutional Law - Case Study Registry',
+    title: 'Constitutional Law - Landmark Case Study Registry',
     category: 'Research',
     college: 'LAW',
     course: 'Bachelor of Laws',
@@ -58,7 +58,7 @@ const MOCK_RESOURCES: Resource[] = [
   },
   {
     id: 'res-4',
-    title: 'Microeconomics Theory - Test Blueprint',
+    title: 'Macroeconomics Theory - Mid-Semester Test Paper',
     category: 'Test',
     college: 'COBAMS',
     course: 'Economics',
@@ -71,7 +71,7 @@ const MOCK_RESOURCES: Resource[] = [
   },
   {
     id: 'res-5',
-    title: 'Human Anatomy - Dissection Guide v4',
+    title: 'Human Anatomy - Practical Dissection Guide v4',
     category: 'Notes/Books',
     college: 'CHS',
     course: 'Medicine',
@@ -81,6 +81,45 @@ const MOCK_RESOURCES: Resource[] = [
     downloads: 320,
     fileType: 'PDF',
     timestamp: '20 May 2025'
+  },
+  {
+    id: 'res-6',
+    title: 'Agribusiness Marketing - Field Research Report',
+    category: 'Research',
+    college: 'CAES',
+    course: 'Agriculture',
+    year: 'Masters',
+    author: 'M. Okello',
+    authorRole: 'Graduate',
+    downloads: 45,
+    fileType: 'PDF',
+    timestamp: '22 May 2025'
+  },
+  {
+    id: 'res-7',
+    title: 'Psychology of Learning - Lecture Summary',
+    category: 'Notes/Books',
+    college: 'CHUSS',
+    course: 'Psychology',
+    year: 'Year 2',
+    author: 'Ms. Atwine',
+    authorRole: 'Student Leader',
+    downloads: 112,
+    fileType: 'PDF',
+    timestamp: '24 May 2025'
+  },
+  {
+    id: 'res-8',
+    title: 'Quantum Physics - Supplementary Problems',
+    category: 'Notes/Books',
+    college: 'CONAS',
+    course: 'Physics',
+    year: 'Year 3',
+    author: 'Prof. Katumba',
+    authorRole: 'Academic Council',
+    downloads: 78,
+    fileType: 'PDF',
+    timestamp: '25 May 2025'
   }
 ];
 

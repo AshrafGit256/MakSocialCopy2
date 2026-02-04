@@ -1,6 +1,6 @@
 
 import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage } from './types';
-import { MOCK_POSTS } from './constants';
+import { MOCK_POSTS, MOCK_CHATS } from './constants';
 
 const DB_KEYS = {
   POSTS: 'maksocial_posts_v27',
@@ -15,6 +15,45 @@ const DB_KEYS = {
   EVENTS: 'maksocial_events_v26',
   GROUPS: 'maksocial_groups_v26'
 };
+
+const MOCK_NOTIFICATIONS: MakNotification[] = [
+  {
+    id: 'n1',
+    type: 'skill_match',
+    title: 'Neural Sync Detected',
+    description: 'A node in CEDAT requires your Logic_Strata skills for project "Smart-Grid".',
+    timestamp: '2m ago',
+    isRead: false,
+    meta: { hash: 'A4F2', reason: 'High Compatibility' }
+  },
+  {
+    id: 'n2',
+    type: 'engagement',
+    title: 'Signal Multiplied',
+    description: 'Prof. Barnabas and 12 others starred your "Distributed Systems" manifest.',
+    timestamp: '15m ago',
+    isRead: false,
+    meta: { hash: '7E91' }
+  },
+  {
+    id: 'n3',
+    type: 'system',
+    title: 'Protocol Upgrade v4.2',
+    description: 'Registry integrity scan complete. Your node security status is now: ELITE.',
+    timestamp: '1h ago',
+    isRead: true,
+    meta: { hash: 'SYS1' }
+  },
+  {
+    id: 'n4',
+    type: 'follow',
+    title: 'New Node Link',
+    description: 'Shamim Nambassa initialized a permanent link with your terminal.',
+    timestamp: '2h ago',
+    isRead: true,
+    meta: { hash: 'U882' }
+  }
+];
 
 const MOCK_EMAILS: PlatformEmail[] = [
   // INBOX
@@ -236,9 +275,9 @@ export const db = {
     const emails = db.getEmails();
     db.saveEmails([email, ...emails]);
   },
-  getChats: (): ChatConversation[] => parseArray<ChatConversation>(DB_KEYS.CHATS, []),
+  getChats: (): ChatConversation[] => parseArray<ChatConversation>(DB_KEYS.CHATS, MOCK_CHATS),
   saveChats: (chats: ChatConversation[]) => localStorage.setItem(DB_KEYS.CHATS, JSON.stringify(chats)),
-  getNotifications: (): MakNotification[] => parseArray<MakNotification>(DB_KEYS.NOTIFICATIONS, []),
+  getNotifications: (): MakNotification[] => parseArray<MakNotification>(DB_KEYS.NOTIFICATIONS, MOCK_NOTIFICATIONS),
   saveNotifications: (notifications: MakNotification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifications)),
   deletePost: (id: string) => db.savePosts(db.getPosts().filter(p => p.id !== id)),
   getEvents: (): LiveEvent[] => parseArray<LiveEvent>(DB_KEYS.EVENTS, []),

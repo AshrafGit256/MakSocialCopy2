@@ -38,11 +38,16 @@ const App: React.FC = () => {
   // Manifest Dropdown States
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isMsgOpen, setIsMsgOpen] = useState(false);
+  const [unreadMsgs, setUnreadMsgs] = useState(0);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
+  
   const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isLoggedIn) {
       setCurrentUser(db.getUser());
+      setUnreadMsgs(db.getChats().reduce((acc, c) => acc + c.unreadCount, 0));
+      setUnreadNotifs(db.getNotifications().filter(n => !n.isRead).length);
     }
   }, [isLoggedIn, view]);
 
@@ -194,7 +199,9 @@ const App: React.FC = () => {
                 className={`p-2 transition-colors relative ${isMsgOpen ? 'text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}
               >
                 <MessageCircle size={20} /> 
-                <span className="absolute top-1 right-1 w-4 h-4 bg-[var(--brand-color)] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[var(--bg-primary)]">3</span>
+                {unreadMsgs > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[var(--brand-color)] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[var(--bg-primary)] shadow-sm">{unreadMsgs}</span>
+                )}
               </button>
               {isMsgOpen && <MessageDropdown onClose={() => setIsMsgOpen(false)} onViewAll={() => handleSetView('chats')} />}
             </div>
@@ -205,7 +212,9 @@ const App: React.FC = () => {
                 className={`p-2 transition-colors relative ${isNotifOpen ? 'text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}
               >
                 <Bell size={20} /> 
-                <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full border border-[var(--bg-primary)] animate-pulse"></span>
+                {unreadNotifs > 0 && (
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border border-[var(--bg-primary)] animate-pulse shadow-sm"></span>
+                )}
               </button>
               {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} onViewAll={() => handleSetView('notifications')} />}
             </div>

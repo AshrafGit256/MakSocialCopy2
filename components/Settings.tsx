@@ -30,13 +30,14 @@ const Settings: React.FC = () => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) return JSON.parse(saved);
     
-    // Default to light paper preference
+    // Default to system preference if no saved settings
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return {
-      primaryColor: '#10918a',
-      fontFamily: 'Chirp, sans-serif',
+      primaryColor: '#475569',
+      fontFamily: '"JetBrains Mono", monospace',
       fontSize: 'md',
       borderRadius: '2px',
-      themePreset: 'paper',
+      themePreset: prefersDark ? 'tactical' : 'paper',
       backgroundPattern: 'none'
     };
   });
@@ -55,10 +56,10 @@ const Settings: React.FC = () => {
       root.style.setProperty('--border-color', '#111111');
       document.documentElement.classList.add('dark');
     } else if (settings.themePreset === 'paper') {
-      root.style.setProperty('--bg-primary', '#fffbf0');
-      root.style.setProperty('--bg-secondary', '#f8f3e6');
-      root.style.setProperty('--text-primary', '#1a1a1a');
-      root.style.setProperty('--border-color', '#e8e2d2');
+      root.style.setProperty('--bg-primary', '#ffffff');
+      root.style.setProperty('--bg-secondary', '#f8fafc');
+      root.style.setProperty('--text-primary', '#1e293b');
+      root.style.setProperty('--border-color', '#e2e8f0');
       document.documentElement.classList.remove('dark');
     } else if (settings.themePreset === 'tactical') {
       root.style.setProperty('--bg-primary', '#0d1117');
@@ -76,12 +77,13 @@ const Settings: React.FC = () => {
   }, [settings]);
 
   const handleReset = () => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setSettings({
-      primaryColor: '#10918a',
-      fontFamily: 'Chirp, sans-serif',
+      primaryColor: '#475569',
+      fontFamily: '"JetBrains Mono", monospace',
       fontSize: 'md',
       borderRadius: '2px',
-      themePreset: 'paper',
+      themePreset: prefersDark ? 'tactical' : 'paper',
       backgroundPattern: 'none'
     });
   };
@@ -132,8 +134,8 @@ const Settings: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                    {[
-                     { id: 'paper', label: 'Paper (Standard)', icon: <FileText size={16}/>, desc: 'Clean academic light mode' },
                      { id: 'tactical', label: 'Tactical (Dark)', icon: <Laptop size={16}/>, desc: 'High-contrast dark mode' },
+                     { id: 'paper', label: 'Paper (Light)', icon: <FileText size={16}/>, desc: 'Clean academic light mode' },
                      { id: 'oled', label: 'Deep OLED', icon: <Ghost size={16}/>, desc: 'Pure black energy saver' },
                      { id: 'standard', label: 'Midnight', icon: <Activity size={16}/>, desc: 'Deep blue night mode' }
                    ].map(p => (
@@ -193,7 +195,7 @@ const Settings: React.FC = () => {
                          <button 
                            key={r}
                            onClick={() => setSettings({...settings, borderRadius: r})}
-                           className={`p-6 border transition-all text-center ${settings.borderRadius === r ? 'bg-[var(--brand-color)] border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[var(--brand-color)]'}`}
+                           className={`p-6 border transition-all text-center ${settings.borderRadius === r ? 'bg-[var(--brand-color)] border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-[var(--brand-color)]'}`}
                            style={{ borderRadius: r }}
                          >
                             <span className="text-[11px] font-black uppercase tracking-widest">{r === '0px' ? 'Tactical (0)' : r === '2px' ? 'Standard (2)' : r === '8px' ? 'Modern (8)' : 'Soft (16)'}</span>

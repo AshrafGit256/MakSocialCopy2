@@ -72,10 +72,24 @@ export const MOCK_POSTS: Post[] = [
     author: 'Main Library Node',
     authorId: 'mak_library',
     authorRole: 'Official Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Library',
+    authorAvatar: 'https://static.vecteezy.com/system/resources/thumbnails/004/297/596/small/education-logo-open-book-dictionary-textbook-or-notebook-with-sunrice-icon-modern-emblem-idea-concept-design-for-business-libraries-schools-universities-educational-courses-vector.jpg',
     authorAuthority: 'Official',
     timestamp: '1h ago',
-    content: `<h1>Vault Maintenance Advisory</h1><p>The electronic journal strata will undergo a logic synchronization tonight at 2300hrs. Access to JSTOR and IEEE nodes may experience latency.</p>`,
+    content: `<h1>LIBRARY OPENING HOURS UPDATED</h1>
+              <p>Hello Makerere community,</p>
+              <p>
+              The Main Library will be open from <strong>8:00 AM to 10:00 PM</strong> starting next week, Monday. 
+              This is to support students preparing for coursework, research, and examinations.
+              </p>
+              <p>
+              All students are reminded to carry their <strong>valid student ID</strong> when accessing library services. 
+              Silent study zones must be respected, and group discussions should only take place in designated areas.
+              </p>
+              <p>
+              For assistance, visit the Reference Desk or send us a message right here on MakSocial.
+              </p>
+              <p>Happy studying 📖</p>
+              `,
     hashtags: ['#TheVault', '#ResearchIntegrity'],
     likes: 312,
     commentsCount: 8,
@@ -84,205 +98,435 @@ export const MOCK_POSTS: Post[] = [
     flags: [],
     isOpportunity: false,
     college: 'Global',
-    images: ['https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1200']
+    images: ['https://campusbee.ug/wp-content/uploads/2022/06/FB_IMG_16565179974172233.jpg']
   },
   {
-    id: 'p-unipod-1',
+    id: 'p-unipod-2',
     author: 'Mak UniPod',
     authorId: 'mak_unipod',
     authorRole: 'Innovation Forge',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=UniPod',
+    authorAvatar: 'https://unipod.mak.ac.ug/wp-content/uploads/2024/12/Unipod-Logo-SVG.svg',
     authorAuthority: 'Official',
-    timestamp: '2h ago',
-    content: `<h1>Prototyping Cycle: Alpha Node</h1><p>New 3D printing protocols are now active for all engineering and computing finalists. Visit the Forge to synchronize your blueprints.</p>`,
-    hashtags: ['#UniPod', '#Fabrication'],
-    likes: 560,
-    commentsCount: 14,
+    timestamp: '1h ago',
+    content: `
+      <h1>Open Innovation Call: Prototype & Build</h1>
+
+      <p>
+        Makerere University Innovation Pod (Mak UniPod) invites students from all colleges 
+        to access our <strong>advanced prototyping facilities</strong>, including 3D printing, 
+        electronics labs, and product design support.
+      </p>
+
+      <p>
+        Final-year students, startup teams, and research groups can now submit their project 
+        concepts for <strong>rapid prototyping, mentorship, and technical validation</strong>.
+      </p>
+
+      <p>
+        Visit the UniPod Forge to register your idea or message us here on MakSocial 
+        for guidance on how to get started.
+      </p>
+
+      <p><strong>Build. Test. Innovate.</strong></p>
+    `,
+    hashtags: ['#MakUniPod', '#Innovation', '#Prototyping', '#Startups'],
+    likes: 1240,
+    commentsCount: 36,
     comments: [],
-    views: 8900,
+    views: 15420,
     flags: [],
-    isOpportunity: false,
+    isOpportunity: true,
     college: 'CEDAT',
-    images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200']
-  },
+    images: [
+      'https://www.undp.org/sites/g/files/zskgke326/files/styles/scaled_image_large/public/2024-12/boys_and_girls.jpg?itok=aY8OcUMK',
+      'https://www.undp.org/sites/g/files/zskgke326/files/2024-03/student_on_the_cnc_milling_machine.jpg'
+    ]
+  }
+,
   {
-    id: 'p-guild-1',
-    author: 'Guild Presidential Office',
-    authorId: 'guild_office',
-    authorRole: 'Student Leadership',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guild',
-    authorAuthority: 'Student Leader',
-    timestamp: '3h ago',
-    content: `<h1>Leadership Signal</h1><p>The 89th Guild has successfully negotiated the restoration of student allowance nodes for the upcoming semester. Distribution sync starts Monday.</p>`,
-    hashtags: ['#Guild89', '#StudentWelfare'],
-    likes: 2100,
-    commentsCount: 156,
-    comments: [],
-    views: 32000,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global',
-    images: ['https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&w=1200']
-  },
+  id: 'p-guild-president-1',
+  author: 'Office of the Guild President',
+  authorId: 'guild_president',
+  authorRole: 'Guild President',
+  authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4InWGvYRKGuV-Qi3v4SansxAxWjDUWfdqig&s',
+  authorAuthority: 'Student Leader',
+  timestamp: '45m ago',
+  content: `
+    <h1>Message from the Guild President</h1>
+
+    <p>
+      Dear Makerere students,
+    </p>
+
+    <p>
+      I am pleased to inform you that following continuous engagement with university 
+      management, the Guild leadership has secured a resolution on key student welfare 
+      concerns, including allowances and academic support services.
+    </p>
+
+    <p>
+      Implementation will begin next week, and further updates will be shared through 
+      official university channels and here on MakSocial.
+    </p>
+
+    <p>
+      I encourage all students to remain united, informed, and actively engaged as we 
+      work together to improve the student experience at Makerere University.
+    </p>
+
+    <p><strong>Service Above Self.</strong></p>
+  `,
+  hashtags: ['#GuildLeadership', '#StudentVoice', '#Makerere'],
+  likes: 3450,
+  commentsCount: 284,
+  comments: [],
+  views: 48700,
+  flags: [],
+  isOpportunity: false,
+  college: 'Global',
+  images: [
+    'https://eagle.co.ug/wp-content/uploads/2024/10/image-2024-10-29T151841.969-1024x485.png'
+  ]
+},
+
   {
-    id: 'p-lec-1',
-    author: 'Dr. Julianne O.',
-    authorId: 'u-julianne',
-    authorRole: 'Senior Lecturer',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Julianne',
-    authorAuthority: 'Lecturer',
-    timestamp: '4h ago',
-    content: `<h1>Course Update: CS3102</h1><p>I have committed the final prep notes for Advanced Computer Architecture to the COCIS Vault. Finalists should sync their local nodes immediately.</p>`,
-    hashtags: ['#Architecture', '#FinalsPrep'],
-    likes: 156,
-    commentsCount: 8,
+    id: 'p-stud-x-1',
+    author: 'Brian K.',
+    authorId: 'u-brian',
+    authorRole: 'CS Finalist',
+    authorAvatar: '',
+    timestamp: '20m ago',
+    content: `<p>COCIS Wi-Fi is finally stable tonight. Grinding till morning 💻🔥</p>`,
+    hashtags: ['#FinalYear', '#COCIS'],
+    likes: 34,
+    commentsCount: 2,
     comments: [],
-    views: 1200,
+    views: 420,
     flags: [],
     isOpportunity: false,
     college: 'COCIS',
-    images: ['https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200']
-  },
+    images: []
+  }
+,
   {
-    id: 'p-ad-airtel',
-    author: 'Airtel Uganda',
-    authorId: 'airtel_partner',
-    authorRole: 'Network Partner',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Airtel',
-    authorAuthority: 'Corporate',
-    isAd: true,
-    timestamp: '5h ago',
-    content: `<h1>A Reason to Imagine: University Bundles</h1><p>Switch to the smartphone network. Get un-throttled access to Microsoft Teams and Zoom for your online research modules. Dial *175*3#.</p>`,
-    hashtags: ['#AirtelUniv', '#Imagination'],
-    likes: 3100,
-    commentsCount: 45,
+  id: 'p-lec-general-1',
+  author: 'Dr. Julianne O.',
+  authorId: 'u-julianne',
+  authorRole: 'Senior Lecturer',
+  authorAvatar: 'https://media.licdn.com/dms/image/v2/C5603AQEbfx2r6KmEBQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1528009115211?e=2147483647&v=beta&t=P79glpXCLtisJ5uT6QkGpTtdDBZ1IHYCouww850tWFE',
+  authorAuthority: 'Lecturer',
+  timestamp: '2h ago',
+  content: `
+    <h1>A Note to All Students</h1>
+
+    <p>
+      As the semester approaches its final phase, I encourage all students to 
+      plan their revision schedules early and make good use of the academic 
+      resources available across the university.
+    </p>
+
+    <p>
+      Do not hesitate to consult your lecturers, use the library facilities, 
+      and collaborate responsibly with your peers.
+    </p>
+
+    <p>
+      Consistent effort, healthy rest, and academic integrity remain key to 
+      success.
+    </p>
+
+    <p>
+      Wishing you all the best in your studies.
+    </p>
+
+    <p>
+      <strong>Dr. Julianne O.</strong><br />
+      Senior Lecturer
+    </p>
+  `,
+  hashtags: ['#AcademicAdvice', '#StudySmart', '#Makerere'],
+  likes: 420,
+  commentsCount: 27,
+  comments: [],
+  views: 9800,
+  flags: [],
+  isOpportunity: false,
+  college: 'COCIS',
+  images: []
+}
+,
+  {
+  id: 'p-ad-airtel',
+  author: 'Airtel Uganda',
+  authorId: 'airtel_partner',
+  authorRole: 'Network Partner',
+  authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGb5X14Mj1kTtRIuEZWnqS7dh4vfKGYMgGw&s',
+  authorAuthority: 'Corporate',
+  isAd: true,
+  timestamp: '5h ago',
+  content: `
+    <h1>A Reason to Imagine: University Bundles</h1>
+    <p>
+      Switch to the smartphone network and enjoy unthrottled access to 
+      Microsoft Teams and Zoom for your online research. Dial <strong>*175*3#</strong>.
+    </p>
+  `,
+  hashtags: ['#AirtelUniv', '#Imagination'],
+  likes: 3100,
+  commentsCount: 45,
+  comments: [],
+  views: 65000,
+  flags: [],
+  isOpportunity: false,
+  college: 'Global',
+  images: ['https://pbs.twimg.com/media/GLXZVucWEAAi-rf.jpg']
+}
+,
+  {
+  id: 'p-stud-text-3',
+  author: 'Kato M.',
+  authorId: 'u-kato',
+  authorRole: 'Software Engineering Student',
+  authorAvatar: 'https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg',
+  timestamp: '8m ago',
+  content: `<p>Why does motivation always show up at 2:17 AM when the deadline is at 8:00 AM 😭💻</p>`,
+  hashtags: ['#StudentLife', '#Deadlines'],
+  likes: 143,
+  commentsCount: 19,
+  comments: [],
+  views: 1200,
+  flags: [],
+  isOpportunity: false,
+  college: 'COCIS',
+  images: []
+}
+,
+  {
+  id: 'p-law-1',
+  author: 'Counsel Peter',
+  authorId: 'u-peter',
+  authorRole: 'Legal Advisor',
+  authorAvatar: 'https://img.freepik.com/premium-photo/portrait-handsome-african-american-man-closeup-business-man-model_423170-2131.jpg',
+  authorAuthority: 'Official',
+  timestamp: '7h ago',
+  content: `
+    <h1>Free Legal Clinic for First-Year Students</h1>
+    <p>
+      The Legal Clinic is offering free legal guidance to all first-year students 
+      on matters related to the Guild Constitution and student rights.
+    </p>
+    <p>
+      Visit the LAW Wing, Room 4B, for assistance.
+    </p>
+  `,
+  hashtags: ['#LegalClinic', '#StudentRights'],
+  likes: 412,
+  commentsCount: 25,
+  comments: [],
+  views: 3400,
+  flags: [],
+  isOpportunity: false,
+  college: 'LAW',
+  images: ['https://campusbee.ug/wp-content/uploads/2024/06/20240619_170258.jpg']
+}
+,
+  {
+  id: 'p-ad-stanbic',
+  author: 'Stanbic Bank',
+  authorId: 'stanbic_partner',
+  authorRole: 'Finance Node',
+  authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTn0s2wWh35UqBmtsFx7GsnO0XMDYuTWTapnQ&s',
+  authorAuthority: 'Corporate',
+  isAd: true,
+  timestamp: '8h ago',
+  content: `
+    <h1>Flexi-Pay: Pay Tuition Easily</h1>
+    <p>
+      Settle your university fees instantly from your wing. Flexi-Pay is now fully synced 
+      with the Makerere Central Finance Hub.
+    </p>
+  `,
+  hashtags: ['#EasyBanking', '#MakerereFlex'],
+  likes: 1520,
+  commentsCount: 15,
+  comments: [],
+  views: 43000,
+  flags: [],
+  isOpportunity: false,
+  college: 'Global',
+  images: ['https://www.independent.co.ug/wp-content/uploads/2025/06/Mellisa-Nyakwera-Solomon-Kimera.jpg']
+}
+,
+ 
+  {
+    id: 'p-grc-cedat-2',
+    author: 'Nambasa S.',
+    authorId: 'u-mugisha',
+    authorRole: 'GRC CEDAT',
+    authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKVJA7A0yJBC5n42YzAU2GSUpUo46FdbUpBA&s',
+    authorAuthority: 'Student Leader',
+    timestamp: '20m ago',
+    content: `
+      <h1>CEDAT Wi-Fi Upgrade Completed</h1>
+      <p>
+        The GRC has successfully upgraded the CEDAT common room Wi-Fi. 
+        Students can now enjoy faster and more stable internet for research, projects, and online classes.
+      </p>
+      <p>
+        Please report any connectivity issues to the GRC office so we can address them promptly.
+      </p>
+    `,
+    hashtags: ['#CEDATLife', '#TechAccess', '#GRCUpdates'],
+    likes: 310,
+    commentsCount: 18,
     comments: [],
-    views: 65000,
+    views: 5400,
     flags: [],
     isOpportunity: false,
     college: 'Global',
-    images: ['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200']
-  },
+    images: []
+  }
+
+,
   {
-    id: 'p-sec-1',
-    author: 'Security Registry',
-    authorId: 'mak_security',
-    authorRole: 'Official Channel',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Security',
+  id: 'p-chs-1',
+  author: 'Dr. Nalule',
+  authorId: 'u-nalule',
+  authorRole: 'Medical Lead',
+  authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nalule',
+  authorAuthority: 'Official',
+  timestamp: '9h ago',
+  content: `
+    <h1>Health Alert: Flu Cases in CHS Wing</h1>
+    <p>
+      Several flu cases have been reported in the CHS wing. Students are advised to 
+      take precautions and update their wellness status at the university clinic.
+    </p>
+    <p>
+      Free medical checks are available for all students—stay safe! 🩺
+    </p>
+  `,
+  hashtags: ['#HealthFirst', '#CampusWellness'],
+  likes: 570,
+  commentsCount: 16,
+  comments: [],
+  views: 9100,
+  flags: [],
+  isOpportunity: false,
+  college: 'CHS',
+  images: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSak_CcF8BjBbrszumAnLw34llp_XBI3f1xIA&s']
+}
+
+,
+  {
+  id: 'p-opp-2',
+  author: 'Ministry of Science & Technology',
+  authorId: 'moest_node',
+  authorRole: 'Grant Provider',
+  authorAvatar: 'https://media.licdn.com/dms/image/v2/C4D0BAQFCumMNaeQgew/company-logo_200_200/company-logo_200_200/0/1654524971607?e=2147483647&v=beta&t=FRkh-Xcwy1a2toQtR5d22fwImh8R_a_o2tcHeFafs6M',
+  authorAuthority: 'Official',
+  timestamp: '10h ago',
+  isOpportunity: true,
+  opportunityData: {
+    type: 'Grant',
+    isAIVerified: true,
+    detectedBenefit: 'UGX 10M Fund'
+  },
+  content: `
+    <h1>Makerere Innovation Grant: Sustainable Solutions</h1>
+    <p>
+      The Ministry of Science & Technology is offering a UGX 10M grant for student projects 
+      focused on sustainable and eco-friendly innovations on campus. Projects can include solar labs, 
+      energy efficiency, or green campus designs.
+    </p>
+    <p>
+      Open to finalists from <strong>CEDAT</strong> and <strong>COCIS</strong>. Submit your proposals 
+      via the MakSocial Opportunities section before the deadline.
+    </p>
+    <p>
+      Bring your ideas to life and make a lasting impact! 🌱
+    </p>
+  `,
+  hashtags: ['#Sustainability', '#StudentGrants', '#MakerereInnovation'],
+  likes: 980,
+  commentsCount: 48,
+  comments: [],
+  views: 20000,
+  flags: [],
+  college: 'Global',
+  images: ['https://www.independent.co.ug/wp-content/uploads/2022/10/Musenero-science-1.jpg']
+}
+
+,
+  {
+    id: 'p-opp-hackathon-1',
+    author: 'MIIC HUB',
+    authorId: 'techhub_node',
+    authorRole: 'Innovation Hub',
+    authorAvatar: 'https://miichub.com/wp-content/uploads/2025/04/OFFICIAL-MIIC-LOGO-PDF.png',
     authorAuthority: 'Official',
-    timestamp: '6h ago',
-    content: `<p>Registry Advisory: All students must update their digital identity IDs before the physical blackout at 2200hrs. Patrol nodes are active.</p>`,
-    hashtags: ['#CampusSafety', '#Notice'],
-    likes: 890,
-    commentsCount: 32,
-    comments: [],
-    views: 22000,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global',
-    images: ['https://images.unsplash.com/photo-1557597774-9d2739f85a76?auto=format&fit=crop&w=1200']
-  },
-  {
-    id: 'p-law-1',
-    author: 'Counsel Peter',
-    authorId: 'u-peter',
-    authorRole: 'Legal Advisor',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Peter',
-    authorAuthority: 'Official',
-    timestamp: '7h ago',
-    content: `<h1>Legal Clinic Strata</h1><p>Providing free legal advice nodes to all first-year students regarding guild constitution violations. Visit the LAW wing room 4B.</p>`,
-    hashtags: ['#LegalTech', '#Justice'],
-    likes: 412,
-    commentsCount: 25,
-    comments: [],
-    views: 3400,
-    flags: [],
-    isOpportunity: false,
-    college: 'LAW',
-    images: ['https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200']
-  },
-  {
-    id: 'p-ad-stanbic',
-    author: 'Stanbic Bank',
-    authorId: 'stanbic_partner',
-    authorRole: 'Finance Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Stanbic',
-    authorAuthority: 'Corporate',
-    isAd: true,
-    timestamp: '8h ago',
-    content: `<h1>Flexi-Pay: Seamless Tuition</h1><p>Settle your university dues without leaving your wing. Flexi-Pay is now synchronized with the Makerere Central Finance Hub.</p>`,
-    hashtags: ['#EasyBanking', '#MakerereFlex'],
-    likes: 1500,
-    commentsCount: 12,
-    comments: [],
-    views: 42000,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global',
-    images: ['https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1200']
-  },
-  {
-    id: 'p-chs-1',
-    author: 'Dr. Nalule',
-    authorId: 'u-nalule',
-    authorRole: 'Medical Lead',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nalule',
-    authorAuthority: 'Official',
-    timestamp: '9h ago',
-    content: `<h1>Health Alert: Resilience Sync</h1><p>Flu nodes detected in the CHS wing. Ensure your wellness telemetry is updated. Free medical checks at the university clinic.</p>`,
-    hashtags: ['#HealthFirst', '#MakerereWellness'],
-    likes: 560,
-    commentsCount: 14,
-    comments: [],
-    views: 8900,
-    flags: [],
-    isOpportunity: false,
-    college: 'CHS',
-    images: ['https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=1200']
-  },
-  {
-    id: 'p-opp-2',
-    author: 'World Bank Node',
-    authorId: 'wb_node',
-    authorRole: 'Grant Provider',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=WorldBank',
-    authorAuthority: 'Official',
-    timestamp: '10h ago',
+    timestamp: '12m ago',
     isOpportunity: true,
     opportunityData: {
       type: 'Grant',
       isAIVerified: true,
-      detectedBenefit: 'UGX 15M Fund'
+      detectedBenefit: 'Cash Prizes + Mentorship'
     },
-    content: `<h1>Research Grant: Sustainable Hill Architecture</h1><p>We are seeking innovative logic proposals for solar-powered student labs. Open to CEDAT and COCIS finalists.</p>`,
-    hashtags: ['#Sustainability', '#GrantAccess'],
-    likes: 950,
-    commentsCount: 42,
+    content: `
+      <h1>🚀 Makerere Hackathon 2026 is Here!</h1>
+      <p>
+        Are you ready to code, innovate, and compete? Join the <strong>Makerere Hackathon 2026</strong> 
+        and showcase your tech skills! Open to all students across Makerere University.
+      </p>
+      <p>
+        <strong>🗓 Application Deadline:</strong> 20th February 2026<br>
+        <strong>💡 Prizes:</strong> Cash rewards, mentorship, and internship opportunities.
+      </p>
+      <p>
+        Don’t wait! Submit your team projects through the MakSocial Opportunities section now and get ready 
+        to hack your way to the top! 🔥
+      </p>
+    `,
+    hashtags: ['#MakerereHackathon', '#InnovationChallenge', '#TechAtMakerere'],
+    likes: 720,
+    commentsCount: 35,
     comments: [],
-    views: 18000,
+    views: 12500,
     flags: [],
     college: 'Global',
-    images: ['https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&w=1200']
-  },
+    images: ['https://miichub.com/wp-content/uploads/2025/07/IMG_8155-1024x683.jpg']
+  }
+
+,
   {
     id: 'p-news-1',
-    author: 'Mak Pulse News',
+    author: 'Makerere University News',
     authorId: 'pulse_news',
     authorRole: 'Media Wing',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Pulse',
+    authorAvatar: 'https://media.istockphoto.com/id/929047972/vector/world-news-flat-vector-icon-news-symbol-logo-illustration-business-concept-simple-flat.jpg?s=612x612&w=0&k=20&c=5jpcJ7xejjFa2qKCzeOXKJGeUl7KZi9qoojZj1Kq_po=',
     authorAuthority: 'Official',
     timestamp: '11h ago',
-    content: `<h1>Breaking: Examination Blockout</h1><p>The University Council has officially authorized the examination dates. Logic testing begins on 12th December for all colleges.</p>`,
-    hashtags: ['#ExamSeason', '#MakerereNews'],
-    likes: 2100,
-    commentsCount: 450,
+    content: `
+      <h1>⚡ Exam Dates Official!</h1>
+      <p>
+        Makerere students, mark your calendars! The University Council has confirmed the exam schedule. 
+        <strong>Logic testing kicks off on 12th December 2026</strong> across all colleges.
+      </p>
+      <p>
+        Start revising, organize your study groups, and get ready to ace your exams! 💪📚
+      </p>
+    `,
+    hashtags: ['#ExamSeason', '#MakerereNews', '#StudySmart', '#CampusUpdate'],
+    likes: 2500,
+    commentsCount: 520,
     comments: [],
-    views: 48000,
+    views: 55000,
     flags: [],
     isOpportunity: false,
     college: 'Global',
     images: ['https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200']
-  },
+  }
+,
   {
     id: 'p-stud-1',
     author: 'Ninfa Monaldo',
@@ -339,25 +583,43 @@ export const MOCK_POSTS: Post[] = [
     images: ['https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200']
   },
   {
-    id: 'p-ad-vivo',
-    author: 'Vivo Energy',
-    authorId: 'vivo_partner',
-    authorRole: 'Energy Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Vivo',
-    authorAuthority: 'Corporate',
-    isAd: true,
-    timestamp: '15h ago',
-    content: `<h1>Shell FuelSave: The Hill Mobility</h1><p>Keeping the university transport nodes synchronized. Get your Shell Card today for subsidized fuel strata.</p>`,
-    hashtags: ['#ShellFuelSave', '#LogisticsSync'],
-    likes: 450,
-    commentsCount: 5,
-    comments: [],
-    views: 12000,
-    flags: [],
-    isOpportunity: false,
-    college: 'Global',
-    images: ['https://images.unsplash.com/photo-1620288627223-53302f4e8c74?auto=format&fit=crop&w=1200']
+  id: 'p-opp-totalenergies',
+  author: 'Total Energies Uganda',
+  authorId: 'totalenergies_node',
+  authorRole: 'Corporate Partner',
+  authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=TotalEnergies',
+  authorAuthority: 'Official',
+  timestamp: '30m ago',
+  isOpportunity: true,
+  opportunityData: {
+    type: 'Internship',
+    isAIVerified: true,
+    detectedBenefit: 'Stipend + Mentorship'
   },
+  content: `
+    <h1>💼 Total Energies Student Internship 2026</h1>
+    <p>
+      Total Energies Uganda is inviting students from all colleges at Makerere to apply for our 
+      3-month internship program. Gain hands-on experience, mentorship, and a monthly stipend.
+    </p>
+    <p>
+      <strong>🗓 Application Deadline:</strong> 28th February 2026<br>
+      <strong>Who Can Apply:</strong> All undergraduate finalists across Makerere University.
+    </p>
+    <p>
+      Don’t miss this chance to learn from industry leaders and jumpstart your career! Apply via MakSocial Opportunities. 🌟
+    </p>
+  `,
+  hashtags: ['#TotalEnergiesInternship', '#MakerereCareers', '#StudentOpportunities'],
+  likes: 640,
+  commentsCount: 22,
+  comments: [],
+  views: 10800,
+  flags: [],
+  college: 'Global',
+  images: ['https://images.unsplash.com/photo-1581092334762-d7a1e1c0f3b2?auto=format&fit=crop&w=1200']
+}
+,
   {
     id: 'p-cees-1',
     author: 'Dr. Mukasa',
@@ -379,43 +641,61 @@ export const MOCK_POSTS: Post[] = [
   },
   {
     id: 'p-hospital-1',
-    author: 'Mak Hospital Node',
-    authorId: 'mak_hospital',
+    author: 'University Hospital',
+    authorId: 'university_hospital',
     authorRole: 'Health Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Hospital',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=UniversityHospital',
     authorAuthority: 'Official',
     timestamp: '17h ago',
-    content: `<p>Identity Registry: Free vaccinations nodes for all verified students available in the CHS Medical Wing. Synchronize your health status today.</p>`,
-    hashtags: ['#CampusHealth', '#ShieldUp'],
-    likes: 1300,
-    commentsCount: 88,
+    content: `
+      <h1>💉 Free Student Vaccinations</h1>
+      <p>
+        Attention Makerere students! University Hospital is offering <strong>free vaccinations</strong> 
+        for all verified students. Ensure your health status is up to date and stay protected. 
+      </p>
+      <p>
+        Visit the CHS Medical Wing and synchronize your health record today. Your wellness matters! 🌟
+      </p>
+    `,
+    hashtags: ['#CampusHealth', '#StayProtected', '#MakerereWellness'],
+    likes: 1450,
+    commentsCount: 95,
     comments: [],
-    views: 18000,
+    views: 20000,
     flags: [],
     isOpportunity: false,
     college: 'Global',
     images: ['https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200']
-  },
+  }
+,
   {
-    id: 'p-ad-michelin',
-    author: 'Michelin Tires',
-    authorId: 'michelin_partner',
-    authorRole: 'Safety Node',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Michelin',
-    authorAuthority: 'Corporate',
-    isAd: true,
-    timestamp: '18h ago',
-    content: `<h1>Grip The Hill</h1><p>Engineered for the tough Makerere terrains. Ensure your logistics node is fitted with Michelin logic for 100% safety synchronization.</p>`,
-    hashtags: ['#SafetyRegistry', '#HillGrip'],
-    likes: 670,
-    commentsCount: 9,
+    id: 'p-fun-1',
+    author: 'Campus Fun Hub',
+    authorId: 'campus_fun',
+    authorRole: 'Student Entertainment',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FunHub',
+    authorAuthority: 'Official',
+    timestamp: '5m ago',
+    content: `
+      <h1>😂 Campus Mood</h1>
+      <p>
+        Why did the student bring a ladder to the exam? Because they heard the questions were on a higher level! 🪜📚
+      </p>
+      <p>
+        Keep calm, study smart, and maybe leave the ladder at home. 😎
+      </p>
+    `,
+    hashtags: ['#CampusHumor', '#StudentLife', '#ExamSeason'],
+    likes: 320,
+    commentsCount: 12,
     comments: [],
-    views: 15000,
+    views: 1500,
     flags: [],
     isOpportunity: false,
     college: 'Global',
-    images: ['https://images.unsplash.com/photo-1544531585-9847b68c8c86?auto=format&fit=crop&w=1200']
+    images: []
   }
+
 ];
 
 export const MOCK_CHATS: ChatConversation[] = [

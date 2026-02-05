@@ -393,7 +393,7 @@ export const MOCK_POSTS: Post[] = [
   author: 'Dr. Nalule',
   authorId: 'u-nalule',
   authorRole: 'Medical Lead',
-  authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nalule',
+  authorAvatar: 'https://covab.mak.ac.ug/wp-content/uploads/2025/03/Nalule-Agnes-Sarah.jpg',
   authorAuthority: 'Official',
   timestamp: '9h ago',
   content: `
@@ -528,60 +528,32 @@ export const MOCK_POSTS: Post[] = [
   }
 ,
   {
-    id: 'p-stud-1',
-    author: 'Ninfa Monaldo',
-    authorId: 'u-ninfa',
-    authorRole: 'Web Architect',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
-    timestamp: '12h ago',
-    content: `<p>Just finished optimizing the logic strata for my final project. React + Tailwind on the Hill is the ultimate stack. 🚀</p>`,
-    hashtags: ['#WebDev', '#SoftwareProject'],
-    likes: 89,
-    commentsCount: 4,
-    comments: [],
-    views: 800,
-    flags: [],
-    isOpportunity: false,
-    college: 'COCIS',
-    images: ['https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200']
-  },
-  {
-    id: 'p-opio-1',
-    author: 'Opio Derrick',
-    authorId: 'u-opio',
-    authorRole: 'Agri Researcher',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
-    timestamp: '13h ago',
-    content: `<p>Field report from the CAES farm wing: The new irrigation sensors are transmitting perfect telemetry. Precision farming is the future of the Pearl.</p>`,
-    hashtags: ['#AgriTech', '#CAES'],
-    likes: 112,
-    commentsCount: 3,
-    comments: [],
-    views: 1100,
-    flags: [],
-    isOpportunity: false,
-    college: 'CAES',
-    images: ['https://images.unsplash.com/photo-1495107336214-bca9f1d95c18?auto=format&fit=crop&w=1200']
-  },
-  {
-    id: 'p-grc-cedat',
-    author: 'Mugisha P.',
-    authorId: 'u-mugisha',
-    authorRole: 'GRC CEDAT',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mugisha',
-    authorAuthority: 'GRC',
-    timestamp: '14h ago',
-    content: `<p>Resolved: The CEDAT common room will now have a permanent Wi-Fi node powered by the Guild Research budget. Stable uplink for all engineers.</p>`,
-    hashtags: ['#TechAccess', '#CEDATLife'],
-    likes: 620,
-    commentsCount: 15,
-    comments: [],
-    views: 3200,
-    flags: [],
-    isOpportunity: false,
-    college: 'CEDAT',
-    images: ['https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200']
-  },
+  id: 'p-stud-1',
+  author: 'Opio Eric',
+  authorId: 'u-opio',
+  authorRole: 'Computer Science Student',
+  authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
+  timestamp: '12h ago',
+  content: `
+    <p>
+      Just completed the <strong>COCIS Network Bootcamp</strong>! 🚀 Learned so much about routing, switching, and cloud networking. 
+      Feeling ready to tackle real-world networking challenges. 💻🌐
+    </p>
+    <p>
+      Shoutout to the instructors and peers for an amazing hands-on experience. Makerere CS students are leveling up! ⚡
+    </p>
+  `,
+  hashtags: ['#NetworkBootcamp', '#COCIS', '#MakerereCS', '#HandsOnLearning'],
+  likes: 150,
+  commentsCount: 10,
+  comments: [],
+  views: 1200,
+  flags: [],
+  isOpportunity: false,
+  college: 'COCIS',
+  images: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr12vxIIFkHgr9czQdx2-ZpJAQHsTuvVU83A&s']
+}
+,
   {
   id: 'p-opp-totalenergies',
   author: 'Total Energies Uganda',

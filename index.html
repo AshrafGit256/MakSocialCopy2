@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +30,6 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Chirp Font Simulation/Import */
         @font-face {
           font-family: 'Chirp';
           src: url('https://abs.twimg.com/fonts/chirp-regular-web.woff2') format('woff2');
@@ -45,12 +45,12 @@
 
         :root {
           --bg-primary: #ffffff;
-          --bg-secondary: #f9f9f9;
-          --text-primary: #0f1419;
-          --text-secondary: #536471;
-          --border-color: #eff3f4;
+          --bg-secondary: #f8fafc;
+          --text-primary: #0f172a;
+          --text-secondary: #475569;
+          --border-color: #e2e8f0;
           --brand-color: #10918a; 
-          --radius-main: 4px;
+          --radius-main: 2px;
         }
 
         body {
@@ -61,29 +61,33 @@
             letter-spacing: -0.01em;
         }
 
-        /* 20px for Headers */
-        h1, h2, .section-header {
-            font-size: 20px !important;
-            font-weight: 800;
-            line-height: 24px;
-        }
-
-        /* 16px for Posts */
-        .post-content, .post-body, .post-content-markdown p {
-            font-size: 16px !important;
-            line-height: 20px;
-        }
-
-        /* 14px for Replies/Comments */
-        .reply-content, .comment-text, .reply-body {
-            font-size: 14px !important;
-            line-height: 18px;
-        }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        .post-content-markdown a { color: var(--brand-color); text-decoration: none; font-weight: 700; }
-        .post-content-markdown a:hover { text-decoration: underline; }
+        /* Headers rule: 20px */
+        .signal-header, h1, h2 { 
+          font-size: 20px !important; 
+          font-weight: 800; 
+          text-transform: uppercase; 
+          letter-spacing: -0.02em;
+        }
+
+        /* Post Content rule: 16px */
+        .post-content-markdown, .post-body { 
+          font-size: 16px !important; 
+          line-height: 1.5; 
+        }
+
+        /* Replies/Comments rule: 14px */
+        .reply-content, .comment-text { 
+          font-size: 14px !important; 
+          line-height: 1.4; 
+        }
+
+        .post-content-markdown p { margin-bottom: 0.75rem; }
+        .post-content-markdown a { color: var(--brand-color); text-decoration: underline; font-weight: 700; }
+        
+        .post-content-markdown table { border: 1px solid var(--border-color); width: 100%; border-collapse: collapse; }
+        .post-content-markdown td, .post-content-markdown th { border: 1px solid var(--border-color); padding: 8px; text-align: center; }
 
         .ticker-text { font-variant-numeric: tabular-nums; }
     </style>
@@ -100,7 +104,7 @@
 }
 </script>
 </head>
-<body class="bg-white overflow-x-hidden antialiased">
+<body class="bg-[var(--bg-primary)] overflow-x-hidden antialiased">
     <div id="root"></div>
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { AppView, User, College, UserStatus } from './types';
 import Landing from './components/Landing';
@@ -14,6 +15,7 @@ import Resources from './components/Resources';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Gallery from './components/Gallery';
+import EmailHub from './components/EmailHub';
 import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
@@ -62,14 +64,14 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
-  // Enforce White Theme and Brand Color
+  // Apply default styles for light theme and #10918a
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--brand-color', '#10918a');
     root.style.setProperty('--bg-primary', '#ffffff');
-    root.style.setProperty('--bg-secondary', '#f9f9f9');
-    root.style.setProperty('--text-primary', '#0f1419');
-    root.style.setProperty('--border-color', '#eff3f4');
+    root.style.setProperty('--bg-secondary', '#f8fafc');
+    root.style.setProperty('--text-primary', '#0f172a');
+    root.style.setProperty('--border-color', '#e2e8f0');
     document.documentElement.classList.remove('dark');
   }, []);
 
@@ -161,6 +163,7 @@ const App: React.FC = () => {
       case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'chats': return <ChatHub />;
+      case 'email': return <EmailHub />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} onUpdateCurrentUser={(u) => setCurrentUser(u)} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'admin-calendar': return <AdminCalendar />;
@@ -176,7 +179,7 @@ const App: React.FC = () => {
   if (!isLoggedIn && isAuthView) return renderContent();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white text-[var(--text-primary)] font-sans">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
       {isSidebarOpen && <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
       
       <Sidebar 
@@ -199,17 +202,17 @@ const App: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header ref={headerRef} className="sticky top-0 z-[80] bg-white/95 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-3 flex items-center justify-between shadow-none">
+        <header ref={headerRef} className="sticky top-0 z-[80] bg-white/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2 sm:gap-3 overflow-visible">
-            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-slate-100 rounded-full lg:hidden shrink-0"><Menu size={22} /></button>
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden shrink-0"><Menu size={22} /></button>
             <div className="relative">
-              <button onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-slate-50 border border-[var(--border-color)] rounded-full transition-all group max-w-[150px] sm:max-w-none">
+              <button onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)} className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl transition-all group max-w-[150px] sm:max-w-none">
                 <div className="shrink-0 text-[var(--brand-color)]">{activeSector === 'Global' ? <Globe size={16} /> : <LayoutGrid size={16} />}</div>
                 <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[var(--brand-color)] truncate">{activeSector} HUB</span>
                 <ChevronDown size={12} className={`text-slate-500 transition-transform shrink-0 ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSectorDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[var(--border-color)] rounded-2xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
                   <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
                   <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}>{c}</button>))}</div>
                 </div>
@@ -224,7 +227,7 @@ const App: React.FC = () => {
               >
                 <MessageCircle size={18} /> 
                 {unreadMsgs > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[var(--brand-color)] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm">{unreadMsgs}</span>
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm">{unreadMsgs}</span>
                 )}
               </button>
               {isMsgOpen && <MessageDropdown onClose={() => setIsMsgOpen(false)} onViewAll={() => handleSetView('chats')} />}

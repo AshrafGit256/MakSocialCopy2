@@ -64,14 +64,14 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
-  // Apply default styles for light theme and #10918a
+  // Apply default styles for Light Paper theme and #10918a
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--brand-color', '#10918a');
-    root.style.setProperty('--bg-primary', '#ffffff');
-    root.style.setProperty('--bg-secondary', '#f8fafc');
-    root.style.setProperty('--text-primary', '#0f172a');
-    root.style.setProperty('--border-color', '#e2e8f0');
+    root.style.setProperty('--bg-primary', '#fffbf0');
+    root.style.setProperty('--bg-secondary', '#f8f3e6');
+    root.style.setProperty('--text-primary', '#1a1a1a');
+    root.style.setProperty('--border-color', '#e8e2d2');
     document.documentElement.classList.remove('dark');
   }, []);
 
@@ -202,7 +202,7 @@ const App: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header ref={headerRef} className="sticky top-0 z-[80] bg-white/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+        <header ref={headerRef} className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2 sm:gap-3 overflow-visible">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden shrink-0"><Menu size={22} /></button>
             <div className="relative">
@@ -212,9 +212,9 @@ const App: React.FC = () => {
                 <ChevronDown size={12} className={`text-slate-500 transition-transform shrink-0 ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSectorDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
-                  <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
-                  <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}>{c}</button>))}</div>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
+                  <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-[var(--bg-secondary)] text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
+                  <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-[var(--bg-secondary)] text-slate-400'}`}>{c}</button>))}</div>
                 </div>
               )}
             </div>

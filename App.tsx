@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { AppView, User, College, UserStatus, AppSettings } from './types';
+import { AppView, User, College, UserStatus } from './types';
 import Landing from './components/Landing';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -12,7 +12,6 @@ import Admin from './components/Admin';
 import CalendarView from './components/Calendar';
 import AdminCalendar from './components/AdminCalendar';
 import Resources from './components/Resources';
-import SettingsView from './components/Settings';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Gallery from './components/Gallery';
@@ -21,7 +20,7 @@ import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import { db } from './db';
-import { Menu, MessageCircle, Bell, Settings, Sun, Moon, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
+import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -30,7 +29,6 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
   const [activeSector, setActiveSector] = useState<College | 'Global'>('Global');
   const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -66,61 +64,15 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
-  // Unified Appearance and System Theme Detection Logic
+  // Apply default styles for light theme and #10918a
   useEffect(() => {
-    const saved = localStorage.getItem('maksocial_appearance_v3');
-    let settings: AppSettings;
-    
-    if (saved) {
-      settings = JSON.parse(saved);
-    } else {
-      // If no saved settings, detect device preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      settings = {
-        primaryColor: '#475569',
-        fontFamily: '"JetBrains Mono", monospace',
-        fontSize: 'md',
-        borderRadius: '2px',
-        themePreset: prefersDark ? 'tactical' : 'paper',
-        backgroundPattern: 'none'
-      };
-    }
-    
     const root = document.documentElement;
-    root.style.setProperty('--brand-color', settings.primaryColor || '#475569');
-    root.style.setProperty('--font-main', settings.fontFamily);
-    root.style.setProperty('--radius-main', settings.borderRadius);
-    
-    // Apply Preset Specific Variables (Matching Settings.tsx logic)
-    if (settings.themePreset === 'oled') {
-      root.style.setProperty('--bg-primary', '#000000');
-      root.style.setProperty('--bg-secondary', '#0a0a0a');
-      root.style.setProperty('--text-primary', '#ffffff');
-      root.style.setProperty('--border-color', '#111111');
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    } else if (settings.themePreset === 'paper') {
-      root.style.setProperty('--bg-primary', '#ffffff');
-      root.style.setProperty('--bg-secondary', '#f8fafc');
-      root.style.setProperty('--text-primary', '#1e293b');
-      root.style.setProperty('--border-color', '#e2e8f0');
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-    } else if (settings.themePreset === 'tactical') {
-      root.style.setProperty('--bg-primary', '#0d1117');
-      root.style.setProperty('--bg-secondary', '#1e1e2d');
-      root.style.setProperty('--text-primary', '#c9d1d9');
-      root.style.setProperty('--border-color', '#2a2a3a');
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    } else {
-      root.style.setProperty('--bg-primary', '#111827');
-      root.style.setProperty('--bg-secondary', '#1f2937');
-      root.style.setProperty('--text-primary', '#f9fafb');
-      root.style.setProperty('--border-color', '#374151');
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    }
+    root.style.setProperty('--brand-color', '#10918a');
+    root.style.setProperty('--bg-primary', '#ffffff');
+    root.style.setProperty('--bg-secondary', '#f8fafc');
+    root.style.setProperty('--text-primary', '#0f172a');
+    root.style.setProperty('--border-color', '#e2e8f0');
+    document.documentElement.classList.remove('dark');
   }, []);
 
   useEffect(() => {
@@ -134,36 +86,6 @@ const App: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const toggleTheme = () => {
-    const newThemeDark = !isDark;
-    setIsDark(newThemeDark);
-    const root = document.documentElement;
-    
-    // Quick toggle between paper (light) and tactical (dark)
-    const preset = newThemeDark ? 'tactical' : 'paper';
-    
-    if (newThemeDark) {
-      document.documentElement.classList.add('dark');
-      root.style.setProperty('--bg-primary', '#0d1117');
-      root.style.setProperty('--bg-secondary', '#1e1e2d');
-      root.style.setProperty('--text-primary', '#c9d1d9');
-      root.style.setProperty('--border-color', '#2a2a3a');
-    } else {
-      document.documentElement.classList.remove('dark');
-      root.style.setProperty('--bg-primary', '#ffffff');
-      root.style.setProperty('--bg-secondary', '#f8fafc');
-      root.style.setProperty('--text-primary', '#1e293b');
-      root.style.setProperty('--border-color', '#e2e8f0');
-    }
-    
-    const saved = localStorage.getItem('maksocial_appearance_v3');
-    if (saved) {
-      const settings = JSON.parse(saved);
-      settings.themePreset = preset;
-      localStorage.setItem('maksocial_appearance_v3', JSON.stringify(settings));
-    }
-  };
 
   const handleLogin = (email: string) => {
     const users = db.getUsers();
@@ -246,7 +168,6 @@ const App: React.FC = () => {
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'admin-calendar': return <AdminCalendar />;
       case 'resources': return <Resources />;
-      case 'settings': return <SettingsView />;
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
       case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
@@ -259,7 +180,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
-      {isSidebarOpen && <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
+      {isSidebarOpen && <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
       
       <Sidebar 
         activeView={view} 
@@ -281,7 +202,7 @@ const App: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header ref={headerRef} className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+        <header ref={headerRef} className="sticky top-0 z-[80] bg-white/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2 sm:gap-3 overflow-visible">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden shrink-0"><Menu size={22} /></button>
             <div className="relative">
@@ -291,16 +212,14 @@ const App: React.FC = () => {
                 <ChevronDown size={12} className={`text-slate-500 transition-transform shrink-0 ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSectorDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
-                  <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-white/5 text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
-                  <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-white/5 text-slate-400'}`}>{c}</button>))}</div>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
+                  <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
+                  <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}>{c}</button>))}</div>
                 </div>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative ml-2">
-            <button onClick={toggleTheme} className="p-2 text-slate-500 hover:text-[var(--text-primary)] transition-colors shrink-0">{isDark ? <Sun size={18} /> : <Moon size={18} />}</button>
-            
             <div className="relative shrink-0">
               <button 
                 onClick={() => { setIsMsgOpen(!isMsgOpen); setIsNotifOpen(false); }} 
@@ -308,7 +227,7 @@ const App: React.FC = () => {
               >
                 <MessageCircle size={18} /> 
                 {unreadMsgs > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[var(--brand-color)] text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[var(--bg-primary)] shadow-sm">{unreadMsgs}</span>
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm">{unreadMsgs}</span>
                 )}
               </button>
               {isMsgOpen && <MessageDropdown onClose={() => setIsMsgOpen(false)} onViewAll={() => handleSetView('chats')} />}
@@ -321,7 +240,7 @@ const App: React.FC = () => {
               >
                 <Bell size={18} /> 
                 {unreadNotifs > 0 && (
-                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border border-[var(--brand-color)] animate-pulse shadow-sm"></span>
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse shadow-sm"></span>
                 )}
               </button>
               {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} onViewAll={() => handleSetView('notifications')} />}

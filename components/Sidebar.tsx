@@ -3,7 +3,7 @@ import React from 'react';
 import { AppView } from '../types';
 import { 
   Home, Search, MessageSquare, User as UserIcon, Calendar, 
-  BookOpen, Bell, Settings, LogOut, 
+  BookOpen, Bell, LogOut, 
   Briefcase, Cpu, LayoutPanelTop, Mail
 } from 'lucide-react';
 
@@ -28,7 +28,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     { id: 'search-widget', label: 'Search', icon: <Search size={20} /> },
     { id: 'opportunities', label: 'Opportunities', icon: <Briefcase size={20} /> },
     { id: 'notifications', label: 'Signals', icon: <Bell size={20} /> },
-    { id: 'settings', label: 'UI Config', icon: <Settings size={20} /> },
     { id: 'profile', label: 'Profile', icon: <UserIcon size={20} /> },
   ];
 
@@ -43,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           >
             <img 
               src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
-              className="w-full h-auto max-h-16 object-contain filter dark:brightness-100 brightness-95 transition-all group-hover:scale-[1.01] group-active:scale-98" 
+              className="w-full h-auto max-h-16 object-contain filter brightness-95 transition-all group-hover:scale-[1.01] group-active:scale-98" 
               style={{ boxShadow: 'none' }}
               alt="MakSocial Logo" 
             />

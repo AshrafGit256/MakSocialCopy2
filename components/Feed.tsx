@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Post, User, College, AuthorityRole, PollData, Comment, CalendarEvent } from '../types';
 import { db } from '../db';
@@ -33,15 +34,15 @@ const Toast: React.FC<{ toast: ToastMsg; onDismiss: (id: string) => void }> = ({
   const c = config[toast.type];
 
   return (
-    <div className={`flex items-start gap-4 p-4 bg-white dark:bg-white/[0.02] border ${c.border} rounded-none shadow-lg min-w-[320px] max-w-[450px] animate-in slide-in-from-right-4 duration-300 font-mono`}>
+    <div className={`flex items-start gap-4 p-4 bg-white border ${c.border} rounded-none shadow-lg min-w-[320px] max-w-[450px] animate-in slide-in-from-right-4 duration-300 font-mono`}>
        <div className="shrink-0 pt-0.5">
           {toast.type === 'error' ? (
-            <div className={`${c.iconBg} rounded-full w-6 h-6 flex items-center justify-center border-2 border-white dark:border-black shadow-sm`}>
+            <div className={`${c.iconBg} rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-sm`}>
                {c.icon}
             </div>
           ) : c.icon}
        </div>
-       <p className="text-[13px] font-black text-slate-600 dark:text-slate-400 leading-tight pr-4">
+       <p className="text-[13px] font-black text-slate-600 leading-tight pr-4">
           {toast.text}
        </p>
        <button onClick={() => onDismiss(toast.id)} className="absolute top-2 right-2 text-slate-300 hover:text-slate-500"><X size={12}/></button>
@@ -116,7 +117,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
   return (
     <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 mb-12' : 'mb-14'}`}>
       <div className="flex">
-          <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 dark:bg-black/10 shrink-0">
+          <div className="w-16 sm:w-20 pt-6 flex flex-col items-center border-r border-[var(--border-color)] bg-slate-50/30 shrink-0">
             <img src={post.authorAvatar} onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-[var(--border-color)] bg-white object-cover cursor-pointer transition-all hover:scale-105" />
             <div className="mt-4 flex flex-col items-center gap-3 flex-1 h-full"><div className="w-px flex-1 bg-gradient-to-b from-[var(--border-color)] via-[var(--border-color)] to-transparent"></div><GitCommit size={14} className="text-slate-300 mb-6" /></div>
           </div>
@@ -124,7 +125,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
             <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }} className="flex flex-col cursor-pointer group/name">
-                    <div className="flex items-center"><span className="text-[14px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight">{post.author}</span><AuthoritySeal role={post.authorAuthority} size={15} /></div>
+                    <div className="flex items-center"><span className="text-[14px] font-black text-slate-800 uppercase tracking-tight">{post.author}</span><AuthoritySeal role={post.authorAuthority} size={15} /></div>
                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-1">{post.authorRole || 'Verified Node'}</span>
                   </div>
                 </div>
@@ -134,11 +135,12 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 </div>
             </div>
             <div className="p-6">
-                <div className="text-[15px] leading-relaxed font-mono text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
+                {/* Headers 20px, Posts 16px handled by global CSS classes post-content-markdown */}
+                <div className="text-[16px] leading-relaxed font-sans text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
                 {post.images && post.images.length > 0 && <PostImageGrid images={post.images} />}
-                <div className="flex flex-wrap gap-2 mt-4">{(post.hashtags || []).map(tag => (<span key={tag} className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-wider">#{tag.replace('#', '')}</span>))}</div>
+                <div className="flex flex-wrap gap-2 mt-4">{(post.hashtags || []).map(tag => (<span key={tag} className="text-[9px] font-bold text-slate-500 tracking-wider">#{tag.replace('#', '')}</span>))}</div>
             </div>
-            <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
+            <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/50">
                 <div className="flex items-center gap-8">
                   <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
@@ -149,14 +151,15 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
           </div>
       </div>
       {isThreadView && (
-        <div className="border-t border-[var(--border-color)] bg-slate-50/20 dark:bg-black/10">
+        <div className="border-t border-[var(--border-color)] bg-slate-50/20">
            <div className="divide-y divide-[var(--border-color)]">
               {post.comments.map((comment) => (
                 <div key={comment.id} className="flex gap-4 p-6 hover:bg-slate-100/30 transition-colors">
                     <img src={comment.authorAvatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" />
                     <div className="flex-1 min-w-0">
-                       <div className="flex items-center justify-between mb-1"><span className="text-[12px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-tight">{comment.author}</span><span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span></div>
-                       <p className="text-[13px] font-medium text-[var(--text-primary)] leading-relaxed">"{comment.text}"</p>
+                       <div className="flex items-center justify-between mb-1"><span className="text-[12px] font-black text-slate-700 uppercase tracking-tight">{comment.author}</span><span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span></div>
+                       {/* Replies rule: 14px */}
+                       <p className="text-[14px] font-medium text-[var(--text-primary)] leading-relaxed comment-text">"{comment.text}"</p>
                     </div>
                 </div>
               ))}

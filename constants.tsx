@@ -621,25 +621,6 @@ export const MOCK_POSTS: Post[] = [
 }
 ,
   {
-    id: 'p-cees-1',
-    author: 'Dr. Mukasa',
-    authorId: 'u-mukasa',
-    authorRole: 'Education Dean',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mukasa',
-    authorAuthority: 'Administrator',
-    timestamp: '16h ago',
-    content: `<h1>Education Strata Expansion</h1><p>We are opening new pedagogical labs for Year 2 nodes. Experience the future of teaching logic in the CEES wing.</p>`,
-    hashtags: ['#CEES', '#TeacherSync'],
-    likes: 245,
-    commentsCount: 18,
-    comments: [],
-    views: 4500,
-    flags: [],
-    isOpportunity: false,
-    college: 'CEES',
-    images: ['https://images.unsplash.com/photo-1544652478-6653e09f18a2?auto=format&fit=crop&w=1200']
-  },
-  {
     id: 'p-hospital-1',
     author: 'University Hospital',
     authorId: 'university_hospital',

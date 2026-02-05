@@ -524,7 +524,7 @@ export const MOCK_POSTS: Post[] = [
     flags: [],
     isOpportunity: false,
     college: 'Global',
-    images: ['https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200']
+    images: ['https://github.com/AshrafGit256/MakSocialImages/blob/main/Public/journalism4.mp4']
   }
 ,
   {
@@ -587,7 +587,7 @@ export const MOCK_POSTS: Post[] = [
   author: 'Total Energies Uganda',
   authorId: 'totalenergies_node',
   authorRole: 'Corporate Partner',
-  authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=TotalEnergies',
+  authorAvatar: 'https://yt3.googleusercontent.com/0X4_rnOYEGy6oz2HKl6tzHANZwe1PrJYzpb6-a8fXSa9SEI2bucq9cs1fODEc4JTl_JzJp2YbQ=s900-c-k-c0x00ffffff-no-rj',
   authorAuthority: 'Official',
   timestamp: '30m ago',
   isOpportunity: true,
@@ -617,7 +617,7 @@ export const MOCK_POSTS: Post[] = [
   views: 10800,
   flags: [],
   college: 'Global',
-  images: ['https://images.unsplash.com/photo-1581092334762-d7a1e1c0f3b2?auto=format&fit=crop&w=1200']
+  images: ['https://www.icanstudent.com/wp-content/uploads/2026/01/Delicate-Feminine-Interior-Designer-Featured-Products-Facebook-Post_20260110_072809_0000-940x675.png']
 }
 ,
   {
@@ -644,7 +644,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'University Hospital',
     authorId: 'university_hospital',
     authorRole: 'Health Hub',
-    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=UniversityHospital',
+    authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHQ7AXGqNl4CNxMtxquN03ZsS7q-EcOlu_7A&s',
     authorAuthority: 'Official',
     timestamp: '17h ago',
     content: `
@@ -665,7 +665,7 @@ export const MOCK_POSTS: Post[] = [
     flags: [],
     isOpportunity: false,
     college: 'Global',
-    images: ['https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200']
+    images: ['https://ugandaradionetwork.net/a/helpers/image.php?fileId=135221&m=0&w=1200&h=600']
   }
 ,
   {
@@ -673,7 +673,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'Campus Fun Hub',
     authorId: 'campus_fun',
     authorRole: 'Student Entertainment',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=FunHub',
+    authorAvatar: 'https://img.freepik.com/premium-vector/fun-playful-logo-using-custom-typography-with-quirky-shapes-bright-colors_1307247-1830.jpg?semt=ais_user_personalization&w=740&q=80',
     authorAuthority: 'Official',
     timestamp: '5m ago',
     content: `

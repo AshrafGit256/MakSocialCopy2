@@ -15,7 +15,7 @@ import Resources from './components/Resources';
 import Opportunities from './components/Opportunities';
 import NotificationsView from './components/Notifications';
 import Gallery from './components/Gallery';
-import EmailHub from './components/EmailHub';
+import Settings from './components/Settings';
 import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
@@ -64,16 +64,59 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
-  // Apply default styles for light theme and #10918a
+  // Load and apply user settings (Dark Theme Support)
   useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty('--brand-color', '#10918a');
-    root.style.setProperty('--bg-primary', '#ffffff');
-    root.style.setProperty('--bg-secondary', '#f8fafc');
-    root.style.setProperty('--text-primary', '#0f172a');
-    root.style.setProperty('--border-color', '#e2e8f0');
-    document.documentElement.classList.remove('dark');
-  }, []);
+    const applyTheme = () => {
+      const saved = localStorage.getItem('maksocial_appearance_v3');
+      const root = document.documentElement;
+      
+      if (saved) {
+        const s = JSON.parse(saved);
+        root.style.setProperty('--brand-color', s.primaryColor);
+        root.style.setProperty('--radius-main', s.borderRadius);
+
+        if (s.themePreset === 'oled') {
+          root.style.setProperty('--bg-primary', '#000000');
+          root.style.setProperty('--bg-secondary', '#0a0a0a');
+          root.style.setProperty('--text-primary', '#ffffff');
+          root.style.setProperty('--border-color', '#111111');
+          document.documentElement.classList.add('dark');
+        } else if (s.themePreset === 'paper') {
+          root.style.setProperty('--bg-primary', '#ffffff');
+          root.style.setProperty('--bg-secondary', '#f8fafc');
+          root.style.setProperty('--text-primary', '#0f172a');
+          root.style.setProperty('--border-color', '#e2e8f0');
+          document.documentElement.classList.remove('dark');
+        } else if (s.themePreset === 'tactical') {
+          root.style.setProperty('--bg-primary', '#0d1117');
+          root.style.setProperty('--bg-secondary', '#1e1e2d');
+          root.style.setProperty('--text-primary', '#c9d1d9');
+          root.style.setProperty('--border-color', '#2a2a3a');
+          document.documentElement.classList.add('dark');
+        } else {
+          // Standard Dark
+          root.style.setProperty('--bg-primary', '#0f172a');
+          root.style.setProperty('--bg-secondary', '#1e293b');
+          root.style.setProperty('--text-primary', '#f9fafb');
+          root.style.setProperty('--border-color', '#334155');
+          document.documentElement.classList.add('dark');
+        }
+      } else {
+        // Default Light Theme
+        root.style.setProperty('--brand-color', '#10918a');
+        root.style.setProperty('--bg-primary', '#ffffff');
+        root.style.setProperty('--bg-secondary', '#f8fafc');
+        root.style.setProperty('--text-primary', '#0f172a');
+        root.style.setProperty('--border-color', '#e2e8f0');
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    applyTheme();
+    // Listen for storage changes if Settings are changed in another tab or the Settings component
+    window.addEventListener('storage', applyTheme);
+    return () => window.removeEventListener('storage', applyTheme);
+  }, [view]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -163,7 +206,6 @@ const App: React.FC = () => {
       case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'chats': return <ChatHub />;
-      case 'email': return <EmailHub />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} onUpdateCurrentUser={(u) => setCurrentUser(u)} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
       case 'admin-calendar': return <AdminCalendar />;
@@ -171,6 +213,7 @@ const App: React.FC = () => {
       case 'opportunities': return <Opportunities />;
       case 'notifications': return <NotificationsView />;
       case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
+      case 'settings': return <Settings />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };
@@ -202,7 +245,7 @@ const App: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header ref={headerRef} className="sticky top-0 z-[80] bg-white/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
+        <header ref={headerRef} className="sticky top-0 z-[80] bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border-color)] px-4 sm:px-6 py-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2 sm:gap-3 overflow-visible">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-full lg:hidden shrink-0"><Menu size={22} /></button>
             <div className="relative">
@@ -212,9 +255,9 @@ const App: React.FC = () => {
                 <ChevronDown size={12} className={`text-slate-500 transition-transform shrink-0 ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSectorDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
-                  <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
-                  <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-50 text-slate-400'}`}>{c}</button>))}</div>
+                <div className="absolute top-full left-0 mt-2 w-64 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl shadow-2xl z-[500] p-3 animate-in slide-in-from-top-2">
+                  <button onClick={() => { setActiveSector('Global'); setIsSectorDropdownOpen(false); setView('home'); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-2 ${activeSector === 'Global' ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-500/10 text-slate-400'}`}><Globe size={16} /> <span className="text-[10px] font-black uppercase">Global Pulse</span></button>
+                  <div className="grid grid-cols-2 gap-1.5">{['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'].map(c => (<button key={c} onClick={() => { setActiveSector(c as College); setIsSectorDropdownOpen(false); setView('home'); }} className={`flex items-center justify-center py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeSector === c ? 'bg-[var(--brand-color)] text-white' : 'hover:bg-slate-500/10 text-slate-400'}`}>{c}</button>))}</div>
                 </div>
               )}
             </div>
@@ -227,7 +270,7 @@ const App: React.FC = () => {
               >
                 <MessageCircle size={18} /> 
                 {unreadMsgs > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm">{unreadMsgs}</span>
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-[var(--bg-primary)] shadow-sm">{unreadMsgs}</span>
                 )}
               </button>
               {isMsgOpen && <MessageDropdown onClose={() => setIsMsgOpen(false)} onViewAll={() => handleSetView('chats')} />}
@@ -240,7 +283,7 @@ const App: React.FC = () => {
               >
                 <Bell size={18} /> 
                 {unreadNotifs > 0 && (
-                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse shadow-sm"></span>
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[var(--bg-primary)] animate-pulse shadow-sm"></span>
                 )}
               </button>
               {isNotifOpen && <NotificationDropdown onClose={() => setIsNotifOpen(false)} onViewAll={() => handleSetView('notifications')} />}

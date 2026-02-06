@@ -74,16 +74,16 @@ const Profile: React.FC<{
   };
 
   if (!user) return (
-    <div className="flex items-center justify-center h-screen font-mono text-slate-400 uppercase tracking-[0.5em] animate-pulse">
+    <div className="flex items-center justify-center h-screen font-sans text-slate-400 uppercase tracking-[0.5em] animate-pulse">
        Target_Node_Nullified
     </div>
   );
 
   return (
-    <div className="max-w-[1440px] mx-auto pb-40 font-mono text-[var(--text-primary)] bg-[var(--bg-primary)]">
-      <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-white/80 dark:bg-black/80 sticky top-0 z-[100] backdrop-blur-md">
+    <div className="max-w-[1440px] mx-auto pb-40 font-sans text-[var(--text-primary)] bg-[var(--bg-primary)]">
+      <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-primary)]/80 sticky top-0 z-[100] backdrop-blur-md">
          <div className="flex items-center gap-6">
-            <button onClick={onNavigateBack} className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded transition-all text-slate-500"><ArrowLeft size={20}/></button>
+            <button onClick={onNavigateBack} className="p-2 hover:bg-[var(--bg-secondary)] rounded transition-all text-slate-500"><ArrowLeft size={20}/></button>
             <div className="flex flex-col">
                <div className="flex items-center gap-1.5">
                   <h2 className="text-[14px] font-black uppercase tracking-tighter leading-none">{user.name.toLowerCase()}</h2>
@@ -104,8 +104,8 @@ const Profile: React.FC<{
           
           <aside className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
-              <div className="relative group overflow-hidden rounded-full aspect-square">
-                <img src={user.avatar} className="w-full h-full rounded-full border border-[var(--border-color)] bg-white object-cover shadow-sm transition-all duration-500" />
+              <div className="relative group overflow-hidden rounded-full aspect-square shadow-sm">
+                <img src={user.avatar} className="w-full h-full rounded-full border border-[var(--border-color)] bg-white object-cover transition-all duration-500" />
                 {isOwnProfile && (
                   <button 
                     onClick={() => fileInputRef.current?.click()}
@@ -117,7 +117,7 @@ const Profile: React.FC<{
                 )}
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleAvatarUpdate} />
                 
-                <div className="absolute -bottom-2 -right-2 p-2 bg-white dark:bg-black rounded-full border border-[var(--border-color)] shadow-xl z-10">
+                <div className="absolute -bottom-2 -right-2 p-2 bg-[var(--bg-primary)] rounded-full border border-[var(--border-color)] shadow-xl z-10">
                    <AuthoritySeal role="Official" size={24} />
                 </div>
               </div>
@@ -196,7 +196,7 @@ const Profile: React.FC<{
               ].map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`pb-4 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all relative whitespace-nowrap ${activeTab === tab.id ? 'text-[var(--text-primary)]' : 'text-slate-400 hover:text-[var(--brand-color)]'}`}>
                   {tab.icon} {tab.label}
-                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${activeTab === tab.id ? 'bg-[var(--brand-color)] text-white' : 'bg-slate-100 dark:bg-white/5 text-slate-500'}`}>{tab.count}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${activeTab === tab.id ? 'bg-[var(--brand-color)] text-white' : 'bg-[var(--bg-secondary)] text-slate-500'}`}>{tab.count}</span>
                   {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--brand-color)] animate-in fade-in zoom-in-x"></div>}
                 </button>
               ))}
@@ -209,7 +209,7 @@ const Profile: React.FC<{
                 </div>
               ) : displayedPosts.length > 0 ? displayedPosts.map(p => (
                 <div key={p.id} className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none overflow-hidden hover:border-[var(--brand-color)] transition-all group">
-                   <div className="px-6 py-3 border-b border-[var(--border-color)] flex items-center justify-between bg-slate-50/50 dark:bg-white/5">
+                   <div className="px-6 py-3 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-primary)]/50">
                       <div className="flex items-center gap-2">
                         <Box size={14} className="text-slate-400" />
                         <span className="text-[11px] font-black uppercase text-slate-600 tracking-widest">COMMIT_{SHA_GEN().slice(0, 4)}</span>
@@ -223,7 +223,7 @@ const Profile: React.FC<{
                       <div dangerouslySetInnerHTML={{ __html: p.content }} className="text-sm font-medium leading-relaxed text-[var(--text-primary)] post-content-markdown" />
                    </div>
 
-                   <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-slate-50/30 dark:bg-black/10">
+                   <div className="px-6 py-3 border-t border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-primary)]/30">
                       <div className="flex items-center gap-8">
                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-[var(--brand-color)] transition-colors cursor-pointer">
                             <Star size={14} /> <span className="ticker-text">{p.likes.toLocaleString()}</span>
@@ -232,11 +232,11 @@ const Profile: React.FC<{
                             <MessageCircle size={14} /> <span className="ticker-text">{p.commentsCount.toLocaleString()}</span>
                          </div>
                       </div>
-                      <span className="text-[8px] font-mono text-slate-300 uppercase tracking-widest">SYNCHRONIZED_STABLE</span>
+                      <span className="text-[8px] font-sans text-slate-300 uppercase tracking-widest">SYNCHRONIZED_STABLE</span>
                    </div>
                 </div>
               )) : (
-                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-none bg-slate-50/50 dark:bg-black/5">
+                <div className="py-32 text-center space-y-6 border border-dashed border-[var(--border-color)] rounded-none bg-[var(--bg-secondary)]">
                    <Database size={48} className="mx-auto text-slate-200" />
                    <div className="space-y-1">
                       <h3 className="text-xl font-black uppercase tracking-tighter">Manifest_Empty</h3>

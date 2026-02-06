@@ -33,8 +33,8 @@ const Settings: React.FC = () => {
     // Default to system preference if no saved settings
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return {
-      primaryColor: '#475569',
-      fontFamily: '"JetBrains Mono", monospace',
+      primaryColor: '#10918a',
+      fontFamily: 'Chirp, sans-serif',
       fontSize: 'md',
       borderRadius: '2px',
       themePreset: prefersDark ? 'tactical' : 'paper',
@@ -58,7 +58,7 @@ const Settings: React.FC = () => {
     } else if (settings.themePreset === 'paper') {
       root.style.setProperty('--bg-primary', '#ffffff');
       root.style.setProperty('--bg-secondary', '#f8fafc');
-      root.style.setProperty('--text-primary', '#1e293b');
+      root.style.setProperty('--text-primary', '#0f172a');
       root.style.setProperty('--border-color', '#e2e8f0');
       document.documentElement.classList.remove('dark');
     } else if (settings.themePreset === 'tactical') {
@@ -79,8 +79,8 @@ const Settings: React.FC = () => {
   const handleReset = () => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setSettings({
-      primaryColor: '#475569',
-      fontFamily: '"JetBrains Mono", monospace',
+      primaryColor: '#10918a',
+      fontFamily: 'Chirp, sans-serif',
       fontSize: 'md',
       borderRadius: '2px',
       themePreset: prefersDark ? 'tactical' : 'paper',
@@ -89,7 +89,7 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 pb-40 text-[var(--text-primary)] font-mono animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 pb-40 text-[var(--text-primary)] font-sans animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div className="flex items-center gap-4">
           <div className="p-3 md:p-4 bg-[var(--brand-color)] rounded-[var(--radius-main)] text-white shadow-xl shadow-[var(--brand-color)]/20">

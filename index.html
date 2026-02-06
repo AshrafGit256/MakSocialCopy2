@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -51,10 +52,11 @@
           --border-color: #e2e8f0;
           --brand-color: #10918a; 
           --radius-main: 2px;
+          --font-main: 'Chirp', sans-serif;
         }
 
         body {
-            font-family: 'Chirp', sans-serif;
+            font-family: var(--font-main);
             background-color: var(--bg-primary);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;

@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage, LostFoundItem } from './types';
 import { MOCK_POSTS, MOCK_CHATS } from './constants';
 
 const DB_KEYS = {
@@ -13,7 +13,8 @@ const DB_KEYS = {
   EMAILS: 'maksocial_emails_v26_prod_v2_mail',
   NOTIFICATIONS: 'maksocial_notifications_v26_signals',
   EVENTS: 'maksocial_events_v26_live',
-  GROUPS: 'maksocial_groups_v26_clusters'
+  GROUPS: 'maksocial_groups_v26_clusters',
+  LOST_FOUND: 'maksocial_lost_found_registry'
 };
 
 const INITIAL_USERS: User[] = [
@@ -93,9 +94,17 @@ export const db = {
   },
   joinGroup: (groupId: string, userId: string) => {
     const groups = db.getGroups();
-    const updated = groups.map(g => g.id === groupId ? { ...g, memberIds: Array.from(new Set([...g.memberIds, userId])) } : g);
+    const updated = groups.map(g => g.id === groupId ? { ...g, memberIds: Array.from(new Set([...(g.memberIds || []), userId])) } : g);
     db.saveGroups(updated);
-  }
+  },
+  getLostFound: (): LostFoundItem[] => parseArray<LostFoundItem>(DB_KEYS.LOST_FOUND, [
+    { id: 'lf1', type: 'Found', title: 'Calculus Workbook', description: 'Found near Main Library. Has some handwritten notes on the first page.', location: 'Main Library Entrance', authorId: 'u-ninfa', authorName: 'Ninfa Monaldo', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa', timestamp: '2h ago', status: 'Open', college: 'Global' },
+    { id: 'lf2', type: 'Lost', title: 'Room Keys', description: 'Bunch of 3 keys with a wooden keychain. Lost between COCIS and Freedom Square.', location: 'COCIS / Freedom Square', authorId: 'u-opio', authorName: 'Opio Eric', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio', timestamp: '5h ago', status: 'Open', college: 'COCIS' }
+  ]),
+  saveLostFound: (items: LostFoundItem[]) => localStorage.setItem(DB_KEYS.LOST_FOUND, JSON.stringify(items)),
+  addLostFound: (item: LostFoundItem) => db.saveLostFound([item, ...db.getLostFound()]),
+  resolveLostFound: (id: string) => db.saveLostFound(db.getLostFound().map(i => i.id === id ? { ...i, status: 'Resolved' } : i)),
+  deleteLostFound: (id: string) => db.saveLostFound(db.getLostFound().filter(i => i.id !== id))
 };
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {

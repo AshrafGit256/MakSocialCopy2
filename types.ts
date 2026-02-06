@@ -1,5 +1,5 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'settings' | 'admin-calendar';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'settings' | 'admin-calendar' | 'lost-found';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
@@ -8,6 +8,21 @@ export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 export type AuthorityRole = 'Lecturer' | 'Administrator' | 'Chairperson' | 'GRC' | 'Student Leader' | 'Super Admin' | 'Graduate' | 'Alumni' | 'Staff' | 'Official' | 'Corporate' | 'Academic Council';
 
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
+
+export interface LostFoundItem {
+  id: string;
+  type: 'Lost' | 'Found';
+  title: string;
+  description: string;
+  location: string;
+  images?: string[];
+  authorId: string;
+  authorName: string;
+  authorAvatar: string;
+  timestamp: string;
+  status: 'Open' | 'Resolved';
+  college: College | 'Global';
+}
 
 export interface EmailAttachment {
   id: string;

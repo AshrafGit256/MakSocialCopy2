@@ -20,6 +20,7 @@ import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import RightSidebar from './components/RightSidebar';
+import LostAndFound from './components/LostAndFound';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
@@ -169,6 +170,7 @@ const App: React.FC = () => {
       case 'notifications': return <NotificationsView />;
       case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'settings': return <Settings />;
+      case 'lost-found': return <LostAndFound onOpenChat={(id) => { setActiveThreadId(id); setView('chats'); }} />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };

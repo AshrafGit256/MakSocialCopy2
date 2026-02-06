@@ -109,7 +109,7 @@ const Opportunities: React.FC = () => {
           <div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-none text-slate-900 uppercase">Student Opportunities</h1>
             <p className="text-[13px] text-slate-500 font-medium mt-1.5 flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {opps.length} jobs and internships currently available
+               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {opps.length} jobs and internships available
             </p>
           </div>
         </div>

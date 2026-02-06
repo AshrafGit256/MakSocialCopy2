@@ -53,7 +53,7 @@ const Notifications: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-mono text-[var(--text-primary)]">
+    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-sans text-[var(--text-primary)]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div className="flex items-center gap-4">
            <div className="p-4 bg-[var(--brand-color)] rounded-md text-white shadow-xl shadow-[var(--brand-color)]/20">

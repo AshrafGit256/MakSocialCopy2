@@ -9,7 +9,8 @@ import {
   Circle,
   Hash,
   ChevronRight,
-  Monitor
+  Monitor,
+  Lock
 } from 'lucide-react';
 
 const COLORS = [
@@ -75,22 +76,32 @@ const Settings: React.FC = () => {
     }
   }, [settings]);
 
+  // handleReset disabled for locked state
   const handleReset = () => {
-    setSettings({
-      primaryColor: '#10918a',
-      fontFamily: 'Chirp, sans-serif',
-      fontSize: 'md',
-      borderRadius: '2px',
-      themePreset: 'paper', // Site-wide default reset is now Paper
-      backgroundPattern: 'none'
-    });
+    console.warn("UNAUTHORIZED: Reset Protocol Terminated.");
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 pb-40 text-[var(--text-primary)] font-sans animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 pb-40 text-[var(--text-primary)] font-sans animate-in fade-in duration-500 relative">
+      
+      {/* LOCKED OVERLAY */}
+      <div className="absolute inset-0 z-50 bg-[var(--bg-primary)]/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
+         <div className="p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center animate-in zoom-in-95">
+            <div className="p-5 bg-rose-500 rounded-full text-white shadow-xl shadow-rose-500/20">
+               <Lock size={40} />
+            </div>
+            <div className="space-y-2">
+               <h2 className="text-xl font-black uppercase tracking-tighter">UNAUTHORIZED_ACCESS</h2>
+               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-loose">
+                 "UI configuration parameters have been locked by the Central Registry Administration to maintain system visual integrity."
+               </p>
+            </div>
+         </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 opacity-50 grayscale">
         <div className="flex items-center gap-4">
-          <div className="p-3 md:p-4 bg-[var(--brand-color)] rounded-[var(--radius-main)] text-white shadow-xl shadow-[var(--brand-color)]/20">
+          <div className="p-3 md:p-4 bg-slate-400 rounded-[var(--radius-main)] text-white shadow-xl">
             <SettingsIcon size={32} />
           </div>
           <div>
@@ -98,12 +109,12 @@ const Settings: React.FC = () => {
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2">Personalize node environment parameters</p>
           </div>
         </div>
-        <button onClick={handleReset} className="flex items-center gap-2 px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-sm text-[9px] font-black uppercase tracking-widest hover:text-rose-500 transition-all active:scale-95 shadow-sm">
+        <button disabled className="flex items-center gap-2 px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-400 rounded-sm text-[9px] font-black uppercase tracking-widest cursor-not-allowed">
           <RefreshCcw size={14} /> Revert_to_System_Defaults
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 opacity-40 grayscale pointer-events-none">
         <aside className="lg:col-span-3 space-y-2">
           {[
             { id: 'visuals', label: 'Visuals', icon: <Palette size={18}/> },
@@ -113,8 +124,8 @@ const Settings: React.FC = () => {
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-[var(--radius-main)] text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-[var(--brand-color)] text-white shadow-lg' : 'text-slate-500 hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'}`}
+              disabled
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-[var(--radius-main)] text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-slate-500 text-white shadow-lg' : 'text-slate-500'}`}
             >
               {tab.icon} {tab.label}
               {activeTab === tab.id && <ChevronRight size={14} className="ml-auto opacity-50" />}
@@ -124,10 +135,10 @@ const Settings: React.FC = () => {
 
         <main className="lg:col-span-9 space-y-12">
           {activeTab === 'visuals' && (
-            <div className="space-y-12 animate-in fade-in slide-in-from-right-2">
+            <div className="space-y-12">
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-4">
-                   <Monitor size={18} className="text-[var(--brand-color)]" />
+                   <Monitor size={18} className="text-slate-400" />
                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Environment_Presets</label>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -139,10 +150,10 @@ const Settings: React.FC = () => {
                    ].map(p => (
                       <button 
                         key={p.id}
-                        onClick={() => setSettings({...settings, themePreset: p.id as any})}
-                        className={`p-6 rounded-[var(--radius-main)] border text-left transition-all group ${settings.themePreset === p.id ? 'bg-[var(--brand-color)] border-transparent text-white shadow-xl ring-4 ring-[var(--brand-color)]/10' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-[var(--brand-color)]'}`}
+                        disabled
+                        className={`p-6 rounded-[var(--radius-main)] border text-left transition-all group ${settings.themePreset === p.id ? 'bg-slate-500 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)]'}`}
                       >
-                         <div className={`mb-4 p-2 w-fit rounded-lg ${settings.themePreset === p.id ? 'bg-white/10' : 'bg-[var(--bg-primary)]'} transition-colors`}>{p.icon}</div>
+                         <div className={`mb-4 p-2 w-fit rounded-lg ${settings.themePreset === p.id ? 'bg-white/10' : 'bg-[var(--bg-primary)]'}`}>{p.icon}</div>
                          <p className="text-[11px] font-black uppercase tracking-widest">{p.label}</p>
                          <p className={`text-[9px] mt-1 font-bold ${settings.themePreset === p.id ? 'text-white/60' : 'text-slate-400'} uppercase`}>{p.desc}</p>
                       </button>
@@ -152,73 +163,37 @@ const Settings: React.FC = () => {
 
               <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-4">
-                   <Palette size={18} className="text-[var(--brand-color)]" />
+                   <Palette size={18} className="text-slate-400" />
                    <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Accent_Uplink_Matrix</label>
                 </div>
                 <div className="flex flex-wrap gap-4 items-center">
                   {COLORS.map(c => (
                     <button 
                       key={c.hex}
-                      onClick={() => setSettings({...settings, primaryColor: c.hex})}
-                      className={`w-14 h-14 rounded-full border-4 transition-all relative shadow-sm ${settings.primaryColor === c.hex ? 'border-[var(--text-primary)] scale-110 shadow-xl' : 'border-transparent hover:scale-105'}`}
+                      disabled
+                      className={`w-14 h-14 rounded-full border-4 transition-all relative ${settings.primaryColor === c.hex ? 'border-slate-800 scale-110' : 'border-transparent'}`}
                       style={{ backgroundColor: c.hex }}
-                      title={c.name}
-                    >
-                       {settings.primaryColor === c.hex && <div className="absolute inset-0 flex items-center justify-center text-white"><Circle size={14} fill="white"/></div>}
-                    </button>
-                  ))}
-                  <div className="flex items-center gap-3 px-5 py-3 bg-[var(--bg-secondary)] rounded-full border border-[var(--border-color)] shadow-inner">
-                    <Hash size={16} className="text-slate-500"/>
-                    <input 
-                      type="text" 
-                      value={settings.primaryColor} 
-                      onChange={(e) => setSettings({...settings, primaryColor: e.target.value})}
-                      className="bg-transparent border-none outline-none text-[12px] font-black uppercase w-20 text-[var(--text-primary)]"
                     />
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           )}
-
-          {activeTab === 'geometry' && (
-             <div className="space-y-12 animate-in fade-in slide-in-from-right-2">
-                <div className="space-y-6">
-                   <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-4">
-                      <Box size={18} className="text-[var(--brand-color)]" />
-                      <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Border_Radius_Protocol</label>
-                   </div>
-                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {['0px', '2px', '8px', '16px'].map(r => (
-                         <button 
-                           key={r}
-                           onClick={() => setSettings({...settings, borderRadius: r})}
-                           className={`p-6 border transition-all text-center ${settings.borderRadius === r ? 'bg-[var(--brand-color)] border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)] hover:border-[var(--brand-color)]'}`}
-                           style={{ borderRadius: r }}
-                         >
-                            <span className="text-[11px] font-black uppercase tracking-widest">{r === '0px' ? 'Tactical (0)' : r === '2px' ? 'Standard (2)' : r === '8px' ? 'Modern (8)' : 'Soft (16)'}</span>
-                         </button>
-                      ))}
-                   </div>
-                </div>
-             </div>
-          )}
         </main>
       </div>
 
-      <div className="mt-20 p-8 bg-[var(--bg-secondary)] border border-dashed border-[var(--border-color)] rounded-[var(--radius-main)] flex flex-col md:flex-row items-center justify-between gap-8 opacity-60">
+      <div className="mt-20 p-8 bg-[var(--bg-secondary)] border border-dashed border-[var(--border-color)] rounded-[var(--radius-main)] flex flex-col md:flex-row items-center justify-between gap-8 opacity-40">
          <div className="flex items-center gap-6">
             <div className="p-3 bg-[var(--bg-primary)] rounded border border-[var(--border-color)]">
-               <ShieldCheck size={24} className="text-[var(--brand-color)]" />
+               <ShieldCheck size={24} className="text-slate-400" />
             </div>
             <div className="space-y-1">
                <p className="text-[10px] font-black uppercase tracking-widest">Client_Storage_Sync</p>
                <p className="text-[11px] font-medium text-slate-500 max-w-lg leading-relaxed">
-                 "UI Config parameters are stored within your local node registry (localStorage). These settings are synchronized across your specific terminal instance."
+                 "UI Config parameters are stored within your local node registry (localStorage). Currently under administrative lock."
                </p>
             </div>
          </div>
-         <button className="px-6 py-2 border border-[var(--border-color)] text-[10px] font-black uppercase tracking-widest hover:text-[var(--brand-color)] transition-all">Audit_Registry</button>
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import { db } from './db';
-import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid, Sun, Moon } from 'lucide-react';
+import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('landing');
@@ -120,26 +120,6 @@ const App: React.FC = () => {
       setIsDark(true);
     }
   }, [view]);
-
-  const toggleTheme = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    const saved = localStorage.getItem('maksocial_appearance_v3');
-    const settings = saved ? JSON.parse(saved) : {
-      primaryColor: '#10918a',
-      fontFamily: 'Chirp',
-      fontSize: 'md',
-      borderRadius: '2px',
-      themePreset: 'paper',
-      backgroundPattern: 'none'
-    };
-    const newSettings = {
-      ...settings,
-      themePreset: newDark ? 'tactical' : 'paper'
-    };
-    localStorage.setItem('maksocial_appearance_v3', JSON.stringify(newSettings));
-    window.location.reload(); 
-  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -286,14 +266,7 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative ml-2">
-            {/* Theme Toggle */}
-            <button 
-              onClick={toggleTheme}
-              className="p-2 text-slate-500 hover:text-[var(--brand-color)] transition-colors rounded-full"
-              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {isDark ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+            {/* Theme Toggle Removed per request */}
 
             <div className="relative shrink-0">
               <button 

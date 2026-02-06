@@ -114,7 +114,7 @@ const Opportunities: React.FC = () => {
   );
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 pb-40 animate-in fade-in duration-700 font-mono text-[var(--text-primary)]">
+    <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 pb-40 animate-in fade-in duration-700 font-sans text-[var(--text-primary)]">
       
       {/* TACTICAL HEADER */}
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-16">

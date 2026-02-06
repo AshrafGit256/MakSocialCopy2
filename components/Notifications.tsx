@@ -47,7 +47,7 @@ const Notifications: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-sans text-[var(--text-primary)]">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 font-sans">
         <div className="flex items-center gap-4">
            <div className="p-4 bg-[var(--brand-color)] rounded-md text-white shadow-xl shadow-[var(--brand-color)]/20"><Bell size={28} /></div>
            <div>
@@ -61,7 +61,7 @@ const Notifications: React.FC = () => {
            <button onClick={markAllAsRead} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-[var(--brand-color)] transition-all flex items-center gap-2"><CheckCircle2 size={12}/> Mark_All_Synced</button>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 font-sans">
         <aside className="lg:col-span-3 space-y-1">
            <h3 className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-widest mb-3">Signal_Categories</h3>
            {[
@@ -72,7 +72,7 @@ const Notifications: React.FC = () => {
            ].map(item => (
              <button key={item.id} onClick={() => setFilter(item.id as any)} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[11px] font-bold uppercase tracking-wide transition-all ${filter === item.id ? 'bg-[var(--bg-secondary)] border-l-4 border-[var(--brand-color)] text-[var(--brand-color)]' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'}`}>
                <span className="flex items-center gap-3">{item.icon} {item.label}</span>
-               {item.count !== undefined && <span className="bg-[var(--brand-color)] text-white px-2 py-0.5 rounded-full text-[8px]">{item.count}</span>}
+               {item.count !== undefined && <span className="bg-[var(--brand-color)] text-white px-2 py-0.5 rounded-full text-[8px] font-sans">{item.count}</span>}
              </button>
            ))}
         </aside>
@@ -93,19 +93,19 @@ const Notifications: React.FC = () => {
                        <div className="flex items-center justify-between">
                           <h4 className="text-[13px] font-black uppercase text-[var(--text-primary)] tracking-tight">{notif.title}</h4>
                           <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                             <span className="text-[8px] font-mono text-slate-400 uppercase tracking-widest">ID_{notif.meta?.hash || '??'}</span>
+                             <span className="text-[8px] font-sans text-slate-400 uppercase tracking-widest">ID_{notif.meta?.hash || '??'}</span>
                              <button onClick={() => deleteNotif(notif.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={14}/></button>
                           </div>
                        </div>
                        <p className="text-[12px] text-slate-500 font-medium leading-relaxed">"{notif.description}"</p>
-                       <div className="pt-2 flex flex-wrap gap-2">
+                       <div className="pt-2 flex flex-wrap gap-2 font-sans">
                           {notif.type === 'follow' && <button className="px-4 py-1.5 bg-[var(--brand-color)] text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest shadow-lg hover:brightness-110 transition-all flex items-center gap-2 active:scale-95"><UserPlus size={12}/> Follow Back</button>}
                           {notif.title.includes('Email') && <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all flex items-center gap-2"><Mail size={12}/> Open Uplink</button>}
                           {notif.title.includes('Vault') && <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-emerald-600 transition-all flex items-center gap-2"><FileText size={12}/> Sync Asset</button>}
                           {notif.type === 'skill_match' && <button className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all flex items-center gap-2"><Zap size={12}/> View Match</button>}
                           {notif.type === 'event' && <button className="px-4 py-1.5 bg-rose-600 text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2"><ExternalLink size={12}/> Access Broadcast</button>}
                        </div>
-                       <div className="flex items-center gap-4 pt-1">
+                       <div className="flex items-center gap-4 pt-1 font-sans">
                           <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Clock size={10}/> {notif.timestamp}</span>
                           <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">STRATA: {notif.meta?.reason || 'LOGGED'}</span>
                        </div>
@@ -114,7 +114,7 @@ const Notifications: React.FC = () => {
                 ))}
              </div>
            ) : (
-             <div className="py-40 text-center space-y-6">
+             <div className="py-40 text-center space-y-6 font-sans">
                 <Bell size={48} className="mx-auto text-slate-300 opacity-30" />
                 <div className="space-y-2">
                    <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-400">Signal.Nullified</h3>

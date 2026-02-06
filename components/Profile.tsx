@@ -51,7 +51,9 @@ const Profile: React.FC<{
 
   const handleEmail = () => {
     if (user?.email) {
-      window.location.href = `mailto:${user.email}`;
+      // Constructs a URL to open Gmail web compose interface directly
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(user.email)}`;
+      window.open(gmailUrl, '_blank');
     }
   };
 

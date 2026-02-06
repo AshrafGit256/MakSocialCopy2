@@ -33,12 +33,12 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
           <div className="absolute bottom-4 right-4">
              <div className="flex items-center gap-2 px-2 py-1 bg-black/40 backdrop-blur-md rounded border border-white/10">
                 <Clock size={10} className="text-white" />
-                <span className="text-[7px] font-black text-white uppercase tracking-widest">{opp.timestamp}</span>
+                <span className="text-[7px] font-black text-white uppercase tracking-widest font-sans">{opp.timestamp}</span>
              </div>
           </div>
         </div>
       )}
-      <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-primary)]/50">
+      <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-primary)]/50 font-sans">
         <div className="flex items-center gap-3 truncate">
           <div className="p-1.5 bg-[var(--bg-secondary)] rounded-md border border-[var(--border-color)]">
              <Box size={14} className="text-[var(--brand-color)]" />
@@ -52,7 +52,7 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
           </div>
         )}
       </div>
-      <div className="p-6 flex-1 space-y-5">
+      <div className="p-6 flex-1 space-y-5 font-sans">
         {!hasPoster && <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase border ${typeColors[type]}`}>{type}</span>}
         <div className="space-y-2">
           <h3 className="text-sm font-black uppercase tracking-tight text-[var(--text-primary)] group-hover:text-[var(--brand-color)] transition-colors leading-snug">
@@ -68,7 +68,7 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
            ))}
         </div>
       </div>
-      <div className="p-5 border-t border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-primary)]/40">
+      <div className="p-5 border-t border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-primary)]/40 font-sans">
         <div className="flex flex-col">
           <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">STRATA_BENEFIT</span>
           <span className="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-tighter">{opp.opportunityData?.detectedBenefit || 'Verified Participation'}</span>
@@ -94,7 +94,7 @@ const Opportunities: React.FC = () => {
   );
   return (
     <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-10 pb-40 animate-in fade-in duration-700 font-sans text-[var(--text-primary)]">
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-16">
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-16 font-sans">
         <div className="flex items-center gap-6">
           <div className="p-5 bg-[var(--brand-color)] rounded-none shadow-2xl shadow-[var(--brand-color)]/20 text-white">
             <Zap size={36} fill="white" />
@@ -108,15 +108,15 @@ const Opportunities: React.FC = () => {
         </div>
         <div className="relative w-full lg:w-96 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[var(--brand-color)] transition-colors" size={18} />
-          <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none py-4 pl-12 pr-4 text-[11px] font-bold uppercase outline-none focus:border-[var(--brand-color)] shadow-inner transition-all" placeholder="Query Registry Stratum..." value={search} onChange={e => setSearch(e.target.value)} />
+          <input className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none py-4 pl-12 pr-4 text-[11px] font-bold uppercase outline-none focus:border-[var(--brand-color)] shadow-inner transition-all font-sans" placeholder="Query Registry Stratum..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </header>
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 font-sans">
           {filtered.map(opp => <OpportunityCard key={opp.id} opp={opp} onDelete={() => {}} isAdmin={false} />)}
         </div>
       ) : (
-        <div className="py-48 text-center space-y-8 bg-[var(--bg-secondary)]/50 border border-dashed border-[var(--border-color)] rounded-none animate-in zoom-in-95 duration-500">
+        <div className="py-48 text-center space-y-8 bg-[var(--bg-secondary)]/50 border border-dashed border-[var(--border-color)] rounded-none animate-in zoom-in-95 duration-500 font-sans">
            <div className="relative inline-block">
               <Database size={64} className="mx-auto text-slate-300 opacity-20" />
               <div className="absolute inset-0 flex items-center justify-center"><ShieldAlert size={24} className="text-rose-500 animate-pulse" /></div>
@@ -128,7 +128,7 @@ const Opportunities: React.FC = () => {
            <button onClick={() => setSearch('')} className="px-10 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[var(--brand-color)] text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 rounded-none">Re-initialize Search</button>
         </div>
       )}
-      <footer className="mt-20 p-8 bg-[var(--brand-color)]/5 border border-dashed border-[var(--brand-color)]/20 rounded-none flex flex-col md:flex-row items-center justify-between gap-8">
+      <footer className="mt-20 p-8 bg-[var(--brand-color)]/5 border border-dashed border-[var(--brand-color)]/20 rounded-none flex flex-col md:flex-row items-center justify-between gap-8 font-sans">
          <div className="flex items-center gap-6">
             <div className="p-3 bg-white dark:bg-black/40 rounded border border-[var(--border-color)] shadow-sm"><Terminal size={24} className="text-[var(--brand-color)]" /></div>
             <div className="space-y-1">

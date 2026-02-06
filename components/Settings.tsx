@@ -84,9 +84,9 @@ const Settings: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 pb-40 text-[var(--text-primary)] font-sans animate-in fade-in duration-500 relative">
       
-      {/* LOCKED OVERLAY */}
-      <div className="absolute inset-0 z-50 bg-[var(--bg-primary)]/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
-         <div className="p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center animate-in zoom-in-95">
+      {/* LOCKED OVERLAY - Pointer events enabled to capture all clicks and block interaction */}
+      <div className="absolute inset-0 z-50 bg-[var(--bg-primary)]/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-auto cursor-not-allowed">
+         <div className="p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center animate-in zoom-in-95 pointer-events-auto">
             <div className="p-5 bg-rose-500 rounded-full text-white shadow-xl shadow-rose-500/20">
                <Lock size={40} />
             </div>
@@ -151,7 +151,7 @@ const Settings: React.FC = () => {
                       <button 
                         key={p.id}
                         disabled
-                        className={`p-6 rounded-[var(--radius-main)] border text-left transition-all group ${settings.themePreset === p.id ? 'bg-slate-500 border-transparent text-white shadow-xl' : 'bg-[var(--bg-secondary)] border-[var(--border-color)]'}`}
+                        className={`p-6 rounded-[var(--radius-main)] border text-left transition-all group ${settings.themePreset === p.id ? 'bg-slate-500 border-transparent text-white shadow-xl ring-4 ring-[var(--brand-color)]/10' : 'bg-[var(--bg-secondary)] border-[var(--border-color)]'}`}
                       >
                          <div className={`mb-4 p-2 w-fit rounded-lg ${settings.themePreset === p.id ? 'bg-white/10' : 'bg-[var(--bg-primary)]'}`}>{p.icon}</div>
                          <p className="text-[11px] font-black uppercase tracking-widest">{p.label}</p>

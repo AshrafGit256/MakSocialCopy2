@@ -32,8 +32,8 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
   };
 
   const insertLink = () => {
-    const label = prompt("Signal Label:", "Reference Signal");
-    const url = prompt("Network Protocol Address (URL):", "https://");
+    const label = prompt("Link text:", "Link");
+    const url = prompt("Address (URL):", "https://");
     if (label && url) {
       const linkHtml = `<a href="${url}" class="text-slate-600 underline font-bold" target="_blank">${label}</a>`;
       if (editorRef.current) {
@@ -41,15 +41,6 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
         document.execCommand('insertHTML', false, linkHtml);
         setContent(editorRef.current.innerHTML);
       }
-    }
-  };
-
-  const insert5x5Table = () => {
-    let tableHtml = '<table class="w-full border-collapse border border-slate-700 my-4 text-[10px] uppercase font-sans"><tr><td class="border border-slate-700 p-2">...</td><td class="border border-slate-700 p-2">...</td></tr></table><p><br></p>';
-    if (editorRef.current) {
-      editorRef.current.focus();
-      document.execCommand('insertHTML', false, tableHtml);
-      setContent(editorRef.current.innerHTML);
     }
   };
 
@@ -92,7 +83,6 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
     setIsScanning(true);
     await onPost(rawContent, pollData);
     
-    // Clear editor only if it wasn't a violation handled by parent (handled via state usually, but simplified for UX)
     if (editorRef.current) editorRef.current.innerHTML = '';
     setContent('');
     setPollOptions(['', '']);
@@ -125,15 +115,15 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
           className={`w-full min-h-[120px] max-h-[600px] overflow-y-auto p-6 outline-none text-[15px] font-sans text-[var(--text-primary)] leading-relaxed post-editor-surface ${isExpanded ? 'min-h-[200px]' : ''} ${isScanning ? 'opacity-50 pointer-events-none' : ''}`}
         ></div>
-        {!content && !isScanning && <div className="absolute top-6 left-6 pointer-events-none text-slate-400 text-[11px] font-sans flex items-center gap-2">
-           <Terminal size={12}/> Initializing contribution buffer...
+        {!content && !isScanning && <div className="absolute top-6 left-6 pointer-events-none text-slate-400 text-[13px] font-sans flex items-center gap-2">
+           Share your thoughts...
         </div>}
 
         {isScanning && (
           <div className="absolute inset-0 bg-[var(--bg-primary)]/40 backdrop-blur-[2px] flex items-center justify-center">
              <div className="flex items-center gap-3 px-6 py-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-none shadow-2xl animate-in fade-in zoom-in-95">
                 <Loader2 size={16} className="text-slate-600 animate-spin" />
-                <span className="text-[10px] font-black uppercase tracking-0.2em text-slate-600">Scanning Signal Integrity...</span>
+                <span className="text-[10px] font-black uppercase tracking-0.2em text-slate-600">Posting your message...</span>
              </div>
           </div>
         )}
@@ -150,7 +140,7 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
                     next[i] = e.target.value;
                     setPollOptions(next);
                   }}
-                  placeholder={`Census Option ${i+1}`}
+                  placeholder={`Option ${i+1}`}
                   className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-none px-3 py-2 text-[10px] font-bold outline-none"
                 />
               ))}
@@ -161,17 +151,17 @@ const RichEditor: React.FC<RichEditorProps> = ({ onPost, currentUser }) => {
       <div className="flex items-center justify-between px-6 py-3 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
         <div className="flex items-center gap-2">
            <div className={`w-1.5 h-1.5 rounded-full ${isScanning ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500 shadow-[0_0_8px_#10b981]'}`}></div>
-           <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{isScanning ? 'Uplink Processing' : 'Protocol Secure'}</span>
+           <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{isScanning ? 'Processing' : 'Ready to post'}</span>
         </div>
         <div className="flex items-center gap-4">
-           {isExpanded && !isScanning && <button onClick={() => setIsExpanded(false)} className="text-[10px] font-black uppercase text-slate-500 hover:text-rose-500 transition-colors">Abort</button>}
+           {isExpanded && !isScanning && <button onClick={() => setIsExpanded(false)} className="text-[10px] font-black uppercase text-slate-500 hover:text-rose-500 transition-colors">Cancel</button>}
            <button 
              onClick={handleSubmit}
              disabled={!content.trim() || content === '<br>' || isScanning}
-             className="px-6 py-2 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white rounded-none text-[10px] font-black uppercase tracking-0.15em flex items-center gap-2 transition-all shadow-lg active:scale-95"
+             className="px-8 py-2 bg-slate-700 hover:bg-slate-800 disabled:opacity-30 text-white rounded-none text-[10px] font-black uppercase tracking-0.15em flex items-center gap-2 transition-all shadow-lg active:scale-95"
            >
              {isScanning ? <Loader2 size={12} className="animate-spin" /> : <Send size={12}/>}
-             {isScanning ? 'Verifying' : 'Commit to Stream'}
+             {isScanning ? 'Posting' : 'Post'}
            </button>
         </div>
       </div>

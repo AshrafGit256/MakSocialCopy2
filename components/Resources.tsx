@@ -121,7 +121,7 @@ const Resources: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-40 animate-in fade-in duration-500 font-mono text-[var(--text-primary)]">
+    <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-6 pb-40 animate-in fade-in duration-500 font-sans text-[var(--text-primary)]">
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-[var(--brand-color)] rounded-md shadow-lg text-white">
@@ -275,7 +275,7 @@ const Resources: React.FC = () => {
       </div>
 
       {isAdding && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in font-sans">
            <div className="bg-[var(--bg-primary)] w-full max-w-lg p-8 rounded-md shadow-2xl space-y-6 border border-[var(--border-color)] max-h-[90vh] overflow-y-auto no-scrollbar">
               <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-4">
                  <div className="flex items-center gap-2">
@@ -331,7 +331,7 @@ const Resources: React.FC = () => {
       )}
 
       {previewResource && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in">
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in font-sans">
            <div className="bg-[var(--bg-primary)] w-full max-w-lg rounded-md shadow-2xl flex flex-col border border-[var(--border-color)] overflow-hidden">
               <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-secondary)]">
                  <h2 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-widest">{previewResource.title}</h2>

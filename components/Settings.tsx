@@ -30,14 +30,13 @@ const Settings: React.FC = () => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) return JSON.parse(saved);
     
-    // Default to system preference if no saved settings
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Site default: Paper (Light)
     return {
       primaryColor: '#10918a',
       fontFamily: 'Chirp, sans-serif',
       fontSize: 'md',
       borderRadius: '2px',
-      themePreset: prefersDark ? 'tactical' : 'paper',
+      themePreset: 'paper',
       backgroundPattern: 'none'
     };
   });
@@ -77,13 +76,12 @@ const Settings: React.FC = () => {
   }, [settings]);
 
   const handleReset = () => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setSettings({
       primaryColor: '#10918a',
       fontFamily: 'Chirp, sans-serif',
       fontSize: 'md',
       borderRadius: '2px',
-      themePreset: prefersDark ? 'tactical' : 'paper',
+      themePreset: 'paper', // Site-wide default reset is now Paper
       backgroundPattern: 'none'
     });
   };

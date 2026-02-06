@@ -34,14 +34,14 @@ const App: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
-  // Theme state
+  // Theme state - Defaulting to Light (false) if no settings exist
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) {
       const settings = JSON.parse(saved);
       return settings.themePreset === 'tactical' || settings.themePreset === 'oled' || settings.themePreset === 'standard';
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return false; // Default to light mode (Paper)
   });
 
   // Manifest Dropdown States
@@ -82,7 +82,7 @@ const App: React.FC = () => {
       fontFamily: 'Chirp',
       fontSize: 'md',
       borderRadius: '2px',
-      themePreset: isDark ? 'tactical' : 'paper',
+      themePreset: 'paper', // Site-wide default is now Paper
       backgroundPattern: 'none'
     };
 
@@ -125,13 +125,19 @@ const App: React.FC = () => {
     const newDark = !isDark;
     setIsDark(newDark);
     const saved = localStorage.getItem('maksocial_appearance_v3');
-    const settings = saved ? JSON.parse(saved) : {};
+    const settings = saved ? JSON.parse(saved) : {
+      primaryColor: '#10918a',
+      fontFamily: 'Chirp',
+      fontSize: 'md',
+      borderRadius: '2px',
+      themePreset: 'paper',
+      backgroundPattern: 'none'
+    };
     const newSettings = {
       ...settings,
       themePreset: newDark ? 'tactical' : 'paper'
     };
     localStorage.setItem('maksocial_appearance_v3', JSON.stringify(newSettings));
-    // Force immediate re-render or effect trigger
     window.location.reload(); 
   };
 

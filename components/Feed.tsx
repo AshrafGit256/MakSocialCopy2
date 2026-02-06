@@ -149,7 +149,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
   return (
     <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-300 mb-8' : 'mb-10'}`}>
       
-      {/* MOBILE HEADER - Removes vertical line and provides full width content */}
+      {/* MOBILE HEADER - Removed the vertical gutter layout for mobile to increase space */}
       <div className="sm:hidden flex items-center justify-between px-5 py-4 border-b border-[var(--border-color)] bg-white/50">
         <div className="flex items-center gap-3 overflow-hidden">
           <img 
@@ -198,7 +198,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 </div>
             </div>
 
-            {/* MAIN CONTENT - Now takes full width on Mobile */}
+            {/* MAIN CONTENT - Full width on Mobile */}
             <div className="p-5 sm:p-6">
                 <div className="text-[15px] sm:text-[16px] leading-relaxed font-sans text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
                 {post.images && post.images.length > 0 && <PostImageGrid images={post.images} />}
@@ -324,8 +324,7 @@ const Feed: React.FC<FeedProps> = ({
     if (threadId) {
       return posts.filter(p => p.id === threadId);
     }
-    // Logic: If filter is Global, show everything. 
-    // If filter is specific college, show that college OR Global university announcements.
+    // Filter logic: Show specific college posts AND Global university announcements
     if (collegeFilter === 'Global') {
       return posts;
     }
@@ -370,7 +369,7 @@ const Feed: React.FC<FeedProps> = ({
         ) : (
           <div className="py-40 text-center opacity-20">
              <GitCommit size={48} className="mx-auto mb-4" />
-             <p className="text-xs font-black uppercase tracking-[0.4em]">No Signals in this Cluster...</p>
+             <p className="text-xs font-black uppercase tracking-[0.4em]">Awaiting Signals...</p>
           </div>
         )}
       </div>

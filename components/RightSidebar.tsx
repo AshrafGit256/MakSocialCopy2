@@ -4,7 +4,7 @@ import { MOCK_NEWS } from '../constants';
 import { Newspaper, TrendingUp, Hash, ExternalLink, Activity, Radio, PlayCircle, Globe, Zap } from 'lucide-react';
 
 const RightSidebar: React.FC = () => {
-  // Direct raw link for HTML video element:
+  // Raw link for HTML video element:
   const NEWS_VIDEO_URL = "https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/journalism4.mp4";
 
   return (
@@ -47,7 +47,7 @@ const RightSidebar: React.FC = () => {
             <div key={news.id} className="p-6 hover:bg-slate-50 transition-all cursor-pointer group relative">
               <div className="flex justify-between items-start mb-2">
                 <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
-                   news.category === 'Academic' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                   news.category === 'Academic' || news.category === 'Research' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
                    news.category === 'Sports' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                    'bg-amber-50 text-amber-600 border-amber-100'
                 }`}>{news.category}</span>

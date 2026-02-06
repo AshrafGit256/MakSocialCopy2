@@ -20,14 +20,14 @@ const DB_KEYS = {
 const INITIAL_USERS: User[] = [
   { id: 'vc_office', name: 'Prof. Barnabas Nawangwe', role: 'Vice Chancellor', avatar: 'https://marcopolis.net/wp-content/uploads/uganda_report/2020/interviews/makerere_university/Professor_Barnabas_Nawangwe_Vice_Chancellor_of_Makerere_University.jpg', connections: 45000, email: 'vc@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 124, followersCount: 42000, followingCount: 89, totalLikesCount: 156000, badges: ['Verified', 'Admin'], verified: true, appliedTo: [] },
   { id: 'u-ninfa', name: 'Ninfa Monaldo', role: 'Web Architect', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa', connections: 1200, email: 'ninfa.m@mak.ac.ug', college: 'COCIS', status: 'Finalist', subscriptionTier: 'Pro', joinedColleges: ['COCIS'], postsCount: 45, followersCount: 890, followingCount: 150, totalLikesCount: 3400, badges: ['Verified'], verified: true, appliedTo: [], bio: 'Building the next generation of academic strata.' },
-  { id: 'mak_library', name: 'Main Library Node', role: 'Information Hub', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Library', connections: 45000, email: 'library@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 560, followersCount: 45000, followingCount: 0, totalLikesCount: 89000, badges: ['Official'], verified: true, appliedTo: [] },
-  { id: 'mak_unipod', name: 'Mak UniPod', role: 'Innovation Forge', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=UniPod', connections: 8000, email: 'unipod@mak.ac.ug', college: 'CEDAT', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['CEDAT'], postsCount: 89, followersCount: 7800, followingCount: 12, totalLikesCount: 12000, badges: ['Verified'], verified: true, appliedTo: [] },
-  { id: 'guild_office', name: 'Guild Presidential Office', role: 'Student Leadership', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guild', connections: 25000, email: 'guild.president@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['Global'], postsCount: 230, followersCount: 28000, followingCount: 450, totalLikesCount: 92000, badges: ['Verified'], verified: true, appliedTo: [] },
+  { id: 'mak_library', name: 'Main Library Node', role: 'Information Hub', avatar: 'https://static.vecteezy.com/system/resources/thumbnails/004/297/596/small/education-logo-open-book-dictionary-textbook-or-notebook-with-sunrice-icon-modern-emblem-idea-concept-design-for-business-libraries-schools-universities-educational-courses-vector.jpg', connections: 45000, email: 'library@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 560, followersCount: 45000, followingCount: 0, totalLikesCount: 89000, badges: ['Official'], verified: true, appliedTo: [] },
+  { id: 'mak_unipod', name: 'Mak UniPod', role: 'Innovation Forge', avatar: 'https://unipod.mak.ac.ug/wp-content/uploads/2024/12/Unipod-Logo-SVG.svg', connections: 8000, email: 'unipod@mak.ac.ug', college: 'CEDAT', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['CEDAT'], postsCount: 89, followersCount: 7800, followingCount: 12, totalLikesCount: 12000, badges: ['Verified'], verified: true, appliedTo: [] },
+  { id: 'guild_office', name: 'Guild Presidential Office', role: 'Student Leadership', avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4InWGvYRKGuV-Qi3v4SansxAxWjDUWfdqig&s', connections: 25000, email: 'guild.president@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['Global'], postsCount: 230, followersCount: 28000, followingCount: 450, totalLikesCount: 92000, badges: ['Verified'], verified: true, appliedTo: [] },
   { id: 'mtn_partner', name: 'MTN Uganda', role: 'Corporate Node', avatar: 'https://yt3.googleusercontent.com/gHH044hTirIU5EXvmfOn6yXwJKM2pQaU2nt9OWrsnQq_fj4YWeQpuofWvyF-S_edIRZjSty4ZA=s900-c-k-c0x00ffffff-no-rj', connections: 50000, email: 'partners@mtn.co.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 12, followersCount: 50000, followingCount: 0, totalLikesCount: 450000, badges: ['Partner'], verified: true, appliedTo: [] },
-  { id: 'u-julianne', name: 'Dr. Julianne O.', role: 'Senior Lecturer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Julianne', connections: 800, email: 'julianne.o@mak.ac.ug', college: 'COCIS', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['COCIS'], postsCount: 64, followersCount: 1200, followingCount: 80, totalLikesCount: 5600, badges: ['Verified', 'Faculty'], verified: true, appliedTo: [] },
-  { id: 'airtel_partner', name: 'Airtel Uganda', role: 'Corporate Partner', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Airtel', connections: 48000, email: 'customercare@ug.airtel.com', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 8, followersCount: 48000, followingCount: 0, totalLikesCount: 320000, badges: ['Partner'], verified: true, appliedTo: [] },
-  { id: 'mak_security', name: 'Security Registry', role: 'Official Channel', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Security', connections: 45000, email: 'security@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 320, followersCount: 45000, followingCount: 0, totalLikesCount: 12000, badges: ['Official'], verified: true, appliedTo: [] },
-  { id: 'u-peter', name: 'Counsel Peter', role: 'Legal Advisor', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Peter', connections: 1200, email: 'peter.counsel@mak.ac.ug', college: 'LAW', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['LAW'], postsCount: 145, followersCount: 2300, followingCount: 120, totalLikesCount: 8900, badges: ['Verified'], verified: true, appliedTo: [] }
+  { id: 'u-julianne', name: 'Dr. Julianne O.', role: 'Senior Lecturer', avatar: 'https://media.licdn.com/dms/image/v2/C5603AQEbfx2r6KmEBQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1528009115211?e=2147483647&v=beta&t=P79glpXCLtisJ5uT6QkGpTtdDBZ1IHYCouww850tWFE', connections: 800, email: 'julianne.o@mak.ac.ug', college: 'COCIS', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['COCIS'], postsCount: 64, followersCount: 1200, followingCount: 80, totalLikesCount: 5600, badges: ['Verified', 'Faculty'], verified: true, appliedTo: [] },
+  { id: 'airtel_partner', name: 'Airtel Uganda', role: 'Corporate Partner', avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGb5X14Mj1kTtRIuEZWnqS7dh4vfKGYMgGw&s', connections: 48000, email: 'customercare@ug.airtel.com', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 8, followersCount: 48000, followingCount: 0, totalLikesCount: 320000, badges: ['Partner'], verified: true, appliedTo: [] },
+  { id: 'mak_security', name: 'Security Registry', role: 'Official Channel', avatar: 'https://img.freepik.com/premium-vector/security-badge-emblem_854353-779.jpg?semt=ais_user_personalization&w=740&q=80', connections: 45000, email: 'security@mak.ac.ug', college: 'Global', status: 'Graduate', subscriptionTier: 'Enterprise', joinedColleges: ['Global'], postsCount: 320, followersCount: 45000, followingCount: 0, totalLikesCount: 12000, badges: ['Official'], verified: true, appliedTo: [] },
+  { id: 'u-peter', name: 'Counsel Peter', role: 'Legal Advisor', avatar: 'https://img.freepik.com/premium-photo/portrait-handsome-african-american-man-closeup-business-man-model_423170-2131.jpg', connections: 1200, email: 'peter.counsel@mak.ac.ug', college: 'LAW', status: 'Graduate', subscriptionTier: 'Pro', joinedColleges: ['LAW'], postsCount: 145, followersCount: 2300, followingCount: 120, totalLikesCount: 8900, badges: ['Verified'], verified: true, appliedTo: [] }
 ];
 
 const parseArray = <T>(key: string, fallback: T[]): T[] => {
@@ -135,7 +135,7 @@ export const db = {
       images: ['https://covenantsecurityequipment.com/cdn/shop/files/CSE-AS-ExtraKeys_700x700.png?v=1713479233'], 
       authorId: 'u-julianne', 
       authorName: 'Dr. Julianne O.', 
-      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Julianne', 
+      authorAvatar: 'https://media.licdn.com/dms/image/v2/C5603AQEbfx2r6KmEBQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1528009115211?e=2147483647&v=beta&t=P79glpXCLtisJ5uT6QkGpTtdDBZ1IHYCouww850tWFE', 
       timestamp: '5h ago', 
       status: 'Open', 
       college: 'COCIS' 
@@ -148,7 +148,7 @@ export const db = {
       location: 'CHS Wing', 
       authorId: 'u-peter', 
       authorName: 'Counsel Peter', 
-      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Peter', 
+      authorAvatar: 'https://img.freepik.com/premium-photo/portrait-handsome-african-american-man-closeup-business-man-model_423170-2131.jpg', 
       timestamp: '1d ago', 
       status: 'Open', 
       college: 'CHS' 
@@ -161,7 +161,7 @@ export const db = {
       location: 'Freedom Square', 
       authorId: 'guild_office', 
       authorName: 'Guild Presidential Office', 
-      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guild', 
+      authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4InWGvYRKGuV-Qi3v4SansxAxWjDUWfdqig&s', 
       timestamp: '2h ago', 
       status: 'Open', 
       college: 'Global' 

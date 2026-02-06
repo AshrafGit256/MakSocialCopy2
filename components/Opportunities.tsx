@@ -3,12 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../db';
 import { Post, User, College } from '../types';
 import { 
-  Zap, Clock, Sparkles, Trash2, ArrowUpRight, 
-  Radio, Cpu, Search, ShieldCheck, Star, 
-  Filter, Calendar, ChevronRight, Info, Award,
-  Terminal, ExternalLink, GitFork, Eye, 
-  Hash, Layers, LayoutGrid, Box, Activity,
-  Globe, Database, Command, ShieldAlert, CheckCircle
+  Briefcase, Clock, Search, ShieldCheck, 
+  ArrowUpRight, Database, ShieldAlert, CheckCircle,
+  Filter, Info
 } from 'lucide-react';
 
 const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isAdmin: boolean; }> = ({ opp, onDelete, isAdmin }) => {
@@ -43,12 +40,12 @@ const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isA
       
       <div className="px-5 py-3 border-b border-[var(--border-color)] flex items-center justify-between bg-[var(--bg-secondary)]">
         <div className="flex items-center gap-2 truncate">
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-[var(--border-color)] bg-white">
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-[var(--border-color)] bg-white shrink-0">
              <img src={opp.authorAvatar} className="w-full h-full object-cover" alt="Author" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-[10px] font-black text-slate-800 truncate uppercase tracking-tight">{opp.author}</span>
-            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{opp.college} Hub</span>
+            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{opp.college}</span>
           </div>
         </div>
         {opp.opportunityData?.isAIVerified && (
@@ -106,12 +103,8 @@ const Opportunities: React.FC = () => {
     <div className="max-w-[1200px] mx-auto px-6 py-10 pb-40 animate-in fade-in duration-700 font-sans text-[var(--text-primary)]">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 flex items-center justify-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-sm p-2 shadow-sm">
-            <img 
-              src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" 
-              className="w-full h-full object-contain" 
-              alt="MakSocial" 
-            />
+          <div className="w-14 h-14 flex items-center justify-center bg-brand-accent border border-brand-primary/20 rounded-sm text-brand-primary shadow-sm">
+            <Briefcase size={32} />
           </div>
           <div>
             <h1 className="text-3xl font-black uppercase tracking-tighter leading-none">Opportunities Hub</h1>
@@ -142,7 +135,7 @@ const Opportunities: React.FC = () => {
               <div className="absolute inset-0 flex items-center justify-center"><ShieldAlert size={20} className="text-rose-400 animate-pulse" /></div>
            </div>
            <div className="space-y-1">
-              <h3 className="text-xl font-black uppercase tracking-tighter text-slate-600">No opportunities found</h3>
+              <h3 className="text-xl font-black uppercase tracking-tighter text-slate-600">No postings found</h3>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">Try adjusting your search terms or filters to find more relevant results.</p>
            </div>
            <button onClick={() => setSearch('')} className="px-8 py-2.5 bg-white border border-[var(--border-color)] hover:border-brand-primary text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 rounded-sm">Clear Search</button>

@@ -23,9 +23,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-hidden selection:bg-[var(--brand-color)] selection:text-white font-sans transition-colors duration-500">
+    <div className="flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--brand-color)] selection:text-white font-sans transition-colors duration-500">
       
-      {/* LEFT PANEL */}
+      {/* LEFT PANEL - Hidden on Mobile */}
       <div className="hidden lg:block w-1/2 relative bg-[var(--bg-secondary)] dark:bg-[#05080c] border-r border-[var(--border-color)] overflow-hidden">
         <img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200" className="absolute inset-0 w-full h-full object-cover opacity-15 dark:opacity-30 grayscale contrast-125" alt="Campus Life" />
         <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)]/95 dark:from-black/90 via-[var(--bg-primary)]/40 dark:via-black/40 to-transparent p-24 flex flex-col justify-end">
@@ -63,32 +63,43 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[var(--bg-primary)] relative overflow-y-auto no-scrollbar animate-in fade-in duration-500">
-        <div className="absolute top-10 right-10">
-           <button onClick={onSwitchToLogin} className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-[var(--brand-color)] transition-colors flex items-center gap-3 group">
-              Already have an account? Sign In <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+      {/* RIGHT PANEL - Form Workspace */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center p-6 sm:p-10 md:p-20 bg-[var(--bg-primary)] relative overflow-y-auto no-scrollbar animate-in fade-in duration-500">
+        
+        {/* MOBILE TOP BAR */}
+        <div className="w-full max-w-md flex justify-between items-center mb-10 md:mb-16 lg:absolute lg:top-10 lg:right-10 lg:mb-0">
+           <div className="flex items-center gap-3 lg:hidden">
+              <div className="w-8 h-8 bg-[var(--brand-color)] rounded-[var(--radius-main)] flex items-center justify-center shadow-lg">
+                <Users size={16} className="text-white" />
+              </div>
+              <span className="text-sm font-black uppercase tracking-tight text-slate-900">MakSocial</span>
+           </div>
+           <button 
+             onClick={onSwitchToLogin} 
+             className="px-4 py-2 border border-[var(--border-color)] rounded-[var(--radius-main)] text-[9px] sm:text-[11px] font-black uppercase tracking-[0.1em] text-slate-400 hover:text-[var(--brand-color)] transition-colors flex items-center gap-2 group"
+           >
+              Sign In <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
            </button>
         </div>
 
-        <div className="w-full max-w-md py-16 space-y-12">
+        <div className="w-full max-w-md space-y-10 sm:space-y-12">
           <div className="space-y-4">
-             <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest shadow-sm">
-                <Terminal size={16} className="text-[var(--brand-color)]" /> Start Your Registration
+             <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-sm">
+                <Terminal size={14} className="text-[var(--brand-color)]" /> Start Enrollment
              </div>
-             <h2 className="text-5xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">Join Today.</h2>
+             <h2 className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">Join Today.</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+            <div className="space-y-5 sm:space-y-6">
               <div className="space-y-2 group">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
                 <div className="relative">
                    <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--brand-color)] transition-colors" size={20} />
                    <input 
                      type="text" 
                      placeholder="e.g. Namusoke Sarah" 
-                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
+                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 sm:py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
                      value={name} 
                      onChange={e => setName(e.target.value)} 
                      required 
@@ -97,13 +108,13 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
               </div>
 
               <div className="space-y-2 group">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Student Email</label>
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Student Email</label>
                 <div className="relative">
                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--brand-color)] transition-colors" size={20} />
                    <input 
                      type="email" 
                      placeholder="yourname@mak.ac.ug" 
-                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
+                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 sm:py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
                      value={email} 
                      onChange={e => setEmail(e.target.value)} 
                      required 
@@ -111,12 +122,12 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 <div className="space-y-2 group">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Your College</label>
+                  <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Your College</label>
                   <div className="relative">
                      <select 
-                       className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-5 px-6 text-[11px] font-black uppercase text-[var(--text-primary)] outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer shadow-inner pr-12" 
+                       className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 sm:py-5 px-5 sm:px-6 text-[11px] font-black uppercase text-[var(--text-primary)] outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer shadow-inner pr-12" 
                        value={college} 
                        onChange={e => setCollege(e.target.value as College)}
                      >
@@ -126,10 +137,10 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
                   </div>
                 </div>
                 <div className="space-y-2 group">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Current Year</label>
+                  <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Current Year</label>
                   <div className="relative">
                      <select 
-                       className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-5 px-6 text-[11px] font-black uppercase text-[var(--text-primary)] outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer shadow-inner pr-12" 
+                       className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 sm:py-5 px-5 sm:px-6 text-[11px] font-black uppercase text-[var(--text-primary)] outline-none focus:border-slate-500 transition-all appearance-none cursor-pointer shadow-inner pr-12" 
                        value={status} 
                        onChange={e => setStatus(e.target.value as UserStatus)}
                      >
@@ -143,20 +154,20 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
 
             <button 
               type="submit" 
-              className="w-full bg-[var(--brand-color)] text-white font-black py-6 rounded-[var(--radius-main)] text-xs uppercase tracking-[0.4em] transition-all shadow-2xl hover:brightness-110 active:scale-95 flex items-center justify-center gap-4 hover:scale-[1.02]"
+              className="w-full bg-[var(--brand-color)] text-white font-black py-5 sm:py-6 rounded-[var(--radius-main)] text-[11px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] transition-all shadow-2xl hover:brightness-110 active:scale-95 flex items-center justify-center gap-4 hover:scale-[1.02]"
             >
-              Create My Account <ArrowRight size={20} />
+              Initialize Profile <ArrowRight size={20} />
             </button>
           </form>
 
-          <div className="pt-10 border-t border-[var(--border-color)] flex flex-col items-center gap-6 text-center opacity-60">
+          <div className="pt-8 sm:pt-10 border-t border-[var(--border-color)] flex flex-col items-center gap-6 text-center opacity-70 mb-12 sm:mb-0">
              <div className="flex items-center gap-8 text-slate-400">
                 <Database size={20} />
                 <Terminal size={20} />
                 <Activity size={20} />
              </div>
-             <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em] max-w-[320px] leading-loose">
-                By joining, you agree to our community guidelines and university digital protocols. We protect your data with Makerere security standards.
+             <p className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.4em] max-w-[320px] leading-loose">
+                By joining, you agree to the university digital protocols. We protect your data with Makerere security standards.
              </p>
           </div>
         </div>

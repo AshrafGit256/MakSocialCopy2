@@ -17,9 +17,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-hidden selection:bg-[var(--brand-color)] selection:text-white font-sans transition-colors duration-500">
+    <div className="flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--brand-color)] selection:text-white font-sans transition-colors duration-500">
       
-      {/* LEFT PANEL */}
+      {/* LEFT PANEL - Hidden on Mobile */}
       <div className="hidden lg:block w-1/2 relative bg-[var(--bg-secondary)] dark:bg-[#05080c] border-r border-[var(--border-color)] overflow-hidden">
         <img
           src="https://lh3.googleusercontent.com/gps-cs-s/AHVAweqcyxlewzxagSqcM7aXE5JrGSLNyiGP7V4XR5PYmTliZcJOnRatS4B5-cUO2UgmsTfT9efVrOAS9Gx-NJk8oIZmgZDLPpvc3W6Fl6GeSh-sbqtKnImUNwovg9unJwqJb_5Rlw9lU_Nfgg69=s680-w680-h510-rw"
@@ -59,30 +59,37 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[var(--bg-primary)] relative animate-in fade-in duration-500">
-        <div className="absolute top-10 right-10 flex items-center gap-6">
-           <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Need an account?</span>
+      {/* RIGHT PANEL - Main Interaction Area */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 sm:p-10 md:p-20 bg-[var(--bg-primary)] relative animate-in fade-in duration-500">
+        
+        {/* MOBILE TOP BAR NAVIGATION */}
+        <div className="w-full max-w-md flex justify-between items-center mb-12 lg:absolute lg:top-10 lg:right-10 lg:mb-0">
+           <div className="flex items-center gap-3 lg:hidden">
+              <div className="w-8 h-8 bg-[var(--brand-color)] rounded-[var(--radius-main)] flex items-center justify-center shadow-lg">
+                <Users size={16} className="text-white" />
+              </div>
+              <span className="text-sm font-black uppercase tracking-tight text-slate-900">MakSocial</span>
+           </div>
            <button 
              onClick={onSwitchToRegister} 
-             className="px-6 py-3 border border-[var(--border-color)] rounded-[var(--radius-main)] text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:border-slate-400 transition-all active:scale-95 shadow-sm flex items-center gap-2"
+             className="px-4 py-2 sm:px-6 sm:py-3 border border-[var(--border-color)] rounded-[var(--radius-main)] text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:border-slate-400 transition-all active:scale-95 shadow-sm flex items-center gap-2"
            >
-             Register Now <ChevronRight size={14}/>
+             Register <ChevronRight size={14} className="hidden sm:block"/>
            </button>
         </div>
 
-        <div className="w-full max-w-md space-y-12">
+        <div className="w-full max-w-md space-y-10 sm:space-y-12">
           <div className="space-y-4">
-             <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full text-slate-500 text-[10px] font-black uppercase tracking-widest shadow-sm">
-                <Terminal size={16} className="text-[var(--brand-color)]" /> Student Login Portal
+             <div className="inline-flex items-center gap-3 px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full text-slate-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-sm">
+                <Terminal size={14} className="text-[var(--brand-color)]" /> Student Login Portal
              </div>
-             <h2 className="text-5xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">Welcome Back.</h2>
+             <h2 className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] uppercase tracking-tighter leading-none">Welcome Back.</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+            <div className="space-y-5 sm:space-y-6">
               <div className="space-y-2 group">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Student Email</label>
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Student Email</label>
                 <div className="relative">
                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--brand-color)] transition-colors" size={20} />
                    <input 
@@ -90,22 +97,22 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
                      value={email} 
                      onChange={(e) => setEmail(e.target.value)} 
                      placeholder="yourname@mak.ac.ug" 
-                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
+                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 sm:py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
                      required 
                    />
                 </div>
               </div>
               <div className="space-y-2 group">
                 <div className="flex justify-between items-center px-1">
-                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Password</label>
-                   <button type="button" className="text-[10px] font-black uppercase text-slate-400 hover:text-[var(--brand-color)] transition-colors">Forgot Password?</button>
+                   <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500">Password</label>
+                   <button type="button" className="text-[9px] sm:text-[10px] font-black uppercase text-slate-400 hover:text-[var(--brand-color)] transition-colors">Forgot?</button>
                 </div>
                 <div className="relative">
                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--brand-color)] transition-colors" size={20} />
                    <input 
                      type="password" 
                      placeholder="••••••••" 
-                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
+                     className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--radius-main)] py-4 sm:py-5 pl-14 pr-6 text-sm font-black text-[var(--text-primary)] outline-none focus:border-slate-500 focus:ring-4 focus:ring-slate-500/5 transition-all shadow-inner" 
                      required 
                    />
                 </div>
@@ -114,20 +121,20 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
 
             <button 
               type="submit" 
-              className="w-full bg-[var(--brand-color)] text-white font-black py-6 rounded-[var(--radius-main)] text-xs uppercase tracking-[0.4em] transition-all shadow-2xl hover:brightness-110 active:scale-95 flex items-center justify-center gap-4 hover:scale-[1.02]"
+              className="w-full bg-[var(--brand-color)] text-white font-black py-5 sm:py-6 rounded-[var(--radius-main)] text-[11px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] transition-all shadow-2xl hover:brightness-110 active:scale-95 flex items-center justify-center gap-4 hover:scale-[1.02]"
             >
-              Sign In to Your Account <ArrowRight size={20} />
+              Sign In <ArrowRight size={20} />
             </button>
           </form>
 
-          <div className="pt-10 border-t border-[var(--border-color)] flex flex-col items-center gap-6 text-center opacity-60">
+          <div className="pt-8 sm:pt-10 border-t border-[var(--border-color)] flex flex-col items-center gap-6 text-center opacity-70">
              <div className="flex items-center gap-8 text-slate-400">
                 <ShieldCheck size={20} />
                 <Fingerprint size={20} />
                 <Activity size={20} />
              </div>
-             <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.4em] max-w-[300px] leading-loose">
-                Your account is protected by the Hill Security Framework. Access is restricted to verified Makerere students and staff.
+             <p className="text-[8px] sm:text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] sm:tracking-[0.4em] max-w-[280px] leading-loose">
+                Your account is protected by the Hill Security Framework. Verified Makerere students only.
              </p>
           </div>
         </div>

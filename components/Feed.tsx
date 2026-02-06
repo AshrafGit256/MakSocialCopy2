@@ -7,10 +7,68 @@ import {
   Star, MessageCircle, Zap, Activity, Globe, 
   Terminal, Share2, Bookmark, 
   BadgeCheck, ArrowLeft, GitCommit,
-  Calendar, MapPin, X, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ArrowUp, Send
+  Calendar, MapPin, X, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ArrowUp, Send, Clock, Timer
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
+
+// --- REFINED TACTICAL COUNTDOWN TIMER ---
+const CountdownTimer: React.FC<{ targetDate: string }> = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
+
+  useEffect(() => {
+    const calculate = () => {
+      const difference = +new Date(targetDate) - +new Date();
+      if (difference > 0) {
+        setTimeLeft({
+          d: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          m: Math.floor((difference / 1000 / 60) % 60),
+          s: Math.floor((difference / 1000) % 60)
+        });
+      } else {
+        setTimeLeft(null);
+      }
+    };
+    calculate();
+    const timer = setInterval(calculate, 1000);
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  if (!timeLeft) return (
+    <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-600 rounded-sm animate-pulse">
+      <Clock size={12}/>
+      <span className="text-[10px] font-black uppercase tracking-widest leading-none">Registry.Expired</span>
+    </div>
+  );
+
+  return (
+    <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-[2px] shadow-lg border border-white/10 select-none">
+      <div className="flex items-center gap-1.5 px-2 py-1">
+        <Timer size={12} className="text-[var(--brand-color)]" />
+        <span className="text-[9px] font-black text-white/40 uppercase tracking-widest mr-1">T-Minus</span>
+      </div>
+      <div className="flex items-center gap-1 pr-1">
+        {[
+          { val: timeLeft.d, lab: 'D' },
+          { val: timeLeft.h, lab: 'H' },
+          { val: timeLeft.m, lab: 'M' },
+          { val: timeLeft.s, lab: 'S', color: 'text-amber-500' }
+        ].map((unit, i) => (
+          <React.Fragment key={i}>
+            <div className="flex flex-col items-center bg-white/5 px-2 py-0.5 min-w-[32px] rounded-sm">
+              <span className={`text-[13px] font-black leading-none ticker-text ${unit.color || 'text-white'}`}>
+                {unit.val.toString().padStart(2, '0')}
+              </span>
+              <span className="text-[6px] font-black text-white/30 uppercase">{unit.lab}</span>
+            </div>
+            {i < 3 && <span className="text-white/20 font-black text-[10px] animate-pulse">:</span>}
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // --- TOAST COMPONENT ---
 interface ToastMsg {
@@ -95,10 +153,10 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
       id: `ev-post-${post.id}-${Date.now()}`,
       title: post.isEventBroadcast ? (post.eventTitle || 'University Protocol') : `Signal Ref: ${post.author}`,
       description: post.content.replace(/<[^>]*>/g, '').slice(0, 100) + '...',
-      date: post.eventDate || new Date().toISOString().split('T')[0],
+      date: post.eventDate || post.opportunityData?.deadline || new Date().toISOString().split('T')[0],
       time: post.eventTime || '09:00',
       location: post.eventLocation || 'Universal Wing',
-      category: 'Academic',
+      category: post.isOpportunity ? 'Other' : 'Academic',
       createdBy: post.authorId,
       attendeeIds: [currentUser.id]
     };
@@ -113,6 +171,9 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
     setNewComment('');
     onUpdate();
   };
+
+  const isTicking = post.isEventBroadcast || post.isOpportunity;
+  const targetDate = post.isEventBroadcast ? post.eventDate : post.opportunityData?.deadline;
 
   return (
     <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-none overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-400 mb-12' : 'mb-14'}`}>
@@ -130,13 +191,69 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {isTicking && targetDate && <CountdownTimer targetDate={targetDate} />}
                   <span className="text-[9px] font-mono text-slate-400 uppercase">{post.timestamp}</span>
                   <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-1 rounded transition-all ${bookmarks.includes(post.id) ? 'text-orange-500 scale-110' : 'text-slate-400'}`}><Bookmark size={16} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} /></button>
                 </div>
             </div>
             <div className="p-6">
-                {/* Headers 20px, Posts 16px handled by global CSS classes post-content-markdown */}
                 <div className="text-[16px] leading-relaxed font-sans text-[var(--text-primary)] post-content-markdown mb-4" dangerouslySetInnerHTML={{ __html: post.content }} />
+                
+                {/* IMPROVED EVENT METADATA BLOCK */}
+                {post.isEventBroadcast && (
+                   <div className="mb-6 overflow-hidden bg-slate-900 rounded-[var(--radius-main)] shadow-xl border border-white/5">
+                      <div className="flex items-stretch divide-x divide-white/10">
+                        <div className="flex-1 p-4 space-y-1">
+                          <span className="text-[7px] font-black text-indigo-400 uppercase tracking-[0.3em]">Protocol_Venue</span>
+                          <div className="flex items-center gap-2 text-white">
+                            <MapPin size={14} className="text-rose-500"/>
+                            <span className="text-[11px] font-black uppercase tracking-tighter truncate">{post.eventLocation}</span>
+                          </div>
+                        </div>
+                        <div className="flex-1 p-4 space-y-1">
+                          <span className="text-[7px] font-black text-indigo-400 uppercase tracking-[0.3em]">Temporal_Window</span>
+                          <div className="flex items-center gap-2 text-white">
+                            <Clock size={14} className="text-indigo-400"/>
+                            <span className="text-[11px] font-black uppercase tracking-tighter">{post.eventDate} @ {post.eventTime}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-[var(--brand-color)]/10 px-4 py-1.5 border-t border-white/10 flex items-center justify-between">
+                        <span className="text-[8px] font-black text-[var(--brand-color)] uppercase tracking-widest">Signal.Authenticated</span>
+                        <div className="flex items-center gap-1.5">
+                           <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                           <span className="text-[8px] font-black text-white/40 uppercase">Broadcast_Active</span>
+                        </div>
+                      </div>
+                   </div>
+                )}
+
+                {/* IMPROVED OPPORTUNITY METADATA BLOCK */}
+                {post.isOpportunity && post.opportunityData && (
+                   <div className="mb-6 overflow-hidden bg-amber-500/10 rounded-[var(--radius-main)] border border-amber-500/30">
+                      <div className="flex items-stretch divide-x divide-amber-500/20">
+                        <div className="flex-1 p-4 space-y-1">
+                           <span className="text-[7px] font-black text-amber-600 uppercase tracking-[0.3em]">Commitment_Type</span>
+                           <div className="flex items-center gap-2 text-slate-800">
+                             <Zap size={14} className="text-amber-500"/>
+                             <span className="text-[11px] font-black uppercase tracking-tighter">{post.opportunityData.type}</span>
+                           </div>
+                        </div>
+                        <div className="flex-1 p-4 space-y-1">
+                           <span className="text-[7px] font-black text-amber-600 uppercase tracking-[0.3em]">Protocol_Deadline</span>
+                           <div className="flex items-center gap-2 text-slate-800">
+                             <Calendar size={14} className="text-amber-500"/>
+                             <span className="text-[11px] font-black uppercase tracking-tighter">{post.opportunityData.deadline}</span>
+                           </div>
+                        </div>
+                      </div>
+                      <div className="bg-amber-500/5 px-4 py-2 border-t border-amber-500/20 flex items-center justify-between">
+                         <span className="text-[9px] font-black text-amber-700 uppercase tracking-widest">{post.opportunityData.detectedBenefit || 'Protocol Validated'}</span>
+                         <BadgeCheck size={14} className="text-amber-500"/>
+                      </div>
+                   </div>
+                )}
+
                 {post.images && post.images.length > 0 && <PostImageGrid images={post.images} />}
                 <div className="flex flex-wrap gap-2 mt-4">{(post.hashtags || []).map(tag => (<span key={tag} className="text-[9px] font-bold text-slate-500 tracking-wider">#{tag.replace('#', '')}</span>))}</div>
             </div>
@@ -144,7 +261,13 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 <div className="flex items-center gap-8">
                   <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[11px] font-bold transition-colors ${isLiked ? 'text-amber-500' : 'text-slate-500 hover:text-amber-500'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
-                  <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:text-[var(--brand-color)] transition-all active:scale-110" title="Add to Registry Roadmap"><Calendar size={18} /> <span className="hidden sm:inline uppercase tracking-widest text-[8px]">Sync roadmap</span></button>
+                  
+                  {isTicking && (
+                    <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 p-1.5 bg-[var(--brand-color)]/10 text-[var(--brand-color)] border border-[var(--brand-color)]/20 rounded-sm hover:bg-[var(--brand-color)] hover:text-white transition-all active:scale-110" title="Sync to Roadmap">
+                      <Calendar size={16} /> 
+                      <span className="uppercase tracking-widest text-[8px] font-black ml-1">Sync_Roadmap</span>
+                    </button>
+                  )}
                 </div>
                 <div className="hidden lg:flex items-center gap-2 px-2 py-0.5 bg-slate-500/10 text-slate-500 border border-slate-500/20 rounded-[2px] text-[8px] font-black uppercase tracking-widest"><Terminal size={10}/> SHA_{SHA_GEN().slice(0,6)}</div>
             </div>
@@ -158,7 +281,6 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                     <img src={comment.authorAvatar} className="w-8 h-8 rounded-full border border-[var(--border-color)] bg-white object-cover" />
                     <div className="flex-1 min-w-0">
                        <div className="flex items-center justify-between mb-1"><span className="text-[12px] font-black text-slate-700 uppercase tracking-tight">{comment.author}</span><span className="text-[9px] font-mono text-slate-400">{comment.timestamp}</span></div>
-                       {/* Replies rule: 14px */}
                        <p className="text-[14px] font-medium text-[var(--text-primary)] leading-relaxed comment-text">"{comment.text}"</p>
                     </div>
                 </div>

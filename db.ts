@@ -98,8 +98,74 @@ export const db = {
     db.saveGroups(updated);
   },
   getLostFound: (): LostFoundItem[] => parseArray<LostFoundItem>(DB_KEYS.LOST_FOUND, [
-    { id: 'lf1', type: 'Found', title: 'Calculus Workbook', description: 'Found near Main Library. Has some handwritten notes on the first page.', location: 'Main Library Entrance', authorId: 'u-ninfa', authorName: 'Ninfa Monaldo', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa', timestamp: '2h ago', status: 'Open', college: 'Global' },
-    { id: 'lf2', type: 'Lost', title: 'Room Keys', description: 'Bunch of 3 keys with a wooden keychain. Lost between COCIS and Freedom Square.', location: 'COCIS / Freedom Square', authorId: 'u-opio', authorName: 'Opio Eric', authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio', timestamp: '5h ago', status: 'Open', college: 'COCIS' }
+    { 
+      id: 'lf-nat-id', 
+      type: 'Found', 
+      title: 'National ID Card', 
+      description: 'Found a Ugandan National ID near the CEDAT entrance. The name on it starts with N. If you lost yours, please message me with your full name to claim it.', 
+      location: 'CEDAT Main Entrance', 
+      images: ['https://pixdynamics.com/assets/images/uganda/IDcardOCR/1.png'], 
+      authorId: 'mak_security', 
+      authorName: 'Security Registry', 
+      authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Security', 
+      timestamp: '1h ago', 
+      status: 'Open', 
+      college: 'CEDAT' 
+    },
+    { 
+      id: 'lf-calc', 
+      type: 'Found', 
+      title: 'Casio Scientific Calculator', 
+      description: 'Found this Casio calculator in the Main Hall after the mathematics exam today. It has a small sticker on the back. Message me if it is yours.', 
+      location: 'Main Hall', 
+      images: ['https://cdn-prd-02.pnp.co.za/sys-master/images/h3a/h07/11256664195102/silo-product-image-v2-31Aug2023-180341-4549526607226-Straight_on-172585-1169_400Wx400H'], 
+      authorId: 'u-ninfa', 
+      authorName: 'Ninfa Monaldo', 
+      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa', 
+      timestamp: '3h ago', 
+      status: 'Open', 
+      college: 'Global' 
+    },
+    { 
+      id: 'lf-keys-lost', 
+      type: 'Lost', 
+      title: 'Set of Door Keys', 
+      description: 'I lost a bunch of about 4 keys on a black strap. I likely dropped them between the COCIS block and the library. Please let me know if you pick them up.', 
+      location: 'COCIS / Library Path', 
+      images: ['https://covenantsecurityequipment.com/cdn/shop/files/CSE-AS-ExtraKeys_700x700.png?v=1713479233'], 
+      authorId: 'u-julianne', 
+      authorName: 'Dr. Julianne O.', 
+      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Julianne', 
+      timestamp: '5h ago', 
+      status: 'Open', 
+      college: 'COCIS' 
+    },
+    { 
+      id: 'lf-text-1', 
+      type: 'Lost', 
+      title: 'White Lab Coat', 
+      description: 'I lost my white lab coat at the CHS wing yesterday. It has "M.S" embroidery on the pocket. If found, please reach out.', 
+      location: 'CHS Wing', 
+      authorId: 'u-peter', 
+      authorName: 'Counsel Peter', 
+      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Peter', 
+      timestamp: '1d ago', 
+      status: 'Open', 
+      college: 'CHS' 
+    },
+    { 
+      id: 'lf-text-2', 
+      type: 'Found', 
+      title: 'Black Leather Wallet', 
+      description: 'Found a small black wallet at Freedom Square. No ID found inside, but it has some cash and receipts. Describe the contents to claim.', 
+      location: 'Freedom Square', 
+      authorId: 'guild_office', 
+      authorName: 'Guild Presidential Office', 
+      authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guild', 
+      timestamp: '2h ago', 
+      status: 'Open', 
+      college: 'Global' 
+    }
   ]),
   saveLostFound: (items: LostFoundItem[]) => localStorage.setItem(DB_KEYS.LOST_FOUND, JSON.stringify(items)),
   addLostFound: (item: LostFoundItem) => db.saveLostFound([item, ...db.getLostFound()]),

@@ -512,6 +512,41 @@ export const MOCK_CHATS: ChatConversation[] = [
       { id: 'm1', text: 'Initializing protocol...', timestamp: '10:00 AM', isMe: false },
       { id: 'm2', text: 'Handshake successful. Ready for uplink.', timestamp: '10:01 AM', isMe: false }
     ]
+  },
+  {
+    id: 'chat-2',
+    user: { name: 'Counsel Peter', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Peter', status: 'online', role: 'Legal Node' },
+    unreadCount: 0,
+    lastMessage: 'The mooter session is scheduled for Friday.',
+    lastTimestamp: 'Yesterday',
+    isGroup: false,
+    messages: [
+      { id: 'm3', text: 'Hello Counselor, when is the next moot?', timestamp: 'Yesterday', isMe: true },
+      { id: 'm4', text: 'The mooter session is scheduled for Friday.', timestamp: 'Yesterday', isMe: false }
+    ]
+  },
+  {
+    id: 'chat-3',
+    user: { name: 'Brian K.', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian', status: 'offline', role: 'CS Peer' },
+    unreadCount: 1,
+    lastMessage: 'Did you sync the repository yet?',
+    lastTimestamp: '2h ago',
+    isGroup: false,
+    messages: [
+      { id: 'm5', text: 'Working on the logic hub now.', timestamp: '4h ago', isMe: true },
+      { id: 'm6', text: 'Did you sync the repository yet?', timestamp: '2h ago', isMe: false }
+    ]
+  },
+  {
+    id: 'chat-4',
+    user: { name: 'Mak UniPod', avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=UniPod', status: 'online', role: 'Innovation Node' },
+    unreadCount: 0,
+    lastMessage: 'Your prototype submission was received.',
+    lastTimestamp: '5h ago',
+    isGroup: false,
+    messages: [
+      { id: 'm7', text: 'Your prototype submission was received.', timestamp: '5h ago', isMe: false }
+    ]
   }
 ];
 

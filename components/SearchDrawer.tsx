@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db';
 import { User } from '../types';
@@ -40,13 +41,13 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onSelectUs
 
   return (
     <div className="fixed inset-y-0 left-0 w-64 z-[3005] flex pointer-events-none">
-      {/* Search Drawer content - Sized to match Sidebar exactly, only clickable part */}
-      <aside className="relative w-full h-full bg-[var(--bg-primary)] border-r border-[var(--border-color)] shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 font-mono pointer-events-auto">
+      {/* Search Drawer content */}
+      <aside className="relative w-full h-full bg-[var(--bg-primary)] border-r border-[var(--border-color)] shadow-2xl flex flex-col animate-in slide-in-from-left duration-300 font-sans pointer-events-auto">
         <div className="p-6 border-b border-[var(--border-color)] space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Terminal size={18} className="text-[var(--brand-color)]" />
-              <h2 className="text-sm font-black uppercase tracking-tighter">Search Registry</h2>
+              <Search size={18} className="text-[var(--brand-color)]" />
+              <h2 className="text-sm font-black uppercase tracking-tighter">Search People</h2>
             </div>
             <button 
               onClick={onClose}
@@ -63,8 +64,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onSelectUs
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Query node..."
-              className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-[var(--brand-color)] shadow-inner transition-all"
+              placeholder="Search for someone..."
+              className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg py-3 pl-10 pr-4 text-[13px] font-bold outline-none focus:border-[var(--brand-color)] shadow-inner transition-all"
             />
           </div>
         </div>
@@ -79,7 +80,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onSelectUs
                     onSelectUser(user.id);
                     onClose();
                   }}
-                  className="w-full flex items-center gap-3 p-3 hover:bg-[var(--bg-secondary)] rounded-md transition-all group text-left"
+                  className="w-full flex items-center gap-3 p-3 hover:bg-[var(--bg-secondary)] rounded-xl transition-all group text-left"
                 >
                   <div className="relative shrink-0">
                     <img 
@@ -91,31 +92,31 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onSelectUs
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <h4 className="text-[11px] font-black uppercase tracking-tight text-[var(--text-primary)] truncate">{user.name}</h4>
+                      <h4 className="text-[12px] font-black text-[var(--text-primary)] truncate">{user.name}</h4>
                       <AuthoritySeal size={12} />
                     </div>
-                    <p className="text-[9px] text-slate-500 uppercase tracking-widest truncate">{user.college} HUB</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">{user.college} Hub</p>
                   </div>
                 </button>
               )) : (
                 <div className="py-20 text-center space-y-4 opacity-40">
                   <Activity size={24} className="mx-auto text-slate-500" />
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em]">No node matches</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest">No matches found</p>
                 </div>
               )}
             </div>
           ) : (
             <div className="p-10 text-center space-y-6 opacity-30">
-              <UserIcon size={40} className="mx-auto" />
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] leading-loose">
-                Locate Peers
+              <UserIcon size={40} className="mx-auto text-slate-400" />
+              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest leading-loose">
+                Find your classmates and friends
               </p>
             </div>
           )}
         </div>
         
-        <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
-          <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest text-center">Protocol v4.2 Search</p>
+        <div className="p-4 border-t border-[var(--border-color)] bg-slate-50/50">
+          <p className="text-[9px] font-bold uppercase text-slate-400 tracking-widest text-center">MakSocial Search Online</p>
         </div>
       </aside>
     </div>

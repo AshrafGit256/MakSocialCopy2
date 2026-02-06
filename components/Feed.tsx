@@ -7,10 +7,40 @@ import {
   Star, MessageCircle, Zap, Activity, Globe, 
   Terminal, Share2, Bookmark, 
   BadgeCheck, ArrowLeft, GitCommit,
-  Calendar, MapPin, X, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ArrowUp, Send
+  Calendar, MapPin, X, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ArrowUp, Send, Clock
 } from 'lucide-react';
 
 const SHA_GEN = () => Math.random().toString(16).substring(2, 8).toUpperCase();
+
+// --- COUNTDOWN COMPONENT ---
+const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const calculate = () => {
+      const diff = new Date(targetDate).getTime() - new Date().getTime();
+      if (diff <= 0) {
+        setTimeLeft('Event Started');
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(`${days}d ${hours}h ${minutes}m left`);
+    };
+
+    calculate();
+    const timer = setInterval(calculate, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  return (
+    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-md shadow-sm">
+      <Clock size={10} className="animate-pulse" />
+      <span className="text-[9px] font-black uppercase tracking-widest">{timeLeft}</span>
+    </div>
+  );
+};
 
 // --- TOAST COMPONENT ---
 interface ToastMsg {
@@ -130,6 +160,9 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  {post.isEventBroadcast && post.eventDate && (
+                    <Countdown targetDate={post.eventDate} />
+                  )}
                   <span className="text-[11px] text-slate-400 font-medium">{post.timestamp}</span>
                   <button onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }} className={`p-1 rounded transition-all ${bookmarks.includes(post.id) ? 'text-orange-500 scale-110' : 'text-slate-400 hover:text-slate-600'}`}><Bookmark size={16} fill={bookmarks.includes(post.id) ? "currentColor" : "none"} /></button>
                 </div>
@@ -143,7 +176,9 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 <div className="flex items-center gap-8">
                   <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[12px] font-bold transition-colors ${isLiked ? 'text-brand-primary' : 'text-slate-500 hover:text-brand-primary'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
-                  <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-brand-primary transition-all" title="Add to Calendar"><Calendar size={18} /> <span className="hidden sm:inline font-bold">Save Event</span></button>
+                  {(post.isOpportunity || post.isEventBroadcast) && (
+                    <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-brand-primary transition-all" title="Add to Calendar"><Calendar size={18} /> <span className="hidden sm:inline font-bold">Save Event</span></button>
+                  )}
                 </div>
                 <div className="hidden lg:flex items-center gap-2 px-2.5 py-1 bg-slate-100 text-slate-400 rounded-md text-[9px] font-bold uppercase tracking-widest"><Globe size={10}/> Public Post</div>
             </div>
@@ -174,154 +209,134 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
   );
 };
 
-const Feed: React.FC<{ collegeFilter?: College | 'Global', threadId?: string, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onBack?: () => void, triggerSafetyError: (msg: string) => void }> = ({ collegeFilter = 'Global', threadId, onOpenThread, onNavigateToProfile, onBack, triggerSafetyError }) => {
+// --- FEED COMPONENT ---
+interface FeedProps {
+  collegeFilter?: College | 'Global';
+  threadId?: string;
+  onOpenThread: (id: string) => void;
+  onNavigateToProfile: (id: string) => void;
+  triggerSafetyError: () => void;
+  onBack?: () => void;
+}
+
+const Feed: React.FC<FeedProps> = ({ 
+  collegeFilter = 'Global', 
+  threadId, 
+  onOpenThread, 
+  onNavigateToProfile, 
+  triggerSafetyError, 
+  onBack 
+}) => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [user, setUser] = useState<User>(db.getUser());
+  const [currentUser] = useState<User>(db.getUser());
   const [bookmarks, setBookmarks] = useState<string[]>(db.getBookmarks());
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
-  const [newPostsAvailable, setNewPostsAvailable] = useState(0);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
-  
-  const lastKnownPostCount = useRef(0);
 
   useEffect(() => {
-    const sync = () => { 
-      const currentPosts = db.getPosts();
-      const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
-      
-      if (lastKnownPostCount.current > 0 && filteredCurrent.length > lastKnownPostCount.current && !threadId) {
-        setNewPostsAvailable(filteredCurrent.length - lastKnownPostCount.current);
-      }
-      
-      if (lastKnownPostCount.current === 0 || updateTrigger > 0) {
-        setPosts(currentPosts);
-        lastKnownPostCount.current = filteredCurrent.length;
-        setNewPostsAvailable(0);
-      }
-      
-      setUser(db.getUser()); 
-      setBookmarks(db.getBookmarks()); 
+    const sync = () => {
+      const allPosts = db.getPosts();
+      setPosts(allPosts);
+      setBookmarks(db.getBookmarks());
     };
-
     sync();
     const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
-  }, [updateTrigger, collegeFilter, threadId]);
-
-  const refreshFeed = () => {
-    const currentPosts = db.getPosts();
-    const filteredCurrent = currentPosts.filter(p => !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
-    setPosts(currentPosts);
-    lastKnownPostCount.current = filteredCurrent.length;
-    setNewPostsAvailable(0);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
   const addToast = (type: ToastMsg['type'], text: string) => {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, type, text }]);
   };
 
-  const removeToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
-
-  const handlePost = async (html: string, poll?: PollData) => {
-    const imgRegex = /<img[^+]+src="([^">]+)"/g;
-    const foundImages: string[] = [];
-    let match;
-    while ((match = imgRegex.exec(html)) !== null) foundImages.push(match[1]);
-
-    const hashtagRegex = /#(\w+)/g;
-    const foundTags = html.match(hashtagRegex) || [];
-    const cleanedHtml = html.replace(/<img[^>]*>/g, '');
-
-    const newPost: Post = { 
-      id: `p-${Date.now()}`, 
-      author: user.name, 
-      authorId: user.id, 
-      authorRole: user.role, 
-      authorAvatar: user.avatar, 
-      timestamp: 'Just now', 
-      content: cleanedHtml, 
-      images: foundImages, 
-      hashtags: foundTags, 
-      likes: 0, 
-      commentsCount: 0, 
-      comments: [], 
-      views: 1, 
-      flags: [], 
-      isOpportunity: false, 
-      college: collegeFilter === 'Global' ? user.college : collegeFilter, 
-      pollData: poll 
-    };
-
-    db.addPost(newPost);
-    setUpdateTrigger(prev => prev + 1);
-    addToast('success', "Your post has been shared with the community.");
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  const filteredPosts = posts.filter(p => threadId ? p.id === threadId : !p.parentId && (collegeFilter === 'Global' || p.college === collegeFilter));
-  
+  const handlePost = async (content: string, pollData?: PollData) => {
+    const newPost: Post = {
+      id: `p-${Date.now()}`,
+      author: currentUser.name,
+      authorId: currentUser.id,
+      authorRole: currentUser.role,
+      authorAvatar: currentUser.avatar,
+      timestamp: 'Just now',
+      content,
+      hashtags: [],
+      likes: 0,
+      commentsCount: 0,
+      comments: [],
+      views: 0,
+      flags: [],
+      isOpportunity: false,
+      college: collegeFilter === 'Global' ? currentUser.college : collegeFilter,
+      pollData
+    };
+    db.addPost(newPost);
+    setPosts(db.getPosts());
+  };
+
+  const handleLike = (id: string) => {
+    db.likePost(id);
+    setPosts(db.getPosts());
+  };
+
+  const handleBookmark = (id: string) => {
+    const newBookmarks = db.toggleBookmark(id);
+    setBookmarks(newBookmarks);
+    addToast('success', newBookmarks.includes(id) ? 'Added to registry vault.' : 'Removed from registry vault.');
+  };
+
+  const displayedPosts = useMemo(() => {
+    if (threadId) {
+      return posts.filter(p => p.id === threadId);
+    }
+    if (collegeFilter === 'Global') {
+      return posts;
+    }
+    return posts.filter(p => p.college === collegeFilter || p.college === 'Global');
+  }, [posts, threadId, collegeFilter]);
+
   return (
-    <div className="max-w-[1440px] mx-auto pb-40 lg:px-12 py-6 bg-[var(--bg-primary)] min-h-screen relative">
-      <div className="fixed bottom-10 right-10 z-[7000] flex flex-col gap-4 pointer-events-none">
-        {toasts.map(toast => (
-          <div key={toast.id} className="pointer-events-auto">
-            <Toast toast={toast} onDismiss={removeToast} />
-          </div>
+    <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-10 relative">
+      {/* TOAST CONTAINER */}
+      <div className="fixed top-6 right-6 z-[6000] flex flex-col gap-3">
+        {toasts.map(t => (
+          <Toast key={t.id} toast={t} onDismiss={removeToast} />
         ))}
       </div>
 
-      {!threadId && newPostsAvailable > 0 && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-4 fade-in duration-300">
-           <button 
-             onClick={refreshFeed}
-             className="px-6 py-2.5 bg-brand-primary text-white rounded-full font-bold text-[13px] flex items-center gap-2 shadow-2xl hover:brightness-110 active:scale-95 transition-all"
-           >
-             <ArrowUp size={16}/> View {newPostsAvailable} new posts
-           </button>
-        </div>
+      {threadId && (
+        <button onClick={onBack} className="mb-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-[var(--brand-color)] transition-all">
+          <ArrowLeft size={16}/> Back to Pulse
+        </button>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-         <div className="lg:col-span-8 px-0 sm:px-4">
-            {!threadId && <RichEditor onPost={handlePost} currentUser={user} />}
-            {threadId && (
-              <div className="mb-10 flex items-center justify-between px-4">
-                <button onClick={onBack} className="px-6 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-[13px] font-bold transition-all flex items-center gap-3"><ArrowLeft size={16}/> Back to Feed</button>
-              </div>
-            )}
-            <div className="space-y-0">
-               {filteredPosts.length > 0 ? filteredPosts.map((post) => (
-                 <PostItem 
-                   key={post.id} 
-                   post={post} 
-                   currentUser={user} 
-                   onOpenThread={onOpenThread} 
-                   onNavigateToProfile={onNavigateToProfile} 
-                   bookmarks={bookmarks} 
-                   onBookmark={(id) => setBookmarks(db.toggleBookmark(id))} 
-                   onUpdate={() => setUpdateTrigger(prev => prev + 1)} 
-                   isThreadView={!!threadId} 
-                   isLiked={likedPosts.has(post.id)} 
-                   onLike={(id) => { 
-                     if(!likedPosts.has(id)){ 
-                       db.likePost(id); 
-                       setLikedPosts(new Set([...likedPosts, id])); 
-                       setUpdateTrigger(p=>p+1); 
-                     } 
-                   }} 
-                   onAddToast={addToast} 
-                 />
-               )) : <div className="py-40 text-center opacity-40 font-bold">No posts to display yet</div>}
-            </div>
-         </div>
-         <aside className="hidden lg:block lg:col-span-4 sticky top-24 h-fit space-y-6">
-            <div className="bg-slate-50 border border-slate-200 p-8 rounded-xl shadow-sm">
-               <h4 className="text-[13px] font-bold text-slate-900 mb-4 flex items-center gap-2"><Globe size={16} className="text-brand-primary" /> Community Status</h4>
-               <p className="text-[13px] text-slate-500 leading-relaxed">The feed is currently active. All student updates are verified to maintain a healthy campus community.</p>
-            </div>
-         </aside>
+      {!threadId && <RichEditor onPost={handlePost} currentUser={currentUser} />}
+
+      <div className="space-y-2">
+        {displayedPosts.length > 0 ? (
+          displayedPosts.map(post => (
+            <PostItem 
+              key={post.id} 
+              post={post} 
+              currentUser={currentUser} 
+              onOpenThread={onOpenThread} 
+              onNavigateToProfile={onNavigateToProfile} 
+              bookmarks={bookmarks}
+              onBookmark={handleBookmark}
+              onUpdate={() => setPosts(db.getPosts())}
+              isThreadView={!!threadId}
+              isLiked={false}
+              onLike={handleLike}
+              onAddToast={addToast}
+            />
+          ))
+        ) : (
+          <div className="py-40 text-center opacity-20">
+             <GitCommit size={48} className="mx-auto mb-4" />
+             <p className="text-xs font-black uppercase tracking-[0.4em]">Awaiting Signals...</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { Post, User, College } from '../types';
 import { 
   Briefcase, Clock, Search, ShieldCheck, 
   ArrowUpRight, Database, ShieldAlert, CheckCircle,
-  Filter, Info, Star
+  Filter, Info, Star, Activity
 } from 'lucide-react';
 
 const OpportunityCard: React.FC<{ opp: Post; onDelete: (id: string) => void; isAdmin: boolean; }> = ({ opp, onDelete, isAdmin }) => {
@@ -107,7 +107,7 @@ const Opportunities: React.FC = () => {
             <Briefcase size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight leading-none text-slate-900">Career Opportunities</h1>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-none text-slate-900 uppercase">Student Opportunities</h1>
             <p className="text-[13px] text-slate-500 font-medium mt-1.5 flex items-center gap-2">
                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {opps.length} jobs and internships currently available
             </p>
@@ -149,10 +149,10 @@ const Opportunities: React.FC = () => {
             </div>
             <div className="space-y-1">
                <p className="text-[15px] font-bold text-brand-primary">Safe & Verified Postings</p>
-               <p className="text-[13px] text-slate-500 max-w-xl leading-relaxed">Our team checks every opportunity to make sure it's legitimate and safe for Makerere students. We focus on academic relevance and real benefits.</p>
+               <p className="text-[13px] text-slate-500 max-w-xl leading-relaxed font-sans">Our team checks every opportunity to make sure it's legitimate and safe for Makerere students. We focus on academic relevance and real benefits.</p>
             </div>
          </div>
-         <button className="px-8 py-3 bg-white border border-slate-200 text-[12px] font-bold rounded-lg hover:text-brand-primary hover:border-brand-primary transition-all whitespace-nowrap shadow-sm">Need Help?</button>
+         <button className="px-8 py-3 bg-white border border-slate-200 text-[12px] font-bold rounded-lg hover:text-brand-primary hover:border-brand-primary transition-all whitespace-nowrap shadow-sm">Report an Issue</button>
       </footer>
     </div>
   );

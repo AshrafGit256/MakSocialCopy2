@@ -30,12 +30,12 @@ const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
     };
 
     calculate();
-    const timer = setInterval(calculate, 60000); 
+    const timer = setInterval(calculate, 60000); // Update every minute
     return () => clearInterval(timer);
   }, [targetDate]);
 
   return (
-    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-[2px] shadow-sm">
+    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-md shadow-sm">
       <Clock size={10} className="animate-pulse" />
       <span className="text-[9px] font-black uppercase tracking-widest">{timeLeft}</span>
     </div>
@@ -144,8 +144,6 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
     onUpdate();
   };
 
-  const isShowSaveButton = post.isEventBroadcast || post.isOpportunity;
-
   return (
     <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-300 mb-8' : 'mb-10'}`}>
       <div className="flex">
@@ -178,7 +176,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 <div className="flex items-center gap-8">
                   <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[12px] font-bold transition-colors ${isLiked ? 'text-brand-primary' : 'text-slate-500 hover:text-brand-primary'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
-                  {isShowSaveButton && (
+                  {(post.isOpportunity || post.isEventBroadcast) && (
                     <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-brand-primary transition-all" title="Add to Calendar"><Calendar size={18} /> <span className="hidden sm:inline font-bold">Save Event</span></button>
                   )}
                 </div>
@@ -285,7 +283,7 @@ const Feed: React.FC<FeedProps> = ({
   const handleBookmark = (id: string) => {
     const newBookmarks = db.toggleBookmark(id);
     setBookmarks(newBookmarks);
-    addToast('success', newBookmarks.includes(id) ? 'Added to vault.' : 'Removed from vault.');
+    addToast('success', newBookmarks.includes(id) ? 'Added to registry vault.' : 'Removed from registry vault.');
   };
 
   const displayedPosts = useMemo(() => {
@@ -309,7 +307,7 @@ const Feed: React.FC<FeedProps> = ({
 
       {threadId && (
         <button onClick={onBack} className="mb-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-[var(--brand-color)] transition-all">
-          <ArrowLeft size={16}/> Back to Feed
+          <ArrowLeft size={16}/> Back to Pulse
         </button>
       )}
 
@@ -336,7 +334,7 @@ const Feed: React.FC<FeedProps> = ({
         ) : (
           <div className="py-40 text-center opacity-20">
              <GitCommit size={48} className="mx-auto mb-4" />
-             <p className="text-xs font-black uppercase tracking-[0.4em]">No updates found...</p>
+             <p className="text-xs font-black uppercase tracking-[0.4em]">Awaiting Signals...</p>
           </div>
         )}
       </div>

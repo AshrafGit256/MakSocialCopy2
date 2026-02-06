@@ -18,7 +18,6 @@ import Gallery from './components/Gallery';
 import Settings from './components/Settings';
 import MessageDropdown from './components/MessageDropdown';
 import NotificationDropdown from './components/NotificationDropdown';
-import RightSidebar from './components/RightSidebar';
 import SearchDrawer from './components/SearchDrawer';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
@@ -35,8 +34,15 @@ const App: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
-  // Theme state - Enforcing Paper (Light)
-  const [isDark, setIsDark] = useState(false);
+  // Theme state - Enforcing Light (false) / Paper
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('maksocial_appearance_v3');
+    if (saved) {
+      const settings = JSON.parse(saved);
+      return settings.themePreset !== 'paper';
+    }
+    return false; // Default to Paper
+  });
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isMsgOpen, setIsMsgOpen] = useState(false);
@@ -81,11 +87,36 @@ const App: React.FC = () => {
     const root = document.documentElement;
     root.style.setProperty('--brand-color', settings.primaryColor);
     root.style.setProperty('--radius-main', settings.borderRadius);
-    root.style.setProperty('--bg-primary', '#ffffff');
-    root.style.setProperty('--bg-secondary', '#f8fafc');
-    root.style.setProperty('--text-primary', '#0f172a');
-    root.style.setProperty('--border-color', '#e2e8f0');
-    document.documentElement.classList.remove('dark');
+
+    if (settings.themePreset === 'oled') {
+      root.style.setProperty('--bg-primary', '#000000');
+      root.style.setProperty('--bg-secondary', '#0a0a0a');
+      root.style.setProperty('--text-primary', '#ffffff');
+      root.style.setProperty('--border-color', '#111111');
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else if (settings.themePreset === 'paper') {
+      root.style.setProperty('--bg-primary', '#ffffff');
+      root.style.setProperty('--bg-secondary', '#f8fafc');
+      root.style.setProperty('--text-primary', '#0f172a');
+      root.style.setProperty('--border-color', '#e2e8f0');
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    } else if (settings.themePreset === 'tactical') {
+      root.style.setProperty('--bg-primary', '#0d1117');
+      root.style.setProperty('--bg-secondary', '#1e1e2d');
+      root.style.setProperty('--text-primary', '#c9d1d9');
+      root.style.setProperty('--border-color', '#2a2a3a');
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      root.style.setProperty('--bg-primary', '#111827');
+      root.style.setProperty('--bg-secondary', '#1f2937');
+      root.style.setProperty('--text-primary', '#f9fafb');
+      root.style.setProperty('--border-color', '#374151');
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    }
   }, [view]);
 
   useEffect(() => {
@@ -122,7 +153,7 @@ const App: React.FC = () => {
     const newUser: User = { 
       id: userId, 
       name: email.split('@')[0], 
-      role: 'Student', 
+      role: 'University Student', 
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`, 
       connections: 0, 
       email, 
@@ -271,10 +302,7 @@ const App: React.FC = () => {
             )}
           </div>
         </header>
-        <div className="flex-1 flex overflow-hidden">
-          <main className="flex-1 overflow-y-auto no-scrollbar">{renderContent()}</main>
-          {(view === 'home' || view === 'thread') && <RightSidebar />}
-        </div>
+        <main className="flex-1 overflow-y-auto no-scrollbar">{renderContent()}</main>
       </div>
     </div>
   );

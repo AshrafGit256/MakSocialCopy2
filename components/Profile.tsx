@@ -51,9 +51,11 @@ const Profile: React.FC<{
 
   const handleEmail = () => {
     if (user?.email) {
-      // Constructs a URL to open Gmail web compose interface directly
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(user.email)}`;
-      window.open(gmailUrl, '_blank');
+      // Use the 'fs=1' flag for full-screen and ensure URL encoding is strict
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(user.email)}&su=${encodeURIComponent("Hill Registry Signal")}`;
+      window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      alert("Diagnostic: Node identity lacks a valid email endpoint in the registry.");
     }
   };
 

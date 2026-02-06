@@ -12,33 +12,28 @@ import {
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<MakNotification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread' | 'engagements' | 'ai'>('all');
-
   useEffect(() => {
     const sync = () => setNotifications(db.getNotifications());
     sync();
     const interval = setInterval(sync, 5000);
     return () => clearInterval(interval);
   }, []);
-
   const filteredNotifs = notifications.filter(n => {
     if (filter === 'unread') return !n.isRead;
     if (filter === 'engagements') return n.type === 'engagement' || n.type === 'follow';
     if (filter === 'ai') return n.type === 'skill_match';
     return true;
   });
-
   const markAllAsRead = () => {
     const updated = notifications.map(n => ({ ...n, isRead: true }));
     db.saveNotifications(updated);
     setNotifications(updated);
   };
-
   const deleteNotif = (id: string) => {
     const updated = notifications.filter(n => n.id !== id);
     db.saveNotifications(updated);
     setNotifications(updated);
   };
-
   const getIcon = (type: MakNotification['type']) => {
     switch (type) {
       case 'skill_match': return <Zap size={16} className="text-amber-500" />;
@@ -49,16 +44,12 @@ const Notifications: React.FC = () => {
       default: return <Bell size={16} />;
     }
   };
-
   const unreadCount = notifications.filter(n => !n.isRead).length;
-
   return (
     <div className="max-w-[1440px] mx-auto px-4 lg:px-8 py-8 pb-32 font-sans text-[var(--text-primary)]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div className="flex items-center gap-4">
-           <div className="p-4 bg-[var(--brand-color)] rounded-md text-white shadow-xl shadow-[var(--brand-color)]/20">
-              <Bell size={28} />
-           </div>
+           <div className="p-4 bg-[var(--brand-color)] rounded-md text-white shadow-xl shadow-[var(--brand-color)]/20"><Bell size={28} /></div>
            <div>
               <h1 className="text-3xl font-black uppercase tracking-tighter leading-none">Signal_Center</h1>
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mt-2 flex items-center gap-2">
@@ -67,12 +58,9 @@ const Notifications: React.FC = () => {
            </div>
         </div>
         <div className="flex gap-2">
-           <button onClick={markAllAsRead} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-[var(--brand-color)] transition-all flex items-center gap-2">
-              <CheckCircle2 size={12}/> Mark_All_Synced
-           </button>
+           <button onClick={markAllAsRead} className="px-5 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-slate-500 rounded-md text-[9px] font-black uppercase tracking-widest hover:text-[var(--brand-color)] transition-all flex items-center gap-2"><CheckCircle2 size={12}/> Mark_All_Synced</button>
         </div>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <aside className="lg:col-span-3 space-y-1">
            <h3 className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-widest mb-3">Signal_Categories</h3>
@@ -82,92 +70,44 @@ const Notifications: React.FC = () => {
              { id: 'engagements', label: 'Engagements', icon: <Star size={14}/> },
              { id: 'ai', label: 'AI_Synchronizations', icon: <Zap size={14}/> }
            ].map(item => (
-             <button
-               key={item.id}
-               onClick={() => setFilter(item.id as any)}
-               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[11px] font-bold uppercase tracking-wide transition-all ${
-                 filter === item.id ? 'bg-[var(--bg-secondary)] border-l-4 border-[var(--brand-color)] text-[var(--brand-color)]' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'
-               }`}
-             >
+             <button key={item.id} onClick={() => setFilter(item.id as any)} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-[11px] font-bold uppercase tracking-wide transition-all ${filter === item.id ? 'bg-[var(--bg-secondary)] border-l-4 border-[var(--brand-color)] text-[var(--brand-color)]' : 'text-slate-500 hover:bg-[var(--bg-secondary)]'}`}>
                <span className="flex items-center gap-3">{item.icon} {item.label}</span>
                {item.count !== undefined && <span className="bg-[var(--brand-color)] text-white px-2 py-0.5 rounded-full text-[8px]">{item.count}</span>}
              </button>
            ))}
         </aside>
-
-        <main className="lg:col-span-9 space-y-0.5 border border-[var(--border-color)] rounded-md overflow-hidden bg-[var(--bg-primary)]">
+        <main className="lg:col-span-9 space-y-0.5 border border-[var(--border-color)] rounded-md overflow-hidden bg-[var(--bg-primary)] font-sans">
            <div className="px-4 py-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                 <Terminal size={14}/> Registry_Output / {filter}
-              </div>
+              <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest"><Terminal size={14}/> Registry_Output / {filter}</div>
               <button className="text-slate-400 hover:text-[var(--brand-color)] transition-colors"><Filter size={14}/></button>
            </div>
-
            {filteredNotifs.length > 0 ? (
              <div className="divide-y divide-[var(--border-color)]">
                 {filteredNotifs.map(notif => (
                   <div key={notif.id} className={`group relative p-5 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${!notif.isRead ? 'border-l-4 border-[var(--brand-color)] bg-[var(--brand-color)]/5' : ''}`}>
                     <div className="mt-1 shrink-0 relative">
-                       {notif.meta?.nodeAvatar ? (
-                         <img src={notif.meta.nodeAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover" />
-                       ) : (
-                         <div className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-slate-100 flex items-center justify-center">
-                            {getIcon(notif.type)}
-                         </div>
-                       )}
-                       <div className="absolute -bottom-1 -right-1 bg-white dark:bg-black rounded-full p-0.5 border border-[var(--border-color)] shadow-sm">
-                          {getIcon(notif.type)}
-                       </div>
+                       {notif.meta?.nodeAvatar ? <img src={notif.meta.nodeAvatar} className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-white object-cover" /> : <div className="w-10 h-10 rounded-full border border-[var(--border-color)] bg-slate-100 flex items-center justify-center">{getIcon(notif.type)}</div>}
+                       <div className="absolute -bottom-1 -right-1 bg-white dark:bg-black rounded-full p-0.5 border border-[var(--border-color)] shadow-sm">{getIcon(notif.type)}</div>
                     </div>
                     <div className="flex-1 min-w-0 space-y-2">
                        <div className="flex items-center justify-between">
-                          <h4 className="text-[13px] font-black uppercase text-[var(--text-primary)] tracking-tight">
-                             {notif.title}
-                          </h4>
+                          <h4 className="text-[13px] font-black uppercase text-[var(--text-primary)] tracking-tight">{notif.title}</h4>
                           <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                              <span className="text-[8px] font-mono text-slate-400 uppercase tracking-widest">ID_{notif.meta?.hash || '??'}</span>
                              <button onClick={() => deleteNotif(notif.id)} className="text-slate-400 hover:text-rose-500 transition-colors"><Trash2 size={14}/></button>
                           </div>
                        </div>
-                       <p className="text-[12px] text-slate-500 font-medium leading-relaxed">
-                          "{notif.description}"
-                       </p>
-
+                       <p className="text-[12px] text-slate-500 font-medium leading-relaxed">"{notif.description}"</p>
                        <div className="pt-2 flex flex-wrap gap-2">
-                          {notif.type === 'follow' && (
-                            <button className="px-4 py-1.5 bg-[var(--brand-color)] text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest shadow-lg hover:brightness-110 transition-all flex items-center gap-2 active:scale-95">
-                               <UserPlus size={12}/> Follow Back
-                            </button>
-                          )}
-                          {notif.title.includes('Email') && (
-                            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all flex items-center gap-2">
-                               <Mail size={12}/> Open Uplink
-                            </button>
-                          )}
-                          {notif.title.includes('Vault') && (
-                            <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-emerald-600 transition-all flex items-center gap-2">
-                               <FileText size={12}/> Sync Asset
-                            </button>
-                          )}
-                          {notif.type === 'skill_match' && (
-                            <button className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all flex items-center gap-2">
-                               <Zap size={12}/> View Match
-                            </button>
-                          )}
-                          {notif.type === 'event' && (
-                            <button className="px-4 py-1.5 bg-rose-600 text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2">
-                               <ExternalLink size={12}/> Access Broadcast
-                            </button>
-                          )}
+                          {notif.type === 'follow' && <button className="px-4 py-1.5 bg-[var(--brand-color)] text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest shadow-lg hover:brightness-110 transition-all flex items-center gap-2 active:scale-95"><UserPlus size={12}/> Follow Back</button>}
+                          {notif.title.includes('Email') && <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all flex items-center gap-2"><Mail size={12}/> Open Uplink</button>}
+                          {notif.title.includes('Vault') && <button className="px-4 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:border-emerald-600 transition-all flex items-center gap-2"><FileText size={12}/> Sync Asset</button>}
+                          {notif.type === 'skill_match' && <button className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all flex items-center gap-2"><Zap size={12}/> View Match</button>}
+                          {notif.type === 'event' && <button className="px-4 py-1.5 bg-rose-600 text-white rounded-[2px] text-[9px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all flex items-center gap-2"><ExternalLink size={12}/> Access Broadcast</button>}
                        </div>
-
                        <div className="flex items-center gap-4 pt-1">
-                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                             <Clock size={10}/> {notif.timestamp}
-                          </span>
-                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                             STRATA: {notif.meta?.reason || 'LOGGED'}
-                          </span>
+                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Clock size={10}/> {notif.timestamp}</span>
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">STRATA: {notif.meta?.reason || 'LOGGED'}</span>
                        </div>
                     </div>
                   </div>
@@ -184,11 +124,8 @@ const Notifications: React.FC = () => {
            )}
         </main>
       </div>
-
-      <div className="mt-20 p-6 border border-dashed border-slate-500/30 rounded-md bg-slate-500/5 flex items-center gap-6">
-         <div className="p-3 bg-white dark:bg-slate-900 rounded border border-[var(--border-color)]">
-            <Hash size={24} className="text-slate-500" />
-         </div>
+      <div className="mt-20 p-6 border border-dashed border-slate-500/30 rounded-md bg-slate-500/5 flex items-center gap-6 font-sans">
+         <div className="p-3 bg-white dark:bg-slate-900 rounded border border-[var(--border-color)]"><Hash size={24} className="text-slate-500" /></div>
          <div className="flex-1">
             <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Integrity Advisory</p>
             <p className="text-[10px] font-medium text-slate-500">"Alphanumeric signal alerts are parsed via local node logic. AI-driven skill matches are computed based on your verified academic profile strata."</p>

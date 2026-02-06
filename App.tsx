@@ -34,17 +34,16 @@ const App: React.FC = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
-  // Theme state - Defaulting to Light (false) if no settings exist
+  // Theme state - Enforcing Light (false) / Paper
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     if (saved) {
       const settings = JSON.parse(saved);
-      return settings.themePreset === 'tactical' || settings.themePreset === 'oled' || settings.themePreset === 'standard';
+      return settings.themePreset !== 'paper';
     }
-    return false; // Default to light mode (Paper)
+    return false; // Default to Paper
   });
 
-  // Manifest Dropdown States
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isMsgOpen, setIsMsgOpen] = useState(false);
   const [unreadMsgs, setUnreadMsgs] = useState(0);
@@ -74,7 +73,6 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, view]);
 
-  // Apply theme settings on load and when settings change
   useEffect(() => {
     const saved = localStorage.getItem('maksocial_appearance_v3');
     const settings: AppSettings = saved ? JSON.parse(saved) : {
@@ -82,7 +80,7 @@ const App: React.FC = () => {
       fontFamily: 'Chirp',
       fontSize: 'md',
       borderRadius: '2px',
-      themePreset: 'paper', // Site-wide default is now Paper
+      themePreset: 'paper', 
       backgroundPattern: 'none'
     };
 
@@ -136,7 +134,6 @@ const App: React.FC = () => {
   const handleLogin = (email: string) => {
     const users = db.getUsers();
     const existingUser = users.find(u => u.email === email);
-    
     if (existingUser) {
       localStorage.setItem('maksocial_current_user_id', existingUser.id);
       setCurrentUser(existingUser);
@@ -145,7 +142,6 @@ const App: React.FC = () => {
       localStorage.setItem('maksocial_current_user_id', mockId);
       setCurrentUser(db.getUser(mockId));
     }
-
     const isAdmin = email.toLowerCase().endsWith('@admin.mak.ac.ug');
     setIsLoggedIn(true);
     setuserRole(isAdmin ? 'admin' : 'student');
@@ -173,7 +169,6 @@ const App: React.FC = () => {
       appliedTo: [], 
       verified: true 
     };
-    
     db.saveUsers([...db.getUsers(), newUser]);
     localStorage.setItem('maksocial_current_user_id', userId);
     setCurrentUser(newUser);
@@ -266,8 +261,6 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0 relative ml-2">
-            {/* Theme Toggle Removed per request */}
-
             <div className="relative shrink-0">
               <button 
                 onClick={() => { setIsMsgOpen(!isMsgOpen); setIsNotifOpen(false); }} 

@@ -16,6 +16,13 @@ export const NAV_ITEMS = [
   { id: 'profile', label: 'My Profile', icon: <User size={22} /> },
 ];
 
+export const MOCK_NEWS = [
+  { id: 'n1', title: 'New research grants are now available for students.', category: 'Academic', time: '2m ago' },
+  { id: 'n2', title: 'Welcome ceremony starts now at the Main Hall.', category: 'Campus', time: '12m ago' },
+  { id: 'n3', title: 'Mak vs MUBs Football Today at the Arena.', category: 'Sports', time: 'Live' },
+  { id: 'n4', title: 'Library maintenance scheduled for Sunday.', category: 'Admin', time: '5h ago' }
+];
+
 export const COLLEGE_BANNERS: Record<College, string> = {
   COCIS: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200',
   CEDAT: 'https://images.unsplash.com/photo-1503387762-592dea58ef23?auto=format&fit=crop&w=1200',
@@ -39,7 +46,7 @@ export const MOCK_POSTS: Post[] = [
     timestamp: 'Just now',
     isEventBroadcast: true,
     eventTitle: 'Grand Alumni Homecoming 2026',
-    eventDate: '2026-06-20',
+    eventDate: '2026-06-20T10:00:00',
     eventTime: '10:00',
     eventLocation: 'Freedom Square',
     content: `<h1>Grand Homecoming 2026</h1><p>Calling all former students! Join us for a day of networking, mentorship, and celebration as we honor a century of excellence at The Hill.</p>`,
@@ -77,7 +84,7 @@ export const MOCK_POSTS: Post[] = [
     author: 'MTN Uganda',
     authorId: 'mtn_partner',
     authorRole: 'Pulse Partner',
-    authorAvatar: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAA8FBMVEX/ywUAAAAAAAMAAAX/zQQAAAj/0Ab/0gdBNQPdtAPjtwX8zQT/ygj/zgYAAAv9ywaqiQaDawEWDwIeGQMvJQH0wwXYrgMoHgIAAwDsvwb/1QmMdAj1ywg6MAnJoAP5yAlURwVcSgfAmQiSeQN5YQNjTANJPgQjHgIVEAsKCwNCNgObfwizkQuEaQpQPAQgGwYlEgWUcAUxKwqlgQqjjA1vYQolGQJqVwQ0JQjAnwXOrAF3YgbjvACLdghJNw06MASyigwxMAXerglcTgZYRg3qxApyWw8XBAkfGAiKaQpkWAcTEwBNSAkEFQeulBQqKQyNsFPLAAANWklEQVR4nO2cC1vbxhKGpb1ia1drAjaWMJaxgQA2oYQkxDYpbSCU0/Q0///fnJmVLzTYYBLZSc8z79NiEELSp52dmZ3dTRAQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEUg3Ni5nEx4uvDy3+i4jEoEz4ja5XSgHLVapKUkSSpZoFO/VFrQZ8xwp9ufvRTP4NIBygsteVmu9fZ2z9Y29l8eXd4VOecHx292Hi5uXN8sH/S7bVrCb4AK+y/SZ/QOsiSZvfk1SHjIedhyJj/GMNCNvqRhfCL0/3tSrPaUFr91ObqIoP9Cx6zWqqst/DZUQFjIyGjD3+As3BylPH8C/9lf7tdzlClCyIXCfejFX1FFBkXaJ30z1p30ED3W2xBODbn6/3zgVdp3E+mUARC6UFnjUtsJDZqpOchJWc8Dvlh600ZXNBPI9E/h1LV9tu8z3HscvVw3M3YVCs4mHdbyLvPL+pE7LnSDBkO0jqpJud9dv37H/Crg8Q4VvwmTv7htWv3Dt0GDZ3FWlyut6a4zHynDOvOTwSHbfLV/sX5W6fWbtSnNfu/8bHix++tpONpXhAplGE73rl20E42z4Y9VoVcjEV+yUOJTZZ+zmI96z3SG+5+wcPZxr4nhShUsBjE+bFeVelg0+IHAs1itm2drPoOcI+8p6n776YvWeQ3MWqx8M9fjQKiPMJLppLl9/ZJ9yzZZTOV3LirNLIXkzH172rAkwPs7gXuwwYvoarm9ffEy3wUyas36QznQZKPv/ZervU6znGm/PwUut+Q9B9+N0tY1ar91h78y37/YZBMfz9cw+AP4CwgIrfXzdrlh7E++Hf9rcP+sX+elkhr+swrrt/s3r47XsP67tnZwsLt/u97ttZu1agp9ToNT+Rm2NT8LiPOYn+KKd0xX/D+NkaZ+dRt+wU8MkSgrEpCPOpwL/LeJnPDwwX+iKEAQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQxP8l/wMM8uAWSgd8iAAAAABJRU5ErkJggg==',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=MTN',
     authorAuthority: 'Corporate',
     isAd: true,
     timestamp: 'Just now',
@@ -166,8 +173,7 @@ export const MOCK_POSTS: Post[] = [
       'https://www.undp.org/sites/g/files/zskgke326/files/styles/scaled_image_large/public/2024-12/boys_and_girls.jpg?itok=aY8OcUMK',
       'https://www.undp.org/sites/g/files/zskgke326/files/2024-03/student_on_the_cnc_milling_machine.jpg'
     ]
-  }
-,
+  },
   {
   id: 'p-guild-president-1',
   author: 'Office of the Guild President',
@@ -213,13 +219,12 @@ export const MOCK_POSTS: Post[] = [
     'https://eagle.co.ug/wp-content/uploads/2024/10/image-2024-10-29T151841.969-1024x485.png'
   ]
 },
-
   {
     id: 'p-stud-x-1',
     author: 'Brian K.',
     authorId: 'u-brian',
     authorRole: 'CS Finalist',
-    authorAvatar: 'data:image/jpeg;base64,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',
+    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
     timestamp: '20m ago',
     content: `<p>COCIS Wi-Fi is finally stable tonight. Grinding till morning 💻🔥</p>`,
     hashtags: ['#FinalYear', '#COCIS'],
@@ -231,8 +236,7 @@ export const MOCK_POSTS: Post[] = [
     isOpportunity: false,
     college: 'COCIS',
     images: []
-  }
-,
+  },
   {
   id: 'p-lec-general-1',
   author: 'Dr. Julianne O.',
@@ -243,31 +247,8 @@ export const MOCK_POSTS: Post[] = [
   timestamp: '2h ago',
   content: `
     <h1>A Note to All Students</h1>
-
-    <p>
-      As the semester approaches its final phase, I encourage all students to 
-      plan their revision schedules early and make good use of the academic 
-      resources available across the university.
-    </p>
-
-    <p>
-      Do not hesitate to consult your lecturers, use the library facilities, 
-      and collaborate responsibly with your peers.
-    </p>
-
-    <p>
-      Consistent effort, healthy rest, and academic integrity remain key to 
-      success.
-    </p>
-
-    <p>
-      Wishing you all the best in your studies.
-    </p>
-
-    <p>
-      <strong>Dr. Julianne O.</strong><br />
-      Senior Lecturer
-    </p>
+    <p>As the semester approaches its final phase, I encourage all students to plan their revision schedules early and make good use of the academic resources available across the university.</p>
+    <p>Consistent effort, healthy rest, and academic integrity remain key to success.</p>
   `,
   hashtags: ['#AcademicAdvice', '#StudySmart', '#Makerere'],
   likes: 420,
@@ -278,8 +259,7 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'COCIS',
   images: []
-}
-,
+},
   {
   id: 'p-ad-airtel',
   author: 'Airtel Uganda',
@@ -291,10 +271,7 @@ export const MOCK_POSTS: Post[] = [
   timestamp: '5h ago',
   content: `
     <h1>A Reason to Imagine: University Bundles</h1>
-    <p>
-      Switch to the smartphone network and enjoy unthrottled access to 
-      Microsoft Teams and Zoom for your online research. Dial <strong>*175*3#</strong>.
-    </p>
+    <p>Switch to the smartphone network and enjoy unthrottled access to Microsoft Teams and Zoom for your online research. Dial <strong>*175*3#</strong>.</p>
   `,
   hashtags: ['#AirtelUniv', '#Imagination'],
   likes: 3100,
@@ -305,14 +282,13 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'Global',
   images: ['https://pbs.twimg.com/media/GLXZVucWEAAi-rf.jpg']
-}
-,
+},
   {
   id: 'p-stud-text-3',
   author: 'Kato M.',
   authorId: 'u-kato',
   authorRole: 'Software Engineering Student',
-  authorAvatar: 'data:image/jpeg;base64,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',
+  authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kato',
   timestamp: '8m ago',
   content: `<p>Why does motivation always show up at 2:17 AM when the deadline is at 8:00 AM 😭💻</p>`,
   hashtags: ['#StudentLife', '#Deadlines'],
@@ -324,8 +300,7 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'COCIS',
   images: []
-}
-,
+},
   {
   id: 'p-law-1',
   author: 'Counsel Peter',
@@ -336,13 +311,7 @@ export const MOCK_POSTS: Post[] = [
   timestamp: '7h ago',
   content: `
     <h1>Free Legal Clinic for First-Year Students</h1>
-    <p>
-      The Legal Clinic is offering free legal guidance to all first-year students 
-      on matters related to the Guild Constitution and student rights.
-    </p>
-    <p>
-      Visit the LAW Wing, Room 4B, for assistance.
-    </p>
+    <p>The Legal Clinic is offering free legal guidance to all first-year students on matters related to the Guild Constitution and student rights.</p>
   `,
   hashtags: ['#LegalClinic', '#StudentRights'],
   likes: 412,
@@ -353,8 +322,7 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'LAW',
   images: ['https://campusbee.ug/wp-content/uploads/2024/06/20240619_170258.jpg']
-}
-,
+},
   {
   id: 'p-ad-stanbic',
   author: 'Stanbic Bank',
@@ -366,10 +334,7 @@ export const MOCK_POSTS: Post[] = [
   timestamp: '8h ago',
   content: `
     <h1>Flexi-Pay: Pay Tuition Easily</h1>
-    <p>
-      Settle your university fees instantly from your wing. Flexi-Pay is now fully synced 
-      with the Makerere Central Finance Hub.
-    </p>
+    <p>Settle your university fees instantly from your wing. Flexi-Pay is now fully synced with the Makerere Central Finance Hub.</p>
   `,
   hashtags: ['#EasyBanking', '#MakerereFlex'],
   likes: 1520,
@@ -380,9 +345,7 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'Global',
   images: ['https://www.independent.co.ug/wp-content/uploads/2025/06/Mellisa-Nyakwera-Solomon-Kimera.jpg']
-}
-,
- 
+},
   {
     id: 'p-grc-cedat-2',
     author: 'Nambasa S.',
@@ -391,16 +354,7 @@ export const MOCK_POSTS: Post[] = [
     authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKVJA7A0yJBC5n42YzAU2GSUpUo46FdbUpBA&s',
     authorAuthority: 'Student Leader',
     timestamp: '20m ago',
-    content: `
-      <h1>CEDAT Wi-Fi Upgrade Completed</h1>
-      <p>
-        The GRC has successfully upgraded the CEDAT common room Wi-Fi. 
-        Students can now enjoy faster and more stable internet for research, projects, and online classes.
-      </p>
-      <p>
-        Please report any connectivity issues to the GRC office so we can address them promptly.
-      </p>
-    `,
+    content: `<h1>CEDAT Wi-Fi Upgrade Completed</h1><p>The GRC has successfully upgraded the CEDAT common room Wi-Fi.</p>`,
     hashtags: ['#CEDATLife', '#TechAccess', '#GRCUpdates'],
     likes: 310,
     commentsCount: 18,
@@ -410,9 +364,7 @@ export const MOCK_POSTS: Post[] = [
     isOpportunity: false,
     college: 'Global',
     images: []
-  }
-
-,
+  },
   {
   id: 'p-chs-1',
   author: 'Dr. Nalule',
@@ -421,16 +373,7 @@ export const MOCK_POSTS: Post[] = [
   authorAvatar: 'https://covab.mak.ac.ug/wp-content/uploads/2025/03/Nalule-Agnes-Sarah.jpg',
   authorAuthority: 'Official',
   timestamp: '9h ago',
-  content: `
-    <h1>Health Alert: Flu Cases in CHS Wing</h1>
-    <p>
-      Several flu cases have been reported in the CHS wing. Students are advised to 
-      take precautions and update their wellness status at the university clinic.
-    </p>
-    <p>
-      Free medical checks are available for all students—stay safe! 🩺
-    </p>
-  `,
+  content: `<h1>Health Alert: Flu Cases in CHS Wing</h1><p>Several flu cases have been reported in the CHS wing. Students are advised to take precautions.</p>`,
   hashtags: ['#HealthFirst', '#CampusWellness'],
   likes: 570,
   commentsCount: 16,
@@ -440,15 +383,13 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'CHS',
   images: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSak_CcF8BjBbrszumAnLw34llp_XBI3f1xIA&s']
-}
-
-,
+},
   {
   id: 'p-opp-2',
   author: 'Ministry of Science & Technology',
   authorId: 'moest_node',
   authorRole: 'Grant Provider',
-  authorAvatar: 'https://media.licdn.com/dms/image/v2/C4D0BAQFCumMNaeQgew/company-logo_200_200/company-logo_200_200/0/1654524971607?e=2147483647&v=beta&t=FRkh-Xcwy1a2toQtR5d22fwImh8R_a_o2tcHeFafs6M',
+  authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Gov',
   authorAuthority: 'Official',
   timestamp: '10h ago',
   isOpportunity: true,
@@ -457,21 +398,7 @@ export const MOCK_POSTS: Post[] = [
     isAIVerified: true,
     detectedBenefit: 'UGX 10M Fund'
   },
-  content: `
-    <h1>Makerere Innovation Grant: Sustainable Solutions</h1>
-    <p>
-      The Ministry of Science & Technology is offering a UGX 10M grant for student projects 
-      focused on sustainable and eco-friendly innovations on campus. Projects can include solar labs, 
-      energy efficiency, or green campus designs.
-    </p>
-    <p>
-      Open to finalists from <strong>CEDAT</strong> and <strong>COCIS</strong>. Submit your proposals 
-      via the MakSocial Opportunities section before the deadline.
-    </p>
-    <p>
-      Bring your ideas to life and make a lasting impact! 🌱
-    </p>
-  `,
+  content: `<h1>Makerere Innovation Grant: Sustainable Solutions</h1><p>The Ministry of Science & Technology is offering a UGX 10M grant for student projects focused on sustainable innovations.</p>`,
   hashtags: ['#Sustainability', '#StudentGrants', '#MakerereInnovation'],
   likes: 980,
   commentsCount: 48,
@@ -480,15 +407,13 @@ export const MOCK_POSTS: Post[] = [
   flags: [],
   college: 'Global',
   images: ['https://www.independent.co.ug/wp-content/uploads/2022/10/Musenero-science-1.jpg']
-}
-
-,
+},
   {
     id: 'p-opp-hackathon-1',
     author: 'MIIC HUB',
     authorId: 'techhub_node',
     authorRole: 'Innovation Hub',
-    authorAvatar: 'https://miichub.com/wp-content/uploads/2025/04/OFFICIAL-MIIC-LOGO-PDF.png',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Miic',
     authorAuthority: 'Official',
     timestamp: '12m ago',
     isOpportunity: true,
@@ -497,21 +422,7 @@ export const MOCK_POSTS: Post[] = [
       isAIVerified: true,
       detectedBenefit: 'Cash Prizes + Mentorship'
     },
-    content: `
-      <h1>🚀 Makerere Hackathon 2026 is Here!</h1>
-      <p>
-        Are you ready to code, innovate, and compete? Join the <strong>Makerere Hackathon 2026</strong> 
-        and showcase your tech skills! Open to all students across Makerere University.
-      </p>
-      <p>
-        <strong>🗓 Application Deadline:</strong> 20th February 2026<br>
-        <strong>💡 Prizes:</strong> Cash rewards, mentorship, and internship opportunities.
-      </p>
-      <p>
-        Don’t wait! Submit your team projects through the MakSocial Opportunities section now and get ready 
-        to hack your way to the top! 🔥
-      </p>
-    `,
+    content: `<h1>🚀 Makerere Hackathon 2026 is Here!</h1><p>Are you ready to code, innovate, and compete? Join the Makerere Hackathon 2026!</p>`,
     hashtags: ['#MakerereHackathon', '#InnovationChallenge', '#TechAtMakerere'],
     likes: 720,
     commentsCount: 35,
@@ -520,9 +431,7 @@ export const MOCK_POSTS: Post[] = [
     flags: [],
     college: 'Global',
     images: ['https://miichub.com/wp-content/uploads/2025/07/IMG_8155-1024x683.jpg']
-  }
-
-,
+  },
   {
     id: 'p-news-1',
     author: 'Makerere University News',
@@ -531,16 +440,7 @@ export const MOCK_POSTS: Post[] = [
     authorAvatar: 'https://media.istockphoto.com/id/929047972/vector/world-news-flat-vector-icon-news-symbol-logo-illustration-business-concept-simple-flat.jpg?s=612x612&w=0&k=20&c=5jpcJ7xejjFa2qKCzeOXKJGeUl7KZi9qoojZj1Kq_po=',
     authorAuthority: 'Official',
     timestamp: '11h ago',
-    content: `
-      <h1>⚡ Exam Dates Official!</h1>
-      <p>
-        Makerere students, mark your calendars! The University Council has confirmed the exam schedule. 
-        <strong>Logic testing kicks off on 12th December 2026</strong> across all colleges.
-      </p>
-      <p>
-        Start revising, organize your study groups, and get ready to ace your exams! 💪📚
-      </p>
-    `,
+    content: `<h1>⚡ Exam Dates Official!</h1><p>Makerere students, mark your calendars! Logic testing kicks off on 12th December 2026.</p>`,
     hashtags: ['#ExamSeason', '#MakerereNews', '#StudySmart', '#CampusUpdate'],
     likes: 2500,
     commentsCount: 520,
@@ -550,8 +450,7 @@ export const MOCK_POSTS: Post[] = [
     isOpportunity: false,
     college: 'Global',
     images: ['https://donnamorgancounselling.co.uk/wp-content/uploads/2023/03/exam-stress.jpg']
-  }
-,
+  },
   {
   id: 'p-stud-1',
   author: 'Opio Eric',
@@ -559,15 +458,7 @@ export const MOCK_POSTS: Post[] = [
   authorRole: 'Computer Science Student',
   authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
   timestamp: '12h ago',
-  content: `
-    <p>
-      Just completed the <strong>COCIS Network Bootcamp</strong>! 🚀 Learned so much about routing, switching, and cloud networking. 
-      Feeling ready to tackle real-world networking challenges. 💻🌐
-    </p>
-    <p>
-      Shoutout to the instructors and peers for an amazing hands-on experience. Makerere CS students are leveling up! ⚡
-    </p>
-  `,
+  content: `<p>Just completed the <strong>COCIS Network Bootcamp</strong>! 🚀 Learned so much about routing and cloud networking.</p>`,
   hashtags: ['#NetworkBootcamp', '#COCIS', '#MakerereCS', '#HandsOnLearning'],
   likes: 150,
   commentsCount: 10,
@@ -577,14 +468,13 @@ export const MOCK_POSTS: Post[] = [
   isOpportunity: false,
   college: 'COCIS',
   images: ['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr12vxIIFkHgr9czQdx2-ZpJAQHsTuvVU83A&s']
-}
-,
+},
   {
   id: 'p-opp-totalenergies',
   author: 'Total Energies Uganda',
   authorId: 'totalenergies_node',
   authorRole: 'Corporate Partner',
-  authorAvatar: 'https://yt3.googleusercontent.com/0X4_rnOYEGy6oz2HKl6tzHANZwe1PrJYzpb6-a8fXSa9SEI2bucq9cs1fODEc4JTl_JzJp2YbQ=s900-c-k-c0x00ffffff-no-rj',
+  authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Total',
   authorAuthority: 'Official',
   timestamp: '30m ago',
   isOpportunity: true,
@@ -593,20 +483,7 @@ export const MOCK_POSTS: Post[] = [
     isAIVerified: true,
     detectedBenefit: 'Stipend + Mentorship'
   },
-  content: `
-    <h1>💼 Total Energies Student Internship 2026</h1>
-    <p>
-      Total Energies Uganda is inviting students from all colleges at Makerere to apply for our 
-      3-month internship program. Gain hands-on experience, mentorship, and a monthly stipend.
-    </p>
-    <p>
-      <strong>🗓 Application Deadline:</strong> 28th February 2026<br>
-      <strong>Who Can Apply:</strong> All undergraduate finalists across Makerere University.
-    </p>
-    <p>
-      Don’t miss this chance to learn from industry leaders and jumpstart your career! Apply via MakSocial Opportunities. 🌟
-    </p>
-  `,
+  content: `<h1>💼 Total Energies Student Internship 2026</h1><p>Total Energies Uganda is inviting students from all colleges at Makerere to apply.</p>`,
   hashtags: ['#TotalEnergiesInternship', '#MakerereCareers', '#StudentOpportunities'],
   likes: 640,
   commentsCount: 22,
@@ -615,8 +492,7 @@ export const MOCK_POSTS: Post[] = [
   flags: [],
   college: 'Global',
   images: ['https://www.icanstudent.com/wp-content/uploads/2026/01/Delicate-Feminine-Interior-Designer-Featured-Products-Facebook-Post_20260110_072809_0000-940x675.png']
-}
-,
+},
   {
     id: 'p-hospital-1',
     author: 'University Hospital',
@@ -625,16 +501,7 @@ export const MOCK_POSTS: Post[] = [
     authorAvatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHQ7AXGqNl4CNxMtxquN03ZsS7q-EcOlu_7A&s',
     authorAuthority: 'Official',
     timestamp: '17h ago',
-    content: `
-      <h1>💉 Free Student Vaccinations</h1>
-      <p>
-        Attention Makerere students! University Hospital is offering <strong>free vaccinations</strong> 
-        for all verified students. Ensure your health status is up to date and stay protected. 
-      </p>
-      <p>
-        Visit the CHS Medical Wing and synchronize your health record today. Your wellness matters! 🌟
-      </p>
-    `,
+    content: `<h1>💉 Free Student Vaccinations</h1><p>Attention Makerere students! University Hospital is offering free vaccinations.</p>`,
     hashtags: ['#CampusHealth', '#StayProtected', '#MakerereWellness'],
     likes: 1450,
     commentsCount: 95,
@@ -644,25 +511,16 @@ export const MOCK_POSTS: Post[] = [
     isOpportunity: false,
     college: 'Global',
     images: ['https://ugandaradionetwork.net/a/helpers/image.php?fileId=135221&m=0&w=1200&h=600']
-  }
-,
+  },
   {
     id: 'p-fun-1',
     author: 'Campus Fun Hub',
     authorId: 'campus_fun',
     authorRole: 'Student Entertainment',
-    authorAvatar: 'https://img.freepik.com/premium-vector/fun-playful-logo-using-custom-typography-with-quirky-shapes-bright-colors_1307247-1830.jpg?semt=ais_user_personalization&w=740&q=80',
+    authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Fun',
     authorAuthority: 'Official',
     timestamp: '5m ago',
-    content: `
-      <h1>😂 Campus Mood</h1>
-      <p>
-        Why did the student bring a ladder to the exam? Because they heard the questions were on a higher level! 🪜📚
-      </p>
-      <p>
-        Keep calm, study smart, and maybe leave the ladder at home. 😎
-      </p>
-    `,
+    content: `<h1>😂 Campus Mood</h1><p>Why did the student bring a ladder to the exam? Because they heard the questions were on a higher level!</p>`,
     hashtags: ['#CampusHumor', '#StudentLife', '#ExamSeason'],
     likes: 320,
     commentsCount: 12,
@@ -673,7 +531,6 @@ export const MOCK_POSTS: Post[] = [
     college: 'Global',
     images: []
   }
-
 ];
 
 export const MOCK_CHATS: ChatConversation[] = [

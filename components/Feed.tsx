@@ -30,12 +30,12 @@ const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
     };
 
     calculate();
-    const timer = setInterval(calculate, 60000); // Update every minute
+    const timer = setInterval(calculate, 60000); 
     return () => clearInterval(timer);
   }, [targetDate]);
 
   return (
-    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-md shadow-sm">
+    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-[2px] shadow-sm">
       <Clock size={10} className="animate-pulse" />
       <span className="text-[9px] font-black uppercase tracking-widest">{timeLeft}</span>
     </div>
@@ -144,6 +144,8 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
     onUpdate();
   };
 
+  const isShowSaveButton = post.isEventBroadcast || post.isOpportunity;
+
   return (
     <article onClick={() => !isThreadView && onOpenThread(post.id)} className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md overflow-hidden transition-all shadow-sm group ${!isThreadView ? 'cursor-pointer hover:border-slate-300 mb-8' : 'mb-10'}`}>
       <div className="flex">
@@ -176,7 +178,7 @@ const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: str
                 <div className="flex items-center gap-8">
                   <button onClick={(e) => { e.stopPropagation(); onLike(post.id); }} className={`flex items-center gap-1.5 text-[12px] font-bold transition-colors ${isLiked ? 'text-brand-primary' : 'text-slate-500 hover:text-brand-primary'}`}><Star size={18} fill={isLiked ? "currentColor" : "none"} /> <span className="ticker-text">{post.likes.toLocaleString()}</span></button>
                   <button onClick={(e) => { e.stopPropagation(); !isThreadView && onOpenThread(post.id); }} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-slate-800 transition-colors"><MessageCircle size={18} /> <span className="ticker-text">{post.commentsCount.toLocaleString()}</span></button>
-                  {(post.isOpportunity || post.isEventBroadcast) && (
+                  {isShowSaveButton && (
                     <button onClick={handleAddToCalendar} className="flex items-center gap-1.5 text-[12px] font-bold text-slate-500 hover:text-brand-primary transition-all" title="Add to Calendar"><Calendar size={18} /> <span className="hidden sm:inline font-bold">Save Event</span></button>
                   )}
                 </div>

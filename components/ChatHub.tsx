@@ -138,7 +138,7 @@ const ChatHub: React.FC = () => {
                     {chat.unreadCount > 0 ? <span className="text-[var(--brand-color)] font-bold italic">transmitting...</span> : chat.lastMessage}
                   </p>
                 </div>
-                {chat.unreadCount > 0 && <span className="bg-rose-500 text-white px-1.5 py-0.5 rounded-full text-[8px] font-black">{chat.unreadCount}</span>}
+                {chat.unreadCount > 0 && <span className="bg-[var(--brand-color)] text-white px-1.5 py-0.5 rounded-full text-[8px] font-black">{chat.unreadCount}</span>}
               </button>
             ))
           ) : (

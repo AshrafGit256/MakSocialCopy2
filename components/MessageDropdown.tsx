@@ -17,7 +17,7 @@ const MessageDropdown: React.FC<MessageDropdownProps> = ({ onClose, onViewAll })
     <div className="absolute top-full right-0 mt-3 w-80 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-md shadow-2xl z-[1000] overflow-hidden animate-in slide-in-from-top-2 duration-200">
       <div className="px-4 py-3 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center justify-between">
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Active_Uplinks</span>
-        <div className="px-1.5 py-0.5 bg-rose-500 text-white text-[8px] font-black rounded-sm">{conversations.length}</div>
+        <div className="px-1.5 py-0.5 bg-[var(--brand-color)] text-white text-[8px] font-black rounded-sm">{conversations.length}</div>
       </div>
 
       <div className="divide-y divide-[var(--border-color)]">

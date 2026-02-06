@@ -4,7 +4,7 @@ import { AppView } from '../types';
 import { 
   Home, Search, MessageSquare, User as UserIcon, Calendar, 
   BookOpen, Bell, LogOut, 
-  Briefcase, Cpu, LayoutPanelTop, Mail
+  Briefcase, Cpu, LayoutPanelTop, Palette
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -24,10 +24,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
     { id: 'resources', label: 'The Vault', icon: <BookOpen size={20} /> },
     { id: 'admin-calendar', label: 'Calendar', icon: <Calendar size={20} /> },
     { id: 'chats', label: 'Chat Hub', icon: <MessageSquare size={20} /> },
-    { id: 'email', label: 'Email Hub', icon: <Mail size={20} /> },
     { id: 'search-widget', label: 'Search', icon: <Search size={20} /> },
     { id: 'opportunities', label: 'Opportunities', icon: <Briefcase size={20} /> },
     { id: 'notifications', label: 'Signals', icon: <Bell size={20} /> },
+    { id: 'settings', label: 'UI Config', icon: <Palette size={20} /> },
     { id: 'profile', label: 'Profile', icon: <UserIcon size={20} /> },
   ];
 

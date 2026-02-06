@@ -19,15 +19,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onSearchToggle }) => {
   const navItems = [
-    { id: 'home', label: 'Pulse Feed', icon: <Home size={20} /> },
-    { id: 'gallery', label: 'Visual Hub', icon: <LayoutPanelTop size={20} /> },
-    { id: 'resources', label: 'The Vault', icon: <BookOpen size={20} /> },
+    { id: 'home', label: 'Home Feed', icon: <Home size={20} /> },
+    { id: 'gallery', label: 'Photos', icon: <LayoutPanelTop size={20} /> },
+    { id: 'resources', label: 'Study Vault', icon: <BookOpen size={20} /> },
     { id: 'admin-calendar', label: 'Calendar', icon: <Calendar size={20} /> },
-    { id: 'chats', label: 'Chat Hub', icon: <MessageSquare size={20} /> },
+    { id: 'chats', label: 'Messages', icon: <MessageSquare size={20} /> },
     { id: 'search-widget', label: 'Search', icon: <Search size={20} /> },
     { id: 'opportunities', label: 'Opportunities', icon: <Briefcase size={20} /> },
-    { id: 'notifications', label: 'Signals', icon: <Bell size={20} /> },
-    { id: 'settings', label: 'UI Config', icon: <Palette size={20} />, locked: true },
+    { id: 'notifications', label: 'Notifications', icon: <Bell size={20} /> },
+    { id: 'settings', label: 'Settings', icon: <Palette size={20} />, locked: true },
     { id: 'profile', label: 'Profile', icon: <UserIcon size={20} /> },
   ];
 
@@ -78,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
           <div className="mt-8 pt-8 px-3 border-t border-[var(--border-color)]">
             <button onClick={() => setView('admin')} className={`w-full flex items-center gap-4 px-5 py-3 rounded-md transition-all ${activeView === 'admin' ? 'bg-[var(--brand-color)]/20 text-[var(--brand-color)]' : 'text-slate-500 hover:text-[var(--text-primary)]'}`}>
               <Cpu size={20} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Admin Terminal</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Admin Control</span>
             </button>
           </div>
         )}
@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogou
 
       <div className="p-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]">
         <button onClick={onLogout} className="w-full py-3 bg-rose-600/10 text-rose-500 rounded-md hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center gap-2 font-black text-[9px] uppercase tracking-widest">
-          <LogOut size={16} /> Terminate_Session
+          <LogOut size={16} /> Logout
         </button>
       </div>
     </aside>

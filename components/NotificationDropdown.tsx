@@ -42,7 +42,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose, on
       <div className="px-5 py-4 bg-[var(--bg-secondary)] border-b border-[var(--border-color)] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Terminal size={14} className="text-[var(--brand-color)]" />
-          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--text-primary)]">Signal_Manifest</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--text-primary)]">Notifications</span>
         </div>
         <button onClick={onClose} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={16}/></button>
       </div>
@@ -90,7 +90,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose, on
         )) : (
           <div className="py-20 text-center space-y-4 opacity-30">
             <Bell size={32} className="mx-auto" />
-            <p className="text-[10px] font-black uppercase tracking-widest">Protocol.Silence</p>
+            <p className="text-[10px] font-black uppercase tracking-widest">No new alerts</p>
           </div>
         )}
       </div>
@@ -99,7 +99,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose, on
         onClick={() => { onViewAll(); onClose(); }}
         className="w-full py-4 bg-[var(--bg-secondary)] hover:bg-[var(--brand-color)] hover:text-white transition-all text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 border-t border-[var(--border-color)] flex items-center justify-center gap-2"
       >
-        Access Signal Center <ChevronRight size={12}/>
+        View All Notifications <ChevronRight size={12}/>
       </button>
     </div>
   );

@@ -40,7 +40,17 @@ const PostItem: React.FC<{
 }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, onNavigateToVault, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike }) => {
   
   if (post.isCampaign && !isThreadView) {
-    return <CampaignCard post={post} currentUser={currentUser} onComplete={onUpdate} />;
+    return (
+      <CampaignCard 
+        post={post} 
+        currentUser={currentUser} 
+        onComplete={onUpdate} 
+        isLiked={isLiked} 
+        onLike={onLike}
+        isBookmarked={bookmarks.includes(post.id)}
+        onBookmark={onBookmark}
+      />
+    );
   }
 
   const isBookmarked = bookmarks.includes(post.id);

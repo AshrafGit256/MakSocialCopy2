@@ -20,7 +20,7 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
       const newTicket: Ticket = {
         id: `TICK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
         eventId: post.id,
-        eventTitle: "Makerere Marathon 2025",
+        eventTitle: post.eventTitle || "Makerere Event",
         eventDate: post.campaignData?.eventDate || "",
         eventLocation: post.campaignData?.location || "",
         price: post.campaignData?.price || "",
@@ -42,19 +42,25 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
     onComplete();
   };
 
+  const themeColor = post.campaignData?.themeColor || '#10918a';
+
   return (
-    <div className="bg-white border-2 border-[#10918a] rounded-none overflow-hidden mb-10 shadow-2xl animate-in fade-in zoom-in-95 duration-500">
-      <div className="relative h-64 bg-[#10918a] overflow-hidden">
+    <div className="bg-white border-2 rounded-none overflow-hidden mb-10 shadow-2xl animate-in fade-in zoom-in-95 duration-500" style={{ borderColor: themeColor }}>
+      <div className="relative h-64 overflow-hidden" style={{ backgroundColor: themeColor }}>
         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/brush-stroke.png')]"></div>
-        <img 
-          src="https://endowment.mak.ac.ug/makrun/assets/img/races/about-min.png" 
-          className="w-full h-full object-cover mix-blend-overlay grayscale"
-        />
+        {post.images && post.images.length > 0 ? (
+          <img 
+            src={post.images[0]} 
+            className="w-full h-full object-cover mix-blend-overlay grayscale"
+          />
+        ) : (
+          <div className="w-full h-full bg-black/10" />
+        )}
         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-black/20">
            <h2 className="text-white text-4xl font-black uppercase tracking-tighter leading-none mb-2 drop-shadow-2xl">
-             Makerere <br/> <span className="text-amber-400">Marathon</span>
+             {post.eventTitle?.split(' ').slice(0, -1).join(' ')} <br/> <span className="text-amber-400">{post.eventTitle?.split(' ').pop()}</span>
            </h2>
-           <p className="text-white font-bold uppercase tracking-widest text-[10px] bg-black/40 px-3 py-1 rounded-full">Official Endowment Event</p>
+           <p className="text-white font-bold uppercase tracking-widest text-[10px] bg-black/40 px-3 py-1 rounded-full">Official Enrollment Hub</p>
         </div>
       </div>
 
@@ -65,14 +71,14 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
                <div className="flex gap-8">
                   <div className="text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Date</p>
-                    <div className="flex items-center gap-2 text-[#10918a] font-black">
-                       <Calendar size={16}/> 17 AUG
+                    <div className="flex items-center gap-2 font-black" style={{ color: themeColor }}>
+                       <Calendar size={16}/> {post.campaignData?.eventDate.split(' ').slice(0, 2).join(' ')}
                     </div>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Venue</p>
-                    <div className="flex items-center gap-2 text-[#10918a] font-black">
-                       <MapPin size={16}/> FREEDOM SQ.
+                    <div className="flex items-center gap-2 font-black" style={{ color: themeColor }}>
+                       <MapPin size={16}/> {post.campaignData?.location.split(' ')[0]}
                     </div>
                   </div>
                </div>
@@ -82,7 +88,7 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
                </div>
             </div>
 
-            <p className="text-slate-600 font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content }} />
+            <div className="text-slate-600 font-medium leading-relaxed post-content-markdown" dangerouslySetInnerHTML={{ __html: post.content }} />
 
             {hasTicket ? (
               <button 
@@ -94,7 +100,8 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
             ) : (
               <button 
                 onClick={() => setStep('pay')}
-                className="w-full py-5 bg-[#10918a] hover:bg-[#0d7a74] text-white font-black uppercase tracking-[0.3em] text-sm shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                className="w-full py-5 text-white font-black uppercase tracking-[0.3em] text-sm shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3"
+                style={{ backgroundColor: themeColor }}
               >
                 <Zap size={20} fill="currentColor"/> {post.campaignData?.cta}
               </button>
@@ -117,7 +124,7 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
                       <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{currentUser.name.split(' ')[0]}_ID_LINKED</p>
                    </div>
                 </div>
-                <p className="font-black text-[#10918a]">{post.campaignData?.price}</p>
+                <p className="font-black" style={{ color: themeColor }}>{post.campaignData?.price}</p>
              </div>
 
              <button 

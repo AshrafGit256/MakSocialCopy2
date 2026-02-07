@@ -62,6 +62,7 @@ const CAMPAIGN_POST: Post = {
   authorAuthority: 'Official',
   timestamp: 'Sponsored',
   isCampaign: true,
+  eventTitle: "Makerere Marathon 2025",
   campaignData: {
     price: 'UGX 50,000',
     cta: 'BUY OFFICIAL KIT & TICKET',
@@ -79,6 +80,35 @@ const CAMPAIGN_POST: Post = {
   isOpportunity: false,
   college: 'Global',
   images: ['https://endowment.mak.ac.ug/makrun/assets/img/races/about-min.png']
+};
+
+const CAMPAIGN_TECH_POST: Post = {
+  id: 'campaign-tech-expo-2025',
+  author: 'COCIS Innovation Hub',
+  authorId: 'tech_node',
+  authorRole: 'Innovation Lead',
+  authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=tech',
+  authorAuthority: 'Official',
+  timestamp: 'Sponsored',
+  isCampaign: true,
+  eventTitle: "Mak Tech Expo 2025",
+  campaignData: {
+    price: 'UGX 30,000',
+    cta: 'SECURE TECH PASS',
+    eventDate: '24 NOV 2025',
+    location: 'COCIS Block B',
+    themeColor: '#4f46e5'
+  },
+  content: `<h1>Mak Tech Expo 2025: Future Strata</h1><p>Experience the latest in AI, Robotics, and Blockchain from the next generation of innovators. Get your limited access digital pass now.</p>`,
+  hashtags: ['#MakTechExpo', '#InnovationStrata', '#FutureHill'],
+  likes: 3100,
+  commentsCount: 85,
+  comments: [],
+  views: 92000,
+  flags: [],
+  isOpportunity: false,
+  college: 'Global',
+  images: ['https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=1200']
 };
 
 export const db = {
@@ -99,7 +129,7 @@ export const db = {
   },
   getPosts: (): Post[] => {
     const saved = localStorage.getItem(DB_KEYS.POSTS);
-    if (!saved) return [CAMPAIGN_POST, ...MOCK_POSTS];
+    if (!saved) return [CAMPAIGN_POST, CAMPAIGN_TECH_POST, ...MOCK_POSTS];
     return JSON.parse(saved);
   },
   addPost: (post: Post) => {

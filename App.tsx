@@ -21,7 +21,6 @@ import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import RightSidebar from './components/RightSidebar';
 import LostAndFound from './components/LostAndFound';
-import TicketsVault from './components/TicketsVault';
 import Splash from './components/Splash';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
@@ -166,8 +165,8 @@ const App: React.FC = () => {
       case 'landing': return <Landing onStart={() => setView('login')} />;
       case 'login': return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
       case 'register': return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
-      case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToVault={() => setView('tickets')} triggerSafetyError={() => {}} />;
-      case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} onNavigateToVault={() => setView('tickets')} triggerSafetyError={() => {}} />;
+      case 'home': return <Feed collegeFilter={activeSector} onOpenThread={(id) => {setActiveThreadId(id); setView('thread');}} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
+      case 'thread': return <Feed threadId={activeThreadId || undefined} onOpenThread={(id) => setActiveThreadId(id)} onBack={() => setView('home')} onNavigateToProfile={(id) => {setSelectedUserId(id); setView('profile');}} triggerSafetyError={() => {}} />;
       case 'chats': return <ChatHub />;
       case 'profile': return <Profile userId={selectedUserId || currentUser?.id} onNavigateBack={() => { setSelectedUserId(null); setView('home'); }} onNavigateToProfile={(id) => setSelectedUserId(id)} onMessageUser={() => setView('chats')} onUpdateCurrentUser={(u) => setCurrentUser(u)} />;
       case 'calendar': return <CalendarView isAdmin={userRole === 'admin'} />;
@@ -178,7 +177,6 @@ const App: React.FC = () => {
       case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'settings': return <Settings />;
       case 'lost-found': return <LostAndFound onOpenChat={(id) => { setActiveThreadId(id); setView('chats'); }} />;
-      case 'tickets': return <TicketsVault onBack={() => setView('home')} />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };

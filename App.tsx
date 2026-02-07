@@ -21,6 +21,7 @@ import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import RightSidebar from './components/RightSidebar';
 import LostAndFound from './components/LostAndFound';
+import TicketsVault from './components/TicketsVault';
 import Splash from './components/Splash';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
@@ -177,6 +178,7 @@ const App: React.FC = () => {
       case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'settings': return <Settings />;
       case 'lost-found': return <LostAndFound onOpenChat={(id) => { setActiveThreadId(id); setView('chats'); }} />;
+      case 'tickets': return <TicketsVault onBack={() => setView('home')} />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };

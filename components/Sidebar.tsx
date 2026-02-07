@@ -3,7 +3,7 @@ import React from 'react';
 import { AppView } from '../types';
 import { 
   Home, Search, MessageSquare, User as UserIcon, Calendar, 
-  BookOpen, Bell, LogOut, Lock,
+  BookOpen, Bell, LogOut, Lock, Database,
   Briefcase, Cpu, LayoutPanelTop, Palette, HelpCircle
 } from 'lucide-react';
 
@@ -20,6 +20,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setView, isAdmin, onLogout, isOpen, onSearchToggle }) => {
   const navItems = [
     { id: 'home', label: 'Home Feed', icon: <Home size={20} /> },
+    { id: 'tickets', label: 'Registry Vault', icon: <Database size={20} /> },
     { id: 'gallery', label: 'Photos', icon: <LayoutPanelTop size={20} /> },
     { id: 'resources', label: 'Study Vault', icon: <BookOpen size={20} /> },
     { id: 'admin-calendar', label: 'Calendar', icon: <Calendar size={20} /> },

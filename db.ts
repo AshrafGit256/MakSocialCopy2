@@ -18,7 +18,6 @@ const DB_KEYS = {
   TICKETS: 'maksocial_tickets_registry'
 };
 
-/* Fix: Added missing COURSES_BY_COLLEGE export */
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   COCIS: ['Computer Science', 'Software Engineering', 'Information Technology', 'Information Systems'],
   CEDAT: ['Architecture', 'Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering'],
@@ -31,7 +30,6 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   LAW: ['Bachelor of Laws'],
 };
 
-/* Fix: Added missing INITIAL_USERS mock data */
 const INITIAL_USERS: User[] = [
   {
     id: 'u-ninfa',
@@ -55,7 +53,6 @@ const INITIAL_USERS: User[] = [
   }
 ];
 
-// Add a Campaign Post to the mock data for the Marathon
 const CAMPAIGN_POST: Post = {
   id: 'campaign-marathon-2025',
   author: 'Makerere Sports Council',
@@ -67,12 +64,12 @@ const CAMPAIGN_POST: Post = {
   isCampaign: true,
   campaignData: {
     price: 'UGX 50,000',
-    cta: 'Register NOW!',
+    cta: 'BUY OFFICIAL KIT & TICKET',
     eventDate: '17 AUG 2025',
     location: 'Freedom Square',
     themeColor: '#10918a'
   },
-  content: `<h1>Join us for the Makerere Marathon</h1><p>Enhance the student experience and run for a cause. Secure your official kit and entry today.</p>`,
+  content: `<h1>Join us for the Makerere Marathon</h1><p>Enhance the student experience and run for a cause. Secure your official kit and entry today through the Hill Registry.</p>`,
   hashtags: ['#MAKRUN2025', '#MakerereAt100'],
   likes: 2450,
   commentsCount: 120,
@@ -81,11 +78,10 @@ const CAMPAIGN_POST: Post = {
   flags: [],
   isOpportunity: false,
   college: 'Global',
-  images: ['https://cioafrica.co/wp-content/uploads/2022/10/Makerere-Uni.jpg'] // This would be the brush-stroke image
+  images: ['https://endowment.mak.ac.ug/makrun/assets/img/races/about-min.png']
 };
 
 export const db = {
-  /* Fix: Implemented missing getUsers and getUser methods */
   getUsers: (): User[] => {
     const saved = localStorage.getItem(DB_KEYS.USERS);
     return saved ? JSON.parse(saved) : INITIAL_USERS;
@@ -96,7 +92,6 @@ export const db = {
     const currentId = id || localStorage.getItem(DB_KEYS.LOGGED_IN_ID) || 'u-ninfa';
     return users.find(u => u.id === currentId) || INITIAL_USERS[0];
   },
-  /* Fix: Implemented missing saveUser method */
   saveUser: (user: User) => {
     const users = db.getUsers();
     const updated = users.map(u => u.id === user.id ? user : u);
@@ -107,24 +102,20 @@ export const db = {
     if (!saved) return [CAMPAIGN_POST, ...MOCK_POSTS];
     return JSON.parse(saved);
   },
-  /* Fix: Implemented missing addPost method */
   addPost: (post: Post) => {
     const posts = db.getPosts();
     localStorage.setItem(DB_KEYS.POSTS, JSON.stringify([post, ...posts]));
   },
-  /* Fix: Implemented missing getChats and saveChats methods */
   getChats: (): ChatConversation[] => {
     const saved = localStorage.getItem(DB_KEYS.CHATS);
     return saved ? JSON.parse(saved) : MOCK_CHATS;
   },
   saveChats: (chats: ChatConversation[]) => localStorage.setItem(DB_KEYS.CHATS, JSON.stringify(chats)),
-  /* Fix: Implemented missing getNotifications and saveNotifications methods */
   getNotifications: (): MakNotification[] => {
     const saved = localStorage.getItem(DB_KEYS.NOTIFICATIONS);
     return saved ? JSON.parse(saved) : [];
   },
   saveNotifications: (notifs: MakNotification[]) => localStorage.setItem(DB_KEYS.NOTIFICATIONS, JSON.stringify(notifs)),
-  /* Fix: Implemented missing getResources and saveResource methods */
   getResources: (): Resource[] => {
     const saved = localStorage.getItem(DB_KEYS.RESOURCES);
     return saved ? JSON.parse(saved) : [];
@@ -133,7 +124,6 @@ export const db = {
     const resources = db.getResources();
     localStorage.setItem(DB_KEYS.RESOURCES, JSON.stringify([res, ...resources]));
   },
-  /* Fix: Implemented missing getCalendarEvents and saveCalendarEvent methods */
   getCalendarEvents: (): CalendarEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.CALENDAR);
     return saved ? JSON.parse(saved) : [];
@@ -142,7 +132,6 @@ export const db = {
     const events = db.getCalendarEvents();
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify([event, ...events]));
   },
-  /* Fix: Implemented missing registerForEvent method */
   registerForEvent: (eventId: string, userId: string) => {
     const events = db.getCalendarEvents();
     const updated = events.map(e => {
@@ -156,34 +145,28 @@ export const db = {
     });
     localStorage.setItem(DB_KEYS.CALENDAR, JSON.stringify(updated));
   },
-  /* Fix: Implemented missing getEmails and saveEmails methods */
   getEmails: (): PlatformEmail[] => {
     const saved = localStorage.getItem(DB_KEYS.EMAILS);
     return saved ? JSON.parse(saved) : [];
   },
   saveEmails: (emails: PlatformEmail[]) => localStorage.setItem(DB_KEYS.EMAILS, JSON.stringify(emails)),
-  /* Fix: Implemented missing getEvents method */
   getEvents: (): LiveEvent[] => {
     const saved = localStorage.getItem(DB_KEYS.EVENTS);
     return saved ? JSON.parse(saved) : [];
   },
-  /* Fix: Implemented missing getOpportunities method */
   getOpportunities: (): Post[] => {
     return db.getPosts().filter(p => p.isOpportunity);
   },
-  /* Fix: Implemented missing getGroups and saveGroups methods */
   getGroups: (): Group[] => {
     const saved = localStorage.getItem(DB_KEYS.GROUPS);
     return saved ? JSON.parse(saved) : [];
   },
   saveGroups: (groups: Group[]) => localStorage.setItem(DB_KEYS.GROUPS, JSON.stringify(groups)),
-  /* Fix: Implemented missing addGroupMessage method */
   addGroupMessage: (groupId: string, msg: GroupMessage) => {
     const groups = db.getGroups();
     const updated = groups.map(g => g.id === groupId ? { ...g, messages: [...g.messages, msg] } : g);
     db.saveGroups(updated);
   },
-  /* Fix: Implemented missing joinGroup method */
   joinGroup: (groupId: string, userId: string) => {
     const groups = db.getGroups();
     const updated = groups.map(g => {
@@ -194,7 +177,6 @@ export const db = {
     });
     db.saveGroups(updated);
   },
-  /* Fix: Implemented missing getLostFound and related methods */
   getLostFound: (): LostFoundItem[] => {
     const saved = localStorage.getItem(DB_KEYS.LOST_FOUND);
     return saved ? JSON.parse(saved) : [];
@@ -212,7 +194,6 @@ export const db = {
     const updated = items.map(i => i.id === id ? { ...i, status: 'Resolved' as const } : i);
     localStorage.setItem(DB_KEYS.LOST_FOUND, JSON.stringify(updated));
   },
-  /* Fix: Implemented missing getBookmarks method */
   getBookmarks: (): string[] => {
     const saved = localStorage.getItem(DB_KEYS.BOOKMARKS);
     return saved ? JSON.parse(saved) : [];
@@ -224,14 +205,12 @@ export const db = {
   purchaseTicket: (ticket: Ticket) => {
     const tickets = db.getTickets();
     localStorage.setItem(DB_KEYS.TICKETS, JSON.stringify([ticket, ...tickets]));
-    
-    // Add a notification
     const notifs = db.getNotifications();
     const newNotif: MakNotification = {
       id: `nt-${Date.now()}`,
       type: 'event',
-      title: 'Ticket Secured',
-      description: `Your entry for ${ticket.eventTitle} is now in your vault.`,
+      title: 'Official Ticket Secured',
+      description: `Your entry kit for ${ticket.eventTitle} has been registered to your ID.`,
       timestamp: 'Just now',
       isRead: false
     };

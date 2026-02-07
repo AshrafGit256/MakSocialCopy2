@@ -13,7 +13,7 @@ import {
   Check
 } from 'lucide-react';
 
-/* Fix: AuthoritySeal with brand teal background and white tick */
+/* Restored: AuthoritySeal with brand teal background and white tick */
 export const AuthoritySeal: React.FC<{ role?: AuthorityRole | string, size?: number }> = ({ size = 16 }) => {
   return (
     <div 
@@ -36,13 +36,11 @@ const PostItem: React.FC<{
   onUpdate: () => void, 
   isThreadView?: boolean, 
   isLiked?: boolean, 
-  onLike: (id: string) => void, 
-  onAddToast: (type: any, text: string) => void 
-}> = ({ post, currentUser, onOpenThread, onNavigateToProfile, onNavigateToVault, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike, onAddToast }) => {
+  onLike: (id: string) => void
+}> = ({ post, currentUser, onOpenThread, onNavigateToProfile, onNavigateToVault, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike }) => {
   
-  // Use specialized card for campaigns
   if (post.isCampaign && !isThreadView) {
-    return <CampaignCard post={post} currentUser={currentUser} onComplete={onUpdate} onNavigateToVault={onNavigateToVault} />;
+    return <CampaignCard post={post} currentUser={currentUser} onComplete={onUpdate} />;
   }
 
   const isBookmarked = bookmarks.includes(post.id);
@@ -57,7 +55,7 @@ const PostItem: React.FC<{
              <div className="flex items-center gap-3">
                 <img 
                   src={post.authorAvatar} 
-                  className="w-10 h-10 rounded-full border border-slate-100 object-cover cursor-pointer hover:brightness-90 transition-all" 
+                  className="w-12 h-12 rounded-full border border-slate-100 object-cover cursor-pointer hover:brightness-90 transition-all shadow-sm" 
                   alt={post.author} 
                   onClick={(e) => { e.stopPropagation(); onNavigateToProfile(post.authorId); }}
                 />
@@ -66,7 +64,10 @@ const PostItem: React.FC<{
                       <h4 className="text-[14px] font-black uppercase tracking-tight text-slate-900">{post.author}</h4>
                       <AuthoritySeal role={post.authorAuthority} size={12} />
                    </div>
-                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{post.timestamp} • {post.college} HUB</p>
+                   {/* Restored: Role display (Vice Chancellor, Student, etc.) */}
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight mt-0.5">
+                     {post.authorRole} • {post.timestamp}
+                   </p>
                 </div>
              </div>
              <button className="p-2 text-slate-300 hover:text-slate-600 transition-colors">
@@ -74,8 +75,8 @@ const PostItem: React.FC<{
              </button>
           </div>
 
-          {/* Separator Line */}
-          <div className="border-t border-slate-100 mb-5"></div>
+          {/* Restored: Separation Line */}
+          <div className="w-full h-px bg-slate-100 mb-5"></div>
 
           <div 
             dangerouslySetInnerHTML={{ __html: post.content }} 
@@ -83,40 +84,53 @@ const PostItem: React.FC<{
           />
 
           {post.images && post.images.length > 0 && (
-            <div className="rounded-xl overflow-hidden border border-slate-100 mb-6">
-               <img src={post.images[0]} className="w-full h-auto object-cover max-h-[500px]" alt="Post content" />
+            <div className="rounded-xl overflow-hidden border border-slate-100 mb-6 shadow-inner bg-slate-50">
+               <img src={post.images[0]} className="w-full h-auto object-cover max-h-[550px]" alt="Post content" />
             </div>
           )}
 
-          {/* Post Action Bar */}
-          <div className="flex items-center justify-between pt-2">
-             <div className="flex items-center gap-6">
+          {/* Restored Action Bar: Star, Comment, Share, Bookmark */}
+          <div className="flex items-center justify-between pt-2 border-t border-slate-50 mt-4">
+             <div className="flex items-center gap-4 sm:gap-8">
+                {/* Stars / Likes - Incremental logic applied */}
                 <button 
                   onClick={(e) => { e.stopPropagation(); onLike(post.id); }}
-                  className="flex items-center gap-2 text-slate-400 hover:text-rose-500 transition-colors group/btn"
+                  className="flex items-center gap-2 text-slate-400 hover:text-rose-500 transition-all group/btn active:scale-125"
                 >
-                   <div className="p-2 rounded-full group-hover/btn:bg-rose-50 transition-colors">
-                      <Star size={18} className={isLiked ? 'fill-rose-500 text-rose-500' : ''} />
+                   <div className={`p-2 rounded-full transition-colors ${isLiked ? 'bg-rose-50 text-rose-500' : 'group-hover/btn:bg-rose-50'}`}>
+                      <Star size={20} className={isLiked ? 'fill-rose-500' : ''} />
                    </div>
-                   <span className="text-[12px] font-bold">{post.likes > 0 ? post.likes : ''}</span>
+                   <span className={`text-[12px] font-black tracking-widest ${isLiked ? 'text-rose-500' : ''}`}>
+                     {post.likes > 0 ? post.likes.toLocaleString() : 'STAR'}
+                   </span>
                 </button>
-                <button className="flex items-center gap-2 text-slate-400 hover:text-[var(--brand-color)] transition-colors group/btn">
-                   <div className="p-2 rounded-full group-hover/btn:bg-teal-50 transition-colors">
-                      <MessageCircle size={18} />
+
+                {/* Comment / MessageCircle - Opens thread */}
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onOpenThread(post.id); }}
+                  className="flex items-center gap-2 text-slate-400 hover:text-[var(--brand-color)] transition-all group/btn active:scale-110"
+                >
+                   <div className="p-2 rounded-full group-hover/btn:bg-teal-50">
+                      <MessageCircle size={20} />
                    </div>
-                   <span className="text-[12px] font-bold">{post.commentsCount > 0 ? post.commentsCount : ''}</span>
+                   <span className="text-[12px] font-black tracking-widest">
+                     {post.commentsCount > 0 ? post.commentsCount.toLocaleString() : 'REPLY'}
+                   </span>
                 </button>
-                <button className="flex items-center gap-2 text-slate-400 hover:text-indigo-500 transition-colors group/btn">
-                   <div className="p-2 rounded-full group-hover/btn:bg-indigo-50 transition-colors">
-                      <Share2 size={18} />
+
+                <button className="flex items-center gap-2 text-slate-400 hover:text-indigo-500 transition-all group/btn active:scale-110">
+                   <div className="p-2 rounded-full group-hover/btn:bg-indigo-50">
+                      <Share2 size={20} />
                    </div>
                 </button>
              </div>
+
+             {/* Bookmark - Saves in profile registry */}
              <button 
                onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }}
-               className={`p-2 rounded-full transition-colors ${isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-amber-50'}`}
+               className={`p-2 rounded-full transition-all active:scale-125 ${isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-amber-50'}`}
              >
-                <Bookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
+                <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
              </button>
           </div>
        </div>
@@ -135,11 +149,14 @@ const Feed: React.FC<{
 }> = ({ collegeFilter, threadId, onOpenThread, onBack, onNavigateToProfile, onNavigateToVault }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
+  const [likedPosts, setLikedPosts] = useState<string[]>([]);
   const currentUser = db.getUser();
 
   useEffect(() => {
     setPosts(db.getPosts());
     setBookmarks(db.getBookmarks());
+    // In a real app we'd track user likes specifically, but we'll simulate for now
+    setLikedPosts(JSON.parse(localStorage.getItem('maksocial_user_likes') || '[]'));
   }, []);
 
   const filteredPosts = useMemo(() => {
@@ -147,6 +164,28 @@ const Feed: React.FC<{
     if (!collegeFilter || collegeFilter === 'Global') return posts;
     return posts.filter(p => p.college === collegeFilter);
   }, [posts, collegeFilter, threadId]);
+
+  const handleLike = (id: string) => {
+    const isLiked = likedPosts.includes(id);
+    const updatedLikes = isLiked 
+      ? likedPosts.filter(l => l !== id) 
+      : [...likedPosts, id];
+    
+    setLikedPosts(updatedLikes);
+    localStorage.setItem('maksocial_user_likes', JSON.stringify(updatedLikes));
+
+    const post = posts.find(p => p.id === id);
+    if (post) {
+      const updatedPost = { ...post, likes: isLiked ? post.likes - 1 : post.likes + 1 };
+      db.updatePost(updatedPost);
+      setPosts(db.getPosts());
+    }
+  };
+
+  const handleBookmark = (id: string) => {
+    const updated = db.toggleBookmark(id);
+    setBookmarks(updated);
+  };
 
   const handleCreatePost = async (content: string) => {
     const newPost: Post = {
@@ -170,16 +209,11 @@ const Feed: React.FC<{
     setPosts(db.getPosts());
   };
 
-  const handleBookmark = (id: string) => {
-    // Basic bookmark toggle simulation
-    setBookmarks(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
-  };
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       {onBack && (
-        <button onClick={onBack} className="flex items-center gap-2 text-slate-500 mb-6 hover:text-slate-900 transition-all font-bold uppercase text-[10px] tracking-widest">
-          <ArrowLeft size={18} /> Back to Pulse
+        <button onClick={onBack} className="flex items-center gap-2 text-slate-500 mb-6 hover:text-slate-900 transition-all font-bold uppercase text-[10px] tracking-widest group">
+          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform"/> Back to Pulse
         </button>
       )}
       
@@ -200,9 +234,9 @@ const Feed: React.FC<{
             onNavigateToVault={onNavigateToVault}
             bookmarks={bookmarks} 
             onBookmark={handleBookmark} 
+            onLike={handleLike}
+            isLiked={likedPosts.includes(p.id)}
             onUpdate={() => setPosts(db.getPosts())}
-            onLike={() => {}}
-            onAddToast={() => {}}
           />
         ))}
         {filteredPosts.length === 0 && (

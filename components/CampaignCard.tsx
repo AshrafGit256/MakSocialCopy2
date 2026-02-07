@@ -4,7 +4,7 @@ import { Post, User, Ticket } from '../types';
 import { db } from '../db';
 import { Zap, MapPin, Calendar, CreditCard, CheckCircle, Loader2, ShieldCheck, ArrowRight } from 'lucide-react';
 
-const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => void }> = ({ post, currentUser, onComplete }) => {
+const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => void; onNavigateToVault?: () => void }> = ({ post, currentUser, onComplete, onNavigateToVault }) => {
   const [isBuying, setIsBuying] = useState(false);
   const [step, setStep] = useState<'view' | 'pay' | 'success'>('view');
   const [hasTicket, setHasTicket] = useState(false);
@@ -36,9 +36,9 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
   };
 
   const navigateToVault = () => {
-    // In a real app we'd use a router or state lift, 
-    // here we trigger the complete action which the parent handles
-    // For visual feedback, we'll just alert that they should check the sidebar vault
+    if (onNavigateToVault) {
+      onNavigateToVault();
+    }
     onComplete();
   };
 
@@ -145,7 +145,7 @@ const CampaignCard: React.FC<{ post: Post; currentUser: User; onComplete: () => 
              </div>
              <div className="flex flex-col gap-3">
                 <button 
-                  onClick={onComplete}
+                  onClick={navigateToVault}
                   className="w-full py-4 bg-emerald-600 text-white font-black uppercase tracking-[0.2em] text-xs shadow-xl flex items-center justify-center gap-2"
                 >
                   <ShieldCheck size={16}/> VIEW TICKET IN VAULT <ArrowRight size={16}/>

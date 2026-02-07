@@ -16,11 +16,11 @@ export const AuthoritySeal: React.FC<{ role?: AuthorityRole | string, size?: num
   return <BadgeCheck size={size} className="text-indigo-500" />;
 };
 
-const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, bookmarks: string[], onBookmark: (id: string) => void, onUpdate: () => void, isThreadView?: boolean, isLiked?: boolean, onLike: (id: string) => void, onAddToast: (type: any, text: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike, onAddToast }) => {
+const PostItem: React.FC<{ post: Post, currentUser: User, onOpenThread: (id: string) => void, onNavigateToProfile: (id: string) => void, onNavigateToVault?: () => void, bookmarks: string[], onBookmark: (id: string) => void, onUpdate: () => void, isThreadView?: boolean, isLiked?: boolean, onLike: (id: string) => void, onAddToast: (type: any, text: string) => void }> = ({ post, currentUser, onOpenThread, onNavigateToProfile, onNavigateToVault, bookmarks, onBookmark, onUpdate, isThreadView = false, isLiked = false, onLike, onAddToast }) => {
   
   // Use specialized card for campaigns
   if (post.isCampaign && !isThreadView) {
-    return <CampaignCard post={post} currentUser={currentUser} onComplete={onUpdate} />;
+    return <CampaignCard post={post} currentUser={currentUser} onComplete={onUpdate} onNavigateToVault={onNavigateToVault} />;
   }
 
   return (
@@ -49,8 +49,9 @@ const Feed: React.FC<{
   onOpenThread: (id: string) => void, 
   onBack?: () => void, 
   onNavigateToProfile: (id: string) => void, 
+  onNavigateToVault?: () => void,
   triggerSafetyError: () => void 
-}> = ({ collegeFilter, threadId, onOpenThread, onBack, onNavigateToProfile }) => {
+}> = ({ collegeFilter, threadId, onOpenThread, onBack, onNavigateToProfile, onNavigateToVault }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const currentUser = db.getUser();
 
@@ -106,6 +107,7 @@ const Feed: React.FC<{
             currentUser={currentUser} 
             onOpenThread={onOpenThread} 
             onNavigateToProfile={onNavigateToProfile} 
+            onNavigateToVault={onNavigateToVault}
             bookmarks={[]} 
             onBookmark={() => {}} 
             onUpdate={() => setPosts(db.getPosts())}

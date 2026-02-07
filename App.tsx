@@ -21,10 +21,12 @@ import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import RightSidebar from './components/RightSidebar';
 import LostAndFound from './components/LostAndFound';
+import Splash from './components/Splash';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
 
 const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true);
   const [view, setView] = useState<AppView>('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setuserRole] = useState<'student' | 'admin'>('student');
@@ -149,6 +151,10 @@ const App: React.FC = () => {
     setIsMsgOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (showSplash) {
+    return <Splash onComplete={() => setShowSplash(false)} />;
+  }
 
   if (isLoggedIn && userRole === 'admin') {
     return <Admin onLogout={handleLogout} />;

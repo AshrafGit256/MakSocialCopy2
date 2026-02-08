@@ -6,9 +6,8 @@ import {
   Share2, Zap, MessageCircle, MapPin, 
   Bell, Image as ImageIcon, Camera,
   CheckCircle2, Heart, ExternalLink,
-  Target, GraduationCap, Cpu, Layers,
-  Shield, Mail, Info, Smartphone,
-  Database
+  Target, Cpu, Layers, Shield, Mail, 
+  Info, Smartphone, Database
 } from "lucide-react";
 
 interface LandingProps {

@@ -58,7 +58,7 @@ const CAMPAIGN_POST: Post = {
   author: 'Makerere Sports Council',
   authorId: 'sports_node',
   authorRole: 'Official Organizer',
-  authorAvatar: 'https://static.vecteezy.com/system/resources/thumbnails/041/943/427/small/sport-logo-black-color-2-vector.jpg',
+  authorAvatar: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png',
   authorAuthority: 'Official',
   timestamp: 'Sponsored',
   isCampaign: true,
@@ -78,7 +78,7 @@ const CAMPAIGN_POST: Post = {
   flags: [],
   isOpportunity: false,
   college: 'Global',
-  images: ['https://pbs.twimg.com/media/Gwn2s3iW8AAncFH.jpg']
+  images: ['https://cioafrica.co/wp-content/uploads/2022/10/Makerere-Uni.jpg']
 };
 
 export const db = {

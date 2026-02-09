@@ -21,9 +21,11 @@ import NotificationDropdown from './components/NotificationDropdown';
 import SearchDrawer from './components/SearchDrawer';
 import RightSidebar from './components/RightSidebar';
 import LostAndFound from './components/LostAndFound';
+import Tickets from './components/Tickets';
+import RegistryAssistant from './components/RegistryAssistant';
 import Splash from './components/Splash';
 import { db } from './db';
-import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid } from 'lucide-react';
+import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid, Ticket as TicketIcon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
@@ -177,6 +179,7 @@ const App: React.FC = () => {
       case 'gallery': return <Gallery onSelectPost={(id) => {setActiveThreadId(id); setView('thread');}} />;
       case 'settings': return <Settings />;
       case 'lost-found': return <LostAndFound onOpenChat={(id) => { setActiveThreadId(id); setView('chats'); }} />;
+      case 'tickets': return <Tickets />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };
@@ -267,9 +270,12 @@ const App: React.FC = () => {
             )}
           </div>
         </header>
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden relative">
           <main className="flex-1 overflow-y-auto no-scrollbar">{renderContent()}</main>
           {(view === 'home' || view === 'thread') && <RightSidebar />}
+          
+          {/* AI ASSISTANT OVERLAY */}
+          {isLoggedIn && <RegistryAssistant />}
         </div>
       </div>
     </div>

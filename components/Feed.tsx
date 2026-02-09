@@ -74,7 +74,7 @@ const PostItem: React.FC<{
                       <h4 className="text-[14px] font-black uppercase tracking-tight text-slate-900">{post.author}</h4>
                       <AuthoritySeal role={post.authorAuthority} size={12} />
                    </div>
-                   {/* Restored: Role display (Vice Chancellor, Student, etc.) */}
+                   {/* Restored: Explicit Role display (e.g. Vice Chancellor) */}
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-tight mt-0.5">
                      {post.authorRole} • {post.timestamp}
                    </p>
@@ -85,7 +85,7 @@ const PostItem: React.FC<{
              </button>
           </div>
 
-          {/* Restored: Separation Line */}
+          {/* Restored: Visual Separation Line */}
           <div className="w-full h-px bg-slate-100 mb-5"></div>
 
           <div 
@@ -99,23 +99,21 @@ const PostItem: React.FC<{
             </div>
           )}
 
-          {/* Restored Action Bar: Star, Comment, Share, Bookmark */}
+          {/* Action Bar with full Star/Reply/Share/Bookmark set */}
           <div className="flex items-center justify-between pt-2 border-t border-slate-50 mt-4">
              <div className="flex items-center gap-4 sm:gap-8">
-                {/* Stars / Likes - Incremental logic applied */}
                 <button 
                   onClick={(e) => { e.stopPropagation(); onLike(post.id); }}
                   className="flex items-center gap-2 text-slate-400 hover:text-rose-500 transition-all group/btn active:scale-125"
                 >
-                   <div className={`p-2 rounded-full transition-colors ${isLiked ? 'bg-rose-50 text-rose-500' : 'group-hover/btn:bg-rose-50'}`}>
-                      <Star size={20} className={isLiked ? 'fill-rose-500' : ''} />
+                   <div className={`p-2 rounded-full transition-colors ${isLiked ? 'bg-rose-50 text-rose-500 shadow-sm' : 'group-hover/btn:bg-rose-50'}`}>
+                      <Star size={20} className={isLiked ? 'fill-rose-500 text-rose-500' : ''} />
                    </div>
                    <span className={`text-[12px] font-black tracking-widest ${isLiked ? 'text-rose-500' : ''}`}>
                      {post.likes > 0 ? post.likes.toLocaleString() : 'STAR'}
                    </span>
                 </button>
 
-                {/* Comment / MessageCircle - Opens thread */}
                 <button 
                   onClick={(e) => { e.stopPropagation(); onOpenThread(post.id); }}
                   className="flex items-center gap-2 text-slate-400 hover:text-[var(--brand-color)] transition-all group/btn active:scale-110"
@@ -135,10 +133,9 @@ const PostItem: React.FC<{
                 </button>
              </div>
 
-             {/* Bookmark - Saves in profile registry */}
              <button 
                onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }}
-               className={`p-2 rounded-full transition-all active:scale-125 ${isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-amber-50'}`}
+               className={`p-2 rounded-full transition-all active:scale-125 ${isBookmarked ? 'text-amber-500 bg-amber-50 shadow-sm' : 'text-slate-300 hover:text-amber-500 hover:bg-amber-50'}`}
              >
                 <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
              </button>
@@ -165,7 +162,6 @@ const Feed: React.FC<{
   useEffect(() => {
     setPosts(db.getPosts());
     setBookmarks(db.getBookmarks());
-    // In a real app we'd track user likes specifically, but we'll simulate for now
     setLikedPosts(JSON.parse(localStorage.getItem('maksocial_user_likes') || '[]'));
   }, []);
 

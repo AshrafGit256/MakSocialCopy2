@@ -5,9 +5,7 @@ import {
   Globe, Zap, ArrowUpRight, Radio, Cpu, Fingerprint,
   Mic2, BookOpen, Trophy, Palette, Code, ChevronRight,
   Navigation, Navigation2, Clock, Car, Footprints, Info,
-  Search as SearchIcon, Compass, Map as MapIcon,
-  /* Fix: Added ExternalLink for grounding sources */
-  ExternalLink
+  Search as SearchIcon, Compass, Map as MapIcon
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
@@ -16,8 +14,6 @@ const Explore: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchingMap, setIsSearchingMap] = useState(false);
   const [mapResponse, setMapResponse] = useState<string | null>(null);
-  /* Fix: Added state for grounding links as required by guidelines */
-  const [mapLinks, setMapLinks] = useState<{title: string, uri: string}[]>([]);
   const [userCoords, setUserCoords] = useState<{latitude: number, longitude: number} | null>(null);
   const [estimationMode, setEstimationMode] = useState<'walking' | 'driving'>('walking');
 
@@ -47,9 +43,7 @@ const Explore: React.FC = () => {
   const handleMapSearch = async () => {
     if (!searchQuery.trim()) return;
     setIsSearchingMap(true);
-    setMapLinks([]);
     try {
-      /* Fix: Proper initialization using process.env.API_KEY */
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -63,20 +57,7 @@ const Explore: React.FC = () => {
           }
         }
       });
-      /* Fix: Use .text property to get text output */
       setMapResponse(response.text || "Scanning complete. Location identified.");
-
-      /* Fix: Extract Maps grounding URLs as required by guidelines */
-      const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-      if (chunks) {
-        const extractedLinks = chunks
-          .filter((chunk: any) => chunk.maps)
-          .map((chunk: any) => ({
-            title: chunk.maps.title || "View Location",
-            uri: chunk.maps.uri
-          }));
-        setMapLinks(extractedLinks);
-      }
     } catch (e) {
       console.error(e);
       setMapResponse("Signal interrupted. Could not retrieve place data.");
@@ -160,28 +141,7 @@ const Explore: React.FC = () => {
                  <div className="space-y-3">
                     <p className="text-sm font-black uppercase text-[var(--text-primary)]">Place Intelligence</p>
                     <p className="text-xs text-slate-500 leading-relaxed">{mapResponse}</p>
-                    
-                    {/* Fix: Rendering grounding links extracted from candidate chunks */}
-                    {mapLinks.length > 0 && (
-                      <div className="pt-2 space-y-2 border-t border-slate-200 dark:border-white/10">
-                        <p className="text-[8px] font-black uppercase text-slate-400">Validated Sources:</p>
-                        <div className="flex flex-col gap-1.5">
-                          {mapLinks.map((link, idx) => (
-                            <a 
-                              key={idx} 
-                              href={link.uri} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="text-[9px] font-bold text-indigo-600 hover:text-indigo-500 flex items-center gap-1.5 transition-colors"
-                            >
-                              <ExternalLink size={10} /> {link.title}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <button onClick={() => { setMapResponse(null); setMapLinks([]); }} className="text-[8px] font-black uppercase text-indigo-600 underline">Clear Signal</button>
+                    <button onClick={() => setMapResponse(null)} className="text-[8px] font-black uppercase text-indigo-600 underline">Clear Signal</button>
                  </div>
                ) : (
                  <p className="text-xs text-slate-500 font-medium">Select a node or search for an asset to initialize place intelligence.</p>
@@ -260,7 +220,7 @@ const Explore: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingTags.map((tag) => (
-            <div key={tag.name} className="glass-card group p-8 bg-[var(--sidebar-bg)] border border-[var(--border-color)] hover:border-indigo-500 transition-all cursor-pointer relative overflow-hidden shadow-sm hover:shadow-xl">
+            <div key={tag.name} className="glass-card group p-8 bg-[var(--sidebar-bg)] border-[var(--border-color)] hover:border-indigo-500 transition-all cursor-pointer relative overflow-hidden shadow-sm hover:shadow-xl">
               <div className="absolute top-0 right-0 p-6 opacity-5 transition-opacity group-hover:opacity-10">
                 <Hash size={80} className={tag.color} />
               </div>

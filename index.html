@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MakSocial - Intelligence Registry</title>
+    <title>MakSocial - Connect Makerere</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -22,7 +22,8 @@
               'custom': '2px',
             },
             fontFamily: {
-              sans: ['Inter', 'Chirp', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+              sans: ['Chirp', 'Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+              chirp: ['Chirp', 'Inter', 'sans-serif'],
               serif: ['"Playfair Display"', 'serif'],
               mono: ['"JetBrains Mono"', 'monospace'],
             }
@@ -44,6 +45,12 @@
           font-weight: 700;
           font-style: normal;
         }
+        @font-face {
+          font-family: 'Chirp';
+          src: url('https://abs.twimg.com/fonts/chirp-heavy-web.woff2') format('woff2');
+          font-weight: 900;
+          font-style: normal;
+        }
 
         :root {
           --bg-primary: #ffffff;
@@ -53,7 +60,7 @@
           --border-color: #f1f1f1;
           --brand-color: #10918a; 
           --radius-main: 0px;
-          --font-main: 'Inter', sans-serif;
+          --font-main: 'Chirp', 'Inter', sans-serif;
         }
 
         body {
@@ -61,7 +68,7 @@
             background-color: var(--bg-primary);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.01em;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -69,7 +76,7 @@
         .ticker-text { font-variant-numeric: tabular-nums; }
 
         ::selection {
-          background: #000;
+          background: #10918a;
           color: #fff;
         }
 
@@ -78,7 +85,6 @@
           scroll-behavior: smooth;
         }
 
-        /* High-end custom shadows */
         .shadow-ethereal {
           box-shadow: 0 50px 100px -20px rgba(0,0,0,0.05);
         }

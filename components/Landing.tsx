@@ -13,28 +13,32 @@ import {
   Cpu, Activity, Triangle, Layers,
   Boxes, GitBranch, Scan, Binary,
   Fingerprint, ArrowDown, MoveRight,
-  Maximize2, Radar
+  Maximize2, Radar, GraduationCap,
+  // Added missing Calendar import
+  Calendar
 } from "lucide-react";
 
 interface LandingProps {
   onStart: () => void;
 }
 
-const MAK_IMAGES = [
-  { url: 'https://cioafrica.co/wp-content/uploads/2022/10/Makerere-Uni.jpg', label: 'Main Administration Node', id: 'ADMIN-01' },
-  { url: 'https://campusbee.ug/wp-content/uploads/2022/06/FB_IMG_16565179974172233.jpg', label: 'The Vault: Main Library', id: 'LIB-02' },
-  { url: 'https://www.monitor.co.ug/resource/image/4501730/landscape_ratio3x2/1200/800/30bf0642ec5596d69a097b2e29a19774/Za/latest15pix.jpg', label: 'Freedom Square Assembly', id: 'SQ-03' },
-  { url: 'https://unipod.mak.ac.ug/wp-content/uploads/2024/12/Unipod-Logo-SVG.svg', label: 'Innovation Forge (UniPod)', id: 'FORGE-04' },
+const MAK_GALLERY = [
+  { url: 'https://cioafrica.co/wp-content/uploads/2022/10/Makerere-Uni.jpg', title: 'Main Campus', desc: 'The heart of our university.' },
+  { url: 'https://campusbee.ug/wp-content/uploads/2022/06/FB_IMG_16565179974172233.jpg', title: 'Main Library', desc: 'Where the brightest minds meet.' },
+  { url: 'https://www.monitor.co.ug/resource/image/4501730/landscape_ratio3x2/1200/800/30bf0642ec5596d69a097b2e29a19774/Za/latest15pix.jpg', title: 'Freedom Square', desc: 'Our home for big moments.' }
 ];
 
 const COLLEGES = [
-  { id: 'COCIS', name: 'Computing & IT', img: 'https://lh3.googleusercontent.com/gps-cs-s/AHVAweqcyxlewzxagSqcM7aXE5JrGSLNyiGP7V4XR5PYmTliZcJOnRatS4B5-cUO2UgmsTfT9efVrOAS9Gx-NJk8oIZmgZDLPpvc3W6Fl6GeSh-sbqtKnImUNwovg9unJwqJb_5Rlw9lU_Nfgg69=s680-w680-h510-rw' },
-  { id: 'CEDAT', name: 'Engineering & Art', img: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=800' },
+  { id: 'COCIS', name: 'Computing', img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800' },
+  { id: 'CEDAT', name: 'Engineering', img: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=800' },
   { id: 'LAW', name: 'School of Law', img: 'https://campusbee.ug/wp-content/uploads/2024/06/20240619_170258.jpg' },
-  { id: 'CHS', name: 'Health Sciences', img: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800' },
+  { id: 'CHS', name: 'Medicine', img: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&w=800' },
+  { id: 'CONAS', name: 'Sciences', img: 'https://images.unsplash.com/photo-1532187875605-183881249611?auto=format&fit=crop&w=800' },
+  { id: 'CAES', name: 'Agriculture', img: 'https://images.unsplash.com/photo-1495107336214-bca9f1d95c18?auto=format&fit=crop&w=800' },
 ];
 
-const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className = '' }) => {
+// Updated Reveal component to accept onClick prop
+const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string; onClick?: () => void }> = ({ children, delay = 0, className = '', onClick }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -50,8 +54,10 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
     <div 
       ref={ref} 
       style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-[1500ms] cubic-bezier(0.16, 1, 0.3, 1) transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+      // Added onClick handler to Reveal's container
+      onClick={onClick}
+      className={`transition-all duration-1000 transform ${
+        isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-95'
       } ${className}`}
     >
       {children}
@@ -60,136 +66,80 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
 };
 
 const Landing: React.FC<LandingProps> = ({ onStart }) => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: (e.clientX / window.innerWidth - 0.5) * 15, y: (e.clientY / window.innerHeight - 0.5) * 15 });
-    };
-    const handleScroll = () => {
-      const winScroll = document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      setScrollProgress(winScroll / height);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <div className="bg-white text-slate-900 min-h-screen selection:bg-slate-900 selection:text-white font-sans overflow-x-hidden relative">
+    <div className="bg-white text-slate-900 min-h-screen font-chirp selection:bg-[var(--brand-color)] selection:text-white overflow-x-hidden">
       
-      {/* 0. TECHNICAL OVERLAY & GRAIN */}
-      <div className="fixed inset-0 pointer-events-none z-[999] opacity-[0.03] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-      <div className="fixed top-0 left-0 w-full h-[2px] bg-slate-100 z-[2000]">
-        <div className="h-full bg-[var(--brand-color)] transition-all duration-100" style={{ width: `${scrollProgress * 100}%` }}></div>
-      </div>
-
-      {/* 1. STARK NAVIGATION */}
-      <nav className="fixed top-0 left-0 right-0 z-[1000] p-6 lg:p-12 flex justify-between items-start pointer-events-none">
-        <div className="flex flex-col gap-1 group cursor-pointer pointer-events-auto" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-          <span className="text-3xl font-black tracking-tighter leading-none italic">MAKSOCIAL.</span>
-          <span className="text-[8px] font-bold tracking-[0.6em] text-slate-400">REGISTRY_v5.0_ALPHA</span>
+      {/* 1. SIMPLE NAV */}
+      <nav className="fixed top-0 left-0 right-0 z-[1000] p-6 lg:p-10 flex justify-between items-center pointer-events-none">
+        <div className="flex items-center gap-3 pointer-events-auto cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+          <div className="w-10 h-10 bg-[var(--brand-color)] rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg">M</div>
+          <span className="text-2xl font-black tracking-tighter text-[var(--brand-color)] hidden sm:block">MakSocial</span>
         </div>
         
-        <div className="flex flex-col items-end gap-10 pointer-events-auto">
-          <button onClick={onStart} className="bg-slate-950 text-white px-10 py-4 rounded-full font-black text-[9px] uppercase tracking-[0.4em] shadow-2xl hover:bg-[var(--brand-color)] transition-all active:scale-95">
-             Initialize_Uplink
+        <div className="pointer-events-auto">
+          <button onClick={onStart} className="bg-[var(--brand-color)] text-white px-8 py-3 rounded-full font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all">
+             Join Now
           </button>
-          <div className="hidden lg:flex flex-col items-end gap-4 text-[9px] font-black uppercase tracking-widest text-slate-400">
-             <a href="#strata" className="hover:text-slate-950 transition-colors">The_Strata</a>
-             <a href="#logic" className="hover:text-slate-950 transition-colors">Logic_Vault</a>
-             <a href="#directives" className="hover:text-slate-950 transition-colors">Directives</a>
-          </div>
         </div>
       </nav>
 
-      {/* 2. HERO: CINEMATIC HILL STRATA */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <div className="absolute inset-0 z-0">
-           <img 
-             src="https://cioafrica.co/wp-content/uploads/2022/10/Makerere-Uni.jpg" 
-             className="w-full h-full object-cover grayscale opacity-[0.08] transition-all duration-[3s] hover:grayscale-0 hover:opacity-20 scale-110" 
-             alt="Makerere Main"
-           />
-           <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white"></div>
-        </div>
+      {/* 2. HERO: SIMPLE & BIG */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 px-6">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <Reveal>
+            <span className="bg-emerald-50 text-[var(--brand-color)] px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border border-emerald-100">
+              Your Campus Community
+            </span>
+          </Reveal>
 
-        <div className="max-w-screen-2xl mx-auto px-6 w-full relative z-10 text-center">
-          <Reveal className="space-y-12">
-            <div className="inline-flex items-center gap-4 px-5 py-2 border border-slate-200 rounded-full bg-white/50 backdrop-blur shadow-sm">
-               <Radar size={14} className="text-rose-500 animate-pulse" />
-               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 italic">Scanning Campus Sectors...</span>
-            </div>
+          <Reveal delay={200}>
+            <h1 className="text-5xl md:text-8xl font-black leading-none tracking-tight text-slate-900">
+              The heart of <br />
+              <span className="text-[var(--brand-color)]">Makerere.</span>
+            </h1>
+          </Reveal>
 
-            <div className="relative">
-              <h1 className="text-[8vw] md:text-[14vw] font-black leading-[0.75] tracking-[-0.05em] uppercase text-slate-950">
-                Nexus of <br />
-                <span className="italic font-serif normal-case tracking-tight text-slate-200" style={{ transform: `translate(${mousePos.x}px, ${mousePos.y}px)` }}>The Hill.</span>
-              </h1>
-              <div className="absolute -top-10 -left-10 text-[20vw] font-black text-slate-900 opacity-[0.01] pointer-events-none italic select-none">MAK</div>
-            </div>
+          <Reveal delay={400}>
+            <p className="max-w-2xl mx-auto text-lg md:text-2xl text-slate-500 font-medium leading-relaxed">
+              Connect with your classmates, share study notes, and stay up to date with everything happening on the Hill.
+            </p>
+          </Reveal>
 
-            <div className="flex flex-col items-center gap-12 pt-10">
-              <p className="max-w-xl text-xl md:text-3xl text-slate-500 font-medium leading-tight italic border-l-[12px] border-slate-900 pl-8">
-                The definitive high-fidelity strata for the student body. Synchronize logic, build nodes, and lead.
-              </p>
-              
-              <button onClick={onStart} className="flex items-center gap-10 group bg-slate-950 px-12 py-8 rounded-[2rem] text-white shadow-[0_40px_80px_-15px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 transition-all">
-                 <span className="text-2xl font-black uppercase tracking-widest group-hover:italic transition-all">Enter Protocol</span>
-                 <div className="w-12 h-12 bg-[var(--brand-color)] rounded-full flex items-center justify-center group-hover:rotate-45 transition-transform shadow-2xl">
-                    <ArrowRight size={24} />
-                 </div>
-              </button>
+          <Reveal delay={600} className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
+            <button onClick={onStart} className="w-full sm:w-auto bg-[var(--brand-color)] text-white px-12 py-5 rounded-2xl font-black text-lg shadow-[0_20px_40px_rgba(16,145,138,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
+              Get Started <ArrowRight size={24} />
+            </button>
+            <div className="flex -space-x-3">
+              {[1,2,3,4].map(i => (
+                <img key={i} src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+10}`} className="w-12 h-12 rounded-full border-4 border-white shadow-lg" alt="User" />
+              ))}
+              <div className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400">18k+</div>
             </div>
           </Reveal>
         </div>
 
-        <div className="absolute bottom-12 left-12 hidden lg:flex items-center gap-6">
-           <div className="w-px h-24 bg-slate-200"></div>
-           <div className="flex flex-col gap-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Network Intensity</span>
-              <span className="text-xl font-black tabular-nums">18,421 NODES</span>
-           </div>
+        {/* HERO BACKGROUND IMAGE */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 -z-10 opacity-10">
+           <img src="https://cioafrica.co/wp-content/uploads/2022/10/Makerere-Uni.jpg" className="w-full h-full object-cover grayscale" alt="Makerere" />
         </div>
       </section>
 
-      {/* 3. ASYMMETRICAL ARCHITECTURAL GALLERY */}
-      <section id="strata" className="py-40 bg-[#fafafa] overflow-hidden">
-        <div className="max-w-screen-2xl mx-auto px-6 mb-32 space-y-4">
-           <Reveal className="border-l-[16px] border-slate-950 pl-10">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.5em]">The_Strata_Catalog</span>
-              <h2 className="text-[8vw] font-black uppercase tracking-tighter leading-none">Sector <br /><span className="text-slate-200 italic font-serif normal-case">Architecture.</span></h2>
-           </Reveal>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 px-6 lg:px-12 max-w-[1800px] mx-auto">
-          {/* Main Visual Node */}
-          <Reveal className="lg:col-span-8 group relative h-[700px] rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100">
-             <img src={MAK_IMAGES[0].url} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-[2s] group-hover:grayscale-0 group-hover:scale-110" />
-             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-             <div className="absolute bottom-12 left-12 space-y-4">
-                <span className="px-4 py-1.5 bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg text-white text-[10px] font-black uppercase tracking-widest w-fit block italic">Node_ID: {MAK_IMAGES[0].id}</span>
-                <h3 className="text-6xl font-black text-white uppercase tracking-tighter leading-none">{MAK_IMAGES[0].label}</h3>
-                <button onClick={onStart} className="flex items-center gap-4 text-white/60 text-[10px] font-black uppercase tracking-[0.4em] hover:text-white transition-all">
-                  Initialize Scan <ChevronRight size={16}/>
-                </button>
-             </div>
+      {/* 3. CAMPUS REEL: BIG IMAGES */}
+      <section className="py-24 bg-slate-50">
+        <div className="max-w-screen-2xl mx-auto px-6">
+          <Reveal className="mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tight">Our <span className="text-[var(--brand-color)]">Campus</span> Life</h2>
+            <p className="text-slate-500 mt-2 font-bold uppercase tracking-widest text-xs">Explore the beauty of the Hill</p>
           </Reveal>
 
-          {/* Secondary Stack */}
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            {MAK_IMAGES.slice(1, 3).map((img, i) => (
-              <Reveal key={i} delay={i * 200} className="group relative flex-1 min-h-[340px] rounded-[3rem] overflow-hidden shadow-xl border border-slate-100 bg-white">
-                <img src={img.url} className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[1.5s]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent group-hover:from-slate-950/40 transition-all"></div>
-                <div className="absolute bottom-8 left-8">
-                   <h4 className="text-2xl font-black uppercase tracking-tighter text-slate-800 group-hover:text-white transition-colors">{img.label}</h4>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1 group-hover:text-white/60">Registry Sync v5.0</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {MAK_GALLERY.map((img, i) => (
+              <Reveal key={i} delay={i * 200} className="group relative rounded-[2rem] overflow-hidden aspect-[4/5] shadow-2xl">
+                <img src={img.url} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt={img.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                <div className="absolute bottom-8 left-8 text-white">
+                  <h3 className="text-2xl font-black uppercase tracking-tight">{img.title}</h3>
+                  <p className="text-sm text-white/70 font-medium">{img.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -197,246 +147,135 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         </div>
       </section>
 
-      {/* 4. THE HUB STRATA: EXPANDING CARDS */}
-      <section className="py-60 bg-white border-y border-slate-100 overflow-hidden relative">
-        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-100 -translate-y-1/2 opacity-50"></div>
-        
-        <div className="max-w-screen-2xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-20 relative z-10 items-center">
-           <div className="lg:col-span-4 space-y-12">
-              <Reveal className="space-y-6">
-                 <h2 className="text-6xl font-black uppercase tracking-tighter leading-[0.85]">College <br /><span className="text-[var(--brand-color)]">Logic.</span></h2>
-                 <p className="text-xl text-slate-500 font-medium leading-relaxed italic pr-12">
-                   "Every college is a synchronized logic node. Bridging the gap between engineering, art, and medicine."
-                 </p>
+      {/* 4. COLLEGE HUB: CIRCULAR DESIGN */}
+      <section className="py-24 bg-white overflow-hidden">
+        <div className="max-w-screen-2xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+            <Reveal>
+              <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tight">Select your <span className="text-[var(--brand-color)]">College</span></h2>
+              <p className="text-slate-500 mt-2 font-bold uppercase tracking-widest text-xs">Find your specific hub and community</p>
+            </Reveal>
+            <button onClick={onStart} className="text-[var(--brand-color)] font-black text-sm uppercase tracking-widest flex items-center gap-2 group">
+              See All Hubs <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
+            {COLLEGES.map((college, i) => (
+              <Reveal key={college.id} delay={i * 100} className="flex flex-col items-center gap-4 group cursor-pointer" onClick={onStart}>
+                <div className="relative w-full aspect-square rounded-full overflow-hidden border-4 border-slate-50 shadow-xl group-hover:border-[var(--brand-color)] transition-all duration-500">
+                  <img src={college.img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt={college.name} />
+                  <div className="absolute inset-0 bg-[var(--brand-color)]/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </div>
+                <div className="text-center">
+                   <span className="text-[10px] font-black text-[var(--brand-color)] uppercase tracking-widest">{college.id}</span>
+                   <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight mt-1">{college.name}</h4>
+                </div>
               </Reveal>
-              <div className="grid grid-cols-2 gap-4">
-                 {[
-                   { label: 'Uptime', val: '99.9%' },
-                   { label: 'Latency', val: '14ms' },
-                   { label: 'Security', val: 'Alpha' },
-                   { label: 'Verified', val: '100%' }
-                 ].map((stat, i) => (
-                   <div key={i} className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col gap-1">
-                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">{stat.label}</span>
-                      <span className="text-lg font-black">{stat.val}</span>
-                   </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. TOOLS FOR SUCCESS: SIMPLE BENTO */}
+      <section className="py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { title: 'Study Notes', desc: 'Find and share past papers and notes from other students.', icon: <BookOpen className="text-indigo-500" /> },
+              { title: 'Campus Chat', desc: 'Talk to your friends and join groups in your college.', icon: <MessageSquare className="text-rose-500" /> },
+              { title: 'Jobs & Gigs', desc: 'Find internships and part-time work for students.', icon: <Zap className="text-amber-500" /> },
+              { title: 'Digital ID', desc: 'Your student identity, verified and always with you.', icon: <Fingerprint className="text-emerald-500" /> },
+              { title: 'Lost & Found', desc: 'Did you lose something? Post it here and get it back.', icon: <Search className="text-[var(--brand-color)]" /> },
+              { title: 'Event Hub', desc: 'Never miss a concert, sports match, or workshop.', icon: <Calendar size={24} className="text-indigo-600" /> }
+            ].map((tool, i) => (
+              <Reveal key={i} delay={i * 100} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                  {/* Cast tool.icon to React.ReactElement<any> to allow size prop injection via cloneElement */}
+                  {React.cloneElement(tool.icon as React.ReactElement<any>, { size: 32 })}
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-3">{tool.title}</h3>
+                <p className="text-slate-500 font-medium leading-relaxed">{tool.desc}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. BIG CALL TO ACTION */}
+      <section className="py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="bg-[var(--brand-color)] rounded-[3rem] p-12 md:p-20 text-center text-white shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform">
+              <GraduationCap size={120} />
+            </div>
+            <div className="relative z-10 space-y-8">
+              <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">Ready to join your friends?</h2>
+              <p className="text-white/80 text-lg md:text-xl font-medium max-w-lg mx-auto">
+                Join thousands of other Makerere students and make the most of your university life.
+              </p>
+              <button onClick={onStart} className="bg-white text-[var(--brand-color)] px-12 py-5 rounded-2xl font-black text-lg shadow-xl hover:scale-105 active:scale-95 transition-all">
+                Create Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. FOOTER: SIMPLE & CLEAN */}
+      <footer className="bg-slate-900 pt-24 pb-12 px-6 text-white overflow-hidden">
+        <div className="max-w-screen-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-24">
+            <div className="col-span-1 md:col-span-2 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[var(--brand-color)] rounded-xl flex items-center justify-center text-white font-black text-xl">M</div>
+                <span className="text-2xl font-black tracking-tighter">MakSocial</span>
+              </div>
+              <p className="max-w-md text-slate-400 font-medium leading-relaxed">
+                The leading social platform for the Makerere University community. Built for students, by students.
+              </p>
+              <div className="flex gap-4">
+                 {[Instagram, Twitter, Facebook, Github].map((Icon, i) => (
+                   <a key={i} href="#" className="p-3 bg-white/5 rounded-full hover:bg-[var(--brand-color)] transition-all">
+                     <Icon size={20} />
+                   </a>
                  ))}
               </div>
-           </div>
-
-           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4 h-[500px]">
-              {COLLEGES.map((college, i) => (
-                <Reveal key={college.id} delay={i * 100} className="h-full">
-                  <div className="group h-full relative rounded-[3rem] overflow-hidden border border-slate-200 transition-all hover:flex-[2] cursor-pointer shadow-2xl">
-                     <img src={college.img} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110" />
-                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60 group-hover:opacity-100"></div>
-                     <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full px-6 flex flex-col items-center gap-2">
-                        <span className="text-[9px] font-black text-white/50 uppercase tracking-[0.5em]">{college.id}</span>
-                        <h4 className="text-lg font-black text-white text-center uppercase tracking-tight leading-none group-hover:scale-110 transition-transform">{college.name}</h4>
-                     </div>
-                  </div>
-                </Reveal>
-              ))}
-           </div>
-        </div>
-      </section>
-
-      {/* 5. LOGIC VAULT: BENTO SYSTEM */}
-      <section id="logic" className="py-60 bg-[#05080c] text-white">
-        <div className="max-w-screen-2xl mx-auto px-6 space-y-40">
-           <Reveal className="text-center space-y-12">
-              <h2 className="text-[10vw] font-black tracking-[-0.08em] uppercase leading-[0.75]">Digital <br /><span className="text-slate-800 italic">Vault.</span></h2>
-              <div className="flex items-center justify-center gap-8 text-[11px] font-black uppercase tracking-[0.5em] text-slate-500">
-                 <div className="h-px w-20 bg-slate-800"></div>
-                 Protocol Execution Modules
-                 <div className="h-px w-20 bg-slate-800"></div>
-              </div>
-           </Reveal>
-
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-800 border border-slate-800 rounded-[4rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]">
-              {[
-                { title: 'Study Hub', desc: 'Secure repository for peer-validated lecture logic and academic logs.', icon: <BookOpen />, color: 'text-indigo-400' },
-                { title: 'Sector Chat', desc: 'Encrypted peer-to-peer communication within college and hall wings.', icon: <MessageSquare />, color: 'text-rose-400' },
-                { title: 'Market Bazaar', desc: 'The internal student-led economy for services, gear, and essentials.', icon: <Zap />, color: 'text-amber-400' },
-                { title: 'Node Identity', desc: 'Verified university-wide digital ID for secure strata access.', icon: <ShieldCheck />, color: 'text-emerald-400' },
-                { title: 'Geo Nav', desc: 'Real-time geospatial guide for every wing, hall, and lecture room.', icon: <Compass />, color: 'text-slate-400' },
-                { title: 'Registry Log', desc: 'Centralized lost & found synchronization for student belongings.', icon: <Search />, color: 'text-[var(--brand-color)]' }
-              ].map((feat, i) => (
-                <div key={i} className="bg-slate-900 p-24 hover:bg-slate-950 transition-all group relative overflow-hidden min-h-[500px] flex flex-col justify-between">
-                   <div className="absolute top-0 right-0 p-10 opacity-[0.02] group-hover:opacity-10 transition-opacity scale-[4] group-hover:rotate-12 duration-1000">
-                      {feat.icon}
-                   </div>
-                   <div className="space-y-12 relative z-10">
-                      <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[2.5rem] flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 shadow-xl">
-                         {React.cloneElement(feat.icon as React.ReactElement<any>, { size: 40, className: feat.color })}
-                      </div>
-                      <div className="space-y-4">
-                         <h3 className="text-4xl font-black uppercase tracking-tighter leading-none">{feat.title}</h3>
-                         <p className="text-slate-500 text-xl font-medium leading-relaxed">{feat.desc}</p>
-                      </div>
-                   </div>
-                   <button onClick={onStart} className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.6em] text-white/30 group-hover:text-white transition-all translate-y-4 group-hover:translate-y-0">
-                      Deploy Interface <ArrowRight size={14}/>
-                   </button>
-                </div>
-              ))}
-           </div>
-        </div>
-      </section>
-
-      {/* 6. WORDY INSTITUTIONAL FOOTER: THE SUPERSTRUCTURE */}
-      <footer id="directives" className="bg-white pt-60 pb-20 px-6 border-t border-slate-100 relative overflow-hidden font-sans">
-        
-        {/* Massive Background Typography */}
-        <div className="absolute top-0 right-0 p-20 opacity-[0.02] scale-[2.5] rotate-12 pointer-events-none transition-transform duration-[60s] hover:scale-[3]">
-           <Layers size={900} fill="currentColor" />
-        </div>
-        
-        <div className="max-w-screen-2xl mx-auto relative z-10">
-          
-          {/* Manifesto Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 mb-60">
-            <div className="lg:col-span-6 space-y-16">
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 bg-slate-950 rounded-none flex items-center justify-center text-white font-black text-4xl shadow-2xl">M</div>
-                <h2 className="text-6xl font-black uppercase tracking-tighter italic">MakSocial.</h2>
-              </div>
-              <div className="space-y-12 max-w-2xl">
-                 <p className="text-3xl text-slate-400 font-medium leading-tight italic border-l-[16px] border-slate-100 pl-12">
-                   MakSocial is established as the definitive digital strata for the Makerere University community. 
-                   Our directive is to foster a more connected, collaborative, and intelligent campus experience 
-                   through secure synchronization and shared student logic.
-                 </p>
-                 <div className="grid grid-cols-2 gap-10 pt-10">
-                   <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                         <ShieldCheck className="text-emerald-500" size={24}/>
-                         <span className="text-[11px] font-black uppercase tracking-widest">Integrity Protocol</span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 font-bold leading-relaxed uppercase tracking-tighter">
-                         End-to-end encryption for all academic exchanges. Identity validation required for node entry.
-                      </p>
-                   </div>
-                   <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                         <Target className="text-rose-500" size={24}/>
-                         <span className="text-[11px] font-black uppercase tracking-widest">Target Alignment</span>
-                      </div>
-                      <p className="text-[11px] text-slate-500 font-bold leading-relaxed uppercase tracking-tighter">
-                         Optimizing student workflow through centralized asset recovery and real-time navigation logic.
-                      </p>
-                   </div>
-                 </div>
-              </div>
             </div>
 
-            {/* MONOLITHIC INDEX COLUMNS */}
-            <div className="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-16">
-              <div className="space-y-12">
-                <h4 className="text-[13px] font-black uppercase tracking-[0.5em] text-slate-950 border-b border-slate-900 pb-2 w-fit">Registry_Nodes</h4>
-                <ul className="space-y-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                  <li><a href="#" className="hover:text-slate-950 transition-colors flex items-center gap-3">Home Pulse <ArrowUpRight size={10} className="opacity-40" /></a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors flex items-center gap-3">The Study Vault <ArrowUpRight size={10} className="opacity-40" /></a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors flex items-center gap-3">Digital Bazaar <ArrowUpRight size={10} className="opacity-40" /></a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors flex items-center gap-3">Visual Sync <ArrowUpRight size={10} className="opacity-40" /></a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors flex items-center gap-3">Alumni Uplink <ArrowUpRight size={10} className="opacity-40" /></a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors flex items-center gap-3">Career Strata <ArrowUpRight size={10} className="opacity-40" /></a></li>
-                </ul>
-              </div>
+            <div className="space-y-6">
+              <h4 className="text-sm font-black uppercase tracking-widest text-[var(--brand-color)]">Quick Links</h4>
+              <ul className="space-y-4 text-sm font-medium text-slate-400">
+                <li><a href="#" className="hover:text-white transition-colors">Study Vault</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Campus News</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Jobs Hub</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+              </ul>
+            </div>
 
-              <div className="space-y-12">
-                <h4 className="text-[13px] font-black uppercase tracking-[0.5em] text-slate-950 border-b border-slate-900 pb-2 w-fit">Wing_Sectors</h4>
-                <ul className="space-y-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">COCIS Wing B</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">CEDAT Art Node</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">Law Faculty Hub</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">CHS Medical Wing</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">CONAS Research</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">COBAMS Finance</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">CAES Agri-Strata</a></li>
-                </ul>
-              </div>
-
-              <div className="space-y-12">
-                <h4 className="text-[13px] font-black uppercase tracking-[0.5em] text-slate-950 border-b border-slate-900 pb-2 w-fit">Directives</h4>
-                <ul className="space-y-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">Support Node</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">Privacy Strata</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">Usage Rules</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">System Uptime</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">Identity Verifier</a></li>
-                  <li><a href="#" className="hover:text-slate-950 transition-colors">Partner Sync</a></li>
-                </ul>
-              </div>
+            <div className="space-y-6">
+              <h4 className="text-sm font-black uppercase tracking-widest text-[var(--brand-color)]">Contact</h4>
+              <ul className="space-y-4 text-sm font-medium text-slate-400">
+                <li className="flex items-center gap-3"><Mail size={16}/> support@maksocial.mak.ac.ug</li>
+                <li className="flex items-center gap-3"><Phone size={16}/> +256 414 531234</li>
+                <li className="flex items-center gap-3"><MapPin size={16}/> Main Library Wing, Makerere</li>
+              </ul>
             </div>
           </div>
 
-          {/* Institutional Integrity Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-24 pt-32 border-t border-slate-100 items-start">
-             <div className="space-y-8">
-                <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-950">Platform Governance</h4>
-                <p className="text-[11px] text-slate-400 font-medium leading-relaxed uppercase tracking-widest">
-                  The MakSocial platform is managed under the Hill Digital Charter 2026. 
-                  Maintenance and synchronization are provided by the Mak Dev Group and authorized 
-                  Student Guild representatives. All connections are encrypted via the Hill Integrity Protocol.
-                </p>
-                <div className="flex gap-4">
-                   <div className="w-12 h-0.5 bg-slate-950"></div>
-                   <div className="w-8 h-0.5 bg-slate-400"></div>
-                   <div className="w-4 h-0.5 bg-slate-200"></div>
-                </div>
-             </div>
-
-             <div className="space-y-8">
-                <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-950">Node_Endpoints</h4>
-                <div className="space-y-4">
-                   <div className="flex items-center gap-5 text-slate-500 hover:text-slate-950 transition-all cursor-pointer group">
-                      <Mail size={18} className="opacity-40 group-hover:opacity-100" />
-                      <span className="text-[11px] font-black tracking-widest uppercase">registry@maksocial.mak.ac.ug</span>
-                   </div>
-                   <div className="flex items-center gap-5 text-slate-500">
-                      <MapPin size={18} className="opacity-40" />
-                      <span className="text-[11px] font-black tracking-widest uppercase leading-loose">Main Library Wing, Floor 4, Suite 4A, Kampala, UG</span>
-                   </div>
-                   <div className="flex items-center gap-5 text-slate-500 hover:text-slate-950 transition-all cursor-pointer group">
-                      <Phone size={18} className="opacity-40 group-hover:opacity-100" />
-                      <span className="text-[11px] font-black tracking-widest uppercase">+256 414 531234</span>
-                   </div>
-                </div>
-             </div>
-
-             <div className="lg:text-right space-y-12">
-                <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-950">Infrastructure</h4>
-                <div className="flex flex-wrap lg:justify-end gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-1000 items-center">
-                   <img src="https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/MakSocial10.png" className="h-10 w-auto" alt="Official Logo" />
-                   <div className="h-12 w-px bg-slate-200"></div>
-                   <span className="font-black text-xs uppercase tracking-tighter italic">Mak Dev Group</span>
-                   <div className="h-12 w-px bg-slate-200"></div>
-                   <span className="font-black text-xs uppercase tracking-tighter italic">Hill Authority</span>
-                </div>
-             </div>
+          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-500 text-xs font-bold uppercase tracking-widest">
+            <p>© 2026 Mak Social Group. All Rights Reserved.</p>
+            <div className="flex gap-8">
+               <a href="#" className="hover:text-white transition-colors">Privacy</a>
+               <a href="#" className="hover:text-white transition-colors">Terms</a>
+            </div>
           </div>
-
-          <div className="mt-60 pt-16 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
-             <div className="flex flex-col gap-3">
-                <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.8em]">© 2026 Mak Social Group. All Rights Reserved.</p>
-                <p className="text-[9px] font-medium text-slate-200 uppercase tracking-[0.4em]">Engineered with pride in Sector COCIS Wing II • Cluster A</p>
-             </div>
-             
-             <div className="flex items-center gap-10">
-                <a href="#" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-950 transition-colors">Privacy_Charter</a>
-                <a href="#" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-950 transition-colors">System_Status</a>
-                <a href="#" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-950 transition-colors">Support_Node</a>
-             </div>
-          </div>
-          
-          <div className="mt-20 w-full h-[1px] bg-slate-100"></div>
         </div>
       </footer>
 
       <style>{`
-        .cubic-bezier {
-          transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+        .font-chirp {
+          font-family: 'Chirp', 'Inter', sans-serif;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>

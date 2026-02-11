@@ -44,97 +44,72 @@ const LectureStream: React.FC = () => {
 
   useEffect(() => {
     setLessons(db.getAudioLessons());
-    
-    // Initialize audio object
-    const audio = new Audio();
-    audioRef.current = audio;
-    
-    // CRITICAL: Google Drive download links do not support CORS headers.
-    // Setting crossOrigin = 'anonymous' causes the browser to send an Origin header, 
-    // which Google rejects or treats as a restricted cross-origin request.
-    // By keeping it default (unset), we can stream the media without CORS interference.
-    
-    const onPlay = () => {
-      setIsPlaying(true);
-      setAudioError(null);
-    };
-    const onPause = () => setIsPlaying(false);
-    const onWaiting = () => setIsLoadingAudio(true);
-    const onPlaying = () => setIsLoadingAudio(false);
-    
-    const onTimeUpdate = () => {
-      if (audio.duration) {
-        const p = (audio.currentTime / audio.duration) * 100;
-        setProgress(p || 0);
-        
-        const mins = Math.floor(audio.currentTime / 60);
-        const secs = Math.floor(audio.currentTime % 60);
-        setCurrentTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
-      }
-    };
-
-    const onEnded = () => {
-      setIsPlaying(false);
-      setProgress(0);
-      setCurrentTime('00:00');
-    };
-
-    const onError = (e: any) => {
-      setIsLoadingAudio(false);
-      setIsPlaying(false);
-      console.error("Audio Engine Error:", audio.error);
-      
-      // Handle Google Drive common error: Large files need explicit confirmation (can't be streamed via uc link directly sometimes)
-      setAudioError("Signal Error: Source node blocked or format unsupported. Try 'Open Source' button.");
-    };
-
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-    audio.addEventListener('waiting', onWaiting);
-    audio.addEventListener('playing', onPlaying);
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('ended', onEnded);
-    audio.addEventListener('error', onError);
-
-    return () => {
-      audio.pause();
-      audio.src = "";
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-      audio.removeEventListener('waiting', onWaiting);
-      audio.removeEventListener('playing', onPlaying);
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('error', onError);
-    };
   }, []);
 
-  const handlePlay = async (lesson: AudioLesson) => {
+  const handlePlay = (lesson: AudioLesson) => {
     if (!audioRef.current) return;
 
     if (activeLesson?.id === lesson.id) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        try {
-          await audioRef.current.play();
-        } catch (err) {
-          setAudioError("Playback blocked by browser protocol.");
-        }
+        audioRef.current.play().catch(e => {
+          console.error("Playback blocked:", e);
+          setAudioError("Playback blocked. Please interact with the page first.");
+        });
       }
     } else {
       setAudioError(null);
       setActiveLesson(lesson);
-      audioRef.current.src = lesson.audioUrl;
-      audioRef.current.load();
+      // Wait for React to update the src via the <audio> element
       setIsLoadingAudio(true);
-      try {
-        await audioRef.current.play();
-      } catch (e) {
-        console.error("Initial Play Error:", e);
-        // We don't alert here because the 'error' event listener handles it if the source is actually broken
-      }
       setProgress(0);
+      setCurrentTime('00:00');
+    }
+  };
+
+  const handleAudioEvent = (type: string) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    switch (type) {
+      case 'play':
+        setIsPlaying(true);
+        setAudioError(null);
+        break;
+      case 'pause':
+        setIsPlaying(false);
+        break;
+      case 'waiting':
+        setIsLoadingAudio(true);
+        break;
+      case 'playing':
+        setIsLoadingAudio(false);
+        break;
+      case 'timeupdate':
+        if (audio.duration) {
+          const p = (audio.currentTime / audio.duration) * 100;
+          setProgress(p || 0);
+          const mins = Math.floor(audio.currentTime / 60);
+          const secs = Math.floor(audio.currentTime % 60);
+          setCurrentTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+        }
+        break;
+      case 'ended':
+        setIsPlaying(false);
+        setProgress(0);
+        setCurrentTime('00:00');
+        break;
+      case 'error':
+        setIsLoadingAudio(false);
+        setIsPlaying(false);
+        console.error("Audio error details:", audio.error);
+        setAudioError("Source Error: Google Drive link might be restricted or file too large for direct stream.");
+        break;
+      case 'canplay':
+        setIsLoadingAudio(false);
+        audio.play().catch(() => {});
+        break;
     }
   };
 
@@ -147,7 +122,6 @@ const LectureStream: React.FC = () => {
     // Sanitize Drive link if user provided a standard /view link
     let sanitizedUrl = recordForm.audioUrl;
     if (sanitizedUrl.includes('drive.google.com')) {
-       // Extract ID from /file/d/ID/view or ?id=ID
        let id = '';
        if (sanitizedUrl.includes('/file/d/')) {
           id = sanitizedUrl.split('/file/d/')[1].split('/')[0];
@@ -156,7 +130,7 @@ const LectureStream: React.FC = () => {
        }
        
        if (id) {
-          sanitizedUrl = `https://drive.google.com/uc?export=download&id=${id}`;
+          sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=media`;
        }
     }
     
@@ -187,7 +161,6 @@ const LectureStream: React.FC = () => {
     const matchesSearch = l.title.toLowerCase().includes(search.toLowerCase()) || 
                           l.courseCode.toLowerCase().includes(search.toLowerCase());
     
-    // Default view is specific to user's course and year
     if (!showGlobal) {
       const isMyCollege = l.college === currentUser.college;
       const isMyYear = l.year === currentUser.status;
@@ -200,6 +173,21 @@ const LectureStream: React.FC = () => {
   return (
     <div className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 pb-60 font-sans text-[var(--text-primary)]">
       
+      {/* HIDDEN AUDIO ELEMENT */}
+      <audio 
+        ref={audioRef}
+        src={activeLesson?.audioUrl}
+        onPlay={() => handleAudioEvent('play')}
+        onPause={() => handleAudioEvent('pause')}
+        onWaiting={() => handleAudioEvent('waiting')}
+        onPlaying={() => handleAudioEvent('playing')}
+        onTimeUpdate={() => handleAudioEvent('timeupdate')}
+        onEnded={() => handleAudioEvent('ended')}
+        onError={() => handleAudioEvent('error')}
+        onCanPlay={() => handleAudioEvent('canplay')}
+        preload="auto"
+      />
+
       {/* 1. COMPACT HERO SECTION */}
       <section className="relative rounded-[2rem] overflow-hidden mb-12 shadow-2xl min-h-[250px] flex flex-col justify-center px-8 md:px-16 py-12">
          <img 

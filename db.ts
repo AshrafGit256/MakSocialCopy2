@@ -31,9 +31,8 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
 };
 
 // DIRECT STREAM LINK CONVERSION: 
-// 1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg is the ID provided by user
-// Using drive.google.com/uc?export=download&id= format which is the most reliable for browsers to detect as media
-const DIRECT_LINK = 'https://drive.google.com/uc?export=download&id=1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg';
+// Using export=media is often more successful for raw streaming than export=download
+const DIRECT_LINK = 'https://docs.google.com/uc?id=1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg&export=media';
 
 const MOCK_AUDIO_LESSONS: AudioLesson[] = [
   {

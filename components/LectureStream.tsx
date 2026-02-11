@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { db, COURSES_BY_COLLEGE } from '../db';
 import { AudioLesson, College, User, UserStatus } from '../types';
@@ -6,7 +7,7 @@ import {
   Activity, User as UserIcon, Link as LinkIcon,
   X, SkipForward, SkipBack, Volume2, Upload,
   Database, Info, AlertCircle, Globe, Filter,
-  ArrowRight, ExternalLink, Loader2
+  ArrowRight, ExternalLink, Loader2, RotateCcw
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -47,25 +48,50 @@ const LectureStream: React.FC = () => {
   }, []);
 
   const handlePlay = (lesson: AudioLesson) => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
     if (activeLesson?.id === lesson.id) {
       if (isPlaying) {
-        audioRef.current.pause();
+        audio.pause();
       } else {
-        audioRef.current.play().catch(e => {
-          console.error("Playback blocked:", e);
-          setAudioError("Playback blocked. Please interact with the page first.");
+        audio.play().catch(e => {
+          console.error("Playback Error:", e);
+          setAudioError("Playback was blocked. Interact with the page first.");
         });
       }
     } else {
       setAudioError(null);
       setActiveLesson(lesson);
-      // Wait for React to update the src via the <audio> element
       setIsLoadingAudio(true);
       setProgress(0);
       setCurrentTime('00:00');
+      
+      // Force immediate source update and load
+      audio.pause();
+      audio.src = lesson.audioUrl;
+      audio.load();
+      
+      // Some browsers need a tiny delay to register the new source before play()
+      setTimeout(() => {
+        audio.play().catch(e => {
+          console.error("Source Load Error:", e);
+          setAudioError("Source Node Refused: Link may be private or file too large.");
+          setIsLoadingAudio(false);
+        });
+      }, 100);
     }
+  };
+
+  const retrySource = () => {
+    if (!activeLesson || !audioRef.current) return;
+    setAudioError(null);
+    setIsLoadingAudio(true);
+    audioRef.current.load();
+    audioRef.current.play().catch(() => {
+      setAudioError("Re-synchronization failed. Try external link.");
+      setIsLoadingAudio(false);
+    });
   };
 
   const handleAudioEvent = (type: string) => {
@@ -103,12 +129,11 @@ const LectureStream: React.FC = () => {
       case 'error':
         setIsLoadingAudio(false);
         setIsPlaying(false);
-        console.error("Audio error details:", audio.error);
-        setAudioError("Source Error: Google Drive link might be restricted or file too large for direct stream.");
+        console.error("Audio DOM Error:", audio.error);
+        setAudioError("Source Error: Google Drive link might be restricted. Check link permissions.");
         break;
       case 'canplay':
         setIsLoadingAudio(false);
-        audio.play().catch(() => {});
         break;
     }
   };
@@ -119,7 +144,6 @@ const LectureStream: React.FC = () => {
       return;
     }
     
-    // Sanitize Drive link if user provided a standard /view link
     let sanitizedUrl = recordForm.audioUrl;
     if (sanitizedUrl.includes('drive.google.com')) {
        let id = '';
@@ -130,7 +154,7 @@ const LectureStream: React.FC = () => {
        }
        
        if (id) {
-          sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=media`;
+          sanitizedUrl = `https://drive.google.com/uc?export=download&id=${id}`;
        }
     }
     
@@ -173,10 +197,9 @@ const LectureStream: React.FC = () => {
   return (
     <div className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 pb-60 font-sans text-[var(--text-primary)]">
       
-      {/* HIDDEN AUDIO ELEMENT */}
+      {/* NATIVE AUDIO HANDLER */}
       <audio 
         ref={audioRef}
-        src={activeLesson?.audioUrl}
         onPlay={() => handleAudioEvent('play')}
         onPause={() => handleAudioEvent('pause')}
         onWaiting={() => handleAudioEvent('waiting')}
@@ -186,9 +209,10 @@ const LectureStream: React.FC = () => {
         onError={() => handleAudioEvent('error')}
         onCanPlay={() => handleAudioEvent('canplay')}
         preload="auto"
+        crossOrigin="anonymous"
       />
 
-      {/* 1. COMPACT HERO SECTION */}
+      {/* 1. HERO SECTION */}
       <section className="relative rounded-[2rem] overflow-hidden mb-12 shadow-2xl min-h-[250px] flex flex-col justify-center px-8 md:px-16 py-12">
          <img 
            src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&w=1600" 
@@ -221,7 +245,7 @@ const LectureStream: React.FC = () => {
          </div>
       </section>
 
-      {/* 2. SMART FILTERING TOOLS */}
+      {/* 2. FILTERING TOOLS */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 border-b border-[var(--border-color)] pb-8">
          <div className="flex flex-col gap-1 w-full md:w-auto">
             <div className="flex items-center gap-3">
@@ -256,7 +280,7 @@ const LectureStream: React.FC = () => {
          </div>
       </div>
 
-      {/* 3. SIMPLIFIED LESSON GRID */}
+      {/* 3. LESSON GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
          {filteredLessons.map(lesson => (
            <div 
@@ -348,21 +372,32 @@ const LectureStream: React.FC = () => {
                       style={{ width: `${progress}%` }}
                     ></div>
                  </div>
-                 {audioError && <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest">{audioError}</p>}
+                 {audioError && (
+                   <div className="flex items-center gap-2">
+                      <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest">{audioError}</p>
+                      <button onClick={retrySource} className="text-[7px] text-emerald-400 hover:text-emerald-300 font-black uppercase tracking-widest flex items-center gap-1"><RotateCcw size={10}/> Retry_Node</button>
+                   </div>
+                 )}
               </div>
 
               <div className="flex items-center gap-4 shrink-0">
                  <button className="text-white/40 hover:text-white" onClick={() => audioRef.current && (audioRef.current.currentTime -= 10)}><SkipBack size={18}/></button>
                  <button 
                    onClick={() => handlePlay(activeLesson)}
-                   className="p-3 bg-white text-black rounded-full shadow-lg active:scale-90 flex items-center justify-center"
+                   className="p-3 bg-white text-black rounded-full shadow-lg active:scale-95 flex items-center justify-center"
                  >
                    {isLoadingAudio ? <Loader2 size={20} className="animate-spin" /> : isPlaying ? <Pause size={20} fill="currentColor"/> : <Play size={20} fill="currentColor" className="translate-x-0.5" />}
                  </button>
                  <button className="text-white/40 hover:text-white" onClick={() => audioRef.current && (audioRef.current.currentTime += 10)}><SkipForward size={18}/></button>
                  <div className="flex items-center gap-2">
                     <div className="h-6 w-px bg-white/10 mx-2"></div>
-                    <button onClick={() => window.open(activeLesson.audioUrl, '_blank')} title="Open Source" className="p-2 text-white/40 hover:text-[var(--brand-color)]"><ExternalLink size={18}/></button>
+                    <button 
+                      onClick={() => window.open(activeLesson.audioUrl.replace('uc?export=download', 'file/d').split('&')[0], '_blank')} 
+                      title="Open Source Link" 
+                      className="p-2 text-white/40 hover:text-[var(--brand-color)]"
+                    >
+                      <ExternalLink size={18}/>
+                    </button>
                     <button onClick={() => { audioRef.current?.pause(); setActiveLesson(null); }} className="p-2 text-white/40 hover:text-rose-500"><X size={18}/></button>
                  </div>
               </div>

@@ -30,9 +30,10 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   LAW: ['Bachelor of Laws'],
 };
 
-// DIRECT STREAM LINK CONVERSION: 
-// Using export=media is often more successful for raw streaming than export=download
-const DIRECT_LINK = 'https://docs.google.com/uc?id=1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg&export=media';
+// DIRECT STREAM LINK:
+// Using drive.google.com/uc?export=download format which is most reliable for audio elements
+const FILE_ID = '1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg';
+const DIRECT_LINK = `https://drive.google.com/uc?export=download&id=${FILE_ID}`;
 
 const MOCK_AUDIO_LESSONS: AudioLesson[] = [
   {
@@ -49,7 +50,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     contributor: 'Brian K.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
     plays: 1420,
-    description: 'A deep dive into client-server models and distributed systems.'
+    description: 'A deep dive into client-server models and distributed systems. Use the external link button if the stream is blocked by university firewall.'
   },
   {
     id: 'aud-2',

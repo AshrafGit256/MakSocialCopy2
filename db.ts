@@ -1,4 +1,3 @@
-
 import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage, LostFoundItem, Ticket, AudioLesson } from './types';
 import { MOCK_POSTS, MOCK_CHATS } from './constants';
 
@@ -31,6 +30,10 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   LAW: ['Bachelor of Laws'],
 };
 
+// DIRECT STREAM LINK CONVERSION: 
+// 1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg is the ID
+const DIRECT_LINK = 'https://drive.google.com/uc?export=download&id=1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg';
+
 const MOCK_AUDIO_LESSONS: AudioLesson[] = [
   {
     id: 'aud-1',
@@ -42,7 +45,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     college: 'COCIS',
     duration: '45:20',
     date: '12 Feb 2026',
-    audioUrl: 'https://drive.google.com/file/d/1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg/view',
+    audioUrl: DIRECT_LINK,
     contributor: 'Brian K.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
     plays: 1420,
@@ -58,7 +61,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     college: 'LAW',
     duration: '52:10',
     date: '10 Feb 2026',
-    audioUrl: 'https://drive.google.com/file/d/1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg/view',
+    audioUrl: DIRECT_LINK,
     contributor: 'Sarah N.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     plays: 850,
@@ -74,7 +77,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     college: 'CHS',
     duration: '38:45',
     date: '08 Feb 2026',
-    audioUrl: 'https://drive.google.com/file/d/1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg/view',
+    audioUrl: DIRECT_LINK,
     contributor: 'Opio Eric',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
     plays: 2100,
@@ -156,6 +159,7 @@ export const db = {
   },
   updatePost: (post: Post) => {
     const posts = db.getPosts();
+    // Added const to declare updated variable
     const updated = posts.map(p => p.id === post.id ? post : p);
     localStorage.setItem(DB_KEYS.POSTS, JSON.stringify(updated));
   },

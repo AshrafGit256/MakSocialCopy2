@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db, COURSES_BY_COLLEGE } from '../db';
 import { AudioLesson, College, User, UserStatus } from '../types';
 import { 
@@ -7,7 +7,7 @@ import {
   Activity, User as UserIcon, Link as LinkIcon,
   X, SkipForward, SkipBack, Volume2, Upload,
   Database, Info, AlertCircle, Globe, Filter,
-  ArrowRight, ExternalLink
+  ArrowRight, ExternalLink, Loader2
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -19,10 +19,14 @@ const LectureStream: React.FC = () => {
   const [currentUser] = useState<User>(db.getUser());
   const [showGlobal, setShowGlobal] = useState(false);
   
-  // Player state
+  // Audio state
   const [activeLesson, setActiveLesson] = useState<AudioLesson | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState('00:00');
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Modal states
   const [isUploading, setIsUploading] = useState(false);
@@ -40,27 +44,61 @@ const LectureStream: React.FC = () => {
 
   useEffect(() => {
     setLessons(db.getAudioLessons());
-  }, []);
+    
+    // Initialize audio object
+    audioRef.current = new Audio();
+    
+    const audio = audioRef.current;
 
-  useEffect(() => {
-    let interval: any;
-    if (isPlaying && progress < 100) {
-      interval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 0.1, 100));
-      }, 100);
-    } else if (progress >= 100) {
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onWaiting = () => setIsLoadingAudio(true);
+    const onPlaying = () => setIsLoadingAudio(false);
+    const onTimeUpdate = () => {
+      const p = (audio.currentTime / audio.duration) * 100;
+      setProgress(p || 0);
+      
+      const mins = Math.floor(audio.currentTime / 60);
+      const secs = Math.floor(audio.currentTime % 60);
+      setCurrentTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+    };
+    const onEnded = () => {
       setIsPlaying(false);
       setProgress(0);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, progress]);
+      setCurrentTime('00:00');
+    };
+
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('waiting', onWaiting);
+    audio.addEventListener('playing', onPlaying);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('ended', onEnded);
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('waiting', onWaiting);
+      audio.removeEventListener('playing', onPlaying);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, []);
 
   const handlePlay = (lesson: AudioLesson) => {
+    if (!audioRef.current) return;
+
     if (activeLesson?.id === lesson.id) {
-      setIsPlaying(!isPlaying);
+      if (isPlaying) audioRef.current.pause();
+      else audioRef.current.play();
     } else {
       setActiveLesson(lesson);
-      setIsPlaying(true);
+      audioRef.current.src = lesson.audioUrl;
+      audioRef.current.play().catch(e => {
+        console.error("Audio Load Error:", e);
+        alert("Signal Integrity Error: Browser blocked the audio stream or the link is invalid.");
+      });
       setProgress(0);
     }
   };
@@ -184,7 +222,7 @@ const LectureStream: React.FC = () => {
          {filteredLessons.map(lesson => (
            <div 
              key={lesson.id} 
-             className="group relative bg-white border border-[var(--border-color)] rounded-2xl p-6 transition-all hover:shadow-xl hover:border-[var(--brand-color)]/20 flex flex-col"
+             className={`group relative bg-white border border-[var(--border-color)] rounded-2xl p-6 transition-all hover:shadow-xl flex flex-col ${activeLesson?.id === lesson.id ? 'border-[var(--brand-color)] ring-2 ring-[var(--brand-color)]/10' : ''}`}
            >
               <div className="flex justify-between items-start mb-6">
                  <div className="flex items-center gap-3 overflow-hidden">
@@ -220,13 +258,13 @@ const LectureStream: React.FC = () => {
               <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
                  <div className="flex flex-col">
                     <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Runtime</span>
-                    <span className="text-xs font-black text-slate-700">{lesson.duration}</span>
+                    <span className="text-xs font-black text-slate-700">{activeLesson?.id === lesson.id ? currentTime : lesson.duration}</span>
                  </div>
                  <button 
                    onClick={() => handlePlay(lesson)}
-                   className={`p-4 rounded-full transition-all active:scale-90 shadow-lg ${activeLesson?.id === lesson.id && isPlaying ? 'bg-rose-500 text-white' : 'bg-[var(--brand-color)] text-white'}`}
+                   className={`p-4 rounded-full transition-all active:scale-90 shadow-lg ${activeLesson?.id === lesson.id && isPlaying ? 'bg-rose-50 text-white' : 'bg-[var(--brand-color)] text-white'}`}
                  >
-                    {activeLesson?.id === lesson.id && isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="translate-x-0.5" />}
+                    {activeLesson?.id === lesson.id && isLoadingAudio ? <Loader2 size={18} className="animate-spin" /> : activeLesson?.id === lesson.id && isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="translate-x-0.5" />}
                  </button>
               </div>
            </div>
@@ -261,6 +299,10 @@ const LectureStream: React.FC = () => {
               </div>
 
               <div className="flex-1 w-full space-y-2">
+                 <div className="flex justify-between text-[8px] uppercase font-black text-white/40 tracking-widest">
+                    <span>{currentTime}</span>
+                    <span>{activeLesson.duration}</span>
+                 </div>
                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden relative">
                     <div 
                       className="absolute inset-y-0 left-0 bg-[var(--brand-color)] transition-all duration-300"
@@ -270,18 +312,18 @@ const LectureStream: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-4 shrink-0">
-                 <button className="text-white/40 hover:text-white"><SkipBack size={18}/></button>
+                 <button className="text-white/40 hover:text-white" onClick={() => audioRef.current && (audioRef.current.currentTime -= 10)}><SkipBack size={18}/></button>
                  <button 
-                   onClick={() => setIsPlaying(!isPlaying)}
-                   className="p-3 bg-white text-black rounded-full shadow-lg active:scale-90"
+                   onClick={() => handlePlay(activeLesson)}
+                   className="p-3 bg-white text-black rounded-full shadow-lg active:scale-90 flex items-center justify-center"
                  >
-                   {isPlaying ? <Pause size={20} fill="currentColor"/> : <Play size={20} fill="currentColor" className="translate-x-0.5" />}
+                   {isLoadingAudio ? <Loader2 size={20} className="animate-spin" /> : isPlaying ? <Pause size={20} fill="currentColor"/> : <Play size={20} fill="currentColor" className="translate-x-0.5" />}
                  </button>
-                 <button className="text-white/40 hover:text-white"><SkipForward size={18}/></button>
+                 <button className="text-white/40 hover:text-white" onClick={() => audioRef.current && (audioRef.current.currentTime += 10)}><SkipForward size={18}/></button>
                  <div className="flex items-center gap-2">
                     <div className="h-6 w-px bg-white/10 mx-2"></div>
                     <button onClick={() => window.open(activeLesson.audioUrl, '_blank')} className="p-2 text-white/40 hover:text-[var(--brand-color)]"><ExternalLink size={18}/></button>
-                    <button onClick={() => setActiveLesson(null)} className="p-2 text-white/40 hover:text-rose-500"><X size={18}/></button>
+                    <button onClick={() => { audioRef.current?.pause(); setActiveLesson(null); }} className="p-2 text-white/40 hover:text-rose-500"><X size={18}/></button>
                  </div>
               </div>
            </div>

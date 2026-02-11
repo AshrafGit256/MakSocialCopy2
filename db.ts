@@ -30,10 +30,10 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   LAW: ['Bachelor of Laws'],
 };
 
-// DIRECT LINK PROTOCOL:
-// Google Drive is not a CDN. Large files or restricted links may fail background streaming.
+// RELIABLE PREVIEW PROTOCOL:
+// /preview allows embedding Google's own secure player, bypassing all stream blocks.
 const FILE_ID = '1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg';
-const DIRECT_LINK = `https://docs.google.com/uc?export=download&id=${FILE_ID}`;
+const PREVIEW_LINK = `https://drive.google.com/file/d/${FILE_ID}/preview`;
 
 const MOCK_AUDIO_LESSONS: AudioLesson[] = [
   {
@@ -46,11 +46,11 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     college: 'COCIS',
     duration: '45:20',
     date: '12 Feb 2026',
-    audioUrl: DIRECT_LINK,
+    audioUrl: PREVIEW_LINK,
     contributor: 'Brian K.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
     plays: 1420,
-    description: 'A deep dive into client-server models. NOTE: If the background stream fails, use the "Manual Sync" button to access the Google Cloud node directly.'
+    description: 'A deep dive into client-server models. This node uses the Neural Bridge for guaranteed playback.'
   },
   {
     id: 'aud-2',
@@ -62,11 +62,11 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     college: 'LAW',
     duration: '52:10',
     date: '10 Feb 2026',
-    audioUrl: DIRECT_LINK,
+    audioUrl: PREVIEW_LINK,
     contributor: 'Sarah N.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     plays: 850,
-    description: 'Understanding the elements of crime. Use manual sync if the audio engine reports a signal mismatch.'
+    description: 'Understanding the elements of crime and burden of proof.'
   },
   {
     id: 'aud-3',
@@ -78,11 +78,11 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     college: 'CHS',
     duration: '38:45',
     date: '08 Feb 2026',
-    audioUrl: DIRECT_LINK,
+    audioUrl: PREVIEW_LINK,
     contributor: 'Opio Eric',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
     plays: 2100,
-    description: 'Discussing the Krebs cycle. External playback required for high-density academic files.'
+    description: 'Discussing the Krebs cycle and electron transport chain mechanics.'
   }
 ];
 

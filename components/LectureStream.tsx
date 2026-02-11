@@ -7,7 +7,7 @@ import {
   X, SkipForward, SkipBack, Volume2, Upload,
   Database, Info, AlertCircle, Globe, Filter,
   ArrowRight, ExternalLink, Loader2, RotateCcw,
-  ShieldAlert
+  ShieldAlert, HelpCircle
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -57,7 +57,7 @@ const LectureStream: React.FC = () => {
       } else {
         audio.play().catch(e => {
           console.error("Playback Error:", e);
-          setAudioError("Playback was blocked. Interact with the page first.");
+          setAudioError("Playback blocked. Please interact with the hub first.");
         });
       }
     } else {
@@ -67,23 +67,22 @@ const LectureStream: React.FC = () => {
       setProgress(0);
       setCurrentTime('00:00');
       
-      // Explicitly pause and clear current source before setting new one
+      // Complete reset of current node
       audio.pause();
-      audio.removeAttribute('src');
+      audio.src = ''; 
       audio.load();
       
-      // Force immediate source update
-      audio.src = lesson.audioUrl;
-      audio.load();
-      
-      // Use a slightly longer delay to ensure the browser has parsed the new source
+      // Update with new protocol source
       setTimeout(() => {
+        audio.src = lesson.audioUrl;
+        audio.load();
+        
         audio.play().catch(e => {
           console.error("Source Load Error:", e);
-          setAudioError("Source Node Refused: Browser security or restricted link.");
+          setAudioError("Sync Error: File might be too large or private. Use Manual Link.");
           setIsLoadingAudio(false);
         });
-      }, 200);
+      }, 50);
     }
   };
 
@@ -93,7 +92,7 @@ const LectureStream: React.FC = () => {
     setIsLoadingAudio(true);
     audioRef.current.load();
     audioRef.current.play().catch(() => {
-      setAudioError("Registry re-sync failed. Try opening link directly.");
+      setAudioError("Auto-Sync failed. Suggest manual stream.");
       setIsLoadingAudio(false);
     });
   };
@@ -133,8 +132,8 @@ const LectureStream: React.FC = () => {
       case 'error':
         setIsLoadingAudio(false);
         setIsPlaying(false);
-        console.error("Audio DOM Error Code:", audio.error?.code);
-        setAudioError("Protocol Mismatch: Remote source returned non-media payload.");
+        console.error("Audio Engine Signal Error:", audio.error?.code);
+        setAudioError("Registry Refused: Source interpretation failed. Use External Node.");
         break;
       case 'canplay':
         setIsLoadingAudio(false);
@@ -158,8 +157,8 @@ const LectureStream: React.FC = () => {
        }
        
        if (id) {
-          // Standardizing to export=media which is best for audio tags
-          sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=media`;
+          // Standardizing to export=download which is best for direct stream
+          sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=download`;
        }
     }
     
@@ -202,7 +201,7 @@ const LectureStream: React.FC = () => {
   return (
     <div className="max-w-[1600px] mx-auto px-4 md:px-8 lg:px-12 py-8 pb-60 font-sans text-[var(--text-primary)]">
       
-      {/* NATIVE AUDIO HANDLER */}
+      {/* HIDDEN NATIVE ENGINE */}
       <audio 
         ref={audioRef}
         onPlay={() => handleAudioEvent('play')}
@@ -237,14 +236,14 @@ const LectureStream: React.FC = () => {
                </h1>
             </div>
             <p className="text-sm md:text-base text-white/70 font-medium leading-relaxed">
-               Personalized audio registry for your study path. Synchronize with your classmates through verified recordings.
+               Registry for shared course recordings. Synchronize audio nodes with your classmates for exam preparation.
             </p>
             <div className="pt-2">
                <button 
                  onClick={() => setIsUploading(true)}
                  className="px-8 py-3 bg-[var(--brand-color)] text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
                >
-                  <Plus size={16}/> Uplink Recording Link
+                  <Plus size={16}/> Uplink Recording
                </button>
             </div>
          </div>
@@ -260,18 +259,18 @@ const LectureStream: React.FC = () => {
                </div>
             </div>
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-               Viewing: {showGlobal ? 'Global Campus Registry' : `${currentUser.college} HUB • ${currentUser.status}`}
+               HUB: {showGlobal ? 'Global Registry' : `${currentUser.college} • ${currentUser.status}`}
             </p>
          </div>
 
          <div className="flex flex-wrap gap-3 w-full md:w-auto">
             <div className="relative flex-1 md:w-64 group">
-               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--brand-color)]" size={16} />
+               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--brand-color)] transition-colors" size={16} />
                <input 
                  value={search}
                  onChange={e => setSearch(e.target.value)}
                  className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl py-3 pl-11 pr-4 text-[11px] font-bold uppercase outline-none focus:border-[var(--brand-color)] transition-all shadow-inner"
-                 placeholder="Filter by code or title..."
+                 placeholder="Search registry..."
                />
             </div>
             
@@ -280,7 +279,7 @@ const LectureStream: React.FC = () => {
                className={`px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border flex items-center gap-2 ${showGlobal ? 'bg-slate-800 text-white border-transparent' : 'bg-white text-slate-500 border-slate-200'}`}
             >
                {showGlobal ? <Globe size={14}/> : <Filter size={14}/>}
-               {showGlobal ? 'Switch to Personal' : 'Discover Global'}
+               {showGlobal ? 'Local Hub' : 'Discover Global'}
             </button>
          </div>
       </div>
@@ -319,13 +318,13 @@ const LectureStream: React.FC = () => {
                  </div>
                  <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-1">
                     <span className="flex items-center gap-1.5"><UserIcon size={12}/> {lesson.lecturer}</span>
-                    <span className="flex items-center gap-1.5"><LinkIcon size={12}/> Drive Node</span>
+                    <span className="flex items-center gap-1.5"><LinkIcon size={12}/> Drive Protocol</span>
                  </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
                  <div className="flex flex-col">
-                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Runtime</span>
+                    <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Temporal Log</span>
                     <span className="text-xs font-black text-slate-700">{activeLesson?.id === lesson.id ? currentTime : lesson.duration}</span>
                  </div>
                  <button 
@@ -343,7 +342,7 @@ const LectureStream: React.FC = () => {
                <Database size={40} className="mx-auto text-slate-200" />
                <div className="space-y-1">
                   <h3 className="text-lg font-black uppercase tracking-tighter text-slate-500">Registry_Empty</h3>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] max-w-xs mx-auto">No recordings match your specific course and year parameters.</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] max-w-xs mx-auto">No records found matching these hub coordinates.</p>
                </div>
                <button onClick={() => {setSearch(''); setShowGlobal(true);}} className="px-6 py-2 bg-white border border-slate-200 rounded-lg text-[9px] font-black uppercase tracking-widest hover:border-[var(--brand-color)] transition-all">Search Global Hub</button>
             </div>
@@ -369,7 +368,7 @@ const LectureStream: React.FC = () => {
               <div className="flex-1 w-full space-y-2">
                  <div className="flex justify-between text-[8px] uppercase font-black text-white/40 tracking-widest">
                     <span>{currentTime}</span>
-                    <span className={audioError ? 'text-rose-500 animate-pulse' : ''}>{audioError ? 'SIGNAL_ERROR' : activeLesson.duration}</span>
+                    <span className={audioError ? 'text-rose-500 animate-pulse' : ''}>{audioError ? 'SYNC_ERROR' : activeLesson.duration}</span>
                  </div>
                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden relative">
                     <div 
@@ -378,10 +377,13 @@ const LectureStream: React.FC = () => {
                     ></div>
                  </div>
                  {audioError && (
-                   <div className="flex items-center gap-2">
+                   <div className="flex items-center gap-3">
                       <ShieldAlert size={10} className="text-rose-400" />
-                      <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest">{audioError}</p>
-                      <button onClick={retrySource} className="text-[7px] text-emerald-400 hover:text-emerald-300 font-black uppercase tracking-widest flex items-center gap-1 border border-emerald-500/20 px-1.5 py-0.5 rounded"><RotateCcw size={8}/> Re-Sync</button>
+                      <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest flex-1">{audioError}</p>
+                      <div className="flex items-center gap-2">
+                         <button onClick={retrySource} className="text-[7px] text-emerald-400 hover:text-emerald-300 font-black uppercase tracking-widest flex items-center gap-1 border border-emerald-500/20 px-1.5 py-0.5 rounded"><RotateCcw size={8}/> Re-Sync</button>
+                         <button onClick={() => window.open(activeLesson.audioUrl, '_blank')} className="text-[7px] text-amber-400 hover:text-amber-300 font-black uppercase tracking-widest flex items-center gap-1 border border-amber-500/20 px-1.5 py-0.5 rounded"><HelpCircle size={8}/> Manual Sync</button>
+                      </div>
                    </div>
                  )}
               </div>
@@ -398,8 +400,11 @@ const LectureStream: React.FC = () => {
                  <div className="flex items-center gap-2">
                     <div className="h-6 w-px bg-white/10 mx-2"></div>
                     <button 
-                      onClick={() => window.open(activeLesson.audioUrl.replace('docs.google.com/uc?id=', 'drive.google.com/file/d/').replace('&export=media', '/view'), '_blank')} 
-                      title="Open Source Link" 
+                      onClick={() => {
+                        const rawUrl = activeLesson.audioUrl.replace('docs.google.com/uc?id=', 'drive.google.com/file/d/').replace('&export=download', '/view');
+                        window.open(rawUrl, '_blank');
+                      }} 
+                      title="Open Original Hub" 
                       className="p-2 text-white/40 hover:text-[var(--brand-color)]"
                     >
                       <ExternalLink size={18}/>
@@ -420,24 +425,24 @@ const LectureStream: React.FC = () => {
                     <div className="p-2 bg-[var(--brand-color)]/10 text-[var(--brand-color)] rounded-lg">
                        <LinkIcon size={20}/>
                     </div>
-                    <h2 className="text-xl font-black uppercase tracking-tighter text-slate-800">Synchronize_Link</h2>
+                    <h2 className="text-xl font-black uppercase tracking-tighter text-slate-800">Uplink_Recording</h2>
                  </div>
                  <button onClick={() => setIsUploading(false)} className="p-2 text-slate-400 hover:text-rose-500 transition-all"><X size={24}/></button>
               </div>
 
               <div className="space-y-5">
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Session_Title</label>
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Session_Protocol</label>
                     <input 
                       className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-sm font-bold outline-none focus:border-[var(--brand-color)]" 
                       value={recordForm.title}
                       onChange={e => setRecordForm({...recordForm, title: e.target.value})}
-                      placeholder="e.g. Lec 04: Neural Networks" 
+                      placeholder="e.g. Lec 05: Data Structures" 
                     />
                  </div>
                  
                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Cloud_Source_Link (Drive, iCloud, etc.)</label>
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Source_Link (Drive/iCloud)</label>
                     <div className="relative">
                        <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                        <input 
@@ -451,7 +456,7 @@ const LectureStream: React.FC = () => {
 
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Target_Course</label>
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Sector_Allocation</label>
                        <select 
                          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[10px] font-bold outline-none"
                          value={recordForm.course}
@@ -461,7 +466,7 @@ const LectureStream: React.FC = () => {
                        </select>
                     </div>
                     <div className="space-y-1">
-                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Level_Allocation</label>
+                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Level_Sync</label>
                        <select 
                          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 text-[10px] font-bold outline-none"
                          value={recordForm.year}
@@ -482,10 +487,10 @@ const LectureStream: React.FC = () => {
                     />
                  </div>
 
-                 <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl flex items-center gap-3">
-                    <Info size={16} className="text-slate-400" />
-                    <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                      Use Direct Drive links (export=media) for the best result. Standard links will be automatically converted.
+                 <div className="p-4 bg-amber-50 border border-dashed border-amber-200 rounded-xl flex items-center gap-3">
+                    <Info size={16} className="text-amber-500" />
+                    <p className="text-[8px] text-amber-700 font-bold uppercase tracking-widest leading-relaxed">
+                      For best results, ensure Drive permissions are set to "Anyone with the link". Private nodes will require manual sync.
                     </p>
                  </div>
 

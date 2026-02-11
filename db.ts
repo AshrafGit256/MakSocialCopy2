@@ -31,9 +31,9 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
 };
 
 // DIRECT STREAM LINK:
-// Using docs.google.com/uc?export=media is the most compatible way to stream Drive audio files
+// Using export=download is generally the most robust for direct MP3 streaming from Drive
 const FILE_ID = '1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg';
-const DIRECT_LINK = `https://docs.google.com/uc?id=${FILE_ID}&export=media`;
+const DIRECT_LINK = `https://docs.google.com/uc?id=${FILE_ID}&export=download`;
 
 const MOCK_AUDIO_LESSONS: AudioLesson[] = [
   {
@@ -50,7 +50,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     contributor: 'Brian K.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
     plays: 1420,
-    description: 'A deep dive into client-server models and distributed systems. Use the external link button if the stream is blocked.'
+    description: 'A deep dive into client-server models and distributed systems. Use the direct open button if sync fails.'
   },
   {
     id: 'aud-2',
@@ -85,57 +85,6 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     description: 'Discussing the Krebs cycle and electron transport chain mechanics.'
   }
 ];
-
-const INITIAL_USERS: User[] = [
-  {
-    id: 'u-ninfa',
-    name: 'Ninfa A.',
-    role: 'University Student',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
-    connections: 120,
-    email: 'ninfa@student.mak.ac.ug',
-    college: 'COCIS',
-    status: 'Year 2',
-    subscriptionTier: 'Free',
-    joinedColleges: ['COCIS'],
-    postsCount: 15,
-    followersCount: 200,
-    followingCount: 150,
-    totalLikesCount: 450,
-    badges: ['Early Adopter'],
-    appliedTo: [],
-    verified: true,
-    bio: 'Software enthusiast at Makerere.'
-  }
-];
-
-const CAMPAIGN_POST: Post = {
-  id: 'campaign-marathon-2025',
-  author: 'Makerere Sports Council',
-  authorId: 'sports_node',
-  authorRole: 'Official Organizer',
-  authorAvatar: 'https://static.vecteezy.com/system/resources/thumbnails/041/943/427/small/sport-logo-black-color-2-vector.jpg',
-  authorAuthority: 'Official',
-  timestamp: 'Sponsored',
-  isCampaign: true,
-  campaignData: {
-    price: 'UGX 50,000',
-    cta: 'Register NOW!',
-    eventDate: '17 AUG 2025',
-    location: 'Freedom Square',
-    themeColor: '#10918a'
-  },
-  content: `<h1>Join us for the Makerere Marathon</h1><p>Enhance the student experience and run for a cause. Secure your official kit and entry today.</p>`,
-  hashtags: ['#MAKRUN2025', '#MakerereAt100'],
-  likes: 2450,
-  commentsCount: 120,
-  comments: [],
-  views: 85000,
-  flags: [],
-  isOpportunity: false,
-  college: 'Global',
-  images: ['https://pbs.twimg.com/media/Gwn2s3iW8AAncFH.jpg']
-};
 
 export const db = {
   getUsers: (): User[] => {
@@ -293,4 +242,55 @@ export const db = {
     const lessons = db.getAudioLessons();
     localStorage.setItem(DB_KEYS.AUDIO_LESSONS, JSON.stringify([lesson, ...lessons]));
   }
+};
+
+const INITIAL_USERS: User[] = [
+  {
+    id: 'u-ninfa',
+    name: 'Ninfa A.',
+    role: 'University Student',
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ninfa',
+    connections: 120,
+    email: 'ninfa@student.mak.ac.ug',
+    college: 'COCIS',
+    status: 'Year 2',
+    subscriptionTier: 'Free',
+    joinedColleges: ['COCIS'],
+    postsCount: 15,
+    followersCount: 200,
+    followingCount: 150,
+    totalLikesCount: 450,
+    badges: ['Early Adopter'],
+    appliedTo: [],
+    verified: true,
+    bio: 'Software enthusiast at Makerere.'
+  }
+];
+
+const CAMPAIGN_POST: Post = {
+  id: 'campaign-marathon-2025',
+  author: 'Makerere Sports Council',
+  authorId: 'sports_node',
+  authorRole: 'Official Organizer',
+  authorAvatar: 'https://static.vecteezy.com/system/resources/thumbnails/041/943/427/small/sport-logo-black-color-2-vector.jpg',
+  authorAuthority: 'Official',
+  timestamp: 'Sponsored',
+  isCampaign: true,
+  campaignData: {
+    price: 'UGX 50,000',
+    cta: 'Register NOW!',
+    eventDate: '17 AUG 2025',
+    location: 'Freedom Square',
+    themeColor: '#10918a'
+  },
+  content: `<h1>Join us for the Makerere Marathon</h1><p>Enhance the student experience and run for a cause. Secure your official kit and entry today.</p>`,
+  hashtags: ['#MAKRUN2025', '#MakerereAt100'],
+  likes: 2450,
+  commentsCount: 120,
+  comments: [],
+  views: 85000,
+  flags: [],
+  isOpportunity: false,
+  college: 'Global',
+  images: ['https://pbs.twimg.com/media/Gwn2s3iW8AAncFH.jpg']
 };

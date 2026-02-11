@@ -30,10 +30,10 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   LAW: ['Bachelor of Laws'],
 };
 
-// DIRECT STREAM LINK:
-// Using export=download is generally the most robust for direct MP3 streaming from Drive
+// DIRECT LINK PROTOCOL:
+// Google Drive is not a CDN. Large files or restricted links may fail background streaming.
 const FILE_ID = '1smJEC8rt9xFQveKsiGtoFSSI4YLz_Mzg';
-const DIRECT_LINK = `https://docs.google.com/uc?id=${FILE_ID}&export=download`;
+const DIRECT_LINK = `https://docs.google.com/uc?export=download&id=${FILE_ID}`;
 
 const MOCK_AUDIO_LESSONS: AudioLesson[] = [
   {
@@ -50,7 +50,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     contributor: 'Brian K.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
     plays: 1420,
-    description: 'A deep dive into client-server models and distributed systems. Use the direct open button if sync fails.'
+    description: 'A deep dive into client-server models. NOTE: If the background stream fails, use the "Manual Sync" button to access the Google Cloud node directly.'
   },
   {
     id: 'aud-2',
@@ -66,7 +66,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     contributor: 'Sarah N.',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     plays: 850,
-    description: 'Understanding the elements of crime and burden of proof.'
+    description: 'Understanding the elements of crime. Use manual sync if the audio engine reports a signal mismatch.'
   },
   {
     id: 'aud-3',
@@ -82,7 +82,7 @@ const MOCK_AUDIO_LESSONS: AudioLesson[] = [
     contributor: 'Opio Eric',
     contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
     plays: 2100,
-    description: 'Discussing the Krebs cycle and electron transport chain mechanics.'
+    description: 'Discussing the Krebs cycle. External playback required for high-density academic files.'
   }
 ];
 

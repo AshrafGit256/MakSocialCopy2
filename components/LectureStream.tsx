@@ -7,7 +7,7 @@ import {
   X, SkipForward, SkipBack, Volume2, Upload,
   Database, Info, AlertCircle, Globe, Filter,
   ArrowRight, ExternalLink, Loader2, RotateCcw,
-  ShieldAlert, HelpCircle
+  ShieldAlert, HelpCircle, HardDrive
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -73,16 +73,17 @@ const LectureStream: React.FC = () => {
       audio.load();
       
       // Update with new protocol source
+      // NOTE: We do not use crossOrigin="anonymous" as it often breaks Google Drive uc?id links
       setTimeout(() => {
         audio.src = lesson.audioUrl;
         audio.load();
         
         audio.play().catch(e => {
-          console.error("Source Load Error:", e);
-          setAudioError("Sync Error: File might be too large or private. Use Manual Link.");
+          console.warn("Direct Source Refused. User intervention required.");
+          setAudioError("Sync Error: Drive blocked direct stream. Use Direct Sync button.");
           setIsLoadingAudio(false);
         });
-      }, 50);
+      }, 100);
     }
   };
 
@@ -92,7 +93,7 @@ const LectureStream: React.FC = () => {
     setIsLoadingAudio(true);
     audioRef.current.load();
     audioRef.current.play().catch(() => {
-      setAudioError("Auto-Sync failed. Suggest manual stream.");
+      setAudioError("Auto-Sync failed. Use Direct Logic Bridge.");
       setIsLoadingAudio(false);
     });
   };
@@ -132,8 +133,9 @@ const LectureStream: React.FC = () => {
       case 'error':
         setIsLoadingAudio(false);
         setIsPlaying(false);
-        console.error("Audio Engine Signal Error:", audio.error?.code);
-        setAudioError("Registry Refused: Source interpretation failed. Use External Node.");
+        console.error("Audio DOM Error:", audio.error);
+        // Common issue: Google serves an HTML warning page instead of audio for large files
+        setAudioError("Registry Refused: Background stream restricted by Google Cloud.");
         break;
       case 'canplay':
         setIsLoadingAudio(false);
@@ -157,8 +159,7 @@ const LectureStream: React.FC = () => {
        }
        
        if (id) {
-          // Standardizing to export=download which is best for direct stream
-          sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=download`;
+          sanitizedUrl = `https://docs.google.com/uc?export=download&id=${id}`;
        }
     }
     
@@ -212,8 +213,7 @@ const LectureStream: React.FC = () => {
         onEnded={() => handleAudioEvent('ended')}
         onError={() => handleAudioEvent('error')}
         onCanPlay={() => handleAudioEvent('canplay')}
-        preload="auto"
-        crossOrigin="anonymous"
+        preload="metadata"
       />
 
       {/* 1. HERO SECTION */}
@@ -236,7 +236,7 @@ const LectureStream: React.FC = () => {
                </h1>
             </div>
             <p className="text-sm md:text-base text-white/70 font-medium leading-relaxed">
-               Registry for shared course recordings. Synchronize audio nodes with your classmates for exam preparation.
+               Shared repository for campus recordings. Note: Google Cloud nodes may require a manual handshake for large files.
             </p>
             <div className="pt-2">
                <button 
@@ -318,7 +318,7 @@ const LectureStream: React.FC = () => {
                  </div>
                  <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-1">
                     <span className="flex items-center gap-1.5"><UserIcon size={12}/> {lesson.lecturer}</span>
-                    <span className="flex items-center gap-1.5"><LinkIcon size={12}/> Drive Protocol</span>
+                    <span className="flex items-center gap-1.5"><LinkIcon size={12}/> Cloud Node</span>
                  </div>
               </div>
 
@@ -368,7 +368,7 @@ const LectureStream: React.FC = () => {
               <div className="flex-1 w-full space-y-2">
                  <div className="flex justify-between text-[8px] uppercase font-black text-white/40 tracking-widest">
                     <span>{currentTime}</span>
-                    <span className={audioError ? 'text-rose-500 animate-pulse' : ''}>{audioError ? 'SYNC_ERROR' : activeLesson.duration}</span>
+                    <span className={audioError ? 'text-rose-500 animate-pulse' : ''}>{audioError ? 'SIGNAL_ERR' : activeLesson.duration}</span>
                  </div>
                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden relative">
                     <div 
@@ -379,10 +379,15 @@ const LectureStream: React.FC = () => {
                  {audioError && (
                    <div className="flex items-center gap-3">
                       <ShieldAlert size={10} className="text-rose-400" />
-                      <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest flex-1">{audioError}</p>
+                      <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest flex-1">Registry Handshake Error (File Restricted)</p>
                       <div className="flex items-center gap-2">
                          <button onClick={retrySource} className="text-[7px] text-emerald-400 hover:text-emerald-300 font-black uppercase tracking-widest flex items-center gap-1 border border-emerald-500/20 px-1.5 py-0.5 rounded"><RotateCcw size={8}/> Re-Sync</button>
-                         <button onClick={() => window.open(activeLesson.audioUrl, '_blank')} className="text-[7px] text-amber-400 hover:text-amber-300 font-black uppercase tracking-widest flex items-center gap-1 border border-amber-500/20 px-1.5 py-0.5 rounded"><HelpCircle size={8}/> Manual Sync</button>
+                         <button 
+                           onClick={() => window.open(activeLesson.audioUrl, '_blank')} 
+                           className="text-[7px] text-white bg-indigo-600 hover:bg-indigo-700 font-black uppercase tracking-widest flex items-center gap-1 px-2.5 py-1 rounded shadow-lg animate-bounce"
+                         >
+                           <HardDrive size={10}/> Manual Logic Sync
+                         </button>
                       </div>
                    </div>
                  )}
@@ -490,7 +495,7 @@ const LectureStream: React.FC = () => {
                  <div className="p-4 bg-amber-50 border border-dashed border-amber-200 rounded-xl flex items-center gap-3">
                     <Info size={16} className="text-amber-500" />
                     <p className="text-[8px] text-amber-700 font-bold uppercase tracking-widest leading-relaxed">
-                      For best results, ensure Drive permissions are set to "Anyone with the link". Private nodes will require manual sync.
+                      For best results, use public direct links. Restricted files require a "Manual Sync" through the player.
                     </p>
                  </div>
 

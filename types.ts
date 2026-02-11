@@ -1,7 +1,7 @@
 
 export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'settings' | 'admin-calendar' | 'lost-found' | 'tickets' | 'lecture-stream';
 
-export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
+export type UserStatus = 'Year 1' | 'Year 2' | 'Year 3' | 'Year 4' | 'Year 5' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 
@@ -33,6 +33,8 @@ export interface AudioLesson {
   title: string;
   lecturer: string;
   courseCode: string;
+  course: string; // Specific course name
+  year: UserStatus; // Year of study
   college: College;
   duration: string;
   date: string;

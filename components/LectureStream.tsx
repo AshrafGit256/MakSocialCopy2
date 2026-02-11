@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { db, COURSES_BY_COLLEGE } from '../db';
 import { AudioLesson, College, User, UserStatus } from '../types';
@@ -7,7 +6,8 @@ import {
   Activity, User as UserIcon, Link as LinkIcon,
   X, SkipForward, SkipBack, Volume2, Upload,
   Database, Info, AlertCircle, Globe, Filter,
-  ArrowRight, ExternalLink, Loader2, RotateCcw
+  ArrowRight, ExternalLink, Loader2, RotateCcw,
+  ShieldAlert
 } from 'lucide-react';
 
 const COLLEGES: College[] = ['COCIS', 'CEDAT', 'CHUSS', 'CONAS', 'CHS', 'CAES', 'COBAMS', 'CEES', 'LAW'];
@@ -67,19 +67,23 @@ const LectureStream: React.FC = () => {
       setProgress(0);
       setCurrentTime('00:00');
       
-      // Force immediate source update and load
+      // Explicitly pause and clear current source before setting new one
       audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+      
+      // Force immediate source update
       audio.src = lesson.audioUrl;
       audio.load();
       
-      // Some browsers need a tiny delay to register the new source before play()
+      // Use a slightly longer delay to ensure the browser has parsed the new source
       setTimeout(() => {
         audio.play().catch(e => {
           console.error("Source Load Error:", e);
-          setAudioError("Source Node Refused: Link may be private or file too large.");
+          setAudioError("Source Node Refused: Browser security or restricted link.");
           setIsLoadingAudio(false);
         });
-      }, 100);
+      }, 200);
     }
   };
 
@@ -89,7 +93,7 @@ const LectureStream: React.FC = () => {
     setIsLoadingAudio(true);
     audioRef.current.load();
     audioRef.current.play().catch(() => {
-      setAudioError("Re-synchronization failed. Try external link.");
+      setAudioError("Registry re-sync failed. Try opening link directly.");
       setIsLoadingAudio(false);
     });
   };
@@ -129,8 +133,8 @@ const LectureStream: React.FC = () => {
       case 'error':
         setIsLoadingAudio(false);
         setIsPlaying(false);
-        console.error("Audio DOM Error:", audio.error);
-        setAudioError("Source Error: Google Drive link might be restricted. Check link permissions.");
+        console.error("Audio DOM Error Code:", audio.error?.code);
+        setAudioError("Protocol Mismatch: Remote source returned non-media payload.");
         break;
       case 'canplay':
         setIsLoadingAudio(false);
@@ -154,7 +158,8 @@ const LectureStream: React.FC = () => {
        }
        
        if (id) {
-          sanitizedUrl = `https://drive.google.com/uc?export=download&id=${id}`;
+          // Standardizing to export=media which is best for audio tags
+          sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=media`;
        }
     }
     
@@ -374,8 +379,9 @@ const LectureStream: React.FC = () => {
                  </div>
                  {audioError && (
                    <div className="flex items-center gap-2">
+                      <ShieldAlert size={10} className="text-rose-400" />
                       <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest">{audioError}</p>
-                      <button onClick={retrySource} className="text-[7px] text-emerald-400 hover:text-emerald-300 font-black uppercase tracking-widest flex items-center gap-1"><RotateCcw size={10}/> Retry_Node</button>
+                      <button onClick={retrySource} className="text-[7px] text-emerald-400 hover:text-emerald-300 font-black uppercase tracking-widest flex items-center gap-1 border border-emerald-500/20 px-1.5 py-0.5 rounded"><RotateCcw size={8}/> Re-Sync</button>
                    </div>
                  )}
               </div>
@@ -392,7 +398,7 @@ const LectureStream: React.FC = () => {
                  <div className="flex items-center gap-2">
                     <div className="h-6 w-px bg-white/10 mx-2"></div>
                     <button 
-                      onClick={() => window.open(activeLesson.audioUrl.replace('uc?export=download', 'file/d').split('&')[0], '_blank')} 
+                      onClick={() => window.open(activeLesson.audioUrl.replace('docs.google.com/uc?id=', 'drive.google.com/file/d/').replace('&export=media', '/view'), '_blank')} 
                       title="Open Source Link" 
                       className="p-2 text-white/40 hover:text-[var(--brand-color)]"
                     >
@@ -479,7 +485,7 @@ const LectureStream: React.FC = () => {
                  <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl flex items-center gap-3">
                     <Info size={16} className="text-slate-400" />
                     <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                      Ensure Drive link access is set to "Anyone with link". Links will be converted to stream nodes automatically.
+                      Use Direct Drive links (export=media) for the best result. Standard links will be automatically converted.
                     </p>
                  </div>
 

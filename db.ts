@@ -1,5 +1,5 @@
 
-import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage, LostFoundItem, Ticket } from './types';
+import { Post, User, College, UserStatus, Resource, CalendarEvent, MakNotification, PlatformEmail, ChatConversation, LiveEvent, Group, GroupMessage, LostFoundItem, Ticket, AudioLesson } from './types';
 import { MOCK_POSTS, MOCK_CHATS } from './constants';
 
 const DB_KEYS = {
@@ -15,7 +15,8 @@ const DB_KEYS = {
   EVENTS: 'maksocial_events_v26_live',
   GROUPS: 'maksocial_groups_v26_clusters',
   LOST_FOUND: 'maksocial_lost_found_registry',
-  TICKETS: 'maksocial_tickets_registry'
+  TICKETS: 'maksocial_tickets_registry',
+  AUDIO_LESSONS: 'maksocial_audio_lessons'
 };
 
 export const COURSES_BY_COLLEGE: Record<College, string[]> = {
@@ -29,6 +30,51 @@ export const COURSES_BY_COLLEGE: Record<College, string[]> = {
   CEES: ['Education', 'Adult Education'],
   LAW: ['Bachelor of Laws'],
 };
+
+const MOCK_AUDIO_LESSONS: AudioLesson[] = [
+  {
+    id: 'aud-1',
+    title: 'Introduction to Web Architecture',
+    lecturer: 'Dr. John Male',
+    courseCode: 'CSC 2100',
+    college: 'COCIS',
+    duration: '45:20',
+    date: '12 Feb 2026',
+    audioUrl: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/lecture1.mp3',
+    contributor: 'Brian K.',
+    contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brian',
+    plays: 1420,
+    description: 'A deep dive into client-server models and distributed systems.'
+  },
+  {
+    id: 'aud-2',
+    title: 'Principles of Criminal Law',
+    lecturer: 'Counsel Peter',
+    courseCode: 'LAW 1205',
+    college: 'LAW',
+    duration: '52:10',
+    date: '10 Feb 2026',
+    audioUrl: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/lecture2.mp3',
+    contributor: 'Sarah N.',
+    contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+    plays: 850,
+    description: 'Understanding the elements of crime and burden of proof.'
+  },
+  {
+    id: 'aud-3',
+    title: 'Biochemistry: Metabolic Pathways',
+    lecturer: 'Prof. Nalule',
+    courseCode: 'CHS 3102',
+    college: 'CHS',
+    duration: '38:45',
+    date: '08 Feb 2026',
+    audioUrl: 'https://raw.githubusercontent.com/AshrafGit256/MakSocialImages/main/Public/lecture3.mp3',
+    contributor: 'Opio Eric',
+    contributorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Opio',
+    plays: 2100,
+    description: 'Discussing the Krebs cycle and electron transport chain mechanics.'
+  }
+];
 
 const INITIAL_USERS: User[] = [
   {
@@ -229,4 +275,12 @@ export const db = {
     };
     db.saveNotifications([newNotif, ...notifs]);
   },
+  getAudioLessons: (): AudioLesson[] => {
+    const saved = localStorage.getItem(DB_KEYS.AUDIO_LESSONS);
+    return saved ? JSON.parse(saved) : MOCK_AUDIO_LESSONS;
+  },
+  addAudioLesson: (lesson: AudioLesson) => {
+    const lessons = db.getAudioLessons();
+    localStorage.setItem(DB_KEYS.AUDIO_LESSONS, JSON.stringify([lesson, ...lessons]));
+  }
 };

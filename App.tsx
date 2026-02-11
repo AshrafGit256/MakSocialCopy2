@@ -24,6 +24,7 @@ import LostAndFound from './components/LostAndFound';
 import Tickets from './components/Tickets';
 import RegistryAssistant from './components/RegistryAssistant';
 import Splash from './components/Splash';
+import LectureStream from './components/LectureStream';
 import { db } from './db';
 import { Menu, MessageCircle, Bell, Globe, ChevronDown, LayoutGrid, Ticket as TicketIcon } from 'lucide-react';
 
@@ -180,6 +181,7 @@ const App: React.FC = () => {
       case 'settings': return <Settings />;
       case 'lost-found': return <LostAndFound onOpenChat={(id) => { setActiveThreadId(id); setView('chats'); }} />;
       case 'tickets': return <Tickets />;
+      case 'lecture-stream': return <LectureStream />;
       default: return <Feed collegeFilter={activeSector} onOpenThread={() => {}} onNavigateToProfile={() => {}} triggerSafetyError={() => {}} />;
     }
   };

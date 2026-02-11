@@ -1,14 +1,12 @@
 
-export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'settings' | 'admin-calendar' | 'lost-found' | 'tickets';
+export type AppView = 'landing' | 'login' | 'register' | 'home' | 'chats' | 'profile' | 'admin' | 'search' | 'calendar' | 'resources' | 'thread' | 'opportunities' | 'notifications' | 'gallery' | 'settings' | 'admin-calendar' | 'lost-found' | 'tickets' | 'lecture-stream';
 
 export type UserStatus = 'Year 1' | 'Year 2' | 'Finalist' | 'Masters' | 'Graduate';
 export type College = 'COCIS' | 'CEDAT' | 'CHUSS' | 'CONAS' | 'CHS' | 'CAES' | 'COBAMS' | 'CEES' | 'LAW';
 export type SubscriptionTier = 'Free' | 'Pro' | 'Enterprise';
 
-/* Fix: Added missing AuthorityRole type definition */
 export type AuthorityRole = 'Official' | 'Administrator' | 'Corporate' | 'Student Leader' | 'Lecturer' | 'Media Wing' | 'Faculty Node' | 'Legal Node' | 'CS Peer' | 'Innovation Node';
 
-/* Fix: Added missing User interface */
 export interface User {
   id: string;
   name: string;
@@ -30,7 +28,21 @@ export interface User {
   bio?: string;
 }
 
-/* Fix: Added missing AppSettings interface */
+export interface AudioLesson {
+  id: string;
+  title: string;
+  lecturer: string;
+  courseCode: string;
+  college: College;
+  duration: string;
+  date: string;
+  audioUrl: string;
+  contributor: string;
+  contributorAvatar: string;
+  plays: number;
+  description: string;
+}
+
 export interface AppSettings {
   primaryColor: string;
   fontFamily: string;
@@ -40,7 +52,6 @@ export interface AppSettings {
   backgroundPattern: string;
 }
 
-/* Fix: Added missing AnalyticsData interface */
 export interface AnalyticsData {
   day: string;
   posts: number;
@@ -50,7 +61,6 @@ export interface AnalyticsData {
   engagement: number;
 }
 
-/* Fix: Added missing ChatMessage interface */
 export interface ChatMessage {
   id: string;
   text: string;
@@ -58,7 +68,6 @@ export interface ChatMessage {
   isMe: boolean;
 }
 
-/* Fix: Added missing ChatConversation interface */
 export interface ChatConversation {
   id: string;
   user: {
@@ -84,10 +93,9 @@ export interface Ticket {
   ownerName: string;
   purchaseDate: string;
   status: 'Valid' | 'Used' | 'Expired';
-  securityHash: string; // For the "Visual Handshake"
+  securityHash: string; 
 }
 
-/* Fix: Added missing Resource interface and type */
 export type ResourceType = 'Test' | 'Past Paper' | 'Notes/Books' | 'Research' | 'Career';
 
 export interface Resource {
@@ -105,7 +113,6 @@ export interface Resource {
   timestamp: string;
 }
 
-/* Fix: Added missing CalendarEvent interface */
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -120,7 +127,6 @@ export interface CalendarEvent {
   attendeeIds: string[];
 }
 
-/* Fix: Added missing MakNotification interface */
 export interface MakNotification {
   id: string;
   type: 'skill_match' | 'engagement' | 'follow' | 'event' | 'system';
@@ -133,7 +139,6 @@ export interface MakNotification {
   };
 }
 
-/* Fix: Added missing EmailAttachment interface */
 export interface EmailAttachment {
   id: string;
   name: string;
@@ -142,7 +147,6 @@ export interface EmailAttachment {
   img?: string;
 }
 
-/* Fix: Added missing PlatformEmail interface */
 export interface PlatformEmail {
   id: string;
   from: string;
@@ -160,7 +164,6 @@ export interface PlatformEmail {
   attachments?: EmailAttachment[];
 }
 
-/* Fix: Added missing LiveEvent interface */
 export interface LiveEvent {
   id: string;
   title: string;
@@ -168,7 +171,6 @@ export interface LiveEvent {
   youtubeUrl: string;
 }
 
-/* Fix: Added missing GroupMessage interface */
 export interface GroupMessage {
   id: string;
   author: string;
@@ -183,7 +185,6 @@ export interface GroupMessage {
   };
 }
 
-/* Fix: Added missing Group interface */
 export interface Group {
   id: string;
   name: string;
@@ -196,7 +197,6 @@ export interface Group {
   category: string;
 }
 
-/* Fix: Added missing LostFoundItem interface */
 export interface LostFoundItem {
   id: string;
   type: 'Lost' | 'Found';
@@ -212,7 +212,6 @@ export interface LostFoundItem {
   college: College | 'Global';
 }
 
-/* Fix: Added missing MarketService interface */
 export interface MarketService {
   id: string;
   providerId: string;
@@ -228,7 +227,6 @@ export interface MarketService {
   isPromoted: boolean;
 }
 
-/* Fix: Added missing GalleryItem interface */
 export interface GalleryItem {
   id: string;
   url: string;
@@ -238,7 +236,6 @@ export interface GalleryItem {
   author: string;
 }
 
-/* Fix: Added missing AdminCalendarEvent interface */
 export interface AdminCalendarEvent {
   id: string;
   title: string;
@@ -249,7 +246,6 @@ export interface AdminCalendarEvent {
   borderColor: string;
 }
 
-/* Fix: Added missing Comment interface */
 export interface Comment {
   id: string;
   author: string;
@@ -259,7 +255,6 @@ export interface Comment {
   likes: number;
 }
 
-/* Fix: Added missing PollOption interface */
 export interface PollOption {
   id: string;
   text: string;
@@ -267,7 +262,6 @@ export interface PollOption {
   voterIds: string[];
 }
 
-/* Fix: Added missing PollData interface */
 export interface PollData {
   totalVotes: number;
   expiresAt: string;
@@ -292,7 +286,7 @@ export interface Post {
   flags: string[]; 
   isOpportunity: boolean;
   isAd?: boolean;
-  isCampaign?: boolean; // New: To identify high-impact ads
+  isCampaign?: boolean; 
   campaignData?: {
     price: string;
     cta: string;

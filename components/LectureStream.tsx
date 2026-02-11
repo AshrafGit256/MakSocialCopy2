@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { db, COURSES_BY_COLLEGE } from '../db';
 import { AudioLesson, College, User, UserStatus } from '../types';
@@ -25,6 +24,7 @@ const LectureStream: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState('00:00');
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -36,7 +36,7 @@ const LectureStream: React.FC = () => {
     lecturer: '',
     courseCode: '',
     college: currentUser.college as College,
-    course: COURSES_BY_COLLEGE[currentUser.college as College][0],
+    course: COURSES_BY_COLLEGE[currentUser.college as College]?.[0] || 'General',
     year: currentUser.status as UserStatus,
     audioUrl: '',
     description: ''
@@ -47,13 +47,19 @@ const LectureStream: React.FC = () => {
     
     // Initialize audio object
     audioRef.current = new Audio();
-    
     const audio = audioRef.current;
-
-    const onPlay = () => setIsPlaying(true);
+    
+    // Set crossOrigin to anonymous to handle some CORS scenarios
+    audio.crossOrigin = 'anonymous';
+    
+    const onPlay = () => {
+      setIsPlaying(true);
+      setAudioError(null);
+    };
     const onPause = () => setIsPlaying(false);
     const onWaiting = () => setIsLoadingAudio(true);
     const onPlaying = () => setIsLoadingAudio(false);
+    
     const onTimeUpdate = () => {
       const p = (audio.currentTime / audio.duration) * 100;
       setProgress(p || 0);
@@ -62,10 +68,18 @@ const LectureStream: React.FC = () => {
       const secs = Math.floor(audio.currentTime % 60);
       setCurrentTime(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
     };
+
     const onEnded = () => {
       setIsPlaying(false);
       setProgress(0);
       setCurrentTime('00:00');
+    };
+
+    const onError = (e: any) => {
+      setIsLoadingAudio(false);
+      setIsPlaying(false);
+      console.error("Audio Engine Error:", e);
+      setAudioError("Unable to stream this source. It might be blocked or private.");
     };
 
     audio.addEventListener('play', onPlay);
@@ -74,6 +88,7 @@ const LectureStream: React.FC = () => {
     audio.addEventListener('playing', onPlaying);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
 
     return () => {
       audio.pause();
@@ -83,6 +98,7 @@ const LectureStream: React.FC = () => {
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
     };
   }, []);
 
@@ -90,14 +106,23 @@ const LectureStream: React.FC = () => {
     if (!audioRef.current) return;
 
     if (activeLesson?.id === lesson.id) {
-      if (isPlaying) audioRef.current.pause();
-      else audioRef.current.play();
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(err => {
+          setAudioError("Playback blocked by browser or source.");
+        });
+      }
     } else {
+      setAudioError(null);
       setActiveLesson(lesson);
       audioRef.current.src = lesson.audioUrl;
+      audioRef.current.load(); // Explicitly call load
+      setIsLoadingAudio(true);
       audioRef.current.play().catch(e => {
         console.error("Audio Load Error:", e);
-        alert("Signal Integrity Error: Browser blocked the audio stream or the link is invalid.");
+        setAudioError("Source node could not be synchronized.");
+        setIsLoadingAudio(false);
       });
       setProgress(0);
     }
@@ -107,6 +132,13 @@ const LectureStream: React.FC = () => {
     if (!recordForm.title || !recordForm.audioUrl) {
       alert("Missing Protocol Fields: Title and Source Link are mandatory.");
       return;
+    }
+    
+    // Sanitize Drive link if user provided a standard /view link
+    let sanitizedUrl = recordForm.audioUrl;
+    if (sanitizedUrl.includes('drive.google.com') && sanitizedUrl.includes('/file/d/')) {
+       const id = sanitizedUrl.split('/d/')[1].split('/')[0];
+       sanitizedUrl = `https://docs.google.com/uc?id=${id}&export=download`;
     }
     
     const newLesson: AudioLesson = {
@@ -119,7 +151,7 @@ const LectureStream: React.FC = () => {
       college: recordForm.college,
       duration: 'TBD',
       date: 'Just now',
-      audioUrl: recordForm.audioUrl,
+      audioUrl: sanitizedUrl,
       contributor: currentUser.name,
       contributorAvatar: currentUser.avatar,
       plays: 0,
@@ -186,7 +218,7 @@ const LectureStream: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8 border-b border-[var(--border-color)] pb-8">
          <div className="flex flex-col gap-1 w-full md:w-auto">
             <div className="flex items-center gap-3">
-               <h2 className="text-xl font-black uppercase tracking-tighter">Study Signal</h2>
+               <h2 className="text-xl font-black uppercase tracking-tighter text-slate-800">Study Signal</h2>
                <div className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded text-emerald-600 text-[8px] font-black uppercase tracking-widest animate-pulse">
                   {filteredLessons.length} NODES
                </div>
@@ -301,14 +333,15 @@ const LectureStream: React.FC = () => {
               <div className="flex-1 w-full space-y-2">
                  <div className="flex justify-between text-[8px] uppercase font-black text-white/40 tracking-widest">
                     <span>{currentTime}</span>
-                    <span>{activeLesson.duration}</span>
+                    <span className={audioError ? 'text-rose-500 animate-pulse' : ''}>{audioError ? 'SIGNAL_ERROR' : activeLesson.duration}</span>
                  </div>
                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden relative">
                     <div 
-                      className="absolute inset-y-0 left-0 bg-[var(--brand-color)] transition-all duration-300"
+                      className={`absolute inset-y-0 left-0 transition-all duration-300 ${audioError ? 'bg-rose-500' : 'bg-[var(--brand-color)]'}`}
                       style={{ width: `${progress}%` }}
                     ></div>
                  </div>
+                 {audioError && <p className="text-[7px] text-rose-400 uppercase font-black tracking-widest">{audioError}</p>}
               </div>
 
               <div className="flex items-center gap-4 shrink-0">
@@ -322,7 +355,7 @@ const LectureStream: React.FC = () => {
                  <button className="text-white/40 hover:text-white" onClick={() => audioRef.current && (audioRef.current.currentTime += 10)}><SkipForward size={18}/></button>
                  <div className="flex items-center gap-2">
                     <div className="h-6 w-px bg-white/10 mx-2"></div>
-                    <button onClick={() => window.open(activeLesson.audioUrl, '_blank')} className="p-2 text-white/40 hover:text-[var(--brand-color)]"><ExternalLink size={18}/></button>
+                    <button onClick={() => window.open(activeLesson.audioUrl, '_blank')} title="Open Source" className="p-2 text-white/40 hover:text-[var(--brand-color)]"><ExternalLink size={18}/></button>
                     <button onClick={() => { audioRef.current?.pause(); setActiveLesson(null); }} className="p-2 text-white/40 hover:text-rose-500"><X size={18}/></button>
                  </div>
               </div>
@@ -339,9 +372,9 @@ const LectureStream: React.FC = () => {
                     <div className="p-2 bg-[var(--brand-color)]/10 text-[var(--brand-color)] rounded-lg">
                        <LinkIcon size={20}/>
                     </div>
-                    <h2 className="text-xl font-black uppercase tracking-tighter">Synchronize_Link</h2>
+                    <h2 className="text-xl font-black uppercase tracking-tighter text-slate-800">Synchronize_Link</h2>
                  </div>
-                 <button onClick={() => setIsUploading(false)} className="p-2 text-slate-400 hover:text-rose-500"><X size={24}/></button>
+                 <button onClick={() => setIsUploading(false)} className="p-2 text-slate-400 hover:text-rose-500 transition-all"><X size={24}/></button>
               </div>
 
               <div className="space-y-5">
@@ -376,7 +409,7 @@ const LectureStream: React.FC = () => {
                          value={recordForm.course}
                          onChange={e => setRecordForm({...recordForm, course: e.target.value})}
                        >
-                          {COURSES_BY_COLLEGE[recordForm.college].map(c => <option key={c} value={c}>{c}</option>)}
+                          {(COURSES_BY_COLLEGE[recordForm.college] || []).map(c => <option key={c} value={c}>{c}</option>)}
                        </select>
                     </div>
                     <div className="space-y-1">
@@ -404,7 +437,7 @@ const LectureStream: React.FC = () => {
                  <div className="p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl flex items-center gap-3">
                     <Info size={16} className="text-slate-400" />
                     <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                      Ensure link access is set to "Anyone with link" for peer synchronization.
+                      Ensure Drive link access is set to "Anyone with link". Links will be converted to stream nodes automatically.
                     </p>
                  </div>
 
